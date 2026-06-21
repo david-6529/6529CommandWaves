@@ -74,6 +74,15 @@ export type GuardianAttestation = {
   attestationHash: string;
 };
 
+export type GuardianPullRequestEvidence = {
+  pullRequestBody: string;
+  changedPaths: string[];
+  generatedAt?: string;
+};
+
+export const COMMAND_PR_MANIFEST_START = "<!-- command-waves:manifest:start -->";
+export const COMMAND_PR_MANIFEST_END = "<!-- command-waves:manifest:end -->";
+
 const proposalStatusesAllowedToLand: CommandProposal["status"][] = ["approved", "reviewing", "complete"];
 
 const diffSignalRules: Array<{
@@ -128,6 +137,38 @@ function waveIdFromUrl(value: string) {
 
 function sortedPaths(paths: string[]) {
   return [...paths].sort((a, b) => a.localeCompare(b));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function isCommandPrManifest(value: unknown): value is CommandPrManifest {
+  const manifest = isRecord(value) ? value : null;
+  const approval = isRecord(manifest?.approval) ? manifest.approval : null;
+
+  return Boolean(
+    manifest &&
+      manifest.version === "command-wave-pr-v0.1" &&
+      typeof manifest.waveId === "string" &&
+      typeof manifest.waveUrl === "string" &&
+      typeof manifest.proposalId === "string" &&
+      (typeof manifest.pollDropId === "string" || manifest.pollDropId === null) &&
+      typeof manifest.commandKind === "string" &&
+      typeof manifest.risk === "string" &&
+      typeof manifest.rulesVersion === "string" &&
+      typeof manifest.rulesHash === "string" &&
+      typeof manifest.promptHash === "string" &&
+      typeof manifest.specHash === "string" &&
+      Array.isArray(manifest.allowedPermissions) &&
+      typeof manifest.runManifestHash === "string" &&
+      approval &&
+      (approval.status === "not_required" || approval.status === "passed") &&
+      typeof approval.yesVotes === "number" &&
+      typeof approval.noVotes === "number" &&
+      typeof approval.quorumRequired === "number" &&
+      typeof approval.yesPercentRequired === "number",
+  );
 }
 
 function riskAllowsSignal(risk: RiskLevel, signal: PrDiffSignal) {
@@ -201,6 +242,41 @@ export function createCommandPrManifest({
   };
 }
 
+export function formatCommandPrManifestForPullRequest(manifest: CommandPrManifest) {
+  return [
+    COMMAND_PR_MANIFEST_START,
+    "```json",
+    JSON.stringify(manifest, null, 2),
+    "```",
+    COMMAND_PR_MANIFEST_END,
+  ].join("\n");
+}
+
+export function extractCommandPrManifestFromPullRequestBody(body: string) {
+  const start = body.indexOf(COMMAND_PR_MANIFEST_START);
+  const end = body.indexOf(COMMAND_PR_MANIFEST_END);
+
+  if (start === -1 || end === -1 || end <= start) {
+    return null;
+  }
+
+  const block = body.slice(start + COMMAND_PR_MANIFEST_START.length, end);
+  const fencedJson = block.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const rawJson = (fencedJson?.[1] ?? block).trim();
+
+  if (!rawJson) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(rawJson);
+
+    return isCommandPrManifest(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 export function validateCommandPrManifest({
   wave,
   proposal,
@@ -231,6 +307,20 @@ export function validateCommandPrManifest({
   const gate = evaluateGate(proposal, wave.rules);
   const pollResult = poll ? evaluatePoll(poll) : null;
 
+  checks.push(
+    check(
+      "wave_identity",
+      manifest.waveId === expected.waveId && manifest.waveUrl === expected.waveUrl ? "pass" : "fail",
+      "Manifest wave id and URL match the governed wave.",
+    ),
+  );
+  checks.push(
+    check(
+      "proposal_identity",
+      manifest.proposalId === proposal.id ? "pass" : "fail",
+      "Manifest proposal id matches the approved command.",
+    ),
+  );
   checks.push(
     check(
       "proposal_status",
@@ -266,6 +356,13 @@ export function validateCommandPrManifest({
       "permissions",
       JSON.stringify(manifest.allowedPermissions) === JSON.stringify(expected.allowedPermissions) ? "pass" : "fail",
       "Manifest permissions match the command type.",
+    ),
+  );
+  checks.push(
+    check(
+      "run_manifest_hash",
+      manifest.runManifestHash === expected.runManifestHash ? "pass" : "fail",
+      "PR manifest points to the expected run manifest hash.",
     ),
   );
   checks.push(
@@ -369,4 +466,25 @@ export function verifyGuardianAttestation({
   });
 
   return expected.attestationHash === attestation.attestationHash && expected.resultHash === attestation.resultHash;
+}
+
+export function createGuardianPullRequestAttestation({
+  wave,
+  evidence,
+}: {
+  wave: CommandWave;
+  evidence: GuardianPullRequestEvidence;
+}) {
+  const manifest = extractCommandPrManifestFromPullRequestBody(evidence.pullRequestBody);
+  const proposal = manifest ? wave.proposals.find((item) => item.id === manifest.proposalId) ?? null : null;
+  const poll = manifest ? wave.polls.find((item) => item.proposalId === manifest.proposalId) ?? null : null;
+
+  return createGuardianAttestation({
+    wave,
+    proposal,
+    poll,
+    manifest,
+    changedPaths: evidence.changedPaths,
+    generatedAt: evidence.generatedAt,
+  });
 }

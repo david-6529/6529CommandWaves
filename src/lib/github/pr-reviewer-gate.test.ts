@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { demoWave, type CommandWave } from "../command-waves";
 import {
   createCommandPrManifest,
+  createGuardianPullRequestAttestation,
   createGuardianAttestation,
+  extractCommandPrManifestFromPullRequestBody,
+  formatCommandPrManifestForPullRequest,
   validateCommandPrManifest,
   verifyGuardianAttestation,
 } from "./pr-reviewer-gate";
@@ -94,6 +97,58 @@ describe("PR reviewer gate", () => {
 
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "prompt_spec_hashes")?.status).toBe("fail");
+  });
+
+  it("round-trips a command manifest through a PR body", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const body = [
+      "This PR was opened by Command Waves.",
+      "",
+      formatCommandPrManifestForPullRequest(manifest),
+    ].join("\n");
+
+    expect(extractCommandPrManifestFromPullRequestBody(body)).toEqual(manifest);
+    expect(extractCommandPrManifestFromPullRequestBody("no manifest")).toBeNull();
+  });
+
+  it("creates a guardian attestation from PR evidence", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const attestation = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        pullRequestBody: formatCommandPrManifestForPullRequest(manifest),
+        changedPaths: ["src/app/page.tsx", "README.md"],
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+
+    expect(attestation.result.status).toBe("pass");
+    expect(attestation.inputs.proposalId).toBe(proposal.id);
+    expect(attestation.inputs.manifestHash).toHaveLength(64);
+  });
+
+  it("fails PR evidence when the manifest is missing", () => {
+    const wave = approvedDemoWave();
+    const attestation = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        pullRequestBody: "No Command Waves manifest here.",
+        changedPaths: ["src/app/page.tsx"],
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+
+    expect(attestation.result.status).toBe("fail");
+    expect(attestation.result.checks[0]).toMatchObject({
+      id: "proposal_exists",
+      status: "fail",
+    });
   });
 
   it("creates a deterministic guardian attestation that can be rerun", () => {

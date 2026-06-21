@@ -30,6 +30,31 @@ pull_request event -> changed paths -> PR manifest -> 6529 vote proof -> same ve
 The important constraint is that the adapter must call the same deterministic verifier. It should gather evidence, not make
 subjective decisions.
 
+The PR manifest is embedded in the PR body between stable markers:
+
+````text
+<!-- command-waves:manifest:start -->
+```json
+{ ... }
+```
+<!-- command-waves:manifest:end -->
+````
+
+The parser and PR evidence adapter live in `src/lib/github/pr-reviewer-gate.ts`:
+
+- `formatCommandPrManifestForPullRequest`
+- `extractCommandPrManifestFromPullRequestBody`
+- `createGuardianPullRequestAttestation`
+
+This means the CI/GitHub App layer only has to gather:
+
+- PR body
+- changed file paths
+- current wave state
+- 6529 vote/proposal evidence
+
+Then it calls the deterministic verifier.
+
 The check fails if:
 
 - the PR has no Command Waves manifest
