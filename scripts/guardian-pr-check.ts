@@ -2,8 +2,10 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { demoWave, type CommandWave } from "../src/lib/command-waves";
 import {
+  assertGuardianWaveStateConfigured,
   changedPathsFromEnv,
   changedPathsFromGitHubFilesPayload,
+  demoWaveStateAllowed,
   pullRequestEvidenceFromGitHubEvent,
   type GitHubPullRequestEvent,
 } from "../src/lib/github/actions-pr-evidence";
@@ -65,6 +67,10 @@ async function loadWaveState() {
     return payload.wave ?? payload as CommandWave;
   }
 
+  if (!demoWaveStateAllowed(process.env)) {
+    assertGuardianWaveStateConfigured(process.env);
+  }
+
   return demoWave;
 }
 
@@ -103,6 +109,8 @@ async function main() {
     console.log("No pull request event found. Skipping guardian PR evidence check.");
     return;
   }
+
+  assertGuardianWaveStateConfigured(process.env);
 
   const wave = await loadWaveState();
   const attestation = createGuardianPullRequestAttestation({

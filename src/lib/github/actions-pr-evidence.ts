@@ -11,6 +11,8 @@ export type PullRequestEvidence = {
   changedPaths: string[];
 };
 
+export type GuardianPrCheckEnv = Record<string, string | undefined>;
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
@@ -65,4 +67,22 @@ export function changedPathsFromEnv(value: string | undefined) {
 
     return paths.length ? paths : null;
   }
+}
+
+export function demoWaveStateAllowed(env: GuardianPrCheckEnv) {
+  return env.COMMAND_WAVE_ALLOW_DEMO_STATE === "true";
+}
+
+export function hasConfiguredWaveState(env: GuardianPrCheckEnv) {
+  return Boolean(env.COMMAND_WAVE_STATE_PATH?.trim() || env.COMMAND_WAVE_STATE_URL?.trim());
+}
+
+export function assertGuardianWaveStateConfigured(env: GuardianPrCheckEnv) {
+  if (hasConfiguredWaveState(env) || demoWaveStateAllowed(env)) {
+    return;
+  }
+
+  throw new Error(
+    "Guardian PR checks require COMMAND_WAVE_STATE_PATH or COMMAND_WAVE_STATE_URL. Set COMMAND_WAVE_ALLOW_DEMO_STATE=true only for local demos.",
+  );
 }

@@ -40,6 +40,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GUARDIAN_ATTESTATION_PATH: guardian-attestation.json
+          COMMAND_WAVE_STATE_PATH: ${{ vars.COMMAND_WAVE_STATE_PATH }}
+          COMMAND_WAVE_STATE_URL: ${{ vars.COMMAND_WAVE_STATE_URL }}
 
       - name: Typecheck
         run: npm run typecheck

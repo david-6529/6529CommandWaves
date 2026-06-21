@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  assertGuardianWaveStateConfigured,
   changedPathsFromEnv,
   changedPathsFromGitHubFilesPayload,
+  demoWaveStateAllowed,
+  hasConfiguredWaveState,
   pullRequestEvidenceFromGitHubEvent,
 } from "./actions-pr-evidence";
 
@@ -39,5 +42,14 @@ describe("GitHub Actions PR evidence", () => {
     expect(changedPathsFromEnv("[\"a.ts\",\"b.ts\"]")).toEqual(["a.ts", "b.ts"]);
     expect(changedPathsFromEnv("a.ts,b.ts\nc.ts")).toEqual(["a.ts", "b.ts", "c.ts"]);
     expect(changedPathsFromEnv("[]")).toBeNull();
+  });
+
+  it("requires real wave state unless demo mode is explicit", () => {
+    expect(hasConfiguredWaveState({ COMMAND_WAVE_STATE_PATH: "/tmp/wave.json" })).toBe(true);
+    expect(hasConfiguredWaveState({ COMMAND_WAVE_STATE_URL: "https://example.com/wave.json" })).toBe(true);
+    expect(demoWaveStateAllowed({ COMMAND_WAVE_ALLOW_DEMO_STATE: "true" })).toBe(true);
+
+    expect(() => assertGuardianWaveStateConfigured({})).toThrow("Guardian PR checks require COMMAND_WAVE_STATE_PATH");
+    expect(() => assertGuardianWaveStateConfigured({ COMMAND_WAVE_ALLOW_DEMO_STATE: "true" })).not.toThrow();
   });
 });
