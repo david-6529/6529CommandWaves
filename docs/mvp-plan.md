@@ -66,7 +66,7 @@ Polls require a voter identity for every yes/no vote. Duplicate votes from the s
 3. The rule engine classifies it as `open_pr`, medium risk, vote required.
 4. The wave votes yes.
 5. The AI worker opens a PR.
-6. The reviewer checks the PR against the approved spec.
+6. The GitHub reviewer gate checks the PR manifest, vote, rules hash, approved prompt/spec hashes, and risky file changes.
 7. The result is posted back to the wave.
 
 ## Non-Goals For First Demo
@@ -103,3 +103,4 @@ Initial adapters:
 5. Ledger persistence with rule/version hashes.
 
 The production table plan is in [data-model.md](data-model.md).
+The GitHub merge gate plan is in [github-reviewer-gate.md](github-reviewer-gate.md).

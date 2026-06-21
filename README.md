@@ -74,6 +74,9 @@ The current app is a local prototype of the simple flow:
 - backend setup validation for 6529 wave links and GitHub repo links
 - controlled run placeholder
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
+- PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, and risky file paths
+- deterministic guardian attestations with input hashes and rerunnable pass/fail results
+- public setup proof endpoint for third-party verification of wave/repo/rules/check expectations
 - review placeholder
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
@@ -100,6 +103,7 @@ With the example env, command-wave demo state is stored in `.data/command-wave.j
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
 - `GET /api/readiness`: show local/production readiness checks.
+- `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave`: return the current local command wave.
 - `PUT /api/command-wave`: replace the local command wave.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.

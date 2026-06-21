@@ -1,0 +1,129 @@
+# GitHub Reviewer Gate
+
+The reviewer should become a merge gate, not just a comment.
+
+For code work, the safe path is:
+
+```text
+Wave command -> rules check -> vote if needed -> AI worker PR -> reviewer gate -> merge -> deploy
+```
+
+## MVP Gate
+
+The first version can run as a required GitHub Action. It should call the same validation code that the app uses.
+
+The check fails if:
+
+- the PR has no Command Waves manifest
+- the manifest points to a missing proposal
+- the proposal is not approved, reviewing, or complete
+- the command is not an `open_pr` command
+- a required poll has not passed
+- the manifest rules hash does not match the approved command
+- the manifest prompt/spec hashes do not match the approved command
+- the PR touches high-risk files without a high-risk or critical approval
+
+The guardian should be deterministic. An LLM can help explain the result or suggest extra risks, but the merge-blocking
+decision should come from checks that anyone can rerun.
+
+Fairness rule:
+
+```text
+Same proposal + same vote + same rules + same PR manifest + same diff = same guardian result
+```
+
+That is the core proof. The guardian output is an attestation with:
+
+- verifier version
+- input hashes
+- rules hash
+- manifest hash
+- changed-paths hash
+- every check result
+- final pass/fail
+- attestation hash
+
+The current attestation code is in `src/lib/github/pr-reviewer-gate.ts`.
+
+## Manifest
+
+Every AI worker PR should include a manifest. It can start in the PR body and later move to a committed artifact.
+
+Required fields:
+
+- `waveId`
+- `waveUrl`
+- `proposalId`
+- `pollDropId`
+- `commandKind`
+- `risk`
+- `rulesVersion`
+- `rulesHash`
+- `promptHash`
+- `specHash`
+- `allowedPermissions`
+- `runManifestHash`
+- `approval`
+
+The current TypeScript foundation is in `src/lib/github/pr-reviewer-gate.ts`.
+
+## Production Gate
+
+The stronger version should be a GitHub App.
+
+Why:
+
+- GitHub can require the check before `main` changes.
+- The required check can be tied to the app/source that produced it.
+- The reviewer logic can live outside the target repo, so a PR cannot weaken the gate by editing workflow code.
+- The app can post check-run details with exact failures and links back to the wave command.
+
+The app needs scoped permissions:
+
+- metadata read
+- contents read
+- pull requests read
+- checks write
+- administration write only during setup if it creates rulesets
+
+## Deployment
+
+Vercel should stay downstream from GitHub:
+
+1. Vercel previews every PR.
+2. GitHub blocks merge until the reviewer gate passes.
+3. Vercel deploys production from `main`.
+
+This keeps the production safety boundary in GitHub. Vercel does not need to understand wave governance; it only deploys code that GitHub allowed onto `main`.
+
+## Third-Party Verification
+
+The setup must be externally verifiable. A user should not have to trust the Command Waves UI.
+
+The app exposes a public setup proof at:
+
+```text
+GET /api/command-wave/setup/proof
+```
+
+The proof includes:
+
+- wave id and wave URL
+- GitHub repo
+- protected branch
+- required reviewer check name
+- Vercel production branch expectation
+- rules version and rules hash
+- PR manifest schema hash
+- reviewer gate version and hash
+- GitHub API URLs a third party can query to inspect rulesets and branch rules
+- stable `setupHash`
+- timestamped `attestationHash`
+
+The first implementation is a deterministic hash-based attestation. Later we can add:
+
+- Ed25519 signatures from a Command Waves setup key
+- GitHub App identity binding
+- 6529 drop anchoring
+- onchain anchoring of setup hashes
+- independent watcher agents that periodically verify the proof against GitHub, Vercel, and 6529 state
