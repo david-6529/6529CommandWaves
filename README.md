@@ -98,6 +98,19 @@ Open the local URL printed by Next. In this workspace it is currently `http://lo
 
 With the example env, command-wave demo state is stored in `.data/command-wave.json`.
 
+## Guardian Check
+
+The repo includes a first GitHub Actions gate named `Command Waves Guardian`.
+
+Run the same deterministic verifier checks locally:
+
+```bash
+npm run guardian:check
+```
+
+This is the simple first step. The next adapter should feed real PR changed paths, PR manifests, and 6529 vote evidence into
+the same verifier so GitHub can block merges that do not match the wave rules.
+
 ## Local API
 
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.

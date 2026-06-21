@@ -10,7 +10,25 @@ Wave command -> rules check -> vote if needed -> AI worker PR -> reviewer gate -
 
 ## MVP Gate
 
-The first version can run as a required GitHub Action. It should call the same validation code that the app uses.
+The first version runs as a required GitHub Action named `Command Waves Guardian`.
+
+Current CI check:
+
+```text
+npm run guardian:check
+```
+
+That command runs the deterministic guardian/proof tests. It proves the verifier code is stable and rerunnable before the
+repo can merge changes that modify the verifier.
+
+Next adapter:
+
+```text
+pull_request event -> changed paths -> PR manifest -> 6529 vote proof -> same verifier -> pass/fail check
+```
+
+The important constraint is that the adapter must call the same deterministic verifier. It should gather evidence, not make
+subjective decisions.
 
 The check fails if:
 
