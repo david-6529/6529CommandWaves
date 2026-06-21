@@ -29,6 +29,10 @@ describe("Command Waves Postgres schema", () => {
     expect(schema).toContain("command_ledger_events_wave_created_idx");
   });
 
+  it("stores guardian proof material with reviews", () => {
+    expect(schema).toContain("proof_json jsonb not null default '{}'::jsonb");
+  });
+
   it("indexes job queue and 6529 drop cache access patterns", () => {
     expect(schema).toContain("command_jobs_status_run_after_idx");
     expect(schema).toContain("cached_wave_drops_wave_serial_idx");

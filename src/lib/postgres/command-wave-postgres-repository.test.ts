@@ -149,6 +149,21 @@ describe("Postgres command wave repository", () => {
             proposal_id: "cmd-001",
             status: "pass",
             checks_json: ["Matched scope"],
+            proof_json: {
+              version: "guardian-attestation-v0.1",
+              verifier: "Command Waves Guardian",
+              verifierVersion: "command-wave-reviewer-gate-v0.1",
+              mode: "deterministic",
+              inputs: {
+                waveId: "demo-command-wave",
+                proposalId: "cmd-001",
+                manifestHash: "a".repeat(64),
+                changedPathsHash: "b".repeat(64),
+                rulesHash: "c".repeat(64),
+              },
+              resultHash: "d".repeat(64),
+              attestationHash: "e".repeat(64),
+            },
             summary: "Passed.",
           },
         ];
@@ -177,7 +192,7 @@ describe("Postgres command wave repository", () => {
       proposals: [{ id: "cmd-001", title: "Demo command" }],
       polls: [{ proposalId: "cmd-001", status: "passed", votes: [{ voterIdentity: "david", vote: "yes" }] }],
       executions: [{ proposalId: "cmd-001", artifacts: ["PR #1"] }],
-      reviews: [{ proposalId: "cmd-001", checks: ["Matched scope"] }],
+      reviews: [{ proposalId: "cmd-001", checks: ["Matched scope"], proof: { attestationHash: "e".repeat(64) } }],
       ledger: [{ id: "evt-001", actor: "Setup" }],
     });
   });

@@ -66,11 +66,28 @@ export type ExecutionRecord = {
   artifacts: string[];
 };
 
+export type GuardianReviewProof = {
+  version: "guardian-attestation-v0.1";
+  verifier: "Command Waves Guardian";
+  verifierVersion: string;
+  mode: "deterministic";
+  inputs: {
+    waveId: string;
+    proposalId: string | null;
+    manifestHash: string | null;
+    changedPathsHash: string;
+    rulesHash: string;
+  };
+  resultHash: string;
+  attestationHash: string;
+};
+
 export type GuardianReview = {
   proposalId: string;
   status: "waiting" | "pass" | "changes_requested" | "rule_violation";
   checks: string[];
   summary: string;
+  proof?: GuardianReviewProof;
 };
 
 export type LedgerEvent = {

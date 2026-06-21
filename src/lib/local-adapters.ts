@@ -8,6 +8,7 @@ import {
   type WaveAdapter,
 } from "./adapters";
 import type { ExecutionRecord, GuardianReview, LedgerEvent } from "./command-waves";
+import { createCommandPrManifest, createGuardianAttestation } from "./github/pr-reviewer-gate";
 import { pullRequestUrl } from "./github/repo";
 import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact } from "./run-manifest";
 import { findDangerousPromptFlags, toolPolicyForProposal } from "./safety/tool-policy";
@@ -81,6 +82,17 @@ export const localGuardianAdapter: GuardianAdapter = {
     const dangerousFlags = findDangerousPromptFlags(`${input.proposal.prompt}\n${input.proposal.spec}`);
     const touchesDangerousSurface = dangerousFlags.length > 0;
     const needsChanges = touchesDangerousSurface || !manifestMatches;
+    const poll = input.wave.polls.find((item) => item.proposalId === input.proposal.id) ?? null;
+    const attestation =
+      input.proposal.kind === "open_pr"
+        ? createGuardianAttestation({
+            wave: input.wave,
+            proposal: input.proposal,
+            poll,
+            manifest: createCommandPrManifest({ wave: input.wave, proposal: input.proposal, poll }),
+            changedPaths: [],
+          })
+        : null;
 
     return {
       proposalId: input.proposal.id,
@@ -95,10 +107,22 @@ export const localGuardianAdapter: GuardianAdapter = {
         touchesDangerousSurface
           ? `Dangerous surface mentioned (${dangerousFlags.join(", ")}); human review required before completion.`
           : "No deploy, spending, private-key, or rule-change language detected.",
+        ...(attestation ? [`Guardian attestation hash: ${attestation.attestationHash}.`] : []),
       ],
       summary: needsChanges
         ? "Reviewer mock requested changes because the run evidence did not fully match the approved command."
         : "Reviewer mock passed the execution against the approved proposal and current rules.",
+      proof: attestation
+        ? {
+            version: attestation.version,
+            verifier: attestation.verifier.name,
+            verifierVersion: attestation.verifier.version,
+            mode: attestation.verifier.mode,
+            inputs: attestation.inputs,
+            resultHash: attestation.resultHash,
+            attestationHash: attestation.attestationHash,
+          }
+        : undefined,
     };
   },
 };

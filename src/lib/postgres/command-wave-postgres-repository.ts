@@ -220,12 +220,13 @@ async function upsertExecution(client: PostgresQueryClient, execution: Execution
 async function upsertReview(client: PostgresQueryClient, review: GuardianReview) {
   await client.query(
     `
-      insert into guardian_reviews (id, proposal_id, execution_id, status, checks_json, summary, reviewer)
-      values ($1, $2, $3, $4, $5::jsonb, $6, $7)
+      insert into guardian_reviews (id, proposal_id, execution_id, status, checks_json, proof_json, summary, reviewer)
+      values ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7, $8)
       on conflict (id) do update set
         execution_id = excluded.execution_id,
         status = excluded.status,
         checks_json = excluded.checks_json,
+        proof_json = excluded.proof_json,
         summary = excluded.summary,
         reviewer = excluded.reviewer
     `,
@@ -235,6 +236,7 @@ async function upsertReview(client: PostgresQueryClient, review: GuardianReview)
       executionId(review.proposalId),
       review.status,
       JSON.stringify(review.checks),
+      JSON.stringify(review.proof ?? {}),
       review.summary,
       "reviewer-agent",
     ],
@@ -254,6 +256,16 @@ async function upsertLedgerEvent(client: PostgresQueryClient, waveId: string, ev
 
 function rowJsonArray(value: unknown) {
   return Array.isArray(value) ? value : [];
+}
+
+function rowJsonObject(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function rowReviewProof(value: unknown): GuardianReview["proof"] {
+  const proof = rowJsonObject(value);
+
+  return typeof proof.attestationHash === "string" ? proof as GuardianReview["proof"] : undefined;
 }
 
 function commandWaveFromRows(params: {
@@ -323,6 +335,7 @@ function commandWaveFromRows(params: {
       status: row.status as GuardianReview["status"],
       checks: rowJsonArray(row.checks_json).map(String),
       summary: String(row.summary),
+      proof: rowReviewProof(row.proof_json),
     })),
     ledger: params.ledgerRows.map((row) => ({
       id: String(row.id),

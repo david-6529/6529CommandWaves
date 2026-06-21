@@ -99,6 +99,7 @@ create table if not exists guardian_reviews (
   execution_id text references command_executions(id) on delete set null,
   status text not null,
   checks_json jsonb not null default '[]'::jsonb,
+  proof_json jsonb not null default '{}'::jsonb,
   summary text not null,
   reviewer text not null,
   created_at timestamptz not null default now()

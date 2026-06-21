@@ -993,6 +993,14 @@ export function CommandWavesConsole() {
                         ))}
                       </ul>
                     ) : null}
+                    {activeReview?.proof ? (
+                      <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Proof</p>
+                        <p className="mt-1 break-all text-xs leading-5 text-zinc-400">
+                          {activeReview.proof.verifierVersion} / {activeReview.proof.attestationHash}
+                        </p>
+                      </div>
+                    ) : null}
                     <Button
                       type="button"
                       className="mt-3"

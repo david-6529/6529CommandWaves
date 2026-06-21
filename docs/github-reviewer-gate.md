@@ -88,6 +88,16 @@ That is the core proof. The guardian output is an attestation with:
 
 The current attestation code is in `src/lib/github/pr-reviewer-gate.ts`.
 
+The app's review record stores the same compact proof material:
+
+- verifier name and version
+- deterministic mode
+- input hashes
+- result hash
+- attestation hash
+
+So a review is not only a human-readable summary. It carries the proof needed to rerun and audit the reviewer.
+
 ## Manifest
 
 Every AI worker PR should include a manifest. It can start in the PR body and later move to a committed artifact.

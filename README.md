@@ -76,6 +76,7 @@ The current app is a local prototype of the simple flow:
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, and risky file paths
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
+- review records store compact guardian proof material for later audit
 - public setup proof endpoint for third-party verification of wave/repo/rules/check expectations
 - review placeholder
 - recent activity view with full audit log export
