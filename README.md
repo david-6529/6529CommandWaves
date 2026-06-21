@@ -1,36 +1,129 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 6529 Command Waves
 
-## Getting Started
+## ELI5
 
-First, run the development server:
+Command Waves let a 6529 wave control an AI worker.
+
+Instead of everyone shouting prompts at the AI, people propose commands in the wave. The app checks the rules:
+
+1. Safe commands can run.
+2. Risky commands need a yes/no vote.
+3. Approved commands run through the AI worker.
+4. The result is reviewed.
+5. Everything important is logged.
+
+The simple flow is:
+
+`Propose -> Vote if risky -> Run -> Review`
+
+## Why This Exists
+
+Agents can write code, open PRs, post updates, run scripts, deploy, and spend money. That gets dangerous when a group is moving at prompt speed.
+
+Command Waves make the answers visible:
+
+- Who decided this work should happen?
+- Did the command need a vote?
+- Did quorum pass?
+- What tool or agent ran the command?
+- What changed?
+- Was the result reviewed?
+- Can humans audit the chain later?
+
+## MVP
+
+The first narrow demo:
+
+1. Choose one 6529 project wave.
+2. Connect one GitHub repo.
+3. Propose a command in plain English.
+4. Let the app decide whether it can run or needs a vote.
+5. Vote yes/no when the command is risky.
+6. Run the approved command through a controlled agent adapter.
+7. Review the result against the approved command.
+8. Show recent activity and keep the full audit log available.
+
+No deploys, merging, spending, or autonomous tool use in the first demo.
+
+## Lessons Reused From `6529arena`
+
+See [docs/6529arena-lessons.md](docs/6529arena-lessons.md) for the full transfer.
+
+Short version:
+
+- Keep 6529 waves as the social/source-of-truth surface.
+- Use the app as the control panel for setup, rules, jobs, and audit views.
+- Reputation can route work, but permissions are the real security boundary.
+- Agents request actions; the platform decides what is allowed.
+- Design for local mock mode first, then production adapters.
+- Log every meaningful state transition.
+
+## Current App
+
+The current app is a local prototype of the simple flow:
+
+- first-screen flow: choose wave, propose work, run/review
+- project wave setup with simpler user-facing language
+- 6529 wave search by name or pasted wave URL/ID
+- GitHub repo link
+- participation gate notes
+- safety rules by command type
+- command proposal form
+- automatic risk classification
+- poll voting with one vote per voter identity
+- controlled run placeholder
+- deterministic run manifest evidence with rules hash, tool permissions, and budget cap
+- review placeholder
+- recent activity view with full audit log export
+- local API routes for fetching/resetting state, proposals, votes, runs, and reviews
+- 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and context previews
+- local file persistence for command-wave state when `COMMAND_WAVE_STORE=file`
+- Postgres schema foundation in [db/001_command_waves.sql](db/001_command_waves.sql)
+
+## Run Locally
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the local URL printed by Next. In this workspace it is currently `http://localhost:5010`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+6529 mock mode is the safe default. Set `6529_MOCK_MODE=false` only when you are ready to use the live 6529 API.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+With the example env, command-wave demo state is stored in `.data/command-wave.json`.
 
-## Learn More
+## Local API
 
-To learn more about Next.js, take a look at the following resources:
+- `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
+- `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
+- `GET /api/readiness`: show local/production readiness checks.
+- `GET /api/command-wave`: return the current local command wave.
+- `PUT /api/command-wave`: replace the local command wave.
+- `PATCH /api/command-wave`: update the demo wave/repo setup and log it.
+- `DELETE /api/command-wave`: reset the local demo.
+- `POST /api/command-wave/proposals`: submit a command proposal.
+- `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
+- `POST /api/command-wave/execute`: run the local AI worker adapter.
+- `POST /api/command-wave/review`: run the local reviewer adapter.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Command-wave mutation routes are open only for local demo mode when `ADMIN_API_KEY` is blank. Once `ADMIN_API_KEY` is set,
+send it as either `x-admin-api-key: <key>` or `Authorization: Bearer <key>`. In production, missing `ADMIN_API_KEY` is a
+server misconfiguration and mutations fail closed.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The web console has a collapsed **Access key** field in setup. It stores the key in browser session storage and sends it
+only for protected actions. This is an MVP bridge for testing protected routes; production should replace it with proper
+wallet/session auth before opening the console broadly.
 
-## Deploy on Vercel
+API errors include an `errorId` so a user-visible error can be matched to server logs.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Next Production Steps
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Finish durable Postgres persistence using [docs/data-model.md](docs/data-model.md).
+2. Wire live 6529 setup, proposal, vote, and result-posting flows.
+3. Add real GitHub repo integration.
+4. Add controlled agent adapters using [docs/agent-harness-plan.md](docs/agent-harness-plan.md): Codex first, then Claude Code.
+5. Add independent review adapters for diffs, tests, rules, and security checks.
+6. Add rule version hashes and append-only ledger storage.
+7. Add production auth, secrets, rate limits, and job queue controls.
