@@ -34,6 +34,13 @@ jobs:
       - name: Verify deterministic guardian
         run: npm run guardian:check
 
+      - name: Verify PR command evidence
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- command-waves:manifest:start -->')
+        run: npm run guardian:pr-check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GUARDIAN_ATTESTATION_PATH: guardian-attestation.json
+
       - name: Typecheck
         run: npm run typecheck
 

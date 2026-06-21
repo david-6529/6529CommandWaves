@@ -109,6 +109,12 @@ Run the same deterministic verifier checks locally:
 npm run guardian:check
 ```
 
+Run the PR evidence adapter against a GitHub pull request event:
+
+```bash
+GITHUB_EVENT_PATH=event.json npm run guardian:pr-check
+```
+
 This is the simple first step. The next adapter should feed real PR changed paths, PR manifests, and 6529 vote evidence into
 the same verifier so GitHub can block merges that do not match the wave rules.
 
