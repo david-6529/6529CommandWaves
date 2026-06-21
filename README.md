@@ -71,6 +71,7 @@ The current app is a local prototype of the simple flow:
 - command proposal form
 - automatic risk classification
 - poll voting with one vote per voter identity
+- backend setup validation for 6529 wave links and GitHub repo links
 - controlled run placeholder
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
 - review placeholder

@@ -44,6 +44,13 @@ describe("Command wave store", () => {
     });
   });
 
+  it("rejects invalid setup before saving", async () => {
+    await expect(updateCommandWaveSetup({
+      waveUrl: "",
+      repoUrl: "not github",
+    })).rejects.toThrow("Fix the 6529 wave and GitHub repo before saving setup.");
+  });
+
   it("submits poll-gated proposals and approves them after quorum passes", async () => {
     const submitted = await submitCommandProposal({
       title: "Open a PR",

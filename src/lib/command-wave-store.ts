@@ -1,5 +1,6 @@
 import { localGuardianAdapter, localOrchestratorAdapter } from "./local-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
+import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
   demoWave,
@@ -118,16 +119,25 @@ export async function resetCommandWave() {
 export async function updateCommandWaveSetup(input: unknown) {
   const body = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};
   const wave = await getCommandWave();
+  const validation = validateSetupShape({
+    waveUrl: body.waveUrl,
+    repoUrl: body.repoUrl,
+  });
+
+  if (!validation.canSave) {
+    throw Object.assign(new Error("Fix the 6529 wave and GitHub repo before saving setup."), { status: 400 });
+  }
+
   const nextWave = appendLedger(
     {
       ...wave,
-      waveUrl: asText(body.waveUrl, wave.waveUrl),
-      repoUrl: asText(body.repoUrl, wave.repoUrl),
+      waveUrl: `https://6529.io/waves/${validation.waveId}`,
+      repoUrl: validation.repo?.htmlUrl ?? wave.repoUrl,
     },
     {
       actor: "Setup",
       type: "rules_defined",
-      message: "Updated wave setup and repo link.",
+      message: `Updated setup to wave ${validation.waveId} and repo ${validation.repo?.owner}/${validation.repo?.repo}.`,
     },
   );
 
@@ -273,6 +283,10 @@ export async function executeProposal(input: unknown) {
 
   if (proposal.status !== "approved") {
     throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });
+  }
+
+  if (proposal.kind === "open_pr" && !validateSetupShape({ waveUrl: wave.waveUrl, repoUrl: wave.repoUrl }).canRunCode) {
+    throw Object.assign(new Error("A valid GitHub repo is required before opening PR commands can run."), { status: 409 });
   }
 
   const execution = await localOrchestratorAdapter.execute({

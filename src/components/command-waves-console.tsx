@@ -81,6 +81,33 @@ type WaveSearchResponse = {
   error?: string;
 };
 
+type SetupValidation = {
+  waveId: string | null;
+  repo: {
+    owner: string;
+    repo: string;
+    htmlUrl: string;
+  } | null;
+  repoMetadata: {
+    defaultBranch: string | null;
+    private: boolean | null;
+    archived: boolean | null;
+  } | null;
+  checks: Array<{
+    id: string;
+    label: string;
+    status: "pass" | "warn" | "fail";
+    message: string;
+  }>;
+  canSave: boolean;
+  canRunCode: boolean;
+};
+
+type SetupValidationResponse = {
+  validation?: SetupValidation;
+  error?: string;
+};
+
 const accessKeyStorageKey = "command-waves-access-key";
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
@@ -133,7 +160,24 @@ async function requestWaveSearch(query: string) {
   return payload.results;
 }
 
-type BusyState = "loading" | "saving" | "search" | "context" | "proposal" | "vote" | "execute" | "review" | "reset";
+async function requestSetupValidation(waveUrl: string, repoUrl: string) {
+  const response = await fetch("/api/command-wave/setup/validate", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ waveUrl, repoUrl }),
+  });
+  const payload = (await response.json()) as SetupValidationResponse;
+
+  if (!response.ok || !payload.validation) {
+    throw new Error(payload.error ?? "Setup check failed.");
+  }
+
+  return payload.validation;
+}
+
+type BusyState = "loading" | "saving" | "setup" | "search" | "context" | "proposal" | "vote" | "execute" | "review" | "reset";
 
 function riskClass(risk: string) {
   if (risk === "critical") {
@@ -165,6 +209,18 @@ function statusClass(status: string) {
   }
 
   return "border-zinc-700 bg-zinc-900 text-zinc-200";
+}
+
+function checkStatusClass(status: "pass" | "warn" | "fail") {
+  if (status === "pass") {
+    return statusClass("pass");
+  }
+
+  if (status === "fail") {
+    return statusClass("failed");
+  }
+
+  return riskClass("medium");
 }
 
 function Badge({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -321,6 +377,7 @@ export function CommandWavesConsole() {
   const [apiNotice, setApiNotice] = useState("Backend demo state is loading.");
   const [apiError, setApiError] = useState("");
   const [contextPreview, setContextPreview] = useState<WaveContextPreview | null>(null);
+  const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const activeProposal = wave.proposals[0];
@@ -436,7 +493,24 @@ export function CommandWavesConsole() {
   function selectWaveResult(result: WaveSearchResult) {
     setWaveUrl(`https://6529.io/waves/${result.id}`);
     setContextPreview(null);
+    setSetupValidation(null);
     setApiNotice(`Selected ${result.name}.`);
+  }
+
+  async function checkSetup() {
+    setApiBusy("setup");
+    setApiError("");
+
+    try {
+      const validation = await requestSetupValidation(waveUrl, repoUrl);
+
+      setSetupValidation(validation);
+      setApiNotice(validation.canSave ? "Setup check passed." : "Setup needs fixes before saving.");
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Setup check failed.");
+    } finally {
+      setApiBusy(null);
+    }
   }
 
   function saveSetup() {
@@ -604,8 +678,35 @@ export function CommandWavesConsole() {
                 ) : null}
               </div>
               <Field label="GitHub repo">
-                <Input value={repoUrl} onChange={(event) => setRepoUrl(event.target.value)} />
+                <Input
+                  value={repoUrl}
+                  onChange={(event) => {
+                    setRepoUrl(event.target.value);
+                    setSetupValidation(null);
+                  }}
+                />
               </Field>
+              {setupValidation ? (
+                <div className="rounded-md border border-zinc-800 bg-black p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-zinc-100">Setup check</p>
+                    <Badge className={setupValidation.canSave ? statusClass("pass") : statusClass("failed")}>
+                      {setupValidation.canSave ? "ready" : "needs fixes"}
+                    </Badge>
+                  </div>
+                  <div className="mt-3 grid gap-2">
+                    {setupValidation.checks.map((item) => (
+                      <div key={item.id} className="grid gap-2 rounded-md border border-zinc-900 bg-zinc-950 p-2 sm:grid-cols-[7rem_1fr]">
+                        <Badge className={checkStatusClass(item.status)}>{item.status}</Badge>
+                        <div>
+                          <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
+                          <p className="mt-1 text-xs leading-5 text-zinc-500">{item.message}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div>
                 <p className="mb-2 text-sm font-semibold text-zinc-200">Who can participate</p>
                 <div className="flex flex-wrap gap-2">
@@ -640,11 +741,19 @@ export function CommandWavesConsole() {
                 </div>
               </details>
               <div className="grid gap-2 sm:grid-cols-2">
+                <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkSetup()}>
+                  {apiBusy === "setup" ? "Checking" : "Check setup"}
+                </Button>
                 <Button type="button" variant="secondary" disabled={isBusy} onClick={saveSetup}>
                   {apiBusy === "saving" ? "Saving" : "Save setup"}
                 </Button>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext()}>
-                  {apiBusy === "context" ? "Checking" : "Check wave"}
+                  {apiBusy === "context" ? "Loading" : "Preview wave posts"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => downloadJson("command-wave-ledger.json", wave)}>
+                  Export activity
                 </Button>
               </div>
               {contextPreview ? (
@@ -673,10 +782,7 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               ) : null}
-              <div className="grid gap-2 sm:grid-cols-2">
-                <Button type="button" variant="secondary" onClick={() => downloadJson("command-wave-ledger.json", wave)}>
-                  Export activity
-                </Button>
+              <div className="grid gap-2">
                 <Button type="button" variant="danger" disabled={isBusy} onClick={resetDemo}>
                   {apiBusy === "reset" ? "Resetting" : "Reset demo"}
                 </Button>
