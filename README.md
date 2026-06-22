@@ -121,7 +121,8 @@ When the PR adapter runs in GitHub Actions, it writes `guardian-attestation.json
 job summary, and uploads the attestation as a workflow artifact.
 
 This is the simple first step. The PR adapter feeds changed paths, PR manifests, and wave state into the same verifier so
-GitHub can block merges that do not match the wave rules.
+GitHub can block merges that do not match the wave rules. Pull requests without a Command Waves manifest fail the guardian
+check instead of bypassing it.
 
 ## Local API
 

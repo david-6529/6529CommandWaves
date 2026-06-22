@@ -36,7 +36,7 @@ jobs:
 
       - name: Verify PR command evidence
         id: guardian-pr-check
-        if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- command-waves:manifest:start -->')
+        if: github.event_name == 'pull_request'
         run: npm run guardian:pr-check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -61,7 +61,7 @@ The workflow also has a PR evidence check:
 npm run guardian:pr-check
 ```
 
-It runs on pull requests that contain the manifest markers. The script reads `GITHUB_EVENT_PATH`, fetches changed file paths,
+It runs on every pull request. The script reads `GITHUB_EVENT_PATH`, fetches changed file paths,
 loads wave state from `COMMAND_WAVE_STATE_PATH` or `COMMAND_WAVE_STATE_URL`, creates the guardian attestation, writes
 `guardian-attestation.json`, appends a GitHub step summary, uploads the attestation as a workflow artifact, and fails if the
 deterministic result is not `pass`.
