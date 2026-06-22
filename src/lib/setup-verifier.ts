@@ -14,6 +14,10 @@ export type SetupVerificationResult = {
   checks: SetupVerificationCheck[];
 };
 
+export type SetupVerificationOptions = {
+  requireExternalGuardian?: boolean;
+};
+
 function check(id: string, status: SetupVerificationCheck["status"], message: string): SetupVerificationCheck {
   return { id, status, message };
 }
@@ -114,13 +118,37 @@ export function extractRequiredStatusChecks(payloads: unknown[]) {
   return [...found].sort((a, b) => a.localeCompare(b));
 }
 
-export function verifySetupProofAgainstGitHubPayloads(proof: SetupProof, payloads: unknown[]): SetupVerificationResult {
+export function verifySetupProofAgainstGitHubPayloads(
+  proof: SetupProof,
+  payloads: unknown[],
+  options: SetupVerificationOptions = {},
+): SetupVerificationResult {
   const requiredChecks = proof.github?.requiredChecks ?? [];
   const observedRequiredChecks = extractRequiredStatusChecks(payloads);
+  const guardianEnforcementMode = proof.guardian?.enforcementMode;
   const checks: SetupVerificationCheck[] = [
     check("proof_hash", verifySetupProofHash(proof) ? "pass" : "fail", "Setup proof hashes are internally consistent."),
     check("github_repo", proof.github ? "pass" : "fail", "Setup proof names a GitHub repo."),
+    check(
+      "guardian_enforcement",
+      guardianEnforcementMode ? "pass" : "fail",
+      guardianEnforcementMode
+        ? `Guardian enforcement mode is ${guardianEnforcementMode}.`
+        : "Setup proof does not declare a guardian enforcement mode.",
+    ),
   ];
+
+  if (options.requireExternalGuardian) {
+    checks.push(
+      check(
+        "external_guardian",
+        guardianEnforcementMode === "external_github_app" ? "pass" : "fail",
+        guardianEnforcementMode === "external_github_app"
+          ? "Guardian enforcement is external to the governed repo."
+          : "Guardian enforcement is repo-local. This is acceptable for MVP, but not for strongest production verification.",
+      ),
+    );
+  }
 
   for (const requiredCheck of requiredChecks) {
     checks.push(

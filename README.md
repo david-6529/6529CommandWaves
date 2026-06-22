@@ -45,6 +45,33 @@ The first narrow demo:
 
 No deploys, merging, spending, or autonomous tool use in the first demo.
 
+## Agent Handoff
+
+This repo is now focused on **Command Waves**, not the earlier summarizer / SwarmOps direction. The product is a governed
+AI worker controlled by a 6529 wave.
+
+Current work is centered on the trust boundary:
+
+- The MVP guardian is a repo-local GitHub Action named `Command Waves Guardian`.
+- PRs must carry a Command Waves manifest that ties code changes back to an approved wave command.
+- The guardian writes replayable proof artifacts: `guardian-attestation.json`, `guardian-wave-state.json`, and
+  `guardian-pr-evidence.json`.
+- `npm run guardian:verify-proof` replays the guardian decision from those artifacts.
+- Setup proofs now disclose the current guardian mode as `repo_local_github_action` and mark it as `mvp` strength.
+- Guardian/reviewer/setup-proof code changes are treated as critical-risk diffs.
+
+The most important missing production step is moving from the repo-local GitHub Action to an external GitHub App. The app
+should own the required check, read the 6529 wave state, replay the same deterministic verifier, and publish the same proof
+artifacts. Until then, the MVP is useful and auditable but not the strongest possible trust boundary.
+
+Best next tasks for another agent:
+
+1. Build the external GitHub App design in code/docs, keeping the existing verifier as the shared core.
+2. Wire live 6529 proposal/vote state into `COMMAND_WAVE_STATE_URL`.
+3. Add the GitHub repo adapter that opens PRs with the required Command Waves manifest.
+4. Replace local mock execution with a controlled Codex harness adapter.
+5. Keep every guardian change covered by tests and reflected in this README.
+
 ## Lessons Reused From `6529arena`
 
 See [docs/6529arena-lessons.md](docs/6529arena-lessons.md) for the full transfer.
@@ -138,6 +165,10 @@ This is the simple first step. The PR adapter feeds changed paths, PR manifests,
 GitHub can block merges that do not match the wave rules. Pull requests without a Command Waves manifest fail the guardian
 check instead of bypassing it.
 
+The current guardian enforcement mode is `repo_local_github_action`. That is good enough for the MVP because guardian code
+and workflow changes are treated as critical-risk PRs, but the stronger production version should move the check into an
+external GitHub App so the governed repo cannot edit its own reviewer.
+
 Before making `Command Waves Guardian` a required GitHub check, configure one real wave-state source for the workflow:
 
 - `COMMAND_WAVE_STATE_URL`
@@ -147,6 +178,14 @@ Verify a published setup proof against GitHub required-check payloads:
 
 ```bash
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
+```
+
+For a stricter production audit that fails until the guardian is external to the repo:
+
+```bash
+SETUP_REQUIRE_EXTERNAL_GUARDIAN=true \
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
+npm run setup:verify
 ```
 
 For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.

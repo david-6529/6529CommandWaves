@@ -80,6 +80,7 @@ The check fails if:
 - the manifest rules hash does not match the approved command
 - the manifest prompt/spec hashes do not match the approved command
 - the PR touches high-risk files without a high-risk or critical approval
+- the PR touches guardian/reviewer/proof code without a critical-risk approval
 
 The guardian should be deterministic. An LLM can help explain the result or suggest extra risks, but the merge-blocking
 decision should come from checks that anyone can rerun.
@@ -173,6 +174,22 @@ The app needs scoped permissions:
 - checks write
 - administration write only during setup if it creates rulesets
 
+The current setup proof declares the MVP mode explicitly:
+
+```text
+guardian.enforcementMode = repo_local_github_action
+guardian.productionStrength = mvp
+```
+
+That means the check is useful and replayable, but it is still running from the governed repo. Guardian code and workflow
+changes are critical-risk diffs, so normal command approvals cannot silently weaken the gate. For the strongest production
+trust boundary, move the reviewer into an external GitHub App and update the proof to:
+
+```text
+guardian.enforcementMode = external_github_app
+guardian.productionStrength = strong
+```
+
 ## Deployment
 
 Vercel should stay downstream from GitHub:
@@ -200,6 +217,8 @@ The proof includes:
 - protected branch
 - required reviewer check name
 - Vercel production branch expectation
+- guardian enforcement mode
+- guardian proof artifact and replay command
 - rules version and rules hash
 - PR manifest schema hash
 - reviewer gate version and hash
@@ -223,3 +242,11 @@ SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run se
 
 The verifier checks the proof hashes and confirms the proof's required GitHub check appears in GitHub required status-check
 payloads. For offline verification, provide `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
+
+To fail unless the setup uses an external guardian:
+
+```text
+SETUP_REQUIRE_EXTERNAL_GUARDIAN=true \
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
+npm run setup:verify
+```

@@ -22,6 +22,15 @@ describe("setup proof", () => {
       vercel: {
         productionBranch: "main",
       },
+      guardian: {
+        enforcementMode: "repo_local_github_action",
+        requiredCheck: "Command Waves Guardian",
+        workflowPath: ".github/workflows/guardian-review.yml",
+        proofArtifact: "guardian-proof",
+        replayCommand: "npm run guardian:verify-proof",
+        productionStrength: "mvp",
+        recommendedUpgrade: "external_github_app",
+      },
       governance: {
         rulesVersion: demoWave.rules.version,
         manifestSchemaVersion: "command-wave-pr-v0.1",
@@ -55,6 +64,10 @@ describe("setup proof", () => {
     expect(verifySetupProofHash({
       ...proof,
       github: proof.github ? { ...proof.github, requiredReviewerCheck: "Not the real guardian" } : null,
+    })).toBe(false);
+    expect(verifySetupProofHash({
+      ...proof,
+      guardian: { ...proof.guardian, enforcementMode: "external_github_app", productionStrength: "strong" },
     })).toBe(false);
   });
 });

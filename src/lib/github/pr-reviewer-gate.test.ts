@@ -80,6 +80,26 @@ describe("PR reviewer gate", () => {
     expect(result.diffSignals).toContainEqual(expect.objectContaining({ label: "workflow", risk: "high" }));
   });
 
+  it("requires critical approval for guardian proof code changes", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["scripts/guardian-pr-check.ts"],
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.diffSignals).toContainEqual(expect.objectContaining({ label: "guardian_proof", risk: "critical" }));
+    expect(result.checks.find((item) => item.id === "diff_guardian_proof_scripts/guardian-pr-check.ts")?.status).toBe(
+      "fail",
+    );
+  });
+
   it("fails tampered prompt/spec hashes", () => {
     const wave = approvedDemoWave();
     const proposal = wave.proposals[0];

@@ -108,6 +108,13 @@ const diffSignalRules: Array<{
   reason: string;
 }> = [
   {
+    label: "guardian_proof",
+    risk: "critical",
+    pattern:
+      /^(\.github\/workflows\/guardian-review\.yml|scripts\/(guardian-pr-check|verify-guardian-proof)\.ts|src\/lib\/github\/(pr-reviewer-gate|guardian-summary)\.ts|src\/lib\/setup-(proof|verifier)\.ts)$/,
+    reason: "Guardian, reviewer, and setup-proof changes can alter merge enforcement or proof verification.",
+  },
+  {
     label: "workflow",
     risk: "high",
     pattern: /^\.github\/workflows\//,

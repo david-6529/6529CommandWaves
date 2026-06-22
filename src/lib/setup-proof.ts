@@ -23,6 +23,16 @@ export type SetupProof = {
     productionBranch: string;
     mode: "expected" | "not_configured";
   };
+  guardian: {
+    enforcementMode: "repo_local_github_action" | "external_github_app";
+    requiredCheck: string;
+    workflowPath: string | null;
+    proofArtifact: string;
+    replayCommand: string;
+    productionStrength: "mvp" | "strong";
+    limitation: string | null;
+    recommendedUpgrade: "external_github_app" | null;
+  };
   governance: {
     rulesVersion: string;
     rulesHash: string;
@@ -97,6 +107,17 @@ export function createSetupProof(
       productionBranch: options.vercelProductionBranch ?? protectedBranch,
       mode: "expected",
     },
+    guardian: {
+      enforcementMode: "repo_local_github_action",
+      requiredCheck: requiredReviewerCheck,
+      workflowPath: ".github/workflows/guardian-review.yml",
+      proofArtifact: "guardian-proof",
+      replayCommand: "npm run guardian:verify-proof",
+      productionStrength: "mvp",
+      limitation:
+        "The MVP guardian runs from the governed repo. Critical-risk diff rules protect guardian changes, but stronger production should use an external GitHub App.",
+      recommendedUpgrade: "external_github_app",
+    },
     governance: {
       rulesVersion: wave.rules.version,
       rulesHash: hashValue(wave.rules),
@@ -130,6 +151,7 @@ export function createSetupProof(
     wave: baseProof.wave,
     github: baseProof.github,
     vercel: baseProof.vercel,
+    guardian: baseProof.guardian,
     governance: baseProof.governance,
     verificationTargets: baseProof.verificationTargets,
   });
@@ -149,6 +171,7 @@ export function verifySetupProofHash(proof: SetupProof) {
     wave: proof.wave,
     github: proof.github,
     vercel: proof.vercel,
+    guardian: proof.guardian,
     governance: proof.governance,
     verificationTargets: proof.verificationTargets,
   });
@@ -158,6 +181,7 @@ export function verifySetupProofHash(proof: SetupProof) {
     wave: proof.wave,
     github: proof.github,
     vercel: proof.vercel,
+    guardian: proof.guardian,
     governance: proof.governance,
     verificationTargets: proof.verificationTargets,
     setupHash,

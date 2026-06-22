@@ -70,7 +70,9 @@ function writeResult(path: string | undefined, value: unknown) {
 async function main() {
   const proof = await loadSetupProof();
   const payloads = await loadGitHubPayloads(proof);
-  const result = verifySetupProofAgainstGitHubPayloads(proof, payloads);
+  const result = verifySetupProofAgainstGitHubPayloads(proof, payloads, {
+    requireExternalGuardian: process.env.SETUP_REQUIRE_EXTERNAL_GUARDIAN === "true",
+  });
 
   writeResult(process.env.SETUP_VERIFICATION_PATH, result);
 

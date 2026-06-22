@@ -65,4 +65,26 @@ describe("setup verifier", () => {
       status: "fail",
     });
   });
+
+  it("can require a stronger external guardian for production audits", () => {
+    const proof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+    const result = verifySetupProofAgainstGitHubPayloads(
+      proof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      { requireExternalGuardian: true },
+    );
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "external_guardian")).toMatchObject({
+      status: "fail",
+    });
+  });
 });
