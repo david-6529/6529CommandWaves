@@ -17,7 +17,7 @@ describe("setup proof", () => {
         owner: "6529-Collections",
         repo: "example-command-wave",
         protectedBranch: "main",
-        requiredReviewerCheck: "Command Waves Reviewer",
+        requiredReviewerCheck: "Command Waves Guardian",
       },
       vercel: {
         productionBranch: "main",

@@ -74,7 +74,7 @@ export function createSetupProof(
   } = {},
 ): SetupProof {
   const protectedBranch = options.protectedBranch ?? "main";
-  const requiredReviewerCheck = options.requiredReviewerCheck ?? "Command Waves Reviewer";
+  const requiredReviewerCheck = options.requiredReviewerCheck ?? "Command Waves Guardian";
   const repo = parseGitHubRepoUrl(wave.repoUrl);
   const baseProof = withoutHashes({
     version: "command-wave-setup-v0.1",

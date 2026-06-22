@@ -124,6 +124,14 @@ This is the simple first step. The PR adapter feeds changed paths, PR manifests,
 GitHub can block merges that do not match the wave rules. Pull requests without a Command Waves manifest fail the guardian
 check instead of bypassing it.
 
+Verify a published setup proof against GitHub required-check payloads:
+
+```bash
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
+```
+
+For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
+
 ## Local API
 
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.

@@ -10,7 +10,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "guardian:check": "vitest run pr-reviewer-gate setup-proof",
-    "guardian:pr-check": "tsx scripts/guardian-pr-check.ts"
+    "guardian:pr-check": "tsx scripts/guardian-pr-check.ts",
+    "setup:verify": "tsx scripts/verify-setup-proof.ts"
   },
   "dependencies": {
     "next": "16.2.9",

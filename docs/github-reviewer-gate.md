@@ -194,3 +194,12 @@ The first implementation is a deterministic hash-based attestation. Later we can
 - 6529 drop anchoring
 - onchain anchoring of setup hashes
 - independent watcher agents that periodically verify the proof against GitHub, Vercel, and 6529 state
+
+Anyone can verify the current setup proof with:
+
+```text
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
+```
+
+The verifier checks the proof hashes and confirms the proof's required GitHub check appears in GitHub required status-check
+payloads. For offline verification, provide `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
