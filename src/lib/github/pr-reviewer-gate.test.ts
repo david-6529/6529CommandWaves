@@ -8,6 +8,7 @@ import {
   formatCommandPrManifestForPullRequest,
   validateCommandPrManifest,
   verifyGuardianAttestation,
+  verifyGuardianPullRequestProof,
 } from "./pr-reviewer-gate";
 
 function approvedDemoWave(): CommandWave {
@@ -212,5 +213,56 @@ describe("PR reviewer gate", () => {
         attestation,
       }),
     ).toBe(false);
+  });
+
+  it("verifies a pull request proof from attestation, wave state, and PR evidence", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const evidence = {
+      pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
+      changedPaths: ["src/app/page.tsx", "README.md"],
+    };
+    const attestation = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        ...evidence,
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+    const result = verifyGuardianPullRequestProof({ wave, evidence, attestation });
+
+    expect(result.status).toBe("pass");
+    expect(result.expectedAttestationHash).toBe(attestation.attestationHash);
+    expect(result.checks.every((item) => item.status === "pass")).toBe(true);
+  });
+
+  it("fails pull request proof verification when PR evidence changes", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const evidence = {
+      pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
+      changedPaths: ["README.md"],
+    };
+    const attestation = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        ...evidence,
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+    const result = verifyGuardianPullRequestProof({
+      wave,
+      evidence: {
+        ...evidence,
+        changedPaths: [".github/workflows/guardian-review.yml"],
+      },
+      attestation,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "changed_paths_hash")?.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "attestation_hash")?.status).toBe("fail");
   });
 });

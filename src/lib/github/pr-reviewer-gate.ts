@@ -83,6 +83,19 @@ export type GuardianPullRequestEvidence = {
   generatedAt?: string;
 };
 
+export type GuardianProofVerificationCheck = {
+  id: string;
+  status: "pass" | "fail";
+  message: string;
+};
+
+export type GuardianProofVerificationResult = {
+  status: "pass" | "fail";
+  checks: GuardianProofVerificationCheck[];
+  expectedAttestationHash: string;
+  actualAttestationHash: string;
+};
+
 export const COMMAND_PR_MANIFEST_START = "<!-- command-waves:manifest:start -->";
 export const COMMAND_PR_MANIFEST_END = "<!-- command-waves:manifest:end -->";
 
@@ -132,6 +145,14 @@ function check(id: string, status: ReviewerGateCheck["status"], message: string)
 
 function overall(checks: ReviewerGateCheck[]) {
   return checks.some((item) => item.status === "fail") ? "fail" : "pass";
+}
+
+function verificationCheck(
+  id: string,
+  status: GuardianProofVerificationCheck["status"],
+  message: string,
+): GuardianProofVerificationCheck {
+  return { id, status, message };
 }
 
 function waveIdFromUrl(value: string) {
@@ -493,4 +514,66 @@ export function createGuardianPullRequestAttestation({
     changedPaths: evidence.changedPaths,
     generatedAt: evidence.generatedAt,
   });
+}
+
+export function verifyGuardianPullRequestProof({
+  wave,
+  evidence,
+  attestation,
+}: {
+  wave: CommandWave;
+  evidence: GuardianPullRequestEvidence;
+  attestation: GuardianAttestation;
+}): GuardianProofVerificationResult {
+  const expected = createGuardianPullRequestAttestation({
+    wave,
+    evidence: {
+      ...evidence,
+      generatedAt: attestation.generatedAt,
+    },
+  });
+  const checks: GuardianProofVerificationCheck[] = [
+    verificationCheck(
+      "wave_state_hash",
+      expected.inputs.waveStateHash === attestation.inputs.waveStateHash ? "pass" : "fail",
+      "Wave-state snapshot hash matches the attestation input.",
+    ),
+    verificationCheck(
+      "proposal_hash",
+      expected.inputs.proposalHash === attestation.inputs.proposalHash ? "pass" : "fail",
+      "Proposal hash matches the attestation input.",
+    ),
+    verificationCheck(
+      "poll_hash",
+      expected.inputs.pollHash === attestation.inputs.pollHash ? "pass" : "fail",
+      "Poll hash matches the attestation input.",
+    ),
+    verificationCheck(
+      "manifest_hash",
+      expected.inputs.manifestHash === attestation.inputs.manifestHash ? "pass" : "fail",
+      "PR manifest hash matches the attestation input.",
+    ),
+    verificationCheck(
+      "changed_paths_hash",
+      expected.inputs.changedPathsHash === attestation.inputs.changedPathsHash ? "pass" : "fail",
+      "Changed-paths hash matches the attestation input.",
+    ),
+    verificationCheck(
+      "result_hash",
+      expected.resultHash === attestation.resultHash ? "pass" : "fail",
+      "Guardian result hash is reproducible from the supplied artifacts.",
+    ),
+    verificationCheck(
+      "attestation_hash",
+      expected.attestationHash === attestation.attestationHash ? "pass" : "fail",
+      "Guardian attestation hash is reproducible from the supplied artifacts.",
+    ),
+  ];
+
+  return {
+    status: checks.some((item) => item.status === "fail") ? "fail" : "pass",
+    checks,
+    expectedAttestationHash: expected.attestationHash,
+    actualAttestationHash: attestation.attestationHash,
+  };
 }

@@ -115,14 +115,24 @@ Run the PR evidence adapter against a GitHub pull request event:
 GITHUB_EVENT_PATH=event.json COMMAND_WAVE_STATE_PATH=wave.json npm run guardian:pr-check
 ```
 
+Replay a published guardian proof artifact:
+
+```bash
+GUARDIAN_ATTESTATION_PATH=guardian-attestation.json \
+GUARDIAN_WAVE_STATE_SNAPSHOT_PATH=guardian-wave-state.json \
+GUARDIAN_PR_EVIDENCE_PATH=guardian-pr-evidence.json \
+npm run guardian:verify-proof
+```
+
 For local demos only, set `COMMAND_WAVE_ALLOW_DEMO_STATE=true` to use the built-in demo wave state.
 
 When the PR adapter runs in GitHub Actions, it writes `guardian-attestation.json`, writes the exact
-`guardian-wave-state.json` snapshot it checked, appends a Markdown proof summary to the job summary, and uploads both as a
-`guardian-proof` workflow artifact.
+`guardian-wave-state.json` snapshot it checked, writes `guardian-pr-evidence.json`, appends a Markdown proof summary to the
+job summary, replays the proof, and uploads the files as a `guardian-proof` workflow artifact.
 
-The attestation includes hashes of the wave state, proposal, poll, rules, PR manifest, and changed paths. That is the
-simple fairness proof: anyone with the same inputs can rerun the deterministic guardian and get the same result.
+The attestation includes hashes of the wave state, proposal, poll, rules, PR manifest, and changed paths. The replay
+script recomputes the guardian result from the uploaded artifacts. That is the simple fairness proof: anyone with the same
+inputs can rerun the deterministic guardian and get the same result.
 
 This is the simple first step. The PR adapter feeds changed paths, PR manifests, and wave state into the same verifier so
 GitHub can block merges that do not match the wave rules. Pull requests without a Command Waves manifest fail the guardian

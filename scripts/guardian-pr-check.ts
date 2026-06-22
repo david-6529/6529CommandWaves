@@ -8,6 +8,7 @@ import {
   demoWaveStateAllowed,
   pullRequestEvidenceFromGitHubEvent,
   type GitHubPullRequestEvent,
+  type PullRequestEvidence,
 } from "../src/lib/github/actions-pr-evidence";
 import { formatGuardianStepSummary } from "../src/lib/github/guardian-summary";
 import { createGuardianPullRequestAttestation } from "../src/lib/github/pr-reviewer-gate";
@@ -102,6 +103,12 @@ function writeWaveStateSnapshot(path: string | undefined, wave: CommandWave) {
   writeAttestation(outputPath, wave);
 }
 
+function writePullRequestEvidence(path: string | undefined, evidence: PullRequestEvidence) {
+  const outputPath = path?.trim() || "guardian-pr-evidence.json";
+
+  writeAttestation(outputPath, evidence);
+}
+
 function appendStepSummary(summaryPath: string | undefined, markdown: string) {
   if (!summaryPath?.trim()) {
     return;
@@ -136,6 +143,7 @@ async function main() {
 
   writeAttestation(outputPath, attestation);
   writeWaveStateSnapshot(process.env.GUARDIAN_WAVE_STATE_SNAPSHOT_PATH, wave);
+  writePullRequestEvidence(process.env.GUARDIAN_PR_EVIDENCE_PATH, evidence);
   appendStepSummary(process.env.GITHUB_STEP_SUMMARY, formatGuardianStepSummary(attestation));
 
   console.log(`Guardian status: ${attestation.result.status}`);

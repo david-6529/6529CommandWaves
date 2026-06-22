@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "guardian:check": "vitest run pr-reviewer-gate setup-proof",
     "guardian:pr-check": "tsx scripts/guardian-pr-check.ts",
+    "guardian:verify-proof": "tsx scripts/verify-guardian-proof.ts",
     "setup:verify": "tsx scripts/verify-setup-proof.ts"
   },
   "dependencies": {
