@@ -26,6 +26,14 @@ function postgresStoreEnabled(env: Record<string, string | undefined>) {
   return Boolean(env.COMMAND_WAVE_STORE === "postgres" || (env.NODE_ENV === "production" && hasValue(env.DATABASE_URL)));
 }
 
+function productionMode(env: Record<string, string | undefined>) {
+  return env.NODE_ENV === "production";
+}
+
+function guardianWaveStateConfigured(env: Record<string, string | undefined>) {
+  return hasValue(env.COMMAND_WAVE_STATE_PATH) || hasValue(env.COMMAND_WAVE_STATE_URL);
+}
+
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const mockMode = env["6529_MOCK_MODE"] !== "false";
@@ -33,6 +41,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
   const hasDatabase = hasValue(env.DATABASE_URL);
   const hasLocalFileStore = localFileStoreEnabled(env);
   const hasPostgresStore = postgresStoreEnabled(env);
+  const hasGuardianWaveState = guardianWaveStateConfigured(env);
 
   return [
     hasValue(appUrl)
@@ -89,6 +98,16 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       message: postingConfigured
         ? "Bot posting credentials are present."
         : "Posting disabled until bot wallet address and auth token are configured.",
+    },
+    {
+      id: "guardian_wave_state",
+      label: "Guardian wave state",
+      status: hasGuardianWaveState ? "pass" : productionMode(env) ? "fail" : "warn",
+      message: hasGuardianWaveState
+        ? "Guardian PR checks have a real wave-state source."
+        : productionMode(env)
+          ? "Missing COMMAND_WAVE_STATE_PATH or COMMAND_WAVE_STATE_URL. PR guardian checks cannot verify real wave state."
+          : "Not configured. Fine for local development, required before using the guardian as a required PR check.",
     },
   ];
 }

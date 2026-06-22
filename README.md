@@ -124,6 +124,11 @@ This is the simple first step. The PR adapter feeds changed paths, PR manifests,
 GitHub can block merges that do not match the wave rules. Pull requests without a Command Waves manifest fail the guardian
 check instead of bypassing it.
 
+Before making `Command Waves Guardian` a required GitHub check, configure one real wave-state source for the workflow:
+
+- `COMMAND_WAVE_STATE_URL`
+- `COMMAND_WAVE_STATE_PATH`
+
 Verify a published setup proof against GitHub required-check payloads:
 
 ```bash
