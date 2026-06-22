@@ -74,6 +74,9 @@ export type GuardianReviewProof = {
   inputs: {
     waveId: string;
     proposalId: string | null;
+    waveStateHash: string;
+    proposalHash: string | null;
+    pollHash: string | null;
     manifestHash: string | null;
     changedPathsHash: string;
     rulesHash: string;

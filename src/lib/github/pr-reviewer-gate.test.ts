@@ -130,6 +130,9 @@ describe("PR reviewer gate", () => {
 
     expect(attestation.result.status).toBe("pass");
     expect(attestation.inputs.proposalId).toBe(proposal.id);
+    expect(attestation.inputs.waveStateHash).toHaveLength(64);
+    expect(attestation.inputs.proposalHash).toHaveLength(64);
+    expect(attestation.inputs.pollHash).toHaveLength(64);
     expect(attestation.inputs.manifestHash).toHaveLength(64);
   });
 
@@ -179,5 +182,35 @@ describe("PR reviewer gate", () => {
     expect(attestation.result.status).toBe("pass");
     expect(verifyGuardianAttestation({ wave, proposal, poll, manifest, changedPaths, attestation })).toBe(true);
     expect(attestation.attestationHash).toHaveLength(64);
+  });
+
+  it("fails attestation replay when the wave state changes", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const attestation = createGuardianAttestation({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["README.md"],
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+    const changedWave = {
+      ...wave,
+      name: "Tampered Wave Name",
+    };
+
+    expect(
+      verifyGuardianAttestation({
+        wave: changedWave,
+        proposal,
+        poll,
+        manifest,
+        changedPaths: ["README.md"],
+        attestation,
+      }),
+    ).toBe(false);
   });
 });

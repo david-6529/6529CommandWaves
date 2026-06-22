@@ -157,6 +157,9 @@ describe("Postgres command wave repository", () => {
               inputs: {
                 waveId: "demo-command-wave",
                 proposalId: "cmd-001",
+                waveStateHash: "f".repeat(64),
+                proposalHash: "1".repeat(64),
+                pollHash: "2".repeat(64),
                 manifestHash: "a".repeat(64),
                 changedPathsHash: "b".repeat(64),
                 rulesHash: "c".repeat(64),

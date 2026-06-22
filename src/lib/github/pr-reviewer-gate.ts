@@ -65,6 +65,9 @@ export type GuardianAttestation = {
   inputs: {
     waveId: string;
     proposalId: string | null;
+    waveStateHash: string;
+    proposalHash: string | null;
+    pollHash: string | null;
     manifestHash: string | null;
     changedPathsHash: string;
     rulesHash: string;
@@ -427,6 +430,9 @@ export function createGuardianAttestation({
     inputs: {
       waveId: waveIdFromUrl(wave.waveUrl),
       proposalId: proposal?.id ?? null,
+      waveStateHash: hashValue(wave),
+      proposalHash: proposal ? hashValue(proposal) : null,
+      pollHash: poll ? hashValue(poll) : null,
       manifestHash: manifest ? hashValue(manifest) : null,
       changedPathsHash: hashValue(sortedChangedPaths),
       rulesHash: hashValue(wave.rules),

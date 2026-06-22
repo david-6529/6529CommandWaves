@@ -41,15 +41,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GUARDIAN_ATTESTATION_PATH: guardian-attestation.json
+          GUARDIAN_WAVE_STATE_SNAPSHOT_PATH: guardian-wave-state.json
           COMMAND_WAVE_STATE_PATH: ${{ vars.COMMAND_WAVE_STATE_PATH }}
           COMMAND_WAVE_STATE_URL: ${{ vars.COMMAND_WAVE_STATE_URL }}
 
-      - name: Upload guardian attestation
+      - name: Upload guardian proof
         if: always() && hashFiles('guardian-attestation.json') != ''
         uses: actions/upload-artifact@v4
         with:
-          name: guardian-attestation
-          path: guardian-attestation.json
+          name: guardian-proof
+          path: |
+            guardian-attestation.json
+            guardian-wave-state.json
           if-no-files-found: error
 
       - name: Typecheck

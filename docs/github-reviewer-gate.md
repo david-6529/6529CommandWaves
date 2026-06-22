@@ -63,8 +63,8 @@ npm run guardian:pr-check
 
 It runs on every pull request. The script reads `GITHUB_EVENT_PATH`, fetches changed file paths,
 loads wave state from `COMMAND_WAVE_STATE_PATH` or `COMMAND_WAVE_STATE_URL`, creates the guardian attestation, writes
-`guardian-attestation.json`, appends a GitHub step summary, uploads the attestation as a workflow artifact, and fails if the
-deterministic result is not `pass`.
+`guardian-attestation.json`, writes the exact `guardian-wave-state.json` snapshot it checked, appends a GitHub step
+summary, uploads both files as a `guardian-proof` workflow artifact, and fails if the deterministic result is not `pass`.
 
 The script will not silently use demo state in production. `COMMAND_WAVE_ALLOW_DEMO_STATE=true` must be set explicitly for
 local demos.
@@ -92,6 +92,9 @@ Same proposal + same vote + same rules + same PR manifest + same diff = same gua
 That is the core proof. The guardian output is an attestation with:
 
 - verifier version
+- wave-state hash
+- proposal hash
+- poll hash
 - input hashes
 - rules hash
 - manifest hash
@@ -111,6 +114,12 @@ The app's review record stores the same compact proof material:
 - attestation hash
 
 So a review is not only a human-readable summary. It carries the proof needed to rerun and audit the reviewer.
+
+The GitHub artifact should include both files:
+
+- `guardian-attestation.json`: the verifier, hashes, check results, and final pass/fail.
+- `guardian-wave-state.json`: the exact wave snapshot used by the guardian. Its hash must match
+  `inputs.waveStateHash` in the attestation.
 
 ## Manifest
 

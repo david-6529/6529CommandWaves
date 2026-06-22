@@ -20,6 +20,7 @@ describe("guardian summary", () => {
     expect(summary).toContain("# Command Waves Guardian");
     expect(summary).toContain("Status: **PASS**");
     expect(summary).toContain(attestation.attestationHash);
+    expect(summary).toContain(attestation.inputs.waveStateHash);
     expect(summary).toContain("| Status | Check | Message |");
     expect(summary).toContain("`rules_hash`");
   });

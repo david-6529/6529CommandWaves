@@ -96,6 +96,12 @@ function writeAttestation(path: string, value: unknown) {
   writeFileSync(outputPath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function writeWaveStateSnapshot(path: string | undefined, wave: CommandWave) {
+  const outputPath = path?.trim() || "guardian-wave-state.json";
+
+  writeAttestation(outputPath, wave);
+}
+
 function appendStepSummary(summaryPath: string | undefined, markdown: string) {
   if (!summaryPath?.trim()) {
     return;
@@ -129,6 +135,7 @@ async function main() {
   const outputPath = process.env.GUARDIAN_ATTESTATION_PATH ?? "guardian-attestation.json";
 
   writeAttestation(outputPath, attestation);
+  writeWaveStateSnapshot(process.env.GUARDIAN_WAVE_STATE_SNAPSHOT_PATH, wave);
   appendStepSummary(process.env.GITHUB_STEP_SUMMARY, formatGuardianStepSummary(attestation));
 
   console.log(`Guardian status: ${attestation.result.status}`);
