@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./command-waves";
-import { createSetupProof, verifySetupProofHash } from "./setup-proof";
+import { createSetupProof, setupProofOptionsFromEnv, verifySetupProofHash } from "./setup-proof";
 
 describe("setup proof", () => {
   it("creates a third-party-verifiable setup proof", () => {
@@ -69,5 +69,32 @@ describe("setup proof", () => {
       ...proof,
       guardian: { ...proof.guardian, enforcementMode: "external_github_app", productionStrength: "strong" },
     })).toBe(false);
+  });
+
+  it("can publish external guardian setup metadata from env", () => {
+    const proof = createSetupProof(
+      demoWave,
+      setupProofOptionsFromEnv({
+        COMMAND_WAVE_GUARDIAN_MODE: "external_github_app",
+        COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK: "Command Waves Guardian App",
+        COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT: "guardian-app-proof",
+        COMMAND_WAVE_GUARDIAN_REPLAY_COMMAND: "npm run guardian:verify-proof",
+        COMMAND_WAVE_PROTECTED_BRANCH: "main",
+      }),
+    );
+
+    expect(proof.github).toMatchObject({
+      requiredReviewerCheck: "Command Waves Guardian App",
+      requiredChecks: ["Command Waves Guardian App"],
+    });
+    expect(proof.guardian).toMatchObject({
+      enforcementMode: "external_github_app",
+      requiredCheck: "Command Waves Guardian App",
+      productionStrength: "strong",
+      proofArtifact: "guardian-app-proof",
+      limitation: null,
+      recommendedUpgrade: null,
+    });
+    expect(verifySetupProofHash(proof)).toBe(true);
   });
 });

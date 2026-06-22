@@ -169,6 +169,12 @@ The current guardian enforcement mode is `repo_local_github_action`. That is goo
 and workflow changes are treated as critical-risk PRs, but the stronger production version should move the check into an
 external GitHub App so the governed repo cannot edit its own reviewer.
 
+The setup proof can advertise the production guardian by setting:
+
+- `COMMAND_WAVE_GUARDIAN_MODE=external_github_app`
+- `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK=<external app check name>`
+- `COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT=<artifact name>`
+
 Before making `Command Waves Guardian` a required GitHub check, configure one real wave-state source for the workflow:
 
 - `COMMAND_WAVE_STATE_URL`

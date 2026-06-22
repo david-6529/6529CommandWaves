@@ -4,6 +4,27 @@ import { parseGitHubRepoUrl } from "./github/repo";
 import { REVIEWER_GATE_VERSION } from "./github/pr-reviewer-gate";
 import { hashValue } from "./run-manifest";
 
+export type GuardianEnforcementMode = "repo_local_github_action" | "external_github_app";
+
+export type SetupProofGuardian = {
+  enforcementMode: GuardianEnforcementMode;
+  requiredCheck: string;
+  workflowPath: string | null;
+  proofArtifact: string;
+  replayCommand: string;
+  productionStrength: "mvp" | "strong";
+  limitation: string | null;
+  recommendedUpgrade: "external_github_app" | null;
+};
+
+export type SetupProofOptions = {
+  generatedAt?: string;
+  protectedBranch?: string;
+  requiredReviewerCheck?: string;
+  vercelProductionBranch?: string;
+  guardian?: Partial<SetupProofGuardian>;
+};
+
 export type SetupProof = {
   version: "command-wave-setup-v0.1";
   generatedAt: string;
@@ -23,16 +44,7 @@ export type SetupProof = {
     productionBranch: string;
     mode: "expected" | "not_configured";
   };
-  guardian: {
-    enforcementMode: "repo_local_github_action" | "external_github_app";
-    requiredCheck: string;
-    workflowPath: string | null;
-    proofArtifact: string;
-    replayCommand: string;
-    productionStrength: "mvp" | "strong";
-    limitation: string | null;
-    recommendedUpgrade: "external_github_app" | null;
-  };
+  guardian: SetupProofGuardian;
   governance: {
     rulesVersion: string;
     rulesHash: string;
@@ -74,17 +86,71 @@ function withoutHashes(proof: Omit<SetupProof, "setupHash" | "attestationHash">)
   return proof;
 }
 
-export function createSetupProof(
-  wave: CommandWave,
-  options: {
-    generatedAt?: string;
-    protectedBranch?: string;
-    requiredReviewerCheck?: string;
-    vercelProductionBranch?: string;
-  } = {},
-): SetupProof {
+function defaultGuardian(requiredCheck: string, enforcementMode: GuardianEnforcementMode): SetupProofGuardian {
+  if (enforcementMode === "external_github_app") {
+    return {
+      enforcementMode,
+      requiredCheck,
+      workflowPath: null,
+      proofArtifact: "guardian-proof",
+      replayCommand: "npm run guardian:verify-proof",
+      productionStrength: "strong",
+      limitation: null,
+      recommendedUpgrade: null,
+    };
+  }
+
+  return {
+    enforcementMode,
+    requiredCheck,
+    workflowPath: ".github/workflows/guardian-review.yml",
+    proofArtifact: "guardian-proof",
+    replayCommand: "npm run guardian:verify-proof",
+    productionStrength: "mvp",
+    limitation:
+      "The MVP guardian runs from the governed repo. Critical-risk diff rules protect guardian changes, but stronger production should use an external GitHub App.",
+    recommendedUpgrade: "external_github_app",
+  };
+}
+
+function asGuardianMode(value: string | undefined): GuardianEnforcementMode | undefined {
+  return value === "repo_local_github_action" || value === "external_github_app" ? value : undefined;
+}
+
+function envValue(env: Record<string, string | undefined>, key: string) {
+  return env[key]?.trim() || undefined;
+}
+
+export function setupProofOptionsFromEnv(env: Record<string, string | undefined> = process.env): SetupProofOptions {
+  const enforcementMode = asGuardianMode(envValue(env, "COMMAND_WAVE_GUARDIAN_MODE"));
+  const requiredCheck = envValue(env, "COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK");
+  const workflowPath = envValue(env, "COMMAND_WAVE_GUARDIAN_WORKFLOW_PATH");
+  const proofArtifact = envValue(env, "COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT");
+  const replayCommand = envValue(env, "COMMAND_WAVE_GUARDIAN_REPLAY_COMMAND");
+
+  return {
+    protectedBranch: envValue(env, "COMMAND_WAVE_PROTECTED_BRANCH"),
+    requiredReviewerCheck: requiredCheck,
+    vercelProductionBranch: envValue(env, "COMMAND_WAVE_VERCEL_PRODUCTION_BRANCH"),
+    guardian: {
+      ...(enforcementMode ? { enforcementMode } : {}),
+      ...(requiredCheck ? { requiredCheck } : {}),
+      ...(workflowPath ? { workflowPath } : {}),
+      ...(proofArtifact ? { proofArtifact } : {}),
+      ...(replayCommand ? { replayCommand } : {}),
+    },
+  };
+}
+
+export function createSetupProof(wave: CommandWave, options: SetupProofOptions = {}): SetupProof {
   const protectedBranch = options.protectedBranch ?? "main";
-  const requiredReviewerCheck = options.requiredReviewerCheck ?? "Command Waves Guardian";
+  const requiredReviewerCheck = options.guardian?.requiredCheck ?? options.requiredReviewerCheck ?? "Command Waves Guardian";
+  const enforcementMode = options.guardian?.enforcementMode ?? "repo_local_github_action";
+  const guardian = {
+    ...defaultGuardian(requiredReviewerCheck, enforcementMode),
+    ...options.guardian,
+    requiredCheck: requiredReviewerCheck,
+  };
   const repo = parseGitHubRepoUrl(wave.repoUrl);
   const baseProof = withoutHashes({
     version: "command-wave-setup-v0.1",
@@ -107,17 +173,7 @@ export function createSetupProof(
       productionBranch: options.vercelProductionBranch ?? protectedBranch,
       mode: "expected",
     },
-    guardian: {
-      enforcementMode: "repo_local_github_action",
-      requiredCheck: requiredReviewerCheck,
-      workflowPath: ".github/workflows/guardian-review.yml",
-      proofArtifact: "guardian-proof",
-      replayCommand: "npm run guardian:verify-proof",
-      productionStrength: "mvp",
-      limitation:
-        "The MVP guardian runs from the governed repo. Critical-risk diff rules protect guardian changes, but stronger production should use an external GitHub App.",
-      recommendedUpgrade: "external_github_app",
-    },
+    guardian,
     governance: {
       rulesVersion: wave.rules.version,
       rulesHash: hashValue(wave.rules),
