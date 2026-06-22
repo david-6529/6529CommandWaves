@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { demoWave, type CommandWave } from "../src/lib/command-waves";
 import {
@@ -9,6 +9,7 @@ import {
   pullRequestEvidenceFromGitHubEvent,
   type GitHubPullRequestEvent,
 } from "../src/lib/github/actions-pr-evidence";
+import { formatGuardianStepSummary } from "../src/lib/github/guardian-summary";
 import { createGuardianPullRequestAttestation } from "../src/lib/github/pr-reviewer-gate";
 
 function readJsonFile<T>(path: string): T {
@@ -95,6 +96,14 @@ function writeAttestation(path: string, value: unknown) {
   writeFileSync(outputPath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function appendStepSummary(summaryPath: string | undefined, markdown: string) {
+  if (!summaryPath?.trim()) {
+    return;
+  }
+
+  appendFileSync(summaryPath, markdown);
+}
+
 async function main() {
   const eventPath = process.env.GITHUB_EVENT_PATH;
 
@@ -120,6 +129,7 @@ async function main() {
   const outputPath = process.env.GUARDIAN_ATTESTATION_PATH ?? "guardian-attestation.json";
 
   writeAttestation(outputPath, attestation);
+  appendStepSummary(process.env.GITHUB_STEP_SUMMARY, formatGuardianStepSummary(attestation));
 
   console.log(`Guardian status: ${attestation.result.status}`);
   console.log(`Guardian attestation: ${attestation.attestationHash}`);

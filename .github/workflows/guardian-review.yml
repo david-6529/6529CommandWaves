@@ -35,6 +35,7 @@ jobs:
         run: npm run guardian:check
 
       - name: Verify PR command evidence
+        id: guardian-pr-check
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.body, '<!-- command-waves:manifest:start -->')
         run: npm run guardian:pr-check
         env:
@@ -42,6 +43,14 @@ jobs:
           GUARDIAN_ATTESTATION_PATH: guardian-attestation.json
           COMMAND_WAVE_STATE_PATH: ${{ vars.COMMAND_WAVE_STATE_PATH }}
           COMMAND_WAVE_STATE_URL: ${{ vars.COMMAND_WAVE_STATE_URL }}
+
+      - name: Upload guardian attestation
+        if: always() && hashFiles('guardian-attestation.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: guardian-attestation
+          path: guardian-attestation.json
+          if-no-files-found: error
 
       - name: Typecheck
         run: npm run typecheck

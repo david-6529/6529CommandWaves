@@ -117,6 +117,9 @@ GITHUB_EVENT_PATH=event.json COMMAND_WAVE_STATE_PATH=wave.json npm run guardian:
 
 For local demos only, set `COMMAND_WAVE_ALLOW_DEMO_STATE=true` to use the built-in demo wave state.
 
+When the PR adapter runs in GitHub Actions, it writes `guardian-attestation.json`, appends a Markdown proof summary to the
+job summary, and uploads the attestation as a workflow artifact.
+
 This is the simple first step. The PR adapter feeds changed paths, PR manifests, and wave state into the same verifier so
 GitHub can block merges that do not match the wave rules.
 
