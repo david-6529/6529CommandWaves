@@ -13,9 +13,11 @@ import {
 
 describe("Command wave store", () => {
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
+  const previousRepoAdapter = process.env.COMMAND_WAVE_REPO_ADAPTER;
 
   beforeEach(async () => {
     process.env.COMMAND_WAVE_STORE = "memory";
+    process.env.COMMAND_WAVE_REPO_ADAPTER = "local";
     clearCommandWaveStoreForTests();
     await resetCommandWave();
   });
@@ -27,6 +29,12 @@ describe("Command wave store", () => {
       delete process.env.COMMAND_WAVE_STORE;
     } else {
       process.env.COMMAND_WAVE_STORE = previousStoreMode;
+    }
+
+    if (previousRepoAdapter === undefined) {
+      delete process.env.COMMAND_WAVE_REPO_ADAPTER;
+    } else {
+      process.env.COMMAND_WAVE_REPO_ADAPTER = previousRepoAdapter;
     }
   });
 

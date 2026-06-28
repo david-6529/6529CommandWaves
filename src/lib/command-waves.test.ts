@@ -21,6 +21,11 @@ describe("Command Waves rule engine", () => {
     expect(classifyRisk("run_script", "Migrate payment records.")).toBe("high");
   });
 
+  it("classifies hook contract work as high risk", () => {
+    expect(classifyRisk("open_pr", "Add a bounded fee parameter to the hook contract.")).toBe("high");
+    expect(classifyRisk("open_pr", "Add a Solidity hook scaffold.")).toBe("high");
+  });
+
   it("classifies deploys, spending, and rule changes as critical", () => {
     expect(classifyRisk("deploy", "Deploy current main.")).toBe("critical");
     expect(classifyRisk("spend_money", "Buy compute.")).toBe("critical");

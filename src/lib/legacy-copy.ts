@@ -1,8 +1,8 @@
 const copyReplacements: Array<[RegExp, string]> = [
   [/\bGenesis Agent\b/g, "Setup"],
-  [/\bOrchestrator Agent\b/g, "AI Worker"],
-  [/\borchestrator execution\b/gi, "AI worker run"],
-  [/\borchestrator\b/gi, "AI worker"],
+  [/\bOrchestrator Agent\b/g, "Agent"],
+  [/\borchestrator execution\b/gi, "agent run"],
+  [/\borchestrator\b/gi, "agent"],
   [/\bGuardian Agent\b/g, "Reviewer"],
   [/\bGuardian review\b/g, "Review"],
   [/\bguardian review\b/g, "review"],

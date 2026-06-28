@@ -3,9 +3,11 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   clearCommandWaveStoreForTests,
   getCommandWave,
+  replaceCommandWave,
   resetCommandWave,
   submitCommandProposal,
 } from "./command-wave-store";
+import { demoWave } from "./command-waves";
 import { deletePersistedCommandWave, getCommandWaveStoreMode } from "./command-wave-persistence";
 
 describe("command wave persistence", () => {
@@ -60,5 +62,55 @@ describe("command wave persistence", () => {
       id: "cmd-002",
       title: "Persist me",
     });
+  });
+
+  it("migrates the old built-in demo state to the hook project demo", async () => {
+    await replaceCommandWave({
+      ...demoWave,
+      id: "cw-6529-shipyard",
+      waveUrl: "https://6529.io/waves/demo-command-wave",
+      repoUrl: "https://github.com/6529-Collections/example-command-wave",
+    });
+
+    clearCommandWaveStoreForTests();
+
+    expect(await getCommandWave()).toMatchObject({
+      id: "cw-6529-hook-builder",
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+    });
+  });
+
+  it("refreshes stale built-in hook demo records without changing custom activity", async () => {
+    await replaceCommandWave({
+      ...demoWave,
+      executions: [
+        {
+          proposalId: "cmd-001",
+          harness: "codex",
+          status: "complete",
+          summary: "Mock execution opened a PR with copy-only changes bound to the approved spec.",
+          artifacts: ["PR #12"],
+        },
+      ],
+      ledger: [
+        {
+          id: "evt-001",
+          at: "2026-06-20T12:00:00.000Z",
+          actor: "Setup",
+          type: "wave_created",
+          message: "Created Command Waves Demo and attached 6529 wave + GitHub repo.",
+        },
+      ],
+    });
+
+    clearCommandWaveStoreForTests();
+
+    const wave = await getCommandWave();
+
+    expect(wave.executions[0]?.summary).toBe(
+      "Mock execution opened a PR with the hook scaffold and parameter-bound tests bound to the approved spec.",
+    );
+    expect(wave.ledger[0]?.message).toBe("Created 6529 Hook Builder and attached the builder wave plus GitHub repo.");
   });
 });

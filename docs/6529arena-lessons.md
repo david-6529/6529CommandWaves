@@ -32,7 +32,7 @@ For Command Waves this means:
 - Read-only and draft-only actions can be low risk.
 - Posting, PR creation, scripts, deploys, spending, and rule changes require explicit policy.
 - High-risk tool calls go through a tool proxy controlled by the app.
-- The AI worker receives only the context required for the approved command.
+- The agent receives only the context required for the approved command.
 - Secrets stay in environment variables or a secret manager and never enter prompts.
 - Prompt injection is expected. The defense is constrained tools and review, not trust in source text.
 - The reviewer checks the approved command, artifacts, changed files, tests, rule version, and dangerous surfaces before completion.
@@ -56,8 +56,8 @@ Start with:
 
 - Next app on Vercel or a simple Node host.
 - Postgres for command waves, proposals, polls, executions, reviews, ledger events, jobs, and cached 6529 drops.
-- Vercel Cron or a small worker for queued AI worker/reviewer jobs.
-- Internal AI worker adapters first: Codex CLI or Claude Code called from controlled workers.
+- Vercel Cron or a small worker for queued agent/reviewer jobs.
+- Internal agent adapters first: Codex CLI or Claude Code called from controlled workers.
 - Dedicated 6529 bot wallet stored only in the host secret store.
 - No arbitrary external agent endpoints until signed manifests, timeouts, payload limits, domain allowlists, and tool permissions exist.
 

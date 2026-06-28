@@ -34,14 +34,20 @@ function guardianWaveStateConfigured(env: Record<string, string | undefined>) {
   return hasValue(env.COMMAND_WAVE_STATE_PATH) || hasValue(env.COMMAND_WAVE_STATE_URL);
 }
 
+function githubPrAdapterEnabled(env: Record<string, string | undefined>) {
+  return env.COMMAND_WAVE_REPO_ADAPTER === "github";
+}
+
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const mockMode = env["6529_MOCK_MODE"] !== "false";
   const postingConfigured = hasValue(env["6529_BOT_BEARER_TOKEN"]) && hasValue(env["6529_BOT_WALLET_ADDRESS"]);
+  const githubPrConfigured = hasValue(env.COMMAND_WAVE_GITHUB_TOKEN) || hasValue(env.GITHUB_TOKEN);
   const hasDatabase = hasValue(env.DATABASE_URL);
   const hasLocalFileStore = localFileStoreEnabled(env);
   const hasPostgresStore = postgresStoreEnabled(env);
   const hasGuardianWaveState = guardianWaveStateConfigured(env);
+  const hasGithubPrAdapter = githubPrAdapterEnabled(env);
 
   return [
     hasValue(appUrl)
@@ -98,6 +104,16 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       message: postingConfigured
         ? "Bot posting credentials are present."
         : "Posting disabled until bot wallet address and auth token are configured.",
+    },
+    {
+      id: "github_pr_adapter",
+      label: "GitHub PR adapter",
+      status: hasGithubPrAdapter ? (githubPrConfigured ? "pass" : "fail") : "warn",
+      message: hasGithubPrAdapter
+        ? githubPrConfigured
+          ? "GitHub PR creation is enabled and credentialed."
+          : "GitHub PR creation is enabled but no token is configured."
+        : "Local PR mock is active. Set COMMAND_WAVE_REPO_ADAPTER=github before production PR creation.",
     },
     {
       id: "guardian_wave_state",

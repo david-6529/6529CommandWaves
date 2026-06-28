@@ -1,6 +1,6 @@
-# AI Worker Harness Plan
+# Agent Harness Plan
 
-Command Waves should not let a wave directly run arbitrary tools. The AI worker should run approved commands through a constrained harness.
+Command Waves should not let a wave directly run arbitrary tools. The agent should run approved commands through a constrained harness.
 
 ## First Harness: Codex
 
@@ -26,7 +26,18 @@ Current local adapter status:
 
 - Generates a deterministic run manifest artifact before mock execution.
 - Includes proposal ID, command kind, risk, rules version/hash, permissions, budget, prompt/spec hashes, target branch, max runtime, and max cost.
-- Reviewer mock requests changes if the run manifest is missing or does not match the approved command.
+- Generates a deterministic Codex handoff packet for PR commands.
+- The handoff packet records the target branch, permission set, budget, required evidence, forbidden actions, run manifest hash, and PR manifest hash.
+- Includes the Command Waves PR manifest in the PR body for `open_pr` commands.
+- Can opt into a real GitHub draft PR adapter with `COMMAND_WAVE_REPO_ADAPTER=github` once a controlled harness has prepared the branch.
+- Reviewer mock requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
+
+Current GitHub PR adapter status:
+
+- Opens draft PRs through the GitHub API from an existing prepared branch.
+- Requires `COMMAND_WAVE_GITHUB_TOKEN` or `GITHUB_TOKEN`.
+- Uses `COMMAND_WAVE_GITHUB_BASE_BRANCH` when set, otherwise `main`.
+- Does not create branches, commit changes, merge PRs, deploy contracts, or spend funds.
 
 ## Safety Defaults
 

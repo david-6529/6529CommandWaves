@@ -9,6 +9,7 @@ import {
   type CommandKind,
   type CommandWave,
 } from "@/lib/command-waves";
+import { createContributionReport } from "@/lib/contribution-report";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
@@ -23,6 +24,14 @@ const commandKinds: Array<{ value: CommandKind; label: string; description: stri
   { value: "spend_money", label: "Spend money", description: "Use paid APIs, compute, bounties, or funds." },
   { value: "change_rules", label: "Change rules", description: "Modify governance or tool permissions." },
 ];
+
+const hookGuardrails = [
+  "No upgradeable hook contracts by default.",
+  "Parameter changes need explicit bounds and review.",
+  "Deployment, payments, and governance changes stay human controlled.",
+  "Contribution scores are reports, not permissions.",
+];
+
 function shortTime(value: string) {
   return new Intl.DateTimeFormat("en", {
     hour: "numeric",
@@ -355,6 +364,10 @@ function artifactLabel(artifact: string) {
     return "run manifest recorded";
   }
 
+  if (artifact.startsWith("agent-handoff:")) {
+    return "agent handoff recorded";
+  }
+
   return artifact;
 }
 
@@ -369,10 +382,12 @@ export function CommandWavesConsole() {
   );
   const [proposer, setProposer] = useState("david");
   const [kind, setKind] = useState<CommandKind>("open_pr");
-  const [title, setTitle] = useState("Add a Command Waves project overview");
-  const [prompt, setPrompt] = useState("Use Codex to add a clear project overview to the repo.");
-  const [spec, setSpec] = useState("Documentation-only change. Do not deploy, change auth, or alter repo settings.");
-  const [budgetUsd, setBudgetUsd] = useState("2");
+  const [title, setTitle] = useState("Draft the non-upgradeable hook scaffold");
+  const [prompt, setPrompt] = useState("Use Codex to draft a non-upgradeable 6529 hook scaffold with bounded fee parameters and tests.");
+  const [spec, setSpec] = useState(
+    "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
+  );
+  const [budgetUsd, setBudgetUsd] = useState("10");
   const [apiBusy, setApiBusy] = useState<BusyState | null>(null);
   const [apiNotice, setApiNotice] = useState("Backend demo state is loading.");
   const [apiError, setApiError] = useState("");
@@ -385,6 +400,7 @@ export function CommandWavesConsole() {
   const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
+  const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
   const recentLedgerEvents = wave.ledger.slice(0, 6);
   const isBusy = apiBusy !== null;
 
@@ -576,7 +592,7 @@ export function CommandWavesConsole() {
           method: "POST",
           body: JSON.stringify({ proposalId: activeProposal.id }),
         }, accessKey),
-      "AI worker run logged.",
+      "Agent build logged.",
     );
   }
 
@@ -793,8 +809,7 @@ export function CommandWavesConsole() {
           <Panel title="Safety rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
-                Low-risk commands can run right away. Anything that changes public state, code, money, deploys, or rules
-                needs a wave vote first.
+                Low-risk reads can run right away. Code, posts, scripts, deploys, funds, and rules need a visible decision.
               </p>
               <div className="grid gap-2 sm:grid-cols-3">
                 <div className="rounded-md border border-zinc-800 bg-black p-3">
@@ -809,6 +824,14 @@ export function CommandWavesConsole() {
                   <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Default yes</p>
                   <p className="mt-1 text-2xl font-semibold text-zinc-50">{wave.rules.defaultYesPercent}%</p>
                 </div>
+              </div>
+              <div className="rounded-md border border-zinc-800 bg-black p-3">
+                <p className="text-sm font-semibold text-zinc-100">Hook guardrails</p>
+                <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+                  {hookGuardrails.map((guardrail) => (
+                    <li key={guardrail}>- {guardrail}</li>
+                  ))}
+                </ul>
               </div>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
                 <summary className="text-sm font-semibold text-zinc-100">Show command rules and tool access</summary>
@@ -848,10 +871,10 @@ export function CommandWavesConsole() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-          <Panel title="2. Propose a command" eyebrow="Ask the AI worker">
+          <Panel title="2. Propose hook work" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Describe one thing the AI worker should do. Keep the limits clear so the wave knows what it is approving.
+                Describe one PR-sized change. Keep the limits clear so the wave knows what it is approving.
               </p>
               <Field label="Your name or agent">
                 <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
@@ -888,12 +911,12 @@ export function CommandWavesConsole() {
                 </div>
               </div>
               <Button type="button" disabled={isBusy} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Proposing" : "Propose command"}
+                {apiBusy === "proposal" ? "Proposing" : "Propose work"}
               </Button>
             </div>
           </Panel>
 
-          <Panel title="3. Current command" eyebrow="Vote, run, review">
+          <Panel title="3. Current work" eyebrow="Decide, build, review">
             {activeProposal ? (
               <div className="space-y-4">
                 <div className="rounded-md border border-zinc-800 bg-black p-4">
@@ -961,7 +984,7 @@ export function CommandWavesConsole() {
 
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
-                    <p className="text-sm font-semibold text-zinc-100">Run</p>
+                    <p className="text-sm font-semibold text-zinc-100">Build PR</p>
                     <p className="mt-2 text-sm leading-6 text-zinc-400">
                       {activeExecution?.summary ? humanizeLegacyCommandCopy(activeExecution.summary) : "Waiting for an approved command."}
                     </p>
@@ -978,7 +1001,7 @@ export function CommandWavesConsole() {
                       disabled={isBusy || activeProposal.status !== "approved"}
                       onClick={launchOrchestrator}
                     >
-                      {apiBusy === "execute" ? "Running" : "Run approved command"}
+                      {apiBusy === "execute" ? "Building" : "Build approved PR"}
                     </Button>
                   </div>
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
@@ -1018,6 +1041,39 @@ export function CommandWavesConsole() {
             )}
           </Panel>
         </section>
+
+        <Panel title="Contribution report" eyebrow="Informational">
+          <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+            <div>
+              <p className="text-sm leading-6 text-zinc-400">{contributionReport.summary}</p>
+              <p className="mt-2 text-xs leading-5 text-zinc-500">
+                This report summarizes visible app activity. It does not grant REP, TDH, payouts, permissions, or merge rights.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {contributionReport.notes.map((note) => (
+                  <Badge key={note} className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                    {note}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div className="divide-y divide-zinc-800 rounded-md border border-zinc-800 bg-black">
+              {contributionReport.contributors.map((contributor) => (
+                <div key={contributor.identity} className="grid gap-2 p-3 sm:grid-cols-[1fr_auto]">
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-100">{contributor.identity}</p>
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">{contributor.rationale.join(", ")}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">score {contributor.score}</Badge>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{contributor.proposals} proposals</Badge>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{contributor.votes} votes</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Panel>
 
         <Panel title="Recent activity" eyebrow="Log">
           <div className="divide-y divide-zinc-800">

@@ -8,9 +8,19 @@ import {
   type WaveAdapter,
 } from "./adapters";
 import type { ExecutionRecord, GuardianReview, LedgerEvent } from "./command-waves";
-import { createCommandPrManifest, createGuardianAttestation } from "./github/pr-reviewer-gate";
+import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
+import {
+  createCommandPrManifest,
+  createGuardianAttestation,
+  formatCommandPrManifestForPullRequest,
+} from "./github/pr-reviewer-gate";
 import { pullRequestUrl } from "./github/repo";
-import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact } from "./run-manifest";
+import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact, hashValue } from "./run-manifest";
+import {
+  findHookContractSignals,
+  proposalAllowsUpgradeabilityException,
+  riskAllowsHookContractSignal,
+} from "./safety/hook-contract-policy";
 import { findDangerousPromptFlags, toolPolicyForProposal } from "./safety/tool-policy";
 
 function stableNumber(value: string) {
@@ -39,39 +49,90 @@ export const localRepoAdapter: RepoAdapter = {
   },
 };
 
-export const localOrchestratorAdapter: OrchestratorAdapter = {
-  async execute(input): Promise<ExecutionRecord> {
-    const manifest = createCommandRunManifest(input);
-    const wavePost = formatProposalForWave(input.proposal, input.poll);
-    const pr =
-      input.proposal.kind === "open_pr"
-        ? await localRepoAdapter.openPullRequest({
-            repoUrl: input.wave.repoUrl,
-            title: input.proposal.title,
-            body: wavePost,
-            branchName: manifest.targetBranch,
-          })
-        : null;
-
-    return {
-      proposalId: input.proposal.id,
-      harness: input.proposal.kind === "open_pr" ? "codex" : "manual",
-      status: "complete",
-      summary:
-        input.proposal.kind === "open_pr"
-          ? "Local AI worker mock opened a deterministic PR artifact for the approved command."
-          : "Local AI worker mock recorded the approved command without external side effects.",
-      artifacts: [
-        formatRunManifestArtifact(manifest),
-        "approved prompt snapshot",
-        `rules ${manifest.rulesVersion}/${manifest.rulesHash}`,
-        `permissions ${manifest.allowedPermissions.join(", ")}`,
-        `budget cap $${manifest.maxCostUsd}`,
-        ...(pr ? [`PR #${pr.prNumber}`, pr.url, `head ${pr.headSha}`] : ["no external PR for this command type"]),
-      ],
-    };
-  },
+export type LocalOrchestratorOptions = {
+  repoAdapter?: RepoAdapter;
+  baseBranch?: string;
 };
+
+function isRepoAdapter(value: RepoAdapter | LocalOrchestratorOptions): value is RepoAdapter {
+  return typeof (value as RepoAdapter).openPullRequest === "function";
+}
+
+function agentHandoffHashMatches(packet: ReturnType<typeof findAgentHandoffArtifact>) {
+  if (!packet) {
+    return false;
+  }
+
+  const { packetHash, ...packetWithoutHash } = packet;
+
+  return hashValue(packetWithoutHash) === packetHash;
+}
+
+export function createLocalOrchestratorAdapter(
+  repoAdapterOrOptions: RepoAdapter | LocalOrchestratorOptions = localRepoAdapter,
+): OrchestratorAdapter {
+  const repoAdapter = isRepoAdapter(repoAdapterOrOptions)
+    ? repoAdapterOrOptions
+    : (repoAdapterOrOptions.repoAdapter ?? localRepoAdapter);
+  const baseBranch = isRepoAdapter(repoAdapterOrOptions) ? "main" : (repoAdapterOrOptions.baseBranch ?? "main");
+
+  return {
+    async execute(input): Promise<ExecutionRecord> {
+      const manifest = createCommandRunManifest(input);
+      const prManifest =
+        input.proposal.kind === "open_pr"
+          ? createCommandPrManifest({ wave: input.wave, proposal: input.proposal, poll: input.poll })
+          : null;
+      const handoff =
+        input.proposal.kind === "open_pr"
+          ? createAgentHandoffPacket({
+              wave: input.wave,
+              proposal: input.proposal,
+              poll: input.poll,
+              runManifest: manifest,
+              baseBranch,
+            })
+          : null;
+      const wavePost = [
+        formatProposalForWave(input.proposal, input.poll),
+        ...(prManifest ? ["", formatCommandPrManifestForPullRequest(prManifest)] : []),
+      ].join("\n");
+      const pr =
+        input.proposal.kind === "open_pr"
+          ? await repoAdapter.openPullRequest({
+              repoUrl: input.wave.repoUrl,
+              title: input.proposal.title,
+              body: wavePost,
+              branchName: manifest.targetBranch,
+              baseBranch,
+              draft: true,
+            })
+          : null;
+
+      return {
+        proposalId: input.proposal.id,
+        harness: input.proposal.kind === "open_pr" ? "codex" : "manual",
+        status: "complete",
+        summary:
+          input.proposal.kind === "open_pr"
+            ? "Local agent mock opened a deterministic PR artifact for the approved command."
+            : "Local agent mock recorded the approved command without external side effects.",
+        artifacts: [
+          formatRunManifestArtifact(manifest),
+          ...(handoff ? [formatAgentHandoffArtifact(handoff), "Codex handoff packet recorded"] : []),
+          "approved prompt snapshot",
+          `rules ${manifest.rulesVersion}/${manifest.rulesHash}`,
+          `permissions ${manifest.allowedPermissions.join(", ")}`,
+          `budget cap $${manifest.maxCostUsd}`,
+          ...(prManifest ? ["PR body includes Command Waves manifest"] : []),
+          ...(pr ? [`PR #${pr.prNumber}`, pr.url, `head ${pr.headSha}`] : ["no external PR for this command type"]),
+        ],
+      };
+    },
+  };
+}
+
+export const localOrchestratorAdapter: OrchestratorAdapter = createLocalOrchestratorAdapter();
 
 export const localGuardianAdapter: GuardianAdapter = {
   async review(input): Promise<GuardianReview> {
@@ -79,10 +140,43 @@ export const localGuardianAdapter: GuardianAdapter = {
     const expectedManifest = createCommandRunManifest(input);
     const actualManifest = findRunManifestArtifact(input.execution.artifacts);
     const manifestMatches = actualManifest?.manifestHash === expectedManifest.manifestHash;
-    const dangerousFlags = findDangerousPromptFlags(`${input.proposal.prompt}\n${input.proposal.spec}`);
-    const touchesDangerousSurface = dangerousFlags.length > 0;
-    const needsChanges = touchesDangerousSurface || !manifestMatches;
     const poll = input.wave.polls.find((item) => item.proposalId === input.proposal.id) ?? null;
+    const actualHandoff = findAgentHandoffArtifact(input.execution.artifacts);
+    const expectedHandoff =
+      input.proposal.kind === "open_pr"
+        ? createAgentHandoffPacket({
+            wave: input.wave,
+            proposal: input.proposal,
+            poll,
+            runManifest: expectedManifest,
+            baseBranch: actualHandoff?.baseBranch ?? "main",
+          })
+        : null;
+    const actualHandoffHashMatches = agentHandoffHashMatches(actualHandoff);
+    const handoffMatches =
+      !expectedHandoff ||
+      Boolean(
+        actualHandoff &&
+          actualHandoffHashMatches &&
+          actualHandoff.packetHash === expectedHandoff.packetHash &&
+          actualHandoff.runManifestHash === expectedManifest.manifestHash &&
+          actualHandoff.targetBranch === expectedManifest.targetBranch &&
+          JSON.stringify(actualHandoff.allowedPermissions) === JSON.stringify(policy.permissions),
+      );
+    const proposalText = `${input.proposal.prompt}\n${input.proposal.spec}`;
+    const dangerousFlags = findDangerousPromptFlags(proposalText);
+    const touchesDangerousSurface = dangerousFlags.length > 0;
+    const hookSignals = findHookContractSignals({ proposalText });
+    const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
+    const blockedHookSignals = hookSignals.filter(
+      (signal) =>
+        !riskAllowsHookContractSignal({
+          risk: input.proposal.risk,
+          signal,
+          upgradeabilityExceptionApproved,
+        }),
+    );
+    const needsChanges = touchesDangerousSurface || !manifestMatches || !handoffMatches || blockedHookSignals.length > 0;
     const attestation =
       input.proposal.kind === "open_pr"
         ? createGuardianAttestation({
@@ -103,10 +197,23 @@ export const localGuardianAdapter: GuardianAdapter = {
         manifestMatches
           ? "Run manifest matches approved command, rules hash, permissions, and budget."
           : "Run manifest is missing or does not match the approved command.",
+        expectedHandoff
+          ? handoffMatches
+            ? "Codex handoff packet matches the run manifest, target branch, permissions, and budget."
+            : actualHandoff
+              ? "Codex handoff packet does not match the approved run manifest."
+              : "Codex handoff packet is missing for this PR command."
+          : "No Codex handoff required for this command type.",
         `Allowed permissions: ${policy.permissions.join(", ")}.`,
         touchesDangerousSurface
           ? `Dangerous surface mentioned (${dangerousFlags.join(", ")}); human review required before completion.`
           : "No deploy, spending, private-key, or rule-change language detected.",
+        hookSignals.length
+          ? `Hook contract signals checked: ${hookSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
+          : "No hook contract risk signals found in the command text.",
+        blockedHookSignals.length
+          ? `Blocked hook signals: ${blockedHookSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
+          : "Hook contract signals fit the approved risk level.",
         ...(attestation ? [`Guardian attestation hash: ${attestation.attestationHash}.`] : []),
       ],
       summary: needsChanges

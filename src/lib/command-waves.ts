@@ -197,7 +197,18 @@ export function classifyRisk(kind: CommandKind, prompt: string): RiskLevel {
   }
 
   if (kind === "open_pr" || kind === "run_script") {
-    return lowerPrompt.includes("auth") || lowerPrompt.includes("wallet") || lowerPrompt.includes("payment")
+    return lowerPrompt.includes("auth") ||
+      lowerPrompt.includes("wallet") ||
+      lowerPrompt.includes("payment") ||
+      lowerPrompt.includes("contract") ||
+      lowerPrompt.includes("solidity") ||
+      lowerPrompt.includes("hook") ||
+      lowerPrompt.includes("fee") ||
+      lowerPrompt.includes("deploy") ||
+      lowerPrompt.includes("proxy") ||
+      lowerPrompt.includes("upgrade") ||
+      lowerPrompt.includes("delegatecall") ||
+      lowerPrompt.includes("governance")
       ? "high"
       : "medium";
   }
@@ -242,24 +253,28 @@ export function evaluatePoll(poll: PollState) {
 }
 
 export const demoWave: CommandWave = {
-  id: "cw-6529-shipyard",
-  name: "Command Waves Demo",
-  waveUrl: "https://6529.io/waves/demo-command-wave",
-  repoUrl: "https://github.com/6529-Collections/example-command-wave",
-  gates: ["manual allowlist for MVP", "REP/NIC/TDH gates later", "agents require sponsor wallets later"],
+  id: "cw-6529-hook-builder",
+  name: "6529 Hook Builder",
+  waveUrl: "https://6529.io/waves/6529-hook-builder",
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  gates: [
+    "Builder wave allowlist for phase 1",
+    "REP or TDH gates are planned, not enforced here",
+    "AI contribution scores are reports, not permissions",
+  ],
   rules: defaultRules,
   proposals: [
     {
       id: "cmd-001",
-      title: "Add a landing page section explaining Command Waves",
+      title: "Draft the non-upgradeable hook scaffold",
       proposer: "david",
       kind: "open_pr",
-      risk: "medium",
+      risk: "high",
       prompt:
-        "Use Codex to add a concise landing page section explaining commands, votes, runs, and reviews.",
+        "Use Codex to draft a non-upgradeable 6529 hook scaffold with bounded fee parameters and tests.",
       spec:
-        "Add copy only. Do not change auth, payments, production deploys, or repo settings. Include tests if existing page tests cover copy.",
-      budgetUsd: 2,
+        "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
+      budgetUsd: 10,
       status: "approved",
     },
   ],
@@ -286,16 +301,22 @@ export const demoWave: CommandWave = {
       proposalId: "cmd-001",
       harness: "codex",
       status: "complete",
-      summary: "Mock execution opened a PR with copy-only changes bound to the approved spec.",
-      artifacts: ["PR #12", "commit abc123", "npm run lint passed"],
+      summary: "Mock execution opened a PR with the hook scaffold and parameter-bound tests bound to the approved spec.",
+      artifacts: ["PR #12", "commit abc123", "forge test passed"],
     },
   ],
   reviews: [
     {
       proposalId: "cmd-001",
       status: "pass",
-      checks: ["Matched approved scope", "No unexpected files", "No production deploy", "Tests/lint recorded"],
-      summary: "Review passed. The work matched the vote and stayed inside the approved command.",
+      checks: [
+        "Matched approved hook scope",
+        "No proxy or upgradeability pattern",
+        "No deployment script",
+        "Parameter bounds requested",
+        "Tests recorded",
+      ],
+      summary: "Review passed. The work matched the vote and stayed inside the approved non-upgradeable hook scope.",
     },
   ],
   ledger: [
@@ -304,21 +325,21 @@ export const demoWave: CommandWave = {
       at: "2026-06-20T12:00:00.000Z",
       actor: "Setup",
       type: "wave_created",
-      message: "Created Command Waves Demo and attached 6529 wave + GitHub repo.",
+      message: "Created 6529 Hook Builder and attached the builder wave plus GitHub repo.",
     },
     {
       id: "evt-002",
       at: "2026-06-20T12:05:00.000Z",
       actor: "david",
       type: "proposal_submitted",
-      message: "Submitted cmd-001 as an open_pr proposal.",
+      message: "Submitted cmd-001 to draft the non-upgradeable hook scaffold.",
     },
     {
       id: "evt-003",
       at: "2026-06-20T12:05:03.000Z",
       actor: "Rule Engine",
       type: "rule_check",
-      message: "Classified cmd-001 as medium risk. Poll required: quorum 3, yes 60%.",
+      message: "Classified cmd-001 as high risk. Poll required: quorum 3, yes 60%.",
     },
     {
       id: "evt-004",
@@ -330,16 +351,16 @@ export const demoWave: CommandWave = {
     {
       id: "evt-005",
       at: "2026-06-20T12:42:00.000Z",
-      actor: "AI Worker",
+      actor: "Agent",
       type: "execution_logged",
-      message: "Executed cmd-001 through Codex and opened PR #12.",
+      message: "Built cmd-001 through Codex and opened PR #12.",
     },
     {
       id: "evt-006",
       at: "2026-06-20T12:50:00.000Z",
       actor: "Reviewer",
       type: "guardian_reviewed",
-      message: "Review passed. Execution matched vote and rules.",
+      message: "Review passed. The hook scaffold matched the vote and rules.",
     },
   ],
 };

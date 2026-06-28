@@ -1,4 +1,4 @@
-import { localGuardianAdapter, localOrchestratorAdapter } from "./local-adapters";
+import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "./configured-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
 import { validateSetupShape } from "./setup-validation";
 import {
@@ -38,12 +38,37 @@ function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
 }
 
+function migrateLegacyDemoWave(wave: CommandWave | null) {
+  if (
+    wave &&
+    (wave.id === "cw-6529-shipyard" ||
+      wave.waveUrl.includes("/waves/demo-command-wave") ||
+      wave.repoUrl.includes("/example-command-wave") ||
+      (wave.id === demoWave.id &&
+        wave.proposals.length === 1 &&
+        wave.proposals[0]?.id === "cmd-001" &&
+        (wave.executions.some((execution) => execution.summary.includes("copy-only")) ||
+          wave.ledger.some((event) => event.message.includes("Command Waves Demo")))))
+  ) {
+    return cloneDemoWave();
+  }
+
+  return wave;
+}
+
 async function store() {
   const persistencePath = getCommandWavePersistencePath();
 
   if (!globalStore.__commandWaveStore || globalStore.__commandWaveStore.persistencePath !== persistencePath) {
+    const persisted = await loadPersistedCommandWave();
+    const wave = migrateLegacyDemoWave(persisted) ?? cloneDemoWave();
+
+    if (persisted && wave !== persisted) {
+      await savePersistedCommandWave(wave);
+    }
+
     globalStore.__commandWaveStore = {
-      wave: (await loadPersistedCommandWave()) ?? cloneDemoWave(),
+      wave,
       persistencePath,
     };
   }
@@ -289,7 +314,7 @@ export async function executeProposal(input: unknown) {
     throw Object.assign(new Error("A valid GitHub repo is required before opening PR commands can run."), { status: 409 });
   }
 
-  const execution = await localOrchestratorAdapter.execute({
+  const execution = await getConfiguredOrchestratorAdapter().execute({
     wave,
     proposal,
     poll: wave.polls.find((item) => item.proposalId === proposalId) ?? null,
@@ -301,7 +326,7 @@ export async function executeProposal(input: unknown) {
       executions: [execution, ...wave.executions.filter((item) => item.proposalId !== proposalId)],
     },
     {
-      actor: "AI Worker",
+      actor: "Agent",
       type: "execution_logged",
       message: `Ran ${proposal.id} through ${execution.harness}. Review is required before completion.`,
     },
@@ -329,7 +354,7 @@ export async function reviewProposal(input: unknown) {
     throw Object.assign(new Error("Proposal execution is not complete."), { status: 409 });
   }
 
-  const review = await localGuardianAdapter.review({ wave, proposal, execution });
+  const review = await getConfiguredGuardianAdapter().review({ wave, proposal, execution });
   const nextWave = appendLedger(
     {
       ...wave,

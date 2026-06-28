@@ -5,7 +5,7 @@ The reviewer should become a merge gate, not just a comment.
 For code work, the safe path is:
 
 ```text
-Wave command -> rules check -> vote if needed -> AI worker PR -> reviewer gate -> merge -> deploy
+Wave command -> rules check -> vote if needed -> agent PR -> reviewer gate -> merge -> deploy
 ```
 
 ## MVP Gate
@@ -55,6 +55,9 @@ This means the CI/GitHub App layer only has to gather:
 
 Then it calls the deterministic verifier.
 
+The opt-in GitHub PR adapter opens draft PRs with this manifest in the body after a controlled harness has prepared the
+branch.
+
 The workflow also has a PR evidence check:
 
 ```text
@@ -81,9 +84,25 @@ The check fails if:
 - the manifest prompt/spec hashes do not match the approved command
 - the PR touches high-risk files without a high-risk or critical approval
 - the PR touches guardian/reviewer/proof code without a critical-risk approval
+- the PR or approved command touches hook contract deployment, parameters, governance, or upgradeability patterns without the required risk level
+- upgradeability appears without an explicit exception and critical approval
 
 The guardian should be deterministic. An LLM can help explain the result or suggest extra risks, but the merge-blocking
 decision should come from checks that anyone can rerun.
+
+## Hook Contract Signals
+
+The first public project is a 6529 hook, so the reviewer has contract-specific signals in addition to generic risky-path
+checks:
+
+- contract source changes: medium risk
+- deployment scripts, broadcast output, and chain config: high risk
+- hook parameter, fee, bound, limit, and config changes: high risk
+- governance, owner, role, timelock, Safe, threshold, quorum, and TDH control changes: critical risk
+- proxy, UUPS, diamond, initializer, delegatecall, and upgradeability patterns: critical risk and blocked by default
+
+The first phase defaults to immutable contracts. Upgradeability requires the approved command text to include an explicit
+upgradeability exception and the manifest must carry critical risk.
 
 Fairness rule:
 
@@ -135,7 +154,7 @@ npm run guardian:verify-proof
 
 ## Manifest
 
-Every AI worker PR should include a manifest. It can start in the PR body and later move to a committed artifact.
+Every agent PR should include a manifest. It can start in the PR body and later move to a committed artifact.
 
 Required fields:
 

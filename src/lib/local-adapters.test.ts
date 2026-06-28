@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { demoWave } from "./command-waves";
-import { localGuardianAdapter, localOrchestratorAdapter } from "./local-adapters";
+import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter } from "./local-adapters";
+import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
 import { findRunManifestArtifact } from "./run-manifest";
 
 describe("local command adapters", () => {
-  it("includes run manifest evidence in local AI worker executions", async () => {
+  it("includes run manifest evidence in local agent executions", async () => {
     const proposal = demoWave.proposals[0];
     const execution = await localOrchestratorAdapter.execute({
       wave: demoWave,
@@ -18,6 +20,71 @@ describe("local command adapters", () => {
       allowedPermissions: ["wave.read", "repo.read", "repo.open_pr"],
       maxCostUsd: proposal.budgetUsd,
     });
+    expect(findAgentHandoffArtifact(execution.artifacts)).toMatchObject({
+      proposalId: proposal.id,
+      repoUrl: demoWave.repoUrl,
+      allowedPermissions: ["wave.read", "repo.read", "repo.open_pr"],
+      maxCostUsd: proposal.budgetUsd,
+    });
+    expect(execution.artifacts).toContain("PR body includes Command Waves manifest");
+    expect(execution.artifacts).toContain("Codex handoff packet recorded");
+  });
+
+  it("passes the command manifest into the PR body", async () => {
+    let prBody = "";
+    const orchestrator = createLocalOrchestratorAdapter({
+      async openPullRequest(input) {
+        prBody = input.body;
+
+        return {
+          prNumber: 12,
+          url: "https://github.com/6529-Collections/6529-hook/pull/12",
+          headSha: "abc123",
+        };
+      },
+    });
+
+    await orchestrator.execute({
+      wave: demoWave,
+      proposal: demoWave.proposals[0],
+      poll: demoWave.polls[0],
+    });
+
+    expect(prBody).toContain(COMMAND_PR_MANIFEST_START);
+    expect(prBody).toContain(demoWave.proposals[0].id);
+  });
+
+  it("passes the configured base branch into the PR adapter and handoff packet", async () => {
+    let prBaseBranch = "";
+    const orchestrator = createLocalOrchestratorAdapter({
+      baseBranch: "develop",
+      repoAdapter: {
+        async openPullRequest(input) {
+          prBaseBranch = input.baseBranch ?? "";
+
+          return {
+            prNumber: 12,
+            url: "https://github.com/6529-Collections/6529-hook/pull/12",
+            headSha: "abc123",
+          };
+        },
+      },
+    });
+
+    const execution = await orchestrator.execute({
+      wave: demoWave,
+      proposal: demoWave.proposals[0],
+      poll: demoWave.polls[0],
+    });
+    const review = await localGuardianAdapter.review({
+      wave: demoWave,
+      proposal: demoWave.proposals[0],
+      execution,
+    });
+
+    expect(prBaseBranch).toBe("develop");
+    expect(findAgentHandoffArtifact(execution.artifacts)).toMatchObject({ baseBranch: "develop" });
+    expect(review.status).toBe("pass");
   });
 
   it("lets the reviewer pass execution only when manifest evidence matches", async () => {
@@ -31,6 +98,9 @@ describe("local command adapters", () => {
 
     expect(review.status).toBe("pass");
     expect(review.checks).toContain("Run manifest matches approved command, rules hash, permissions, and budget.");
+    expect(review.checks).toContain(
+      "Codex handoff packet matches the run manifest, target branch, permissions, and budget.",
+    );
     expect(review.proof).toMatchObject({
       version: "guardian-attestation-v0.1",
       verifier: "Command Waves Guardian",
@@ -58,6 +128,61 @@ describe("local command adapters", () => {
 
     expect(review.status).toBe("changes_requested");
     expect(review.checks).toContain("Run manifest is missing or does not match the approved command.");
+    expect(review.checks).toContain("Codex handoff packet is missing for this PR command.");
+  });
+
+  it("asks for changes when a PR command has no Codex handoff packet", async () => {
+    const proposal = demoWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: demoWave,
+      proposal,
+      poll: demoWave.polls[0],
+    });
+    const review = await localGuardianAdapter.review({
+      wave: demoWave,
+      proposal,
+      execution: {
+        ...execution,
+        artifacts: execution.artifacts.filter(
+          (artifact) => !artifact.startsWith("agent-handoff:") && artifact !== "Codex handoff packet recorded",
+        ),
+      },
+    });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain("Codex handoff packet is missing for this PR command.");
+  });
+
+  it("asks for changes when a PR command handoff packet is changed", async () => {
+    const proposal = demoWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: demoWave,
+      proposal,
+      poll: demoWave.polls[0],
+    });
+    const handoff = findAgentHandoffArtifact(execution.artifacts);
+
+    if (!handoff) {
+      throw new Error("Expected handoff packet.");
+    }
+
+    const changedHandoff = {
+      ...handoff,
+      repoUrl: "https://github.com/6529-Collections/other-hook",
+    };
+    const review = await localGuardianAdapter.review({
+      wave: demoWave,
+      proposal,
+      execution: {
+        ...execution,
+        artifacts: execution.artifacts.map((artifact) =>
+          artifact.startsWith("agent-handoff:") ? formatAgentHandoffArtifact(changedHandoff) : artifact,
+        ),
+      },
+    });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain("Codex handoff packet does not match the approved run manifest.");
   });
 
   it("does not attach PR gate proof to non-PR command reviews", async () => {

@@ -110,7 +110,7 @@ Indexes:
 
 ### command_executions
 
-The AI worker run record.
+The agent run record.
 
 - `id`
 - `proposal_id`
@@ -200,7 +200,7 @@ This supports later cross-wave questions and user activity lookup without refetc
 
 ### command_jobs
 
-Used for AI worker and reviewer jobs.
+Used for agent and reviewer jobs.
 
 - `id`
 - `command_wave_id`

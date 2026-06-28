@@ -16,6 +16,9 @@ export type RepoPullRequestInput = {
   title: string;
   body: string;
   branchName: string;
+  baseBranch?: string;
+  draft?: boolean;
+  maintainerCanModify?: boolean;
 };
 
 export type RepoPullRequestResult = {

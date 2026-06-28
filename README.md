@@ -2,19 +2,23 @@
 
 ## ELI5
 
-Command Waves let a 6529 wave control an AI worker.
+Command Waves let a 6529 builder wave govern scoped work in a GitHub repo.
 
-Instead of everyone shouting prompts at the AI, people propose commands in the wave. The app checks the rules:
+For the first public phase, the project is simple: use a 6529 wave to coordinate a community-built 6529 hook.
+People propose scoped work, decisions approve PRs, agents can help, reviewers check the output, and humans keep control.
 
-1. Safe commands can run.
-2. Risky commands need a yes/no vote.
-3. Approved commands run through the AI worker.
-4. The result is reviewed.
-5. Everything important is logged.
+The app keeps the loop visible:
+
+1. Choose the builder wave and GitHub repo.
+2. Propose one PR-sized change.
+3. Decide whether it should run.
+4. Build or open the PR.
+5. Review the result.
+6. Log the activity.
 
 The simple flow is:
 
-`Propose -> Vote if risky -> Run -> Review`
+`Choose project -> Propose work -> Decide -> Build PR -> Review -> Log`
 
 ## Why This Exists
 
@@ -32,23 +36,23 @@ Command Waves make the answers visible:
 
 ## MVP
 
-The first narrow demo:
+The first public phase:
 
-1. Choose one 6529 project wave.
-2. Connect one GitHub repo.
-3. Propose a command in plain English.
-4. Let the app decide whether it can run or needs a vote.
-5. Vote yes/no when the command is risky.
-6. Run the approved command through a controlled agent adapter.
-7. Review the result against the approved command.
-8. Show recent activity and keep the full audit log available.
+1. Choose one 6529 builder wave.
+2. Connect one GitHub smart contract repo for the 6529 hook.
+3. Propose hook work in plain English with clear limits.
+4. Decide whether the work is approved.
+5. Let an agent help produce a PR when allowed.
+6. Review the PR against the approved command, rules, and hook guardrails.
+7. Show recent activity and a transparent contribution report.
+8. Keep the full audit log available.
 
-No deploys, merging, spending, or autonomous tool use in the first demo.
+No auto-merges, autonomous deploys, spending, or live REP/TDH authority in the first phase.
 
 ## Agent Handoff
 
 This repo is now focused on **Command Waves**, not the earlier summarizer / SwarmOps direction. The product is a governed
-AI worker controlled by a 6529 wave.
+agent workflow controlled by a 6529 wave.
 
 Current work is centered on the trust boundary:
 
@@ -87,21 +91,26 @@ Short version:
 
 ## Current App
 
-The current app is a local prototype of the simple flow:
+The current app is a local prototype of the hook-building flow:
 
-- first-screen flow: choose wave, propose work, run/review
+- first-screen flow: choose project, propose work, decide, build PR, review
 - project wave setup with simpler user-facing language
 - 6529 wave search by name or pasted wave URL/ID
 - GitHub repo link
-- participation gate notes
+- participation gate notes that do not claim live REP/TDH enforcement
+- hook guardrails for immutable-by-default smart contract work
+- transparent contribution report that does not grant permissions
 - safety rules by command type
 - command proposal form
 - automatic risk classification
+- high-risk classification for hook, fee, Solidity, proxy, deployment, and governance work
 - poll voting with one vote per voter identity
 - backend setup validation for 6529 wave links and GitHub repo links
 - controlled run placeholder
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
-- PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, and risky file paths
+- deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
+- opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
+- PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
 - review records store compact guardian proof material for later audit
 - public setup proof endpoint for third-party verification of wave/repo/rules/check expectations
@@ -180,6 +189,15 @@ Before making `Command Waves Guardian` a required GitHub check, configure one re
 - `COMMAND_WAVE_STATE_URL`
 - `COMMAND_WAVE_STATE_PATH`
 
+To open real GitHub PRs from prepared agent branches, configure:
+
+- `COMMAND_WAVE_REPO_ADAPTER=github`
+- `COMMAND_WAVE_GITHUB_TOKEN` or `GITHUB_TOKEN`
+- `COMMAND_WAVE_GITHUB_BASE_BRANCH`, optional, defaults to `main`
+
+The GitHub adapter only opens draft PRs from an existing branch. It does not create branches, merge PRs, deploy contracts,
+or spend funds.
+
 Verify a published setup proof against GitHub required-check payloads:
 
 ```bash
@@ -208,7 +226,7 @@ For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH
 - `DELETE /api/command-wave`: reset the local demo.
 - `POST /api/command-wave/proposals`: submit a command proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
-- `POST /api/command-wave/execute`: run the local AI worker adapter.
+- `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.
 
 Command-wave mutation routes are open only for local demo mode when `ADMIN_API_KEY` is blank. Once `ADMIN_API_KEY` is set,
@@ -225,8 +243,8 @@ API errors include an `errorId` so a user-visible error can be matched to server
 
 1. Finish durable Postgres persistence using [docs/data-model.md](docs/data-model.md).
 2. Wire live 6529 setup, proposal, vote, and result-posting flows.
-3. Add real GitHub repo integration.
-4. Add controlled agent adapters using [docs/agent-harness-plan.md](docs/agent-harness-plan.md): Codex first, then Claude Code.
-5. Add independent review adapters for diffs, tests, rules, and security checks.
-6. Add rule version hashes and append-only ledger storage.
-7. Add production auth, secrets, rate limits, and job queue controls.
+3. Finish controlled GitHub branch, commit, PR comment, and CI-state operations.
+4. Add controlled Codex execution using [docs/agent-harness-plan.md](docs/agent-harness-plan.md).
+5. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
+6. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.
+7. Add production auth, secrets, rate limits, job queue controls, and required GitHub branch protection.

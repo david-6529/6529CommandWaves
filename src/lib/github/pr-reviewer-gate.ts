@@ -8,6 +8,12 @@ import {
   type RiskLevel,
 } from "../command-waves";
 import { createCommandRunManifest, hashValue } from "../run-manifest";
+import {
+  findHookContractSignals,
+  proposalAllowsUpgradeabilityException,
+  riskAllowsHookContractSignal,
+  type HookContractSignal,
+} from "../safety/hook-contract-policy";
 import { toolPolicyForProposal, type ToolPermission } from "../safety/tool-policy";
 
 export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.1" as const;
@@ -52,6 +58,7 @@ export type ReviewerGateResult = {
   status: "pass" | "fail";
   checks: ReviewerGateCheck[];
   diffSignals: PrDiffSignal[];
+  hookSignals: HookContractSignal[];
 };
 
 export type GuardianAttestation = {
@@ -160,6 +167,10 @@ function verificationCheck(
   message: string,
 ): GuardianProofVerificationCheck {
   return { id, status, message };
+}
+
+function checkIdValue(value: string) {
+  return value.replace(/[^a-z0-9/_-]+/gi, "_").slice(0, 96);
 }
 
 function waveIdFromUrl(value: string) {
@@ -323,15 +334,21 @@ export function validateCommandPrManifest({
 }): ReviewerGateResult {
   const checks: ReviewerGateCheck[] = [];
   const diffSignals = findPrDiffSignals(changedPaths);
+  const proposalText = proposal ? `${proposal.prompt}\n${proposal.spec}` : "";
+  const hookSignals = findHookContractSignals({
+    changedPaths,
+    proposalText,
+  });
+  const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
 
   if (!proposal) {
     checks.push(check("proposal_exists", "fail", "No matching command proposal was found."));
-    return { status: "fail", checks, diffSignals };
+    return { status: "fail", checks, diffSignals, hookSignals };
   }
 
   if (!manifest) {
     checks.push(check("manifest_exists", "fail", "PR is missing a Command Waves manifest."));
-    return { status: "fail", checks, diffSignals };
+    return { status: "fail", checks, diffSignals, hookSignals };
   }
 
   const expected = createCommandPrManifest({ wave, proposal, poll });
@@ -416,10 +433,27 @@ export function validateCommandPrManifest({
     );
   }
 
+  for (const signal of hookSignals) {
+    const allowed = riskAllowsHookContractSignal({
+      risk: manifest.risk,
+      signal,
+      upgradeabilityExceptionApproved,
+    });
+
+    checks.push(
+      check(
+        `hook_${signal.label}_${signal.source}_${checkIdValue(signal.value)}`,
+        allowed ? "pass" : "fail",
+        `${signal.value}: ${signal.reason}`,
+      ),
+    );
+  }
+
   return {
     status: overall(checks),
     checks,
     diffSignals,
+    hookSignals,
   };
 }
 

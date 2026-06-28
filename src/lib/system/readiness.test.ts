@@ -6,7 +6,7 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 0, warn: 6, fail: 3 });
+    expect(summary).toEqual({ pass: 0, warn: 7, fail: 3 });
     expect(checks.find((check) => check.id === "database")).toMatchObject({
       status: "warn",
     });
@@ -27,7 +27,7 @@ describe("readiness checks", () => {
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 7, warn: 1, fail: 1 });
+    expect(summary).toEqual({ pass: 7, warn: 2, fail: 1 });
     expect(checks.find((check) => check.id === "6529_posting")).toMatchObject({
       status: "warn",
     });
@@ -43,6 +43,17 @@ describe("readiness checks", () => {
     });
 
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
+      status: "pass",
+    });
+  });
+
+  it("passes GitHub PR adapter readiness when enabled with a token", () => {
+    const checks = getReadinessChecks({
+      COMMAND_WAVE_REPO_ADAPTER: "github",
+      COMMAND_WAVE_GITHUB_TOKEN: "token",
+    });
+
+    expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "pass",
     });
   });

@@ -65,8 +65,18 @@ describe("PR reviewer gate", () => {
 
   it("fails medium-risk commands that touch workflow enforcement", () => {
     const wave = approvedDemoWave();
-    const proposal = wave.proposals[0];
-    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-docs",
+      title: "Update docs",
+      risk: "medium" as const,
+      prompt: "Update the README.",
+      spec: "Documentation only.",
+    };
+    const poll = {
+      ...wave.polls[0],
+      proposalId: proposal.id,
+    };
     const manifest = createCommandPrManifest({ wave, proposal, poll });
     const result = validateCommandPrManifest({
       wave,
@@ -78,6 +88,52 @@ describe("PR reviewer gate", () => {
 
     expect(result.status).toBe("fail");
     expect(result.diffSignals).toContainEqual(expect.objectContaining({ label: "workflow", risk: "high" }));
+  });
+
+  it("passes bounded hook parameter changes when approved as high risk", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["contracts/HookParameters.sol"],
+    });
+
+    expect(result.status).toBe("pass");
+    expect(result.hookSignals).toContainEqual(expect.objectContaining({ label: "parameter_change", risk: "high" }));
+  });
+
+  it("blocks upgradeable hook patterns without an explicit exception", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-upgradeable",
+      risk: "critical" as const,
+      prompt: "Add a UUPS proxy to the hook.",
+      spec: "Use upgradeable storage and initializer wiring.",
+    };
+    const poll = {
+      ...wave.polls[0],
+      proposalId: proposal.id,
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["contracts/UUPSProxy.sol"],
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.hookSignals).toContainEqual(
+      expect.objectContaining({ label: "upgradeability", risk: "critical", defaultBlocked: true }),
+    );
+    expect(result.checks.find((item) => item.id.startsWith("hook_upgradeability"))?.status).toBe("fail");
   });
 
   it("requires critical approval for guardian proof code changes", () => {

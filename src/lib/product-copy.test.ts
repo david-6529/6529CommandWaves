@@ -3,12 +3,12 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.headline).toBe("Let a wave control an AI worker.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Propose - Vote if risky - Run - Review");
+    expect(commandWaveProductCopy.headline).toBe("Build the 6529 hook in public.");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Choose project - Propose work - Decide - Build PR - Review");
     expect(commandWaveProductCopy.steps.map((step) => step.title)).toEqual([
-      "Choose the wave",
-      "Propose work",
-      "Run and review",
+      "Choose the project",
+      "Approve scoped work",
+      "Build and review",
     ]);
   });
 

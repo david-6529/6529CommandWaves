@@ -1,24 +1,24 @@
 export const commandWaveProductCopy = {
-  eyebrow: "6529 Command Waves",
-  headline: "Let a wave control an AI worker.",
+  eyebrow: "6529 Hook Builder",
+  headline: "Build the 6529 hook in public.",
   subhead:
-    "Connect a 6529 wave to a repo. People propose commands. Simple rules decide what can run now and what needs a vote first.",
-  simpleFlow: "Propose - Vote if risky - Run - Review",
+    "One builder wave governs one smart contract repo. Members propose scoped work, decisions approve PRs, agents help, and reviewers check every change.",
+  simpleFlow: "Choose project - Propose work - Decide - Build PR - Review",
   steps: [
     {
       step: "Step 1",
-      title: "Choose the wave",
-      body: "Pick the 6529 wave and GitHub repo this AI worker is allowed to help with.",
+      title: "Choose the project",
+      body: "Pick the builder wave and GitHub repo for the hook project.",
     },
     {
       step: "Step 2",
-      title: "Propose work",
-      body: "Write the command in plain English. The app checks the risk before anything runs.",
+      title: "Approve scoped work",
+      body: "Turn ideas into clear PR-sized commands with limits and review criteria.",
     },
     {
       step: "Step 3",
-      title: "Run and review",
-      body: "Approved work is executed, reviewed, and logged so the wave can see what happened.",
+      title: "Build and review",
+      body: "Agents can help open PRs, but humans keep control of merges and deploys.",
     },
   ],
 } as const;

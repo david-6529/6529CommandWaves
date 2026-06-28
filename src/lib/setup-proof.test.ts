@@ -11,11 +11,11 @@ describe("setup proof", () => {
     expect(proof).toMatchObject({
       version: "command-wave-setup-v0.1",
       wave: {
-        id: "demo-command-wave",
+        id: "6529-hook-builder",
       },
       github: {
         owner: "6529-Collections",
-        repo: "example-command-wave",
+        repo: "6529-hook",
         protectedBranch: "main",
         requiredReviewerCheck: "Command Waves Guardian",
       },
