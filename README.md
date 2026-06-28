@@ -102,6 +102,7 @@ The current app is a local prototype of the hook-building flow:
 - hook guardrails for immutable-by-default smart contract work
 - bounded hook parameter policy that requires explicit caps and bound-focused tests
 - transparent contribution report that does not grant permissions
+- manual developer fee plan that uses review evidence without moving funds
 - safety rules by command type
 - command proposal form
 - automatic risk classification

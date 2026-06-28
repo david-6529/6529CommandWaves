@@ -1,5 +1,6 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
 import { createContributionReport } from "./contribution-report";
+import { createDeveloperFeePlan } from "./developer-fee-plan";
 
 function pollLine(poll: PollState | null) {
   if (!poll) {
@@ -39,6 +40,13 @@ function contributorLine(wave: CommandWave) {
   return `Contribution report: ${report.summary} Visible contributors: ${contributors}. Scores are informational only.`;
 }
 
+function developerFeeLine(wave: CommandWave) {
+  const report = createContributionReport(wave);
+  const plan = createDeveloperFeePlan(wave, report);
+
+  return `Developer fee plan: ${plan.summary} No automatic payouts.`;
+}
+
 export function createWaveUpdateDraft({
   wave,
   proposal,
@@ -64,6 +72,7 @@ export function createWaveUpdateDraft({
     reviewLine(review),
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
+    developerFeeLine(wave),
     "Next step: review this draft, then post it in the builder wave if it matches the work.",
   ].join("\n");
 }

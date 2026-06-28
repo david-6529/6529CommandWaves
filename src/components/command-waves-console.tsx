@@ -9,6 +9,7 @@ import {
   type CommandWave,
 } from "@/lib/command-waves";
 import { createContributionReport } from "@/lib/contribution-report";
+import { createDeveloperFeePlan } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
@@ -273,6 +274,19 @@ function Panel({ title, eyebrow, children }: { title: string; eyebrow?: string; 
   );
 }
 
+function CompactList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="rounded-md border border-zinc-800 bg-black p-3">
+      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{title}</p>
+      <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+        {items.map((item) => (
+          <li key={item}>- {item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function StepCard({ step, title, body }: { step: string; title: string; body: string }) {
   return (
     <div className="rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
@@ -443,6 +457,7 @@ export function CommandWavesConsole() {
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
+  const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const waveUpdateDraft = useMemo(
     () =>
@@ -1146,6 +1161,25 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </Panel>
+
+        <Panel title="Developer fee plan" eyebrow="Manual payout">
+          <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-sm leading-6 text-zinc-400">{developerFeePlan.summary}</p>
+              <p className="mt-2 text-xs leading-5 text-zinc-500">
+                Planning evidence only. Humans approve the budget and move funds outside this app.
+              </p>
+              <Badge className="mt-3 border-amber-700 bg-amber-950/45 text-amber-100">
+                {developerFeePlan.mode.replaceAll("_", " ")}
+              </Badge>
+            </div>
+            <div className="grid gap-3 xl:grid-cols-3">
+              <CompactList title="Evidence" items={developerFeePlan.evidenceInputs} />
+              <CompactList title="Decisions" items={developerFeePlan.requiredDecisions} />
+              <CompactList title="Blocked" items={developerFeePlan.blockedActions} />
             </div>
           </div>
         </Panel>

@@ -68,13 +68,14 @@ Polls require a voter identity for every yes/no vote. Duplicate votes from the s
 5. The agent opens a PR with a Command Waves manifest.
 6. The GitHub reviewer gate checks the PR manifest, vote, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
 7. A reviewer verifies tests, contract guardrails, and changed files before humans merge.
-8. The result and contribution activity are drafted for a human to post back to the wave.
+8. The result, contribution activity, and manual developer fee evidence are drafted for a human to post back to the wave.
 
 ## Non-Goals For First Demo
 
 - No autonomous deploys.
 - No spending.
 - No automatic merges.
+- No automatic payouts.
 - No token-weighted voting until manual gating works.
 - No broad multi-agent swarm marketplace.
 - No upgradeable hook contracts by default.

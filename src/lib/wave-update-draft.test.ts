@@ -18,6 +18,8 @@ describe("wave update draft", () => {
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
     expect(draft).toContain("humans keep merge, deploy, payment, and governance authority");
     expect(draft).toContain("Scores are informational only.");
+    expect(draft).toContain("Developer fee plan:");
+    expect(draft).toContain("No automatic payouts.");
     expect(draft).toContain("post it in the builder wave if it matches the work");
     expect(draft).not.toContain("automatically posted");
   });
