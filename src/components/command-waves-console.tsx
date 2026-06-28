@@ -13,6 +13,11 @@ import { createDeveloperFeePlan } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
+import {
+  createFirstPhaseLaunchAudit,
+  type FirstPhaseLaunchAuditItemStatus,
+  type FirstPhaseLaunchAuditStatus,
+} from "@/lib/first-phase-launch-audit";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
@@ -333,6 +338,30 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
 }
 
+function launchAuditStatusClass(status: FirstPhaseLaunchAuditStatus) {
+  if (status === "ready") {
+    return statusClass("pass");
+  }
+
+  if (status === "blocked") {
+    return statusClass("failed");
+  }
+
+  return riskClass("medium");
+}
+
+function launchAuditItemClass(status: FirstPhaseLaunchAuditItemStatus) {
+  if (status === "ready") {
+    return statusClass("pass");
+  }
+
+  if (status === "blocked") {
+    return statusClass("failed");
+  }
+
+  return riskClass("medium");
+}
+
 function Badge({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${className}`}>
@@ -548,6 +577,15 @@ export function CommandWavesConsole() {
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
+  const launchAudit = useMemo(
+    () =>
+      createFirstPhaseLaunchAudit({
+        phaseChecklist,
+        readinessChecks: readiness?.checks ?? null,
+      }),
+    [phaseChecklist, readiness],
+  );
+  const launchAuditOpenItems = launchAudit.openItems.slice(0, 5);
   const waveUpdateDraft = useMemo(
     () =>
       createWaveUpdateDraft({
@@ -1049,6 +1087,39 @@ export function CommandWavesConsole() {
                   <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkReadiness()}>
                     {apiBusy === "readiness" ? "Checking" : "Check readiness"}
                   </Button>
+                  <div className="border-t border-zinc-900 pt-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">Public launch audit</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">{launchAudit.summary}</p>
+                      </div>
+                      <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
+                    </div>
+                    {launchAuditOpenItems.length ? (
+                      <div className="mt-3 grid gap-2">
+                        {launchAuditOpenItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:grid-cols-[6rem_1fr]"
+                          >
+                            <Badge className={launchAuditItemClass(item.status)}>{item.status}</Badge>
+                            <div>
+                              <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
+                              <p className="mt-1 text-xs leading-5 text-zinc-500">{item.detail}</p>
+                            </div>
+                          </div>
+                        ))}
+                        {launchAudit.openItems.length > launchAuditOpenItems.length ? (
+                          <p className="text-xs leading-5 text-zinc-500">
+                            +{launchAudit.openItems.length - launchAuditOpenItems.length} more item
+                            {launchAudit.openItems.length - launchAuditOpenItems.length === 1 ? "" : "s"}.
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <p className="mt-3 text-xs leading-5 text-zinc-500">No public launch gaps found in these checks.</p>
+                    )}
+                  </div>
                   {readiness ? (
                     <div className="grid gap-2">
                       {readiness.checks.map((item) => (

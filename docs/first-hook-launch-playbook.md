@@ -20,6 +20,7 @@ Make the first public phase a clear community win:
 - Copyable Codex work packets for approved PR commands.
 - Draft PRs with Command Waves manifests.
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
+- Public launch audit for launch blockers before inviting broad participation.
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
 - Human-reviewed wave update draft.
@@ -67,6 +68,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 11. Use the contribution report and fee plan as evidence for any separate payout vote.
 12. Post the wave update draft back to the builder wave.
 13. Keep the launch packet with the PR so later contributors can audit the loop.
+14. Run the public launch audit and fix blockers before broad launch.
 
 ## Success Criteria
 
