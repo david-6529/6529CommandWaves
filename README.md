@@ -110,6 +110,7 @@ The current app is a local prototype of the hook-building flow:
 - safety rules by command type
 - command proposal form
 - first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
+- hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims
 - automatic risk classification
 - high-risk classification for hook, fee, Solidity, proxy, deployment, and governance work
 - poll voting with one vote per voter identity

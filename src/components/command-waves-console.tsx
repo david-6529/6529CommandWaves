@@ -18,6 +18,7 @@ import {
   type FirstPhaseLaunchAuditItemStatus,
   type FirstPhaseLaunchAuditStatus,
 } from "@/lib/first-phase-launch-audit";
+import { createHookProposalPreflight, type HookProposalPreflightCheck } from "@/lib/hook-proposal-preflight";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
@@ -49,6 +50,28 @@ const hookGuardrails = [
   "Deployment, payments, and governance changes stay human controlled.",
   "Contribution scores are reports, not permissions.",
 ];
+const hookProposalCheckPriority = [
+  "hook_proposal_blocked_language",
+  "hook_parameter_explicit_bound",
+  "hook_parameter_bound_tests",
+  "hook_parameter_live_holder_authority",
+  "hook_parameter_immutable_default",
+  "hook_parameter_not_requested",
+];
+
+function hookProposalCheckWeight(check: HookProposalPreflightCheck) {
+  const index = hookProposalCheckPriority.indexOf(check.id);
+
+  return index === -1 ? hookProposalCheckPriority.length : index;
+}
+
+function visibleHookProposalPreflightChecks(checks: HookProposalPreflightCheck[], failedOnly: boolean) {
+  const filtered = failedOnly ? checks.filter((check) => check.status === "fail") : checks;
+
+  return [...filtered]
+    .sort((left, right) => hookProposalCheckWeight(left) - hookProposalCheckWeight(right))
+    .slice(0, 4);
+}
 
 function shortTime(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -581,6 +604,14 @@ export function CommandWavesConsole() {
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
+  const hookProposalPreflight = useMemo(
+    () => createHookProposalPreflight({ command: prompt, criteria: spec }),
+    [prompt, spec],
+  );
+  const visibleHookProposalChecks = visibleHookProposalPreflightChecks(
+    hookProposalPreflight.checks,
+    hookProposalPreflight.status === "fail",
+  );
   const activeProposal = wave.proposals[0];
   const activePoll = activeProposal ? wave.polls.find((poll) => poll.proposalId === activeProposal.id) : undefined;
   const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
@@ -1309,6 +1340,32 @@ export function CommandWavesConsole() {
                   </div>
                   <p className="mt-2 text-xs leading-5 text-zinc-500">{selectedRule.reason}</p>
                 </div>
+              </div>
+              <div className="rounded-md border border-zinc-800 bg-black p-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-100">Hook proposal preflight</p>
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">{hookProposalPreflight.summary}</p>
+                  </div>
+                  <Badge className={checkStatusClass(hookProposalPreflight.status)}>{hookProposalPreflight.statusLabel}</Badge>
+                </div>
+                <div className="mt-3 grid gap-2">
+                  {visibleHookProposalChecks.map((check) => (
+                    <div key={check.id} className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:grid-cols-[6rem_1fr]">
+                      <Badge className={checkStatusClass(check.status)}>{check.status}</Badge>
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">{check.label}</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">{check.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {hookProposalPreflight.checks.length > visibleHookProposalChecks.length ? (
+                  <p className="mt-2 text-xs leading-5 text-zinc-500">
+                    +{hookProposalPreflight.checks.length - visibleHookProposalChecks.length} more check
+                    {hookProposalPreflight.checks.length - visibleHookProposalChecks.length === 1 ? "" : "s"}.
+                  </p>
+                ) : null}
               </div>
               <Button type="button" disabled={isBusy} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Proposing" : "Propose work"}
