@@ -4,7 +4,7 @@ import { commandWaveProductCopy } from "./product-copy";
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
     expect(commandWaveProductCopy.headline).toBe("Build the 6529 hook in public.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Choose project - Propose work - Decide - Build PR - Review");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Choose project - Propose work - Decide - Build PR - Review - Log");
     expect(commandWaveProductCopy.steps.map((step) => step.title)).toEqual([
       "Choose the project",
       "Approve scoped work",

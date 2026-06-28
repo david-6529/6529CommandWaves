@@ -38,6 +38,16 @@ function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
 }
 
+function isStaleBuiltInHookDemo(wave: CommandWave) {
+  return Boolean(
+    wave.proposals[0]?.status !== demoWave.proposals[0]?.status &&
+      wave.executions.length === 1 &&
+      wave.reviews.length === 1 &&
+      wave.executions[0]?.summary === demoWave.executions[0]?.summary &&
+      wave.reviews[0]?.summary === demoWave.reviews[0]?.summary,
+  );
+}
+
 function migrateLegacyDemoWave(wave: CommandWave | null) {
   if (
     wave &&
@@ -47,7 +57,8 @@ function migrateLegacyDemoWave(wave: CommandWave | null) {
       (wave.id === demoWave.id &&
         wave.proposals.length === 1 &&
         wave.proposals[0]?.id === "cmd-001" &&
-        (wave.executions.some((execution) => execution.summary.includes("copy-only")) ||
+        (isStaleBuiltInHookDemo(wave) ||
+          wave.executions.some((execution) => execution.summary.includes("copy-only")) ||
           wave.ledger.some((event) => event.message.includes("Command Waves Demo")))))
   ) {
     return cloneDemoWave();

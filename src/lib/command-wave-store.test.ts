@@ -38,6 +38,19 @@ describe("Command wave store", () => {
     }
   });
 
+  async function makeSeedProposalReadyToBuild() {
+    const wave = await getCommandWave();
+
+    await replaceCommandWave({
+      ...wave,
+      proposals: wave.proposals.map((proposal) =>
+        proposal.id === "cmd-001" ? { ...proposal, status: "approved" as const } : proposal,
+      ),
+      executions: [],
+      reviews: [],
+    });
+  }
+
   it("logs setup updates with user-facing setup language", async () => {
     const wave = await updateCommandWaveSetup({
       waveUrl: "https://6529.io/waves/new-command-wave",
@@ -163,6 +176,8 @@ describe("Command wave store", () => {
   });
 
   it("executes approved proposals and lets the reviewer complete them", async () => {
+    await makeSeedProposalReadyToBuild();
+
     const executed = await executeProposal({ proposalId: "cmd-001" });
 
     expect(executed.proposals[0].status).toBe("reviewing");
@@ -184,6 +199,7 @@ describe("Command wave store", () => {
   it("rejects reviews unless the proposal is waiting for review", async () => {
     await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow("Proposal is not ready for review.");
 
+    await makeSeedProposalReadyToBuild();
     await executeProposal({ proposalId: "cmd-001" });
     await reviewProposal({ proposalId: "cmd-001" });
 

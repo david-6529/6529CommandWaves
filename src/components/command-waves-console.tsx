@@ -12,6 +12,7 @@ import {
 import { createContributionReport } from "@/lib/contribution-report";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
+import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
@@ -233,6 +234,22 @@ function checkStatusClass(status: "pass" | "warn" | "fail") {
   return riskClass("medium");
 }
 
+function phaseStatusClass(status: PhaseChecklistStatus) {
+  if (status === "done") {
+    return statusClass("complete");
+  }
+
+  if (status === "blocked") {
+    return statusClass("blocked");
+  }
+
+  if (status === "active") {
+    return statusClass("reviewing");
+  }
+
+  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+}
+
 function Badge({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${className}`}>
@@ -403,6 +420,7 @@ export function CommandWavesConsole() {
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
+  const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const waveUpdateDraft = useMemo(
     () =>
       createWaveUpdateDraft({
@@ -666,6 +684,18 @@ export function CommandWavesConsole() {
             </span>
           )}
         </div>
+
+        <section className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">
+          {phaseChecklist.map((item) => (
+            <div key={item.id} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
+                <Badge className={phaseStatusClass(item.status)}>{item.status}</Badge>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-zinc-500">{item.detail}</p>
+            </div>
+          ))}
+        </section>
 
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <Panel title="1. Choose the project" eyebrow="Setup">
@@ -1020,7 +1050,7 @@ export function CommandWavesConsole() {
                     <Button
                       type="button"
                       className="mt-3"
-                      disabled={isBusy || activeProposal.status !== "approved"}
+                      disabled={isBusy || activeProposal.status !== "approved" || Boolean(activeExecution)}
                       onClick={launchOrchestrator}
                     >
                       {apiBusy === "execute" ? "Building" : "Build approved PR"}
@@ -1050,7 +1080,7 @@ export function CommandWavesConsole() {
                       type="button"
                       className="mt-3"
                       variant="secondary"
-                      disabled={isBusy || !activeExecution || activeProposal.status === "complete"}
+                      disabled={isBusy || !activeExecution || activeProposal.status !== "reviewing" || Boolean(activeReview)}
                       onClick={runGuardianReview}
                     >
                       {apiBusy === "review" ? "Reviewing" : "Review result"}

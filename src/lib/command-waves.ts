@@ -275,7 +275,7 @@ export const demoWave: CommandWave = {
       spec:
         "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
       budgetUsd: 10,
-      status: "approved",
+      status: "complete",
     },
   ],
   polls: [

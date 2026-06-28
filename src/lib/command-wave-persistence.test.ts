@@ -84,6 +84,7 @@ describe("command wave persistence", () => {
   it("refreshes stale built-in hook demo records without changing custom activity", async () => {
     await replaceCommandWave({
       ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "approved" }],
       executions: [
         {
           proposalId: "cmd-001",
@@ -111,6 +112,32 @@ describe("command wave persistence", () => {
     expect(wave.executions[0]?.summary).toBe(
       "Mock execution opened a PR with the hook scaffold and parameter-bound tests bound to the approved spec.",
     );
+    expect(wave.proposals[0]?.status).toBe("complete");
     expect(wave.ledger[0]?.message).toBe("Created 6529 Hook Builder and attached the builder wave plus GitHub repo.");
+  });
+
+  it("keeps custom local hook demo activity during stale status migration", async () => {
+    await replaceCommandWave({
+      ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+      executions: [
+        {
+          proposalId: "cmd-001",
+          harness: "codex",
+          status: "complete",
+          summary: "Local agent mock opened a deterministic PR artifact for the approved command.",
+          artifacts: ["PR #99"],
+        },
+      ],
+      reviews: [],
+    });
+
+    clearCommandWaveStoreForTests();
+
+    const wave = await getCommandWave();
+
+    expect(wave.proposals[0]?.status).toBe("approved");
+    expect(wave.executions[0]?.summary).toBe("Local agent mock opened a deterministic PR artifact for the approved command.");
+    expect(wave.executions[0]?.artifacts).toEqual(["PR #99"]);
   });
 });

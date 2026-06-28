@@ -3,7 +3,7 @@ export const commandWaveProductCopy = {
   headline: "Build the 6529 hook in public.",
   subhead:
     "One builder wave governs one smart contract repo. Members propose scoped work, decisions approve PRs, agents help, and reviewers check every change.",
-  simpleFlow: "Choose project - Propose work - Decide - Build PR - Review",
+  simpleFlow: "Choose project - Propose work - Decide - Build PR - Review - Log",
   steps: [
     {
       step: "Step 1",
