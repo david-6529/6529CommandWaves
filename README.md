@@ -22,7 +22,8 @@ The simple flow is:
 
 ## Why This Exists
 
-Agents can write code, open PRs, post updates, run scripts, deploy, and spend money. That gets dangerous when a group is moving at prompt speed.
+Agents are useful, but broad tool access gets dangerous when a group is moving at prompt speed. In phase 1, agents only
+help with reads, drafts, wave updates, and PR commands.
 
 Command Waves make the answers visible:
 
@@ -73,11 +74,11 @@ artifacts. Until then, the MVP is useful and auditable but not the strongest pos
 
 Best next tasks for another agent:
 
-1. Build the external GitHub App design in code/docs, keeping the existing verifier as the shared core.
-2. Wire live 6529 proposal/vote state into `COMMAND_WAVE_STATE_URL`.
-3. Add the GitHub repo adapter that opens PRs with the required Command Waves manifest.
-4. Replace local mock execution with a controlled Codex harness adapter.
-5. Keep every guardian change covered by tests and reflected in this README.
+1. Pick the first real builder wave and hook repo, then publish the launch playbook.
+2. Wire live 6529 proposal and vote state into `COMMAND_WAVE_STATE_URL`.
+3. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
+4. Replace local mock PR execution with a controlled Codex harness that prepares branches.
+5. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
 
 ## Lessons Reused From `6529arena`
 
@@ -111,6 +112,7 @@ The current app is a local prototype of the hook-building flow:
 - safety rules by command type
 - command proposal form
 - backend command surface limited to context reads, drafts, wave updates, and PR commands
+- persisted older rule sets are normalized so scripts, deploys, spending, and rule changes stay parked
 - first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
 - hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims
 - automatic risk classification
