@@ -19,6 +19,16 @@ This repo uses one 6529 builder wave to govern one GitHub smart contract repo.
 - Include tests or reviewer evidence for the approved scope.
 - Keep deploys, payments, merges, and governance changes out of phase 1 PRs.
 
+## Local Verification
+
+Run the same app quality gate used by CI:
+
+```bash
+npm run verify
+```
+
+This runs typecheck, lint, tests, and build. It does not merge, deploy, spend funds, or post to the builder wave.
+
 ## Hook Guardrails
 
 - Hook contracts are immutable by default.

@@ -65,14 +65,5 @@ jobs:
             guardian-pr-evidence.json
           if-no-files-found: error
 
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Test
-        run: npm run test
-
-      - name: Build
-        run: npm run build
+      - name: Verify app
+        run: npm run verify

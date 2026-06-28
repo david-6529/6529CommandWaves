@@ -152,6 +152,12 @@ Open the local URL printed by Next. In this workspace it is currently `http://lo
 
 With the example env, command-wave demo state is stored in `.data/command-wave.json`.
 
+Before opening a PR, run the local app gate:
+
+```bash
+npm run verify
+```
+
 ## Guardian Check
 
 The repo includes a first GitHub Actions gate named `Command Waves Guardian`.

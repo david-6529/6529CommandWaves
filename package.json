@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run lint && npm test && npm run build",
     "guardian:check": "vitest run pr-reviewer-gate setup-proof",
     "guardian:pr-check": "tsx scripts/guardian-pr-check.ts",
     "guardian:verify-proof": "tsx scripts/verify-guardian-proof.ts",
