@@ -608,9 +608,11 @@ export function CommandWavesConsole() {
     () => createHookProposalPreflight({ command: prompt, criteria: spec }),
     [prompt, spec],
   );
+  const hookProposalPreflightRequired = kind === "open_pr";
+  const hookProposalPreflightBlocked = hookProposalPreflightRequired && hookProposalPreflight.status === "fail";
   const visibleHookProposalChecks = visibleHookProposalPreflightChecks(
     hookProposalPreflight.checks,
-    hookProposalPreflight.status === "fail",
+    hookProposalPreflightBlocked,
   );
   const activeProposal = wave.proposals[0];
   const activePoll = activeProposal ? wave.polls.find((poll) => poll.proposalId === activeProposal.id) : undefined;
@@ -858,6 +860,11 @@ export function CommandWavesConsole() {
   }
 
   function submitProposal() {
+    if (hookProposalPreflightBlocked) {
+      setApiError("Fix hook proposal preflight before submitting PR work.");
+      return;
+    }
+
     void runWaveAction(
       "proposal",
       () =>
@@ -1345,29 +1352,50 @@ export function CommandWavesConsole() {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-zinc-100">Hook proposal preflight</p>
-                    <p className="mt-1 text-xs leading-5 text-zinc-500">{hookProposalPreflight.summary}</p>
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">
+                      {hookProposalPreflightRequired
+                        ? hookProposalPreflight.summary
+                        : "Required only when the command opens a PR."}
+                    </p>
                   </div>
-                  <Badge className={checkStatusClass(hookProposalPreflight.status)}>{hookProposalPreflight.statusLabel}</Badge>
+                  <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
+                    {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "not required"}
+                  </Badge>
                 </div>
                 <div className="mt-3 grid gap-2">
-                  {visibleHookProposalChecks.map((check) => (
-                    <div key={check.id} className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:grid-cols-[6rem_1fr]">
-                      <Badge className={checkStatusClass(check.status)}>{check.status}</Badge>
+                  {hookProposalPreflightRequired ? (
+                    visibleHookProposalChecks.map((check) => (
+                      <div
+                        key={check.id}
+                        className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:grid-cols-[6rem_1fr]"
+                      >
+                        <Badge className={checkStatusClass(check.status)}>{check.status}</Badge>
+                        <div>
+                          <p className="text-sm font-semibold text-zinc-100">{check.label}</p>
+                          <p className="mt-1 text-xs leading-5 text-zinc-500">{check.message}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:grid-cols-[6rem_1fr]">
+                      <Badge className={checkStatusClass("pass")}>pass</Badge>
                       <div>
-                        <p className="text-sm font-semibold text-zinc-100">{check.label}</p>
-                        <p className="mt-1 text-xs leading-5 text-zinc-500">{check.message}</p>
+                        <p className="text-sm font-semibold text-zinc-100">No PR opened</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">
+                          Use this command for context, drafts, or wave updates. PR commands still need hook preflight.
+                        </p>
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
-                {hookProposalPreflight.checks.length > visibleHookProposalChecks.length ? (
+                {hookProposalPreflightRequired && hookProposalPreflight.checks.length > visibleHookProposalChecks.length ? (
                   <p className="mt-2 text-xs leading-5 text-zinc-500">
                     +{hookProposalPreflight.checks.length - visibleHookProposalChecks.length} more check
                     {hookProposalPreflight.checks.length - visibleHookProposalChecks.length === 1 ? "" : "s"}.
                   </p>
                 ) : null}
               </div>
-              <Button type="button" disabled={isBusy} onClick={submitProposal}>
+              <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Proposing" : "Propose work"}
               </Button>
             </div>

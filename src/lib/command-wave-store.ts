@@ -1,6 +1,7 @@
 import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "./configured-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
 import { demoWave } from "./demo-wave";
+import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
@@ -212,6 +213,18 @@ export async function submitCommandProposal(input: unknown) {
   const wave = await getCommandWave();
   const kind = isCommandKind(body.kind) ? body.kind : "open_pr";
   const prompt = asText(body.prompt, "No prompt supplied.");
+  const spec = asText(body.spec, "No execution spec supplied.");
+  const hookPreflight = createHookProposalPreflight({ command: prompt, criteria: spec });
+
+  if (kind === "open_pr" && hookPreflight.status === "fail") {
+    const firstFailure = hookPreflight.checks.find((check) => check.status === "fail");
+
+    throw Object.assign(
+      new Error(`Fix hook proposal preflight before submitting PR work: ${firstFailure?.message ?? hookPreflight.summary}`),
+      { status: 400 },
+    );
+  }
+
   const proposalId = nextId("cmd", wave.proposals.length);
   const ruleMode = wave.rules.rulesByKind[kind].mode;
   const proposal: CommandProposal = {
@@ -221,7 +234,7 @@ export async function submitCommandProposal(input: unknown) {
     kind,
     risk: classifyRisk(kind, prompt),
     prompt,
-    spec: asText(body.spec, "No execution spec supplied."),
+    spec,
     budgetUsd: asBudget(body.budgetUsd),
     status: initialProposalStatus(ruleMode),
   };

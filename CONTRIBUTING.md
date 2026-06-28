@@ -28,6 +28,7 @@ npm run verify
 ```
 
 This runs typecheck, lint, tests, and build. It does not merge, deploy, spend funds, or post to the builder wave.
+The app rejects PR commands that fail hook preflight.
 
 ## Hook Guardrails
 

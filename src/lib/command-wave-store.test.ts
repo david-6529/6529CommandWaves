@@ -105,6 +105,36 @@ describe("Command wave store", () => {
     expect(approved.polls[0].votes.map((vote) => vote.voterIdentity)).toEqual(["carol", "bob", "alice"]);
   });
 
+  it("rejects PR proposals that fail hook preflight", async () => {
+    await expect(
+      submitCommandProposal({
+        title: "Deploy upgradeable hook",
+        proposer: "tester",
+        kind: "open_pr",
+        prompt: "Deploy an upgradeable UUPS hook and transfer ownership to a Safe.",
+        spec: "Add governance threshold controls for future parameter changes.",
+        budgetUsd: 1,
+      }),
+    ).rejects.toThrow("Fix hook proposal preflight before submitting PR work");
+  });
+
+  it("allows non-PR commands to discuss parked hook work", async () => {
+    const submitted = await submitCommandProposal({
+      title: "Draft launch scope note",
+      proposer: "tester",
+      kind: "draft_response",
+      prompt: "Draft a note explaining that deployment and governance work are parked for phase 1.",
+      spec: "Draft text only. Do not post it.",
+      budgetUsd: 0,
+    });
+
+    expect(submitted.proposals[0]).toMatchObject({
+      id: "cmd-002",
+      kind: "draft_response",
+      status: "approved",
+    });
+  });
+
   it("requires voter identity and rejects duplicate votes", async () => {
     await submitCommandProposal({
       title: "Open a PR",
