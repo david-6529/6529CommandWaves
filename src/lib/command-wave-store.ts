@@ -6,6 +6,7 @@ import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
   createWaveDecisionReceipt,
+  defaultRules,
   evaluateGate,
   evaluatePoll,
   type CommandKind,
@@ -41,6 +42,7 @@ const commandKinds = new Set<CommandKind>([
   "change_rules",
 ]);
 const firstPhaseCommandKinds = new Set<CommandKind>(["read_context", "draft_response", "post_to_wave", "open_pr"]);
+const parkedCommandKinds: CommandKind[] = ["run_script", "deploy", "spend_money", "change_rules"];
 
 function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
@@ -96,12 +98,54 @@ function migrateLegacyDemoWave(wave: CommandWave | null) {
   return wave;
 }
 
+function sameRule(left: CommandWave["rules"]["rulesByKind"][CommandKind], right: CommandWave["rules"]["rulesByKind"][CommandKind]) {
+  return (
+    left.mode === right.mode &&
+    left.quorum === right.quorum &&
+    left.yesPercent === right.yesPercent &&
+    left.expiresHours === right.expiresHours &&
+    left.reason === right.reason
+  );
+}
+
+function withFirstPhaseRules(wave: CommandWave) {
+  const rulesByKind = {
+    ...defaultRules.rulesByKind,
+    ...wave.rules.rulesByKind,
+  };
+  let changed = Object.keys(defaultRules.rulesByKind).some(
+    (kind) => !wave.rules.rulesByKind[kind as CommandKind],
+  );
+
+  for (const kind of parkedCommandKinds) {
+    if (!sameRule(rulesByKind[kind], defaultRules.rulesByKind[kind])) {
+      changed = true;
+    }
+
+    rulesByKind[kind] = defaultRules.rulesByKind[kind];
+  }
+
+  if (!changed) {
+    return wave;
+  }
+
+  return {
+    ...wave,
+    rules: {
+      ...wave.rules,
+      rulesByKind,
+    },
+  };
+}
+
 async function store() {
   const persistencePath = getCommandWavePersistencePath();
 
   if (!globalStore.__commandWaveStore || globalStore.__commandWaveStore.persistencePath !== persistencePath) {
     const persisted = await loadPersistedCommandWave();
-    const wave = migrateLegacyDemoWave(persisted) ?? cloneDemoWave();
+    const migrated = migrateLegacyDemoWave(persisted);
+    const baseWave = migrated ?? cloneDemoWave();
+    const wave = withFirstPhaseRules(baseWave);
 
     if (persisted && wave !== persisted) {
       await savePersistedCommandWave(wave);
@@ -170,7 +214,15 @@ function initialProposalStatus(ruleMode: CommandWave["rules"]["rulesByKind"][Com
 }
 
 export async function getCommandWave() {
-  return (await store()).wave;
+  const currentStore = await store();
+  const wave = withFirstPhaseRules(currentStore.wave);
+
+  if (wave !== currentStore.wave) {
+    await savePersistedCommandWave(wave);
+    currentStore.wave = wave;
+  }
+
+  return currentStore.wave;
 }
 
 export function clearCommandWaveStoreForTests() {
@@ -178,8 +230,10 @@ export function clearCommandWaveStoreForTests() {
 }
 
 export async function replaceCommandWave(wave: CommandWave) {
-  await savePersistedCommandWave(wave);
-  (await store()).wave = wave;
+  const nextWave = withFirstPhaseRules(wave);
+
+  await savePersistedCommandWave(nextWave);
+  (await store()).wave = nextWave;
 
   return (await store()).wave;
 }

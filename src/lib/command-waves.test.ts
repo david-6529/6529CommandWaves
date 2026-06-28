@@ -54,6 +54,17 @@ describe("Command Waves rule engine", () => {
     });
   });
 
+  it.each(["run_script", "deploy", "spend_money", "change_rules"] satisfies CommandProposal["kind"][])(
+    "parks %s by default in phase 1",
+    (kind) => {
+      expect(evaluateGate(proposal(kind), defaultRules)).toMatchObject({
+        needsPoll: false,
+        canExecuteNow: false,
+        blocked: true,
+      });
+    },
+  );
+
   it("passes a poll only when quorum and yes threshold are both met", () => {
     const underQuorum: PollState = {
       proposalId: "cmd-test",

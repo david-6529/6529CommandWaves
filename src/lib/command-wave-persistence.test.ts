@@ -8,7 +8,7 @@ import {
   submitCommandProposal,
 } from "./command-wave-store";
 import { demoWave } from "./demo-wave";
-import { deletePersistedCommandWave, getCommandWaveStoreMode } from "./command-wave-persistence";
+import { deletePersistedCommandWave, getCommandWaveStoreMode, savePersistedCommandWave } from "./command-wave-persistence";
 
 describe("command wave persistence", () => {
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
@@ -193,5 +193,46 @@ describe("command wave persistence", () => {
     expect(wave.polls[0]?.decision).toMatchObject({
       dropId: "drop-cmd-001-approval",
     });
+  });
+
+  it("parks future command rules loaded from older persisted state", async () => {
+    await savePersistedCommandWave({
+      ...demoWave,
+      rules: {
+        ...demoWave.rules,
+        rulesByKind: {
+          ...demoWave.rules.rulesByKind,
+          run_script: {
+            ...demoWave.rules.rulesByKind.run_script,
+            mode: "poll",
+            reason: "Scripts can mutate local or remote state.",
+          },
+          deploy: {
+            ...demoWave.rules.rulesByKind.deploy,
+            mode: "poll",
+            reason: "Deploys affect production users.",
+          },
+          spend_money: {
+            ...demoWave.rules.rulesByKind.spend_money,
+            mode: "poll",
+            reason: "Spending needs explicit budget consent.",
+          },
+          change_rules: {
+            ...demoWave.rules.rulesByKind.change_rules,
+            mode: "poll",
+            reason: "Changing rules changes the governance system itself.",
+          },
+        },
+      },
+    });
+
+    clearCommandWaveStoreForTests();
+
+    const wave = await getCommandWave();
+
+    expect(wave.rules.rulesByKind.run_script).toMatchObject({ mode: "blocked", reason: "Script execution is parked in phase 1." });
+    expect(wave.rules.rulesByKind.deploy).toMatchObject({ mode: "blocked", reason: "Deploys stay human-controlled outside this app." });
+    expect(wave.rules.rulesByKind.spend_money).toMatchObject({ mode: "blocked", reason: "Spending stays outside phase 1." });
+    expect(wave.rules.rulesByKind.change_rules).toMatchObject({ mode: "blocked", reason: "Rule changes stay outside phase 1." });
   });
 });

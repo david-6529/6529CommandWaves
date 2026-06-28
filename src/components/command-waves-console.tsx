@@ -523,6 +523,10 @@ function modeLabel(mode: string) {
     return "needs vote";
   }
 
+  if (mode === "blocked") {
+    return "parked";
+  }
+
   return mode;
 }
 
