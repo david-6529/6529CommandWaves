@@ -14,10 +14,13 @@ describe("contribution report", () => {
     });
     expect(report.notes.join(" ")).toContain("not a permission system");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
+    expect(report.notes.join(" ")).toContain("decision receipts");
     expect(report.contributors[0]).toMatchObject({
       identity: "david",
       proposals: 1,
+      decisions: 1,
     });
+    expect(report.contributors[0].rationale).toContain("Recorded wave decision evidence");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
   });
 });

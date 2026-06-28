@@ -5,6 +5,7 @@ export type ContributionContributor = {
   score: number;
   proposals: number;
   votes: number;
+  decisions: number;
   ledgerEvents: number;
   rationale: string[];
 };
@@ -30,6 +31,7 @@ function addContributor(map: Map<string, ContributionContributor>, identity: str
     score: 0,
     proposals: 0,
     votes: 0,
+    decisions: 0,
     ledgerEvents: 0,
     rationale: [],
   };
@@ -66,6 +68,14 @@ export function createContributionReport(
   }
 
   for (const poll of wave.polls) {
+    if (poll.decision?.recordedBy) {
+      const contributor = addContributor(contributors, poll.decision.recordedBy);
+
+      contributor.decisions += 1;
+      contributor.score += 2;
+      addRationale(contributor, "Recorded wave decision evidence");
+    }
+
     for (const vote of poll.votes ?? []) {
       const contributor = addContributor(contributors, vote.voterIdentity);
 
@@ -101,7 +111,8 @@ export function createContributionReport(
     notes: [
       "Scores are an AI-readable activity report, not a permission system.",
       "REP, TDH, payouts, and merge rights must use separate human-approved rules.",
-      "The report only uses proposals, votes, and ledger events currently stored by this app.",
+      "The report only uses proposals, votes, decision receipts, and ledger events currently stored by this app.",
+      "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
     ],
   };
 }

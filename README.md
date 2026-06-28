@@ -106,7 +106,7 @@ The current app is a local prototype of the hook-building flow:
 - participation gate notes that do not claim live REP/TDH enforcement
 - hook guardrails for immutable-by-default smart contract work
 - bounded hook parameter policy that requires explicit caps and bound-focused tests
-- transparent contribution report that does not grant permissions
+- transparent contribution report for proposals, votes, decision receipts, and activity log evidence
 - manual developer fee plan that uses review evidence without moving funds
 - copyable launch packet for wave, PR, review, contribution, and fee evidence
 - safety rules by command type

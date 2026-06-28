@@ -578,6 +578,10 @@ function artifactLabel(artifact: string) {
   return artifact;
 }
 
+function countLabel(count: number, singular: string) {
+  return `${count} ${count === 1 ? singular : `${singular}s`}`;
+}
+
 export function CommandWavesConsole() {
   const [wave, setWave] = useState<CommandWave>(() => cloneDemoWave());
   const [waveUrl, setWaveUrl] = useState(wave.waveUrl);
@@ -1617,8 +1621,15 @@ export function CommandWavesConsole() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                     <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">score {contributor.score}</Badge>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{contributor.proposals} proposals</Badge>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{contributor.votes} votes</Badge>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                      {countLabel(contributor.proposals, "proposal")}
+                    </Badge>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{countLabel(contributor.votes, "vote")}</Badge>
+                    {contributor.decisions ? (
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                        {countLabel(contributor.decisions, "decision")}
+                      </Badge>
+                    ) : null}
                   </div>
                 </div>
               ))}
