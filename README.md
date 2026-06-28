@@ -49,6 +49,8 @@ The first public phase:
 
 No auto-merges, autonomous deploys, spending, or live REP/TDH authority in the first phase.
 
+Launch operating notes are in [docs/first-hook-launch-playbook.md](docs/first-hook-launch-playbook.md).
+
 ## Agent Handoff
 
 This repo is now focused on **Command Waves**, not the earlier summarizer / SwarmOps direction. The product is a governed

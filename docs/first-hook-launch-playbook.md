@@ -1,0 +1,72 @@
+# First Hook Launch Playbook
+
+## Goal
+
+Make the first public phase a clear community win:
+
+1. Use one 6529 builder wave.
+2. Build one non-upgradeable 6529 hook in one GitHub repo.
+3. Let people propose scoped PR work.
+4. Let the wave decide what should run.
+5. Let agents help only inside approved commands.
+6. Review every result before humans merge or pay anyone.
+
+## Use Now
+
+- Builder wave and GitHub repo setup.
+- One PR-sized command at a time.
+- Local or imported wave decisions for approvals.
+- Draft PRs with Command Waves manifests.
+- Reviewer gate checks for vote status, rules hashes, risky files, hook signals, and explicit parameter caps.
+- Contribution report as activity evidence.
+- Manual developer fee plan as payout evidence.
+- Human-reviewed wave update draft.
+
+## Park For Later
+
+- Live REP or TDH voting authority.
+- Automatic payouts.
+- Automatic merges or deploys.
+- Broad multi-agent marketplace behavior.
+- Upgradeable hook contracts.
+- Complex role systems beyond proposer, voter, agent, reviewer, and human maintainer.
+
+## Community Flow
+
+Use two social spaces if the community wants them:
+
+1. General chat wave: collect ideas, questions, and onboarding help.
+2. Builder wave: approve scoped commands that can become PRs.
+
+The app should treat the builder wave as the source of truth for work approval. General chat can feed ideas, but it should not authorize code changes.
+
+## Optional QnA Gate
+
+A QnA gate can be useful for onboarding, but it should stay manual in this phase:
+
+- Ask people to answer a short hook-design question before proposing PR work.
+- Record the result as a note or allowlist entry.
+- Do not treat it as live REP, TDH, or payment authority.
+- Do not block review or merge solely because an automated QnA score exists.
+
+## Launch Sequence
+
+1. Publish the builder wave and repo link.
+2. Post the hook scope: immutable by default, capped parameters only, no deploys in phase 1.
+3. Invite ideas in the general chat wave or thread.
+4. Turn one strong idea into a PR-sized command.
+5. Vote or approve through the builder wave.
+6. Run the agent only after approval.
+7. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+8. Humans merge only after review passes.
+9. Use the contribution report and fee plan as evidence for any separate payout vote.
+10. Post the wave update draft back to the builder wave.
+
+## Success Criteria
+
+- New contributors understand where to propose work.
+- Every code change traces back to a visible wave decision.
+- The hook stays non-upgradeable by default.
+- Parameter changes name explicit caps and tests.
+- Fees and contribution scores are evidence, not automatic authority.
+- The first merged PR feels simple, auditable, and worth repeating.
