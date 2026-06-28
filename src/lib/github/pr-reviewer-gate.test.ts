@@ -143,6 +143,55 @@ describe("PR reviewer gate", () => {
     });
   });
 
+  it("fails a stored decision receipt URL from another wave", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-wrong-wave-receipt",
+      status: "approved" as const,
+      prompt: "Use Codex to update documentation.",
+      spec: "Docs only.",
+      risk: "medium" as const,
+    };
+    const poll = {
+      proposalId: proposal.id,
+      yesVotes: 3,
+      noVotes: 0,
+      quorumRequired: 3,
+      yesPercentRequired: 60,
+      status: "passed" as const,
+      votes: [],
+      decision: createWaveDecisionReceipt({
+        proposalId: proposal.id,
+        reference: "https://6529.io/waves/other-builder-wave/drops/drop-wrong-wave",
+        waveUrl: wave.waveUrl,
+        recordedBy: "david",
+        recordedAt: "2026-06-20T18:00:00.000Z",
+      }),
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest: {
+        ...manifest,
+        approval: {
+          ...manifest.approval,
+          status: "passed",
+        },
+      },
+      changedPaths: ["README.md"],
+    });
+
+    expect(manifest.approval.status).toBe("pending");
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "vote")).toMatchObject({
+      status: "fail",
+      message: "Wave decision URL must match the configured builder wave.",
+    });
+  });
+
   it("fails medium-risk commands that touch workflow enforcement", () => {
     const wave = approvedDemoWave();
     const proposal = {

@@ -10,6 +10,7 @@ import {
   evaluateGate,
   evaluatePoll,
   pollApprovalPassed,
+  validateWaveDecisionReference,
   type CommandKind,
   type CommandProposal,
   type CommandVote,
@@ -431,6 +432,12 @@ export async function recordDecisionReceipt(input: unknown) {
 
   if (!reference) {
     throw Object.assign(new Error("Wave decision URL or drop id is required."), { status: 400 });
+  }
+
+  const referenceCheck = validateWaveDecisionReference({ reference, waveUrl: wave.waveUrl });
+
+  if (!referenceCheck.ok) {
+    throw Object.assign(new Error(referenceCheck.message), { status: 400 });
   }
 
   const decision = createWaveDecisionReceipt({

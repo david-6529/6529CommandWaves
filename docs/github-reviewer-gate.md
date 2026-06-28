@@ -95,7 +95,8 @@ The guardian should be deterministic. An LLM can help explain the result or sugg
 decision should come from checks that anyone can rerun.
 
 For the first phase, local counted votes are visible sentiment only. PR build and reviewer approval require a recorded
-wave decision receipt that points to a 6529 decision drop. The receipt does not claim live REP, TDH, or weighted voting.
+wave decision receipt that points to a 6529 decision drop in the configured builder wave. The receipt does not claim live
+REP, TDH, or weighted voting.
 
 ## Hook Contract Signals
 

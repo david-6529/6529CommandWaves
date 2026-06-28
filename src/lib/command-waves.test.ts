@@ -6,6 +6,7 @@ import {
   evaluateGate,
   evaluatePoll,
   pollApprovalPassed,
+  validateWaveDecisionReference,
   type CommandProposal,
   type PollState,
 } from "./command-waves";
@@ -133,5 +134,49 @@ describe("Command Waves rule engine", () => {
 
     expect(evaluatePoll(poll).passed).toBe(true);
     expect(pollApprovalPassed(poll)).toBe(false);
+  });
+
+  it("validates decision receipt URLs against the configured builder wave", () => {
+    const waveUrl = "https://6529.io/waves/hook-builder";
+
+    expect(
+      validateWaveDecisionReference({
+        reference: "https://6529.io/waves/hook-builder/drops/drop-123",
+        waveUrl,
+      }),
+    ).toEqual({ ok: true });
+    expect(
+      validateWaveDecisionReference({
+        reference: "drop-123",
+        waveUrl,
+      }),
+    ).toEqual({ ok: true });
+    expect(
+      validateWaveDecisionReference({
+        reference: "https://6529.io/waves/other-wave/drops/drop-123",
+        waveUrl,
+      }),
+    ).toEqual({
+      ok: false,
+      message: "Wave decision URL must match the configured builder wave.",
+    });
+    expect(
+      validateWaveDecisionReference({
+        reference: "https://not6529.io/waves/hook-builder/drops/drop-123",
+        waveUrl,
+      }),
+    ).toEqual({
+      ok: false,
+      message: "Wave decision URL must be a 6529 wave drop.",
+    });
+    expect(
+      validateWaveDecisionReference({
+        reference: "https://6529.io/waves/hook-builder",
+        waveUrl,
+      }),
+    ).toEqual({
+      ok: false,
+      message: "Wave decision URL must include a drop id.",
+    });
   });
 });

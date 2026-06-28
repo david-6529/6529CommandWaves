@@ -183,7 +183,7 @@ describe("Command wave store", () => {
 
     const approved = await recordDecisionReceipt({
       proposalId: "cmd-002",
-      reference: "https://6529.io/waves/new-command-wave/drops/drop-approval-002",
+      reference: "https://6529.io/waves/6529-hook-builder/drops/drop-approval-002",
       recordedBy: "david",
     });
 
@@ -203,6 +203,48 @@ describe("Command wave store", () => {
       },
     });
     expect(approved.ledger[0].message).toBe("Recorded wave decision receipt for cmd-002.");
+  });
+
+  it("rejects decision receipt URLs from another wave", async () => {
+    await updateCommandWaveSetup({
+      waveUrl: "https://6529.io/waves/new-command-wave",
+      repoUrl: "https://github.com/6529-Collections/new-command-wave",
+    });
+    await submitCommandProposal({
+      title: "Open a PR",
+      proposer: "tester",
+      kind: "open_pr",
+      prompt: "Use Codex to add docs.",
+      spec: "Docs only.",
+      budgetUsd: 1,
+    });
+
+    await expect(
+      recordDecisionReceipt({
+        proposalId: "cmd-002",
+        reference: "https://6529.io/waves/other-command-wave/drops/drop-approval-002",
+        recordedBy: "david",
+      }),
+    ).rejects.toThrow("Wave decision URL must match the configured builder wave.");
+  });
+
+  it("rejects malformed decision receipt URLs", async () => {
+    await submitCommandProposal({
+      title: "Open a PR",
+      proposer: "tester",
+      kind: "open_pr",
+      prompt: "Use Codex to add docs.",
+      spec: "Docs only.",
+      budgetUsd: 1,
+    });
+
+    await expect(
+      recordDecisionReceipt({
+        proposalId: "cmd-002",
+        reference: "https://[invalid",
+        recordedBy: "david",
+      }),
+    ).rejects.toThrow("Wave decision URL is not valid.");
   });
 
   it("rejects blocked command kinds without opening a poll", async () => {
@@ -277,7 +319,7 @@ describe("Command wave store", () => {
 
     await recordDecisionReceipt({
       proposalId: "cmd-002",
-      reference: "https://6529.io/waves/new-command-wave/drops/drop-approval-002",
+      reference: "https://6529.io/waves/6529-hook-builder/drops/drop-approval-002",
       recordedBy: "david",
     });
 

@@ -275,6 +275,61 @@ function dropIdFromUrl(value: string) {
   );
 }
 
+function waveIdFromUrl(value: string) {
+  return value.match(/\/waves\/([^/?#\s]+)/i)?.[1] ?? value.trim();
+}
+
+function is6529Host(hostname: string) {
+  return hostname === "6529.io" || hostname.endsWith(".6529.io");
+}
+
+export function validateWaveDecisionReference({
+  reference,
+  waveUrl,
+}: {
+  reference: string;
+  waveUrl: string;
+}): { ok: true } | { ok: false; message: string } {
+  const trimmedReference = reference.trim();
+
+  if (!trimmedReference) {
+    return { ok: false, message: "Wave decision URL or drop id is required." };
+  }
+
+  if (!/^https?:\/\//i.test(trimmedReference)) {
+    return { ok: true };
+  }
+
+  let url: URL;
+
+  try {
+    url = new URL(trimmedReference);
+  } catch {
+    return { ok: false, message: "Wave decision URL is not valid." };
+  }
+
+  if (!is6529Host(url.hostname)) {
+    return { ok: false, message: "Wave decision URL must be a 6529 wave drop." };
+  }
+
+  if (!dropIdFromUrl(trimmedReference)) {
+    return { ok: false, message: "Wave decision URL must include a drop id." };
+  }
+
+  const expectedWaveId = waveIdFromUrl(waveUrl);
+  const receiptWaveId = waveIdFromUrl(url.pathname);
+
+  if (!receiptWaveId || receiptWaveId === url.pathname) {
+    return { ok: false, message: "Wave decision URL must include the builder wave id." };
+  }
+
+  if (receiptWaveId !== expectedWaveId) {
+    return { ok: false, message: "Wave decision URL must match the configured builder wave." };
+  }
+
+  return { ok: true };
+}
+
 export function createWaveDecisionReceipt({
   proposalId,
   reference,
@@ -303,7 +358,7 @@ export function createWaveDecisionReceipt({
   }
 
   return {
-    source: url?.hostname.endsWith("6529.io") ? "6529" : "manual",
+    source: url && is6529Host(url.hostname) ? "6529" : "manual",
     dropId: isUrl ? dropIdFromUrl(trimmedReference) : trimmedReference,
     url: isUrl ? trimmedReference : null,
     recordedBy: recordedBy.trim() || "manual reviewer",

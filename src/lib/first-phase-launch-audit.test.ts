@@ -109,6 +109,41 @@ describe("first phase launch audit", () => {
     );
   });
 
+  it("blocks public launch when a stored receipt points to another wave", () => {
+    const decision = demoWave.polls[0].decision;
+
+    if (!decision) {
+      throw new Error("Expected demo decision receipt.");
+    }
+
+    const wave = {
+      ...demoWave,
+      polls: [
+        {
+          ...demoWave.polls[0],
+          decision: {
+            ...decision,
+            url: "https://6529.io/waves/other-builder-wave/drops/drop-cmd-001-approval",
+          },
+        },
+      ],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_wave_decision_receipt",
+        status: "blocked",
+        detail: "Wave decision URL must match the configured builder wave.",
+      }),
+    );
+  });
+
   it("does not emit em dash characters", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),

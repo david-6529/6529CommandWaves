@@ -2,6 +2,7 @@ import {
   evaluateGate,
   evaluatePoll,
   pollApprovalPassed,
+  validateWaveDecisionReference,
   type CommandKind,
   type CommandProposal,
   type CommandWave,
@@ -238,6 +239,23 @@ function riskAllowsSignal(risk: RiskLevel, signal: PrDiffSignal) {
   return risk === "critical";
 }
 
+function validatePollDecisionReference(poll: PollState | null, waveUrl: string) {
+  if (!poll?.decision) {
+    return null;
+  }
+
+  return validateWaveDecisionReference({
+    reference: poll.decision.url ?? poll.decision.dropId ?? "",
+    waveUrl,
+  });
+}
+
+function pollApprovalPassedForWave(poll: PollState | null, waveUrl: string) {
+  const referenceCheck = validatePollDecisionReference(poll, waveUrl);
+
+  return pollApprovalPassed(poll) && Boolean(referenceCheck?.ok);
+}
+
 export function findPrDiffSignals(paths: string[] = []): PrDiffSignal[] {
   return paths.flatMap((path) =>
     diffSignalRules
@@ -263,7 +281,7 @@ export function createCommandPrManifest({
   pollDropId?: string | null;
 }): CommandPrManifest {
   const runManifest = createCommandRunManifest({ wave, proposal });
-  const approvalPassed = pollApprovalPassed(poll);
+  const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl);
 
   return {
     version: "command-wave-pr-v0.1",
@@ -375,7 +393,8 @@ export function validateCommandPrManifest({
   const expected = createCommandPrManifest({ wave, proposal, poll });
   const gate = evaluateGate(proposal, wave.rules);
   const pollResult = poll ? evaluatePoll(poll) : null;
-  const approvalPassed = pollApprovalPassed(poll);
+  const decisionReferenceCheck = validatePollDecisionReference(poll, wave.waveUrl);
+  const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl);
 
   checks.push(
     check(
@@ -450,7 +469,9 @@ export function validateCommandPrManifest({
       gate.needsPoll ? (approvalPassed && manifest.approval.status === "passed" ? "pass" : "fail") : "pass",
       gate.needsPoll
         ? poll?.decision
-          ? `Wave decision receipt ${approvalPassed ? "passed" : "has not passed"} for ${poll.decision.dropId ?? poll.decision.url ?? "recorded approval"}.`
+          ? decisionReferenceCheck?.ok
+            ? `Wave decision receipt ${approvalPassed ? "passed" : "has not passed"} for ${poll.decision.dropId ?? poll.decision.url ?? "recorded approval"}.`
+            : (decisionReferenceCheck?.message ?? "Wave decision receipt is not valid.")
           : pollResult?.passed
             ? "Local vote passed. Record a wave decision receipt before PR review can pass."
             : `Vote has not passed under quorum ${gate.rule.quorum} / yes ${gate.rule.yesPercent}%.`

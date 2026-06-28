@@ -1,4 +1,4 @@
-import type { CommandWave } from "./command-waves";
+import { validateWaveDecisionReference, type CommandWave } from "./command-waves";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
 import type { ReadinessCheck } from "./system/readiness";
 
@@ -93,6 +93,23 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   const receipt = poll?.decision ?? null;
 
   if (receipt) {
+    const referenceCheck = validateWaveDecisionReference({
+      reference: receipt.url ?? receipt.dropId ?? "",
+      waveUrl: wave?.waveUrl ?? "",
+    });
+
+    if (!referenceCheck.ok) {
+      return [
+        {
+          id: "flow_wave_decision_receipt",
+          label: "Wave decision receipt",
+          status: "blocked",
+          detail: referenceCheck.message,
+          source: "flow",
+        },
+      ];
+    }
+
     return [
       {
         id: "flow_wave_decision_receipt",

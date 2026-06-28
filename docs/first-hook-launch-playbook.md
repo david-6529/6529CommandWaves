@@ -16,7 +16,7 @@ Make the first public phase a clear community win:
 - Builder wave and GitHub repo setup.
 - One PR-sized command at a time.
 - Local or imported wave decisions for approvals.
-- Manual decision receipts that link approved work to a 6529 drop URL.
+- Manual decision receipts that link approved work to a 6529 drop URL in the builder wave.
 - Copyable Codex work packets for PR commands with a recorded wave decision receipt.
 - Draft PRs with Command Waves manifests.
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
