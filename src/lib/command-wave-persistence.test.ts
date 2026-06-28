@@ -7,7 +7,7 @@ import {
   resetCommandWave,
   submitCommandProposal,
 } from "./command-wave-store";
-import { demoWave } from "./command-waves";
+import { demoWave } from "./demo-wave";
 import { deletePersistedCommandWave, getCommandWaveStoreMode } from "./command-wave-persistence";
 
 describe("command wave persistence", () => {
@@ -109,9 +109,7 @@ describe("command wave persistence", () => {
 
     const wave = await getCommandWave();
 
-    expect(wave.executions[0]?.summary).toBe(
-      "Mock execution opened a PR with the hook scaffold and parameter-bound tests bound to the approved spec.",
-    );
+    expect(wave.executions[0]?.summary).toBe(demoWave.executions[0]?.summary);
     expect(wave.proposals[0]?.status).toBe("complete");
     expect(wave.ledger[0]?.message).toBe("Created 6529 Hook Builder and attached the builder wave plus GitHub repo.");
   });
@@ -139,5 +137,36 @@ describe("command wave persistence", () => {
     expect(wave.proposals[0]?.status).toBe("approved");
     expect(wave.executions[0]?.summary).toBe("Local agent mock opened a deterministic PR artifact for the approved command.");
     expect(wave.executions[0]?.artifacts).toEqual(["PR #99"]);
+  });
+
+  it("refreshes old complete hook demo records that lack deterministic evidence", async () => {
+    await replaceCommandWave({
+      ...demoWave,
+      executions: [
+        {
+          proposalId: "cmd-001",
+          harness: "codex",
+          status: "complete",
+          summary: "Mock execution opened a PR with the hook scaffold and parameter-bound tests bound to the approved spec.",
+          artifacts: ["PR #12", "commit abc123", "forge test passed"],
+        },
+      ],
+      reviews: [
+        {
+          proposalId: "cmd-001",
+          status: "pass",
+          checks: ["Matched approved hook scope"],
+          summary: "Review passed. The work matched the vote and stayed inside the approved non-upgradeable hook scope.",
+        },
+      ],
+    });
+
+    clearCommandWaveStoreForTests();
+
+    const wave = await getCommandWave();
+
+    expect(wave.executions[0]?.artifacts.some((artifact) => artifact.startsWith("run-manifest:"))).toBe(true);
+    expect(wave.executions[0]?.artifacts.some((artifact) => artifact.startsWith("agent-handoff:"))).toBe(true);
+    expect(wave.reviews[0]?.proof?.attestationHash).toHaveLength(64);
   });
 });

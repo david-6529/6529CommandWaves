@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { demoWave, type CommandWave } from "../command-waves";
+import type { CommandWave } from "../command-waves";
+import { demoWave } from "../demo-wave";
 import {
   createCommandPrManifest,
   createGuardianPullRequestAttestation,

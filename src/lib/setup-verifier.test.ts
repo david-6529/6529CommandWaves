@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoWave } from "./command-waves";
+import { demoWave } from "./demo-wave";
 import { createSetupProof } from "./setup-proof";
 import { extractRequiredStatusChecks, verifySetupProofAgainstGitHubPayloads } from "./setup-verifier";
 

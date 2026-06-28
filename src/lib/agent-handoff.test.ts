@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoWave } from "./command-waves";
+import { demoWave } from "./demo-wave";
 import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { createCommandPrManifest } from "./github/pr-reviewer-gate";
 import { createCommandRunManifest, hashValue } from "./run-manifest";

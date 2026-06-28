@@ -1,6 +1,7 @@
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { demoWave, type CommandWave } from "../src/lib/command-waves";
+import type { CommandWave } from "../src/lib/command-waves";
+import { demoWave } from "../src/lib/demo-wave";
 import {
   assertGuardianWaveStateConfigured,
   changedPathsFromEnv,

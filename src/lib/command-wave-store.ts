@@ -1,9 +1,9 @@
 import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "./configured-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
+import { demoWave } from "./demo-wave";
 import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
-  demoWave,
   evaluateGate,
   evaluatePoll,
   type CommandKind,
@@ -23,6 +23,11 @@ const globalStore = globalThis as typeof globalThis & {
   __commandWaveStore?: Store;
 };
 
+const previousHookDemoExecutionSummary =
+  "Mock execution opened a PR with the hook scaffold and parameter-bound tests bound to the approved spec.";
+const previousHookDemoReviewSummary =
+  "Review passed. The work matched the vote and stayed inside the approved non-upgradeable hook scope.";
+
 const commandKinds = new Set<CommandKind>([
   "read_context",
   "draft_response",
@@ -39,12 +44,22 @@ function cloneDemoWave(): CommandWave {
 }
 
 function isStaleBuiltInHookDemo(wave: CommandWave) {
+  const execution = wave.executions[0] ?? null;
+  const review = wave.reviews[0] ?? null;
+  const missingDeterministicEvidence = Boolean(
+    execution &&
+      review &&
+      (!execution.artifacts.some((artifact) => artifact.startsWith("run-manifest:")) ||
+        !execution.artifacts.some((artifact) => artifact.startsWith("agent-handoff:")) ||
+        !review.proof),
+  );
+
   return Boolean(
-    wave.proposals[0]?.status !== demoWave.proposals[0]?.status &&
+    missingDeterministicEvidence &&
       wave.executions.length === 1 &&
       wave.reviews.length === 1 &&
-      wave.executions[0]?.summary === demoWave.executions[0]?.summary &&
-      wave.reviews[0]?.summary === demoWave.reviews[0]?.summary,
+      (execution?.summary === demoWave.executions[0]?.summary || execution?.summary === previousHookDemoExecutionSummary) &&
+      (review?.summary === demoWave.reviews[0]?.summary || review?.summary === previousHookDemoReviewSummary),
   );
 }
 

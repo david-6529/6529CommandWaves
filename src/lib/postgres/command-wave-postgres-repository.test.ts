@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { QueryResult, QueryResultRow } from "pg";
-import { demoWave } from "../command-waves";
+import { demoWave } from "../demo-wave";
 import {
   loadCommandWaveFromPostgres,
   saveCommandWaveToPostgres,

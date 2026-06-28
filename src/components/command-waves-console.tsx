@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import {
   classifyRisk,
-  demoWave,
   evaluatePoll,
   type CommandKind,
   type CommandWave,
 } from "@/lib/command-waves";
 import { createContributionReport } from "@/lib/contribution-report";
+import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
@@ -384,6 +384,26 @@ function artifactLabel(artifact: string) {
 
   if (artifact.startsWith("agent-handoff:")) {
     return "agent handoff recorded";
+  }
+
+  if (artifact.startsWith("rules ")) {
+    return "rules hash recorded";
+  }
+
+  if (artifact.startsWith("permissions ")) {
+    return "tool permissions recorded";
+  }
+
+  if (artifact.startsWith("head ")) {
+    return "head commit recorded";
+  }
+
+  if (artifact.startsWith("https://github.com/")) {
+    return "PR link recorded";
+  }
+
+  if (artifact === "PR body includes Command Waves manifest") {
+    return "PR manifest in body";
   }
 
   return artifact;

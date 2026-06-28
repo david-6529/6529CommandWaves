@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
-import { demoWave } from "./command-waves";
+import { demoWave } from "./demo-wave";
 import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter } from "./local-adapters";
 import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
 import { findRunManifestArtifact } from "./run-manifest";

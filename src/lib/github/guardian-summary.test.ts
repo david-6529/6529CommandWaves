@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoWave } from "../command-waves";
+import { demoWave } from "../demo-wave";
 import { createCommandPrManifest, createGuardianAttestation } from "./pr-reviewer-gate";
 import { formatGuardianStepSummary } from "./guardian-summary";
 

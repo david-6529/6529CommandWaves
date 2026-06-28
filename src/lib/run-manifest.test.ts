@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demoWave } from "./command-waves";
+import { demoWave } from "./demo-wave";
 import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact } from "./run-manifest";
 
 describe("command run manifest", () => {
