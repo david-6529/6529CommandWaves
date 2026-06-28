@@ -145,6 +145,16 @@ type ReadinessResponse = {
   error?: string;
 };
 
+type CodexWorkPacketResponse = {
+  packet?: {
+    proposalId: string;
+    targetBranch: string;
+    packetHash: string;
+    text: string;
+  };
+  error?: string;
+};
+
 const accessKeyStorageKey = "command-waves-access-key";
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
@@ -227,6 +237,26 @@ async function requestReadiness() {
   return payload;
 }
 
+async function requestCodexWorkPacket(proposalId: string, accessKey?: string) {
+  const headers = new Headers();
+
+  headers.set("content-type", "application/json");
+  attachAdminApiKey(headers, accessKey);
+
+  const response = await fetch("/api/command-wave/codex-packet", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ proposalId }),
+  });
+  const payload = (await response.json()) as CodexWorkPacketResponse;
+
+  if (!response.ok || !payload.packet) {
+    throw new Error(payload.error ?? "Codex work packet failed.");
+  }
+
+  return payload.packet;
+}
+
 type BusyState =
   | "loading"
   | "saving"
@@ -237,6 +267,7 @@ type BusyState =
   | "proposal"
   | "vote"
   | "decision"
+  | "codex"
   | "execute"
   | "review"
   | "reset";
@@ -497,6 +528,7 @@ export function CommandWavesConsole() {
   const [apiNotice, setApiNotice] = useState("Backend demo state is loading.");
   const [apiError, setApiError] = useState("");
   const [copyNotice, setCopyNotice] = useState("");
+  const [codexPacketNotice, setCodexPacketNotice] = useState("");
   const [contextPreview, setContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
@@ -506,6 +538,11 @@ export function CommandWavesConsole() {
   const activePoll = activeProposal ? wave.polls.find((poll) => poll.proposalId === activeProposal.id) : undefined;
   const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
+  const canCopyCodexPacket = Boolean(
+    activeProposal &&
+      activeProposal.kind === "open_pr" &&
+      ["approved", "reviewing", "complete"].includes(activeProposal.status),
+  );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
@@ -569,6 +606,7 @@ export function CommandWavesConsole() {
     setWave(nextWave);
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
+    setCodexPacketNotice("");
   }
 
   async function runWaveAction(busy: BusyState, action: () => Promise<CommandWave>, success: string) {
@@ -687,6 +725,27 @@ export function CommandWavesConsole() {
       setCopyNotice("Draft copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
+    }
+  }
+
+  async function copyCodexWorkPacket() {
+    if (!activeProposal) {
+      return;
+    }
+
+    setApiBusy("codex");
+    setApiError("");
+    setCodexPacketNotice("");
+
+    try {
+      const packet = await requestCodexWorkPacket(activeProposal.id, accessKey);
+
+      await navigator.clipboard.writeText(packet.text);
+      setCodexPacketNotice(`Codex packet copied for ${packet.targetBranch}.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Codex packet copy failed.");
+    } finally {
+      setApiBusy(null);
     }
   }
 
@@ -1257,6 +1316,19 @@ export function CommandWavesConsole() {
                     >
                       {apiBusy === "execute" ? "Building" : "Build approved PR"}
                     </Button>
+                    <Button
+                      type="button"
+                      className="mt-2"
+                      variant="secondary"
+                      disabled={isBusy || !canCopyCodexPacket}
+                      onClick={() => void copyCodexWorkPacket()}
+                    >
+                      {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
+                    </Button>
+                    <p className="mt-2 text-xs leading-5 text-zinc-500">
+                      Manual handoff for a prepared branch. It does not merge, deploy, or spend funds.
+                    </p>
+                    {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
                   </div>
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
                     <p className="text-sm font-semibold text-zinc-100">Review</p>

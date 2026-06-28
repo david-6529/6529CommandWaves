@@ -114,6 +114,7 @@ The current app is a local prototype of the hook-building flow:
 - backend setup validation for 6529 wave links and GitHub repo links
 - launch readiness checks for local mode, storage, 6529 mode, GitHub PRs, and guardian wave state
 - controlled local run record
+- copyable manual Codex work packet for approved PR commands
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
 - deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
 - manual wave decision receipt that can anchor approval to a 6529 drop URL
@@ -235,6 +236,7 @@ For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH
 - `POST /api/command-wave/proposals`: submit a command proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
 - `POST /api/command-wave/decision`: record a manual wave decision receipt. Body requires `proposalId` and `reference`.
+- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for an approved PR command.
 - `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.
 
