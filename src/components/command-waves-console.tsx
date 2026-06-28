@@ -1251,7 +1251,7 @@ export function CommandWavesConsole() {
           <Panel title="Safety rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
-                Low-risk reads can run right away. Code, posts, scripts, deploys, funds, and rules need a visible decision.
+                Phase 1 accepts reads, drafts, wave updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
               </p>
               <div className="grid gap-2 sm:grid-cols-3">
                 <div className="rounded-md border border-zinc-800 bg-black p-3">

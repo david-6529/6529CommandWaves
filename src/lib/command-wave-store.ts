@@ -40,6 +40,7 @@ const commandKinds = new Set<CommandKind>([
   "spend_money",
   "change_rules",
 ]);
+const firstPhaseCommandKinds = new Set<CommandKind>(["read_context", "draft_response", "post_to_wave", "open_pr"]);
 
 function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
@@ -137,6 +138,15 @@ function isCommandKind(value: unknown): value is CommandKind {
   return typeof value === "string" && commandKinds.has(value as CommandKind);
 }
 
+function assertFirstPhaseCommandKind(kind: CommandKind) {
+  if (!firstPhaseCommandKinds.has(kind)) {
+    throw Object.assign(
+      new Error("This phase accepts only context reads, drafts, wave updates, and PR commands."),
+      { status: 400 },
+    );
+  }
+}
+
 function asText(value: unknown, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
@@ -214,6 +224,9 @@ export async function submitCommandProposal(input: unknown) {
   const kind = isCommandKind(body.kind) ? body.kind : "open_pr";
   const prompt = asText(body.prompt, "No prompt supplied.");
   const spec = asText(body.spec, "No execution spec supplied.");
+
+  assertFirstPhaseCommandKind(kind);
+
   const hookPreflight = createHookProposalPreflight({ command: prompt, criteria: spec });
 
   if (kind === "open_pr" && hookPreflight.status === "fail") {

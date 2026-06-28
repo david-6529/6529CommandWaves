@@ -11,6 +11,7 @@ import {
   submitCommandProposal,
   updateCommandWaveSetup,
 } from "./command-wave-store";
+import type { CommandKind } from "./command-waves";
 
 describe("Command wave store", () => {
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
@@ -135,6 +136,22 @@ describe("Command wave store", () => {
     });
   });
 
+  it.each(["run_script", "deploy", "spend_money", "change_rules"] satisfies CommandKind[])(
+    "rejects %s proposals outside the first phase command surface",
+    async (kind) => {
+      await expect(
+        submitCommandProposal({
+          title: `Submit ${kind}`,
+          proposer: "tester",
+          kind,
+          prompt: "Request work outside the first public hook phase.",
+          spec: "Not available in phase 1.",
+          budgetUsd: 1,
+        }),
+      ).rejects.toThrow("This phase accepts only context reads, drafts, wave updates, and PR commands.");
+    },
+  );
+
   it("requires voter identity and rejects duplicate votes", async () => {
     await submitCommandProposal({
       title: "Open a PR",
@@ -197,21 +214,21 @@ describe("Command wave store", () => {
         ...wave.rules,
         rulesByKind: {
           ...wave.rules.rulesByKind,
-          run_script: {
-            ...wave.rules.rulesByKind.run_script,
+          post_to_wave: {
+            ...wave.rules.rulesByKind.post_to_wave,
             mode: "blocked",
-            reason: "Scripts are disabled for this wave.",
+            reason: "Wave posts are disabled for this wave.",
           },
         },
       },
     });
 
     const submitted = await submitCommandProposal({
-      title: "Run cleanup script",
+      title: "Post launch update",
       proposer: "tester",
-      kind: "run_script",
-      prompt: "Run a cleanup script.",
-      spec: "Use the approved script only.",
+      kind: "post_to_wave",
+      prompt: "Post a launch update.",
+      spec: "Use approved text only.",
       budgetUsd: 1,
     });
 

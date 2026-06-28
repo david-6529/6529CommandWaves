@@ -17,6 +17,7 @@ This repo uses one 6529 builder wave to govern one GitHub smart contract repo.
 - Keep the PR scoped to that command.
 - Include the Command Waves manifest in the PR body.
 - Include tests or reviewer evidence for the approved scope.
+- Submit only context reads, drafts, wave updates, or PR commands in phase 1.
 - Keep deploys, payments, merges, and governance changes out of phase 1 PRs.
 - Use the agent build step only for approved PR commands.
 

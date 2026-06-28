@@ -110,6 +110,7 @@ The current app is a local prototype of the hook-building flow:
 - copyable launch packet for wave, PR, review, contribution, and fee evidence
 - safety rules by command type
 - command proposal form
+- backend command surface limited to context reads, drafts, wave updates, and PR commands
 - first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
 - hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims
 - automatic risk classification
