@@ -20,6 +20,7 @@ import {
 } from "@/lib/first-phase-launch-audit";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
+import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
@@ -338,6 +339,22 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
 }
 
+function nextActionStatusClass(status: PhaseNextActionStatus) {
+  if (status === "ready") {
+    return statusClass("pass");
+  }
+
+  if (status === "blocked") {
+    return statusClass("failed");
+  }
+
+  if (status === "action") {
+    return statusClass("reviewing");
+  }
+
+  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+}
+
 function launchAuditStatusClass(status: FirstPhaseLaunchAuditStatus) {
   if (status === "ready") {
     return statusClass("pass");
@@ -577,6 +594,7 @@ export function CommandWavesConsole() {
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
+  const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const launchAudit = useMemo(
     () =>
       createFirstPhaseLaunchAudit({
@@ -927,6 +945,22 @@ export function CommandWavesConsole() {
             </span>
           )}
         </div>
+
+        <section className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 md:grid-cols-[10rem_1fr] md:items-center">
+          <div className="flex flex-wrap items-center gap-2 md:block">
+            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
+            <Badge className={`${nextActionStatusClass(phaseNextAction.status)} mt-0 md:mt-2`}>
+              {phaseNextAction.statusLabel}
+            </Badge>
+          </div>
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base font-semibold text-zinc-50">{phaseNextAction.title}</h2>
+              <Badge className="border-zinc-700 bg-black text-zinc-300">{phaseNextAction.stepLabel}</Badge>
+            </div>
+            <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
+          </div>
+        </section>
 
         <section className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">
           {phaseChecklist.map((item) => (
