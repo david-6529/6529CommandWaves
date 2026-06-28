@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { classifyRisk, defaultRules, evaluateGate, evaluatePoll, type CommandProposal, type PollState } from "./command-waves";
+import {
+  classifyRisk,
+  createWaveDecisionReceipt,
+  defaultRules,
+  evaluateGate,
+  evaluatePoll,
+  pollApprovalPassed,
+  type CommandProposal,
+  type PollState,
+} from "./command-waves";
 
 function proposal(kind: CommandProposal["kind"], prompt = "Do the work."): CommandProposal {
   return {
@@ -69,5 +78,33 @@ describe("Command Waves rule engine", () => {
     expect(evaluatePoll(underQuorum)).toMatchObject({ quorumMet: false, thresholdMet: true, passed: false });
     expect(evaluatePoll(underThreshold)).toMatchObject({ quorumMet: true, thresholdMet: false, passed: false });
     expect(evaluatePoll(passed)).toMatchObject({ quorumMet: true, thresholdMet: true, passed: true });
+  });
+
+  it("treats a recorded wave decision receipt as manual approval evidence", () => {
+    const receipt = createWaveDecisionReceipt({
+      proposalId: "cmd-test",
+      reference: "https://6529.io/waves/hook-builder/drops/drop-123",
+      waveUrl: "https://6529.io/waves/hook-builder",
+      recordedBy: "david",
+      recordedAt: "2026-06-20T12:00:00.000Z",
+    });
+    const poll: PollState = {
+      proposalId: "cmd-test",
+      yesVotes: 0,
+      noVotes: 0,
+      quorumRequired: 3,
+      yesPercentRequired: 60,
+      status: "passed",
+      votes: [],
+      decision: receipt,
+    };
+
+    expect(receipt).toMatchObject({
+      source: "6529",
+      dropId: "drop-123",
+      url: "https://6529.io/waves/hook-builder/drops/drop-123",
+    });
+    expect(evaluatePoll(poll).passed).toBe(false);
+    expect(pollApprovalPassed(poll)).toBe(true);
   });
 });

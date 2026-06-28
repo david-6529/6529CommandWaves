@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createWaveDecisionReceipt } from "../command-waves";
 import type { CommandWave } from "../command-waves";
 import { demoWave } from "../demo-wave";
 import {
@@ -62,6 +63,46 @@ describe("PR reviewer gate", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "proposal_status")?.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "vote")?.status).toBe("fail");
+  });
+
+  it("passes a vote-gated command with a manual wave decision receipt", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-manual-wave-decision",
+      status: "approved" as const,
+      prompt: "Use Codex to update documentation.",
+      spec: "Docs only.",
+      risk: "medium" as const,
+    };
+    const poll = {
+      proposalId: proposal.id,
+      yesVotes: 0,
+      noVotes: 0,
+      quorumRequired: 3,
+      yesPercentRequired: 60,
+      status: "passed" as const,
+      votes: [],
+      decision: createWaveDecisionReceipt({
+        proposalId: proposal.id,
+        reference: "https://6529.io/waves/6529-hook-builder/drops/drop-manual-decision",
+        waveUrl: wave.waveUrl,
+        recordedBy: "david",
+        recordedAt: "2026-06-20T18:00:00.000Z",
+      }),
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["README.md"],
+    });
+
+    expect(manifest.pollDropId).toBe("drop-manual-decision");
+    expect(result.status).toBe("pass");
+    expect(result.checks.find((item) => item.id === "vote")?.status).toBe("pass");
   });
 
   it("fails medium-risk commands that touch workflow enforcement", () => {

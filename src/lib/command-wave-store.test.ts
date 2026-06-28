@@ -3,6 +3,7 @@ import {
   clearCommandWaveStoreForTests,
   executeProposal,
   getCommandWave,
+  recordDecisionReceipt,
   recordVote,
   replaceCommandWave,
   resetCommandWave,
@@ -121,6 +122,40 @@ describe("Command wave store", () => {
     await expect(recordVote({ proposalId: "cmd-002", voterIdentity: "alice", vote: "no" })).rejects.toThrow(
       "Voter has already voted on this proposal.",
     );
+  });
+
+  it("records a manual wave decision receipt as approval evidence", async () => {
+    await submitCommandProposal({
+      title: "Open a PR",
+      proposer: "tester",
+      kind: "open_pr",
+      prompt: "Use Codex to add docs.",
+      spec: "Docs only.",
+      budgetUsd: 1,
+    });
+
+    const approved = await recordDecisionReceipt({
+      proposalId: "cmd-002",
+      reference: "https://6529.io/waves/new-command-wave/drops/drop-approval-002",
+      recordedBy: "david",
+    });
+
+    expect(approved.proposals[0]).toMatchObject({
+      id: "cmd-002",
+      status: "approved",
+    });
+    expect(approved.polls[0]).toMatchObject({
+      proposalId: "cmd-002",
+      status: "passed",
+      yesVotes: 0,
+      noVotes: 0,
+      decision: {
+        source: "6529",
+        dropId: "drop-approval-002",
+        recordedBy: "david",
+      },
+    });
+    expect(approved.ledger[0].message).toBe("Recorded wave decision receipt for cmd-002.");
   });
 
   it("rejects blocked command kinds without opening a poll", async () => {

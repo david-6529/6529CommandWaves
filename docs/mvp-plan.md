@@ -65,10 +65,11 @@ Polls require a voter identity for every yes/no vote. Duplicate votes from the s
 2. A member proposes: "Draft the non-upgradeable hook scaffold with fee parameters capped at 100 bps and tests."
 3. The rule engine classifies it as `open_pr`, high risk, vote required.
 4. The wave decision approves the scoped work.
-5. The agent opens a PR with a Command Waves manifest.
-6. The GitHub reviewer gate checks the PR manifest, vote, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
-7. A reviewer verifies tests, contract guardrails, and changed files before humans merge.
-8. The result, contribution activity, and manual developer fee evidence are drafted for a human to post back to the wave.
+5. The operator records the decision drop URL as a manual approval receipt.
+6. The agent opens a PR with a Command Waves manifest.
+7. The GitHub reviewer gate checks the PR manifest, vote or receipt status, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
+8. A reviewer verifies tests, contract guardrails, and changed files before humans merge.
+9. The result, contribution activity, and manual developer fee evidence are drafted for a human to post back to the wave.
 
 ## Non-Goals For First Demo
 

@@ -33,6 +33,12 @@ describe("Command Waves Postgres schema", () => {
     expect(schema).toContain("proof_json jsonb not null default '{}'::jsonb");
   });
 
+  it("stores manual wave decision receipts with polls", () => {
+    expect(schema).toContain("decision_receipt_json jsonb not null default '{}'::jsonb");
+    expect(schema).toContain("poll_drop_id_6529 text");
+    expect(schema).toContain("command_polls_drop_id_6529_idx");
+  });
+
   it("indexes job queue and 6529 drop cache access patterns", () => {
     expect(schema).toContain("command_jobs_status_run_after_idx");
     expect(schema).toContain("cached_wave_drops_wave_serial_idx");

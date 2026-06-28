@@ -1,5 +1,5 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
-import { defaultRules } from "./command-waves";
+import { createWaveDecisionReceipt, defaultRules } from "./command-waves";
 import { createAgentHandoffPacket, formatAgentHandoffArtifact } from "./agent-handoff";
 import { createCommandPrManifest, createGuardianAttestation } from "./github/pr-reviewer-gate";
 import { pullRequestUrl } from "./github/repo";
@@ -30,6 +30,14 @@ const poll: PollState = {
   quorumRequired: 3,
   yesPercentRequired: 60,
   status: "passed",
+  decision: createWaveDecisionReceipt({
+    proposalId: "cmd-001",
+    reference: "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
+    waveUrl: "https://6529.io/waves/6529-hook-builder",
+    recordedBy: "david",
+    recordedAt: "2026-06-20T12:40:30.000Z",
+    summary: "Builder wave approved cmd-001 with 5 yes and 1 no.",
+  }),
   votes: [
     { voterIdentity: "david", vote: "yes", weight: 1, source: "local", at: "2026-06-20T12:10:00.000Z" },
     { voterIdentity: "gpebbles", vote: "yes", weight: 1, source: "local", at: "2026-06-20T12:11:00.000Z" },
@@ -82,7 +90,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:40:00.000Z",
       actor: "Wave Poll",
       type: "poll_passed",
-      message: "cmd-001 passed with 5 yes, 1 no.",
+      message: "cmd-001 passed with 5 yes, 1 no, and a builder wave decision receipt.",
     },
   ],
 };

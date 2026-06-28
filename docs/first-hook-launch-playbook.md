@@ -16,6 +16,7 @@ Make the first public phase a clear community win:
 - Builder wave and GitHub repo setup.
 - One PR-sized command at a time.
 - Local or imported wave decisions for approvals.
+- Manual decision receipts that link approved work to a 6529 drop URL.
 - Draft PRs with Command Waves manifests.
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, and explicit parameter caps.
 - Contribution report as activity evidence.
@@ -56,11 +57,12 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 3. Invite ideas in the general chat wave or thread.
 4. Turn one strong idea into a PR-sized command.
 5. Vote or approve through the builder wave.
-6. Run the agent only after approval.
-7. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-8. Humans merge only after review passes.
-9. Use the contribution report and fee plan as evidence for any separate payout vote.
-10. Post the wave update draft back to the builder wave.
+6. Record the decision drop URL as the manual approval receipt.
+7. Run the agent only after approval.
+8. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+9. Humans merge only after review passes.
+10. Use the contribution report and fee plan as evidence for any separate payout vote.
+11. Post the wave update draft back to the builder wave.
 
 ## Success Criteria
 

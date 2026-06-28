@@ -8,6 +8,7 @@ import type {
   GuardianReview,
   LedgerEvent,
   PollState,
+  WaveDecisionReceipt,
 } from "../command-waves";
 import type { CommandWaveRepository } from "../command-wave-repository";
 
@@ -51,6 +52,37 @@ function pollId(proposalId: string) {
 
 function asRecord(value: unknown) {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function rowDecisionReceipt(row: QueryResultRow): WaveDecisionReceipt | null {
+  const receipt = asRecord(row.decision_receipt_json);
+
+  if (typeof receipt.summary === "string") {
+    return {
+      source: receipt.source === "6529" || receipt.source === "manual" || receipt.source === "local" ? receipt.source : "manual",
+      dropId: typeof receipt.dropId === "string" ? receipt.dropId : null,
+      url: typeof receipt.url === "string" ? receipt.url : null,
+      recordedBy: typeof receipt.recordedBy === "string" ? receipt.recordedBy : "stored receipt",
+      recordedAt:
+        typeof receipt.recordedAt === "string"
+          ? receipt.recordedAt
+          : new Date(row.closed_at ?? row.opened_at ?? Date.now()).toISOString(),
+      summary: receipt.summary,
+    };
+  }
+
+  if (!row.poll_drop_id_6529) {
+    return null;
+  }
+
+  return {
+    source: "6529",
+    dropId: String(row.poll_drop_id_6529),
+    url: null,
+    recordedBy: "stored receipt",
+    recordedAt: new Date(row.closed_at ?? row.opened_at ?? Date.now()).toISOString(),
+    summary: `Stored 6529 poll drop ${String(row.poll_drop_id_6529)}.`,
+  };
 }
 
 async function withTransaction<T>(client: PostgresQueryClient, work: () => Promise<T>) {
@@ -146,10 +178,12 @@ async function upsertPoll(client: PostgresQueryClient, poll: PollState) {
   await client.query(
     `
       insert into command_polls (
-        id, proposal_id, yes_votes, no_votes, quorum_required, yes_percent_required, status, closed_at
+        id, proposal_id, poll_drop_id_6529, decision_receipt_json, yes_votes, no_votes, quorum_required, yes_percent_required, status, closed_at
       )
-      values ($1, $2, $3, $4, $5, $6, $7, case when $7 in ('passed', 'failed') then now() else null end)
+      values ($1, $2, $3, $4::jsonb, $5, $6, $7, $8, $9, case when $9 in ('passed', 'failed') then now() else null end)
       on conflict (proposal_id) do update set
+        poll_drop_id_6529 = excluded.poll_drop_id_6529,
+        decision_receipt_json = excluded.decision_receipt_json,
         yes_votes = excluded.yes_votes,
         no_votes = excluded.no_votes,
         quorum_required = excluded.quorum_required,
@@ -160,6 +194,8 @@ async function upsertPoll(client: PostgresQueryClient, poll: PollState) {
     [
       pollId(poll.proposalId),
       poll.proposalId,
+      poll.decision?.dropId ?? null,
+      JSON.stringify(poll.decision ?? {}),
       poll.yesVotes,
       poll.noVotes,
       poll.quorumRequired,
@@ -315,6 +351,7 @@ function commandWaveFromRows(params: {
       quorumRequired: Number(row.quorum_required),
       yesPercentRequired: Number(row.yes_percent_required),
       status: row.status as PollState["status"],
+      decision: rowDecisionReceipt(row),
       votes: (votesByPoll.get(String(row.id)) ?? []).map((voteRow) => ({
         voterIdentity: String(voteRow.voter_identity),
         vote: voteRow.vote === "no" ? "no" : "yes",

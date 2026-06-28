@@ -14,6 +14,10 @@ describe("demo wave", () => {
       status: "complete",
       kind: "open_pr",
     });
+    expect(demoWave.polls[0].decision).toMatchObject({
+      source: "6529",
+      dropId: "drop-cmd-001-approval",
+    });
     expect(findRunManifestArtifact(execution.artifacts)).toMatchObject({
       proposalId: "cmd-001",
       allowedPermissions: ["wave.read", "repo.read", "repo.open_pr"],

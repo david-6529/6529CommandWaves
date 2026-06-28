@@ -169,4 +169,29 @@ describe("command wave persistence", () => {
     expect(wave.executions[0]?.artifacts.some((artifact) => artifact.startsWith("agent-handoff:"))).toBe(true);
     expect(wave.reviews[0]?.proof?.attestationHash).toHaveLength(64);
   });
+
+  it("refreshes old built-in hook demo records that lack decision receipts", async () => {
+    await replaceCommandWave({
+      ...demoWave,
+      proposals: [
+        {
+          ...demoWave.proposals[0],
+          prompt: "Use Codex to draft a non-upgradeable 6529 hook scaffold with bounded fee parameters and tests.",
+          spec:
+            "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
+        },
+      ],
+      polls: [{ ...demoWave.polls[0], decision: null }],
+    });
+
+    clearCommandWaveStoreForTests();
+
+    const wave = await getCommandWave();
+
+    expect(wave.proposals[0]?.prompt).toContain("100 bps");
+    expect(wave.proposals[0]?.spec).toContain("100 bps fee cap");
+    expect(wave.polls[0]?.decision).toMatchObject({
+      dropId: "drop-cmd-001-approval",
+    });
+  });
 });

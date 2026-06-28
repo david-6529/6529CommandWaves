@@ -63,6 +63,9 @@ export function formatProposalForWave(proposal: CommandProposal, poll: PollState
   const pollText = poll
     ? `Vote required: quorum ${poll.quorumRequired}, yes ${poll.yesPercentRequired}%.`
     : "No vote required by current rules.";
+  const decisionText = poll?.decision
+    ? `Decision receipt: ${poll.decision.dropId ?? poll.decision.url ?? "recorded"} (${poll.decision.source}).`
+    : null;
 
   return [
     `Command proposal ${proposal.id}: ${proposal.title}`,
@@ -71,6 +74,7 @@ export function formatProposalForWave(proposal: CommandProposal, poll: PollState
     `Risk: ${proposal.risk}`,
     `Budget cap: $${proposal.budgetUsd}`,
     pollText,
+    ...(decisionText ? [decisionText] : []),
     "",
     "Prompt:",
     proposal.prompt,

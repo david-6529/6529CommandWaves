@@ -51,6 +51,7 @@ create table if not exists command_polls (
   id text primary key,
   proposal_id text not null unique references command_proposals(id) on delete cascade,
   poll_drop_id_6529 text,
+  decision_receipt_json jsonb not null default '{}'::jsonb,
   yes_votes integer not null default 0,
   no_votes integer not null default 0,
   quorum_required integer not null,
@@ -62,6 +63,7 @@ create table if not exists command_polls (
 );
 
 create index if not exists command_polls_status_closes_idx on command_polls (status, closes_at);
+create index if not exists command_polls_drop_id_6529_idx on command_polls (poll_drop_id_6529);
 
 create table if not exists command_votes (
   id text primary key,

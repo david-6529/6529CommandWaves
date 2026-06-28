@@ -77,6 +77,7 @@ The vote state tied to a proposal.
 - `id`
 - `proposal_id`
 - `6529_poll_drop_id`
+- `decision_receipt_json`
 - `yes_votes`
 - `no_votes`
 - `quorum_required`
@@ -89,6 +90,7 @@ The vote state tied to a proposal.
 Indexes:
 
 - unique `proposal_id`
+- `6529_poll_drop_id`
 - `status, closes_at`
 
 ### command_votes

@@ -197,7 +197,18 @@ async function requestSetupValidation(waveUrl: string, repoUrl: string) {
   return payload.validation;
 }
 
-type BusyState = "loading" | "saving" | "setup" | "search" | "context" | "proposal" | "vote" | "execute" | "review" | "reset";
+type BusyState =
+  | "loading"
+  | "saving"
+  | "setup"
+  | "search"
+  | "context"
+  | "proposal"
+  | "vote"
+  | "decision"
+  | "execute"
+  | "review"
+  | "reset";
 
 function riskClass(risk: string) {
   if (risk === "critical") {
@@ -450,6 +461,7 @@ export function CommandWavesConsole() {
     "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.",
   );
   const [budgetUsd, setBudgetUsd] = useState("10");
+  const [decisionReference, setDecisionReference] = useState("");
   const [apiBusy, setApiBusy] = useState<BusyState | null>(null);
   const [apiNotice, setApiNotice] = useState("Backend demo state is loading.");
   const [apiError, setApiError] = useState("");
@@ -662,6 +674,26 @@ export function CommandWavesConsole() {
           body: JSON.stringify({ proposalId: activePoll.proposalId, voterIdentity: proposer, vote: delta }),
         }, accessKey),
       `Recorded ${delta} vote.`,
+    );
+  }
+
+  function recordWaveDecision() {
+    if (!activePoll || !decisionReference.trim()) {
+      return;
+    }
+
+    void runWaveAction(
+      "decision",
+      () =>
+        requestWave("/api/command-wave/decision", {
+          method: "POST",
+          body: JSON.stringify({
+            proposalId: activePoll.proposalId,
+            reference: decisionReference,
+            recordedBy: proposer,
+          }),
+        }, accessKey),
+      "Wave decision receipt recorded.",
     );
   }
 
@@ -1072,6 +1104,45 @@ export function CommandWavesConsole() {
                         Vote no
                       </Button>
                     </div>
+                    {activePoll.decision ? (
+                      <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-sm font-semibold text-zinc-100">Wave decision receipt</p>
+                          <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{activePoll.decision.source}</Badge>
+                        </div>
+                        <p className="mt-2 text-xs leading-5 text-zinc-500">{activePoll.decision.summary}</p>
+                        {activePoll.decision.url ? (
+                          <a
+                            className="mt-2 block break-all text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                            href={activePoll.decision.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {activePoll.decision.url}
+                          </a>
+                        ) : activePoll.decision.dropId ? (
+                          <p className="mt-2 break-all text-xs text-zinc-400">Drop id: {activePoll.decision.dropId}</p>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+                      <Input
+                        value={decisionReference}
+                        placeholder="6529 decision URL or drop id"
+                        onChange={(event) => setDecisionReference(event.target.value)}
+                      />
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={isBusy || !decisionReference.trim()}
+                        onClick={recordWaveDecision}
+                      >
+                        {apiBusy === "decision" ? "Recording" : "Record decision"}
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-zinc-500">
+                      Manual evidence only. This does not add live REP, TDH, or weighted voting.
+                    </p>
                   </div>
                 ) : (
                   <p className="rounded-md border border-emerald-800 bg-emerald-950/25 p-3 text-sm text-emerald-100">

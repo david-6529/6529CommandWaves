@@ -48,6 +48,15 @@ export type CommandVote = {
   at: string;
 };
 
+export type WaveDecisionReceipt = {
+  source: "local" | "6529" | "manual";
+  dropId: string | null;
+  url: string | null;
+  recordedBy: string;
+  recordedAt: string;
+  summary: string;
+};
+
 export type PollState = {
   proposalId: string;
   yesVotes: number;
@@ -56,6 +65,7 @@ export type PollState = {
   yesPercentRequired: number;
   status: "not_required" | "open" | "passed" | "failed";
   votes: CommandVote[];
+  decision?: WaveDecisionReceipt | null;
 };
 
 export type ExecutionRecord = {
@@ -249,5 +259,58 @@ export function evaluatePoll(poll: PollState) {
     quorumMet: totalVotes >= poll.quorumRequired,
     thresholdMet: yesPercent >= poll.yesPercentRequired,
     passed: totalVotes >= poll.quorumRequired && yesPercent >= poll.yesPercentRequired,
+  };
+}
+
+export function pollApprovalPassed(poll: PollState | null) {
+  if (!poll) {
+    return false;
+  }
+
+  return evaluatePoll(poll).passed || (poll.status === "passed" && Boolean(poll.decision));
+}
+
+function dropIdFromUrl(value: string) {
+  return (
+    value.match(/\/drops\/([^/?#\s]+)/i)?.[1] ??
+    value.match(/[?&](?:dropId|drop_id|drop)=([^&#\s]+)/i)?.[1] ??
+    null
+  );
+}
+
+export function createWaveDecisionReceipt({
+  proposalId,
+  reference,
+  waveUrl,
+  recordedBy,
+  summary,
+  recordedAt = new Date().toISOString(),
+}: {
+  proposalId: string;
+  reference: string;
+  waveUrl: string;
+  recordedBy: string;
+  summary?: string;
+  recordedAt?: string;
+}): WaveDecisionReceipt {
+  const trimmedReference = reference.trim();
+  const isUrl = /^https?:\/\//i.test(trimmedReference);
+  let url: URL | null = null;
+
+  if (isUrl) {
+    try {
+      url = new URL(trimmedReference);
+    } catch {
+      url = null;
+    }
+  }
+
+  return {
+    source: url?.hostname.endsWith("6529.io") ? "6529" : "manual",
+    dropId: isUrl ? dropIdFromUrl(trimmedReference) : trimmedReference,
+    url: isUrl ? trimmedReference : null,
+    recordedBy: recordedBy.trim() || "manual reviewer",
+    recordedAt,
+    summary: summary?.trim() || `Manual wave decision receipt for ${proposalId} in ${waveUrl}.`,
   };
 }

@@ -114,6 +114,15 @@ describe("Postgres command wave repository", () => {
             quorum_required: 3,
             yes_percent_required: 60,
             status: "passed",
+            poll_drop_id_6529: "drop-approval",
+            decision_receipt_json: {
+              source: "6529",
+              dropId: "drop-approval",
+              url: "https://6529.io/waves/demo-command-wave/drops/drop-approval",
+              recordedBy: "david",
+              recordedAt: "2026-06-20T12:40:00.000Z",
+              summary: "Builder wave approved cmd-001.",
+            },
           },
         ];
       }
@@ -152,7 +161,7 @@ describe("Postgres command wave repository", () => {
             proof_json: {
               version: "guardian-attestation-v0.1",
               verifier: "Command Waves Guardian",
-              verifierVersion: "command-wave-reviewer-gate-v0.2",
+              verifierVersion: "command-wave-reviewer-gate-v0.3",
               mode: "deterministic",
               inputs: {
                 waveId: "demo-command-wave",
@@ -193,7 +202,14 @@ describe("Postgres command wave repository", () => {
       id: demoWave.id,
       name: demoWave.name,
       proposals: [{ id: "cmd-001", title: "Demo command" }],
-      polls: [{ proposalId: "cmd-001", status: "passed", votes: [{ voterIdentity: "david", vote: "yes" }] }],
+      polls: [
+        {
+          proposalId: "cmd-001",
+          status: "passed",
+          decision: { dropId: "drop-approval", recordedBy: "david" },
+          votes: [{ voterIdentity: "david", vote: "yes" }],
+        },
+      ],
       executions: [{ proposalId: "cmd-001", artifacts: ["PR #1"] }],
       reviews: [{ proposalId: "cmd-001", checks: ["Matched scope"], proof: { attestationHash: "e".repeat(64) } }],
       ledger: [{ id: "evt-001", actor: "Setup" }],

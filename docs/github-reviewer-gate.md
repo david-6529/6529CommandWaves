@@ -80,6 +80,7 @@ The check fails if:
 - the proposal is not approved, reviewing, or complete
 - the command is not an `open_pr` command
 - a required poll has not passed
+- the manifest poll drop id does not match the recorded wave decision receipt
 - the manifest rules hash does not match the approved command
 - the manifest prompt/spec hashes do not match the approved command
 - the PR touches high-risk files without a high-risk or critical approval
@@ -91,6 +92,9 @@ The check fails if:
 
 The guardian should be deterministic. An LLM can help explain the result or suggest extra risks, but the merge-blocking
 decision should come from checks that anyone can rerun.
+
+For the first phase, a poll can be approved by local counted votes or by a manual wave decision receipt. The receipt is
+operator-recorded evidence that points to a 6529 decision drop. It does not claim live REP, TDH, or weighted voting.
 
 ## Hook Contract Signals
 

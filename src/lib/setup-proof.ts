@@ -190,6 +190,8 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
           "prompt_spec_hashes",
           "permissions",
           "vote",
+          "poll_drop_id",
+          "wave_decision_receipt",
           "risky_diff_paths",
           "hook_contract_signals",
           "hook_parameter_policy",

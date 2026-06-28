@@ -1,6 +1,7 @@
 import {
   evaluateGate,
   evaluatePoll,
+  pollApprovalPassed,
   type CommandKind,
   type CommandProposal,
   type CommandWave,
@@ -17,7 +18,7 @@ import {
 import { evaluateHookParameterPolicy, type HookParameterPolicyCheck } from "../safety/hook-parameter-policy";
 import { toolPolicyForProposal, type ToolPermission } from "../safety/tool-policy";
 
-export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.2" as const;
+export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.3" as const;
 
 export type CommandPrManifest = {
   version: "command-wave-pr-v0.1";
@@ -244,7 +245,7 @@ export function createCommandPrManifest({
   wave,
   proposal,
   poll,
-  pollDropId = null,
+  pollDropId,
 }: {
   wave: CommandWave;
   proposal: CommandProposal;
@@ -252,14 +253,14 @@ export function createCommandPrManifest({
   pollDropId?: string | null;
 }): CommandPrManifest {
   const runManifest = createCommandRunManifest({ wave, proposal });
-  const pollResult = poll ? evaluatePoll(poll) : null;
+  const approvalPassed = pollApprovalPassed(poll);
 
   return {
     version: "command-wave-pr-v0.1",
     waveId: waveIdFromUrl(wave.waveUrl),
     waveUrl: wave.waveUrl,
     proposalId: proposal.id,
-    pollDropId,
+    pollDropId: pollDropId ?? poll?.decision?.dropId ?? null,
     commandKind: proposal.kind,
     risk: proposal.risk,
     rulesVersion: wave.rules.version,
@@ -270,7 +271,7 @@ export function createCommandPrManifest({
     runManifestHash: runManifest.manifestHash,
     approval: poll
       ? {
-          status: pollResult?.passed ? "passed" : "not_required",
+          status: approvalPassed ? "passed" : "not_required",
           yesVotes: poll.yesVotes,
           noVotes: poll.noVotes,
           quorumRequired: poll.quorumRequired,
@@ -361,6 +362,7 @@ export function validateCommandPrManifest({
   const expected = createCommandPrManifest({ wave, proposal, poll });
   const gate = evaluateGate(proposal, wave.rules);
   const pollResult = poll ? evaluatePoll(poll) : null;
+  const approvalPassed = pollApprovalPassed(poll);
 
   checks.push(
     check(
@@ -374,6 +376,15 @@ export function validateCommandPrManifest({
       "proposal_identity",
       manifest.proposalId === proposal.id ? "pass" : "fail",
       "Manifest proposal id matches the approved command.",
+    ),
+  );
+  checks.push(
+    check(
+      "poll_drop_id",
+      manifest.pollDropId === expected.pollDropId ? "pass" : "fail",
+      expected.pollDropId
+        ? "Manifest poll drop id matches the wave decision receipt."
+        : "No poll drop id is required by the approved command.",
     ),
   );
   checks.push(
@@ -423,9 +434,11 @@ export function validateCommandPrManifest({
   checks.push(
     check(
       "vote",
-      gate.needsPoll ? (pollResult?.passed && manifest.approval.status === "passed" ? "pass" : "fail") : "pass",
+      gate.needsPoll ? (approvalPassed && manifest.approval.status === "passed" ? "pass" : "fail") : "pass",
       gate.needsPoll
-        ? `Vote ${pollResult?.passed ? "passed" : "has not passed"} under quorum ${gate.rule.quorum} / yes ${gate.rule.yesPercent}%.`
+        ? poll?.decision
+          ? `Wave decision receipt ${approvalPassed ? "passed" : "has not passed"} for ${poll.decision.dropId ?? poll.decision.url ?? "recorded approval"}.`
+          : `Vote ${pollResult?.passed ? "passed" : "has not passed"} under quorum ${gate.rule.quorum} / yes ${gate.rule.yesPercent}%.`
         : "No vote is required by the current rules.",
     ),
   );

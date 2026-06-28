@@ -4,6 +4,7 @@ import { demoWave } from "./demo-wave";
 import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
+  createWaveDecisionReceipt,
   evaluateGate,
   evaluatePoll,
   type CommandKind,
@@ -44,8 +45,16 @@ function cloneDemoWave(): CommandWave {
 }
 
 function isStaleBuiltInHookDemo(wave: CommandWave) {
+  const proposal = wave.proposals[0] ?? null;
+  const poll = wave.polls[0] ?? null;
   const execution = wave.executions[0] ?? null;
   const review = wave.reviews[0] ?? null;
+  const oldHookPrompt = Boolean(
+    proposal &&
+      proposal.id === "cmd-001" &&
+      (proposal.prompt.includes("bounded fee parameters") || proposal.spec.includes("parameter bounds")),
+  );
+  const missingDecisionReceipt = Boolean(poll && poll.proposalId === "cmd-001" && !poll.decision);
   const missingDeterministicEvidence = Boolean(
     execution &&
       review &&
@@ -54,13 +63,16 @@ function isStaleBuiltInHookDemo(wave: CommandWave) {
         !review.proof),
   );
 
-  return Boolean(
-    missingDeterministicEvidence &&
+  const looksLikeBuiltInHookDemo = Boolean(
+    wave.proposals.length === 1 &&
+      proposal?.id === "cmd-001" &&
       wave.executions.length === 1 &&
       wave.reviews.length === 1 &&
       (execution?.summary === demoWave.executions[0]?.summary || execution?.summary === previousHookDemoExecutionSummary) &&
       (review?.summary === demoWave.reviews[0]?.summary || review?.summary === previousHookDemoReviewSummary),
   );
+
+  return Boolean(looksLikeBuiltInHookDemo && (missingDeterministicEvidence || oldHookPrompt || missingDecisionReceipt));
 }
 
 function migrateLegacyDemoWave(wave: CommandWave | null) {
@@ -316,6 +328,49 @@ export async function recordVote(input: unknown) {
       message: passed
         ? `${proposal.id} passed and is approved to run.`
         : `Recorded ${vote} vote from ${voterIdentity} for ${proposal.id}.`,
+    },
+  );
+
+  return replaceCommandWave(nextWave);
+}
+
+export async function recordDecisionReceipt(input: unknown) {
+  const body = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};
+  const proposalId = asText(body.proposalId);
+  const reference = asText(body.reference);
+  const recordedBy = asText(body.recordedBy, "manual reviewer");
+  const summary = asText(body.summary);
+  const wave = await getCommandWave();
+  const proposal = wave.proposals.find((item) => item.id === proposalId);
+  const poll = wave.polls.find((item) => item.proposalId === proposalId);
+
+  if (!proposal || !poll) {
+    throw Object.assign(new Error("Proposal poll not found."), { status: 404 });
+  }
+
+  if (!reference) {
+    throw Object.assign(new Error("Wave decision URL or drop id is required."), { status: 400 });
+  }
+
+  const decision = createWaveDecisionReceipt({
+    proposalId,
+    reference,
+    waveUrl: wave.waveUrl,
+    recordedBy,
+    summary,
+  });
+  const nextWave = appendLedger(
+    {
+      ...wave,
+      polls: wave.polls.map((item) => (item.proposalId === proposalId ? { ...item, status: "passed" as const, decision } : item)),
+      proposals: wave.proposals.map((item) =>
+        item.id === proposalId && item.status !== "complete" ? { ...item, status: "approved" as const } : item,
+      ),
+    },
+    {
+      actor: recordedBy,
+      type: "poll_passed",
+      message: `Recorded wave decision receipt for ${proposal.id}.`,
     },
   );
 
