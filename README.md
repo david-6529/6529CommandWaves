@@ -112,6 +112,7 @@ The current app is a local prototype of the hook-building flow:
 - high-risk classification for hook, fee, Solidity, proxy, deployment, and governance work
 - poll voting with one vote per voter identity
 - backend setup validation for 6529 wave links and GitHub repo links
+- launch readiness checks for local mode, storage, 6529 mode, GitHub PRs, and guardian wave state
 - controlled local run record
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
 - deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds

@@ -128,6 +128,23 @@ type SetupValidationResponse = {
   error?: string;
 };
 
+type ReadinessCheck = {
+  id: string;
+  label: string;
+  status: "pass" | "warn" | "fail";
+  message: string;
+};
+
+type ReadinessResponse = {
+  summary: {
+    pass: number;
+    warn: number;
+    fail: number;
+  };
+  checks: ReadinessCheck[];
+  error?: string;
+};
+
 const accessKeyStorageKey = "command-waves-access-key";
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
@@ -197,10 +214,24 @@ async function requestSetupValidation(waveUrl: string, repoUrl: string) {
   return payload.validation;
 }
 
+async function requestReadiness() {
+  const response = await fetch("/api/readiness", {
+    headers: { accept: "application/json" },
+  });
+  const payload = (await response.json()) as ReadinessResponse;
+
+  if (!response.ok || !payload.checks) {
+    throw new Error(payload.error ?? "Readiness check failed.");
+  }
+
+  return payload;
+}
+
 type BusyState =
   | "loading"
   | "saving"
   | "setup"
+  | "readiness"
   | "search"
   | "context"
   | "proposal"
@@ -468,6 +499,7 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [contextPreview, setContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
+  const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const activeProposal = wave.proposals[0];
@@ -612,6 +644,22 @@ export function CommandWavesConsole() {
       setApiNotice(validation.canSave ? "Setup check passed." : "Setup needs fixes before saving.");
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Setup check failed.");
+    } finally {
+      setApiBusy(null);
+    }
+  }
+
+  async function checkReadiness() {
+    setApiBusy("readiness");
+    setApiError("");
+
+    try {
+      const result = await requestReadiness();
+
+      setReadiness(result);
+      setApiNotice(`Readiness checked: ${result.summary.fail} fail, ${result.summary.warn} warn.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Readiness check failed.");
     } finally {
       setApiBusy(null);
     }
@@ -901,6 +949,44 @@ export function CommandWavesConsole() {
                   Export activity
                 </Button>
               </div>
+              <details className="rounded-md border border-zinc-800 bg-black p-3">
+                <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+                  <span>Launch readiness</span>
+                  {readiness ? (
+                    <span className="flex flex-wrap justify-end gap-1.5">
+                      <Badge className={checkStatusClass("pass")}>{readiness.summary.pass} pass</Badge>
+                      <Badge className={checkStatusClass("warn")}>{readiness.summary.warn} warn</Badge>
+                      <Badge className={checkStatusClass("fail")}>{readiness.summary.fail} fail</Badge>
+                    </span>
+                  ) : (
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-400">not checked</Badge>
+                  )}
+                </summary>
+                <div className="mt-3 grid gap-3">
+                  <p className="text-xs leading-5 text-zinc-500">
+                    Shows local mode, storage, 6529 mode, GitHub PR adapter, and guardian wave-state readiness.
+                  </p>
+                  <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkReadiness()}>
+                    {apiBusy === "readiness" ? "Checking" : "Check readiness"}
+                  </Button>
+                  {readiness ? (
+                    <div className="grid gap-2">
+                      {readiness.checks.map((item) => (
+                        <div
+                          key={item.id}
+                          className="grid gap-2 rounded-md border border-zinc-900 bg-zinc-950 p-2 sm:grid-cols-[5rem_1fr]"
+                        >
+                          <Badge className={checkStatusClass(item.status)}>{item.status}</Badge>
+                          <div>
+                            <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
+                            <p className="mt-1 text-xs leading-5 text-zinc-500">{item.message}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              </details>
               {contextPreview ? (
                 <div className="rounded-md border border-zinc-800 bg-black p-3">
                   <div className="flex flex-wrap items-center gap-2">
