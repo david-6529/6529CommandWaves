@@ -47,4 +47,54 @@ describe("phase checklist", () => {
       detail: "Approved work is ready for the PR build step.",
     });
   });
+
+  it("keeps support commands outside the PR build checklist", () => {
+    const checklist = createPhaseChecklist({
+      ...demoWave,
+      proposals: [
+        {
+          ...demoWave.proposals[0],
+          id: "cmd-002",
+          title: "Draft launch scope note",
+          kind: "draft_response",
+          status: "approved",
+        },
+      ],
+      polls: [],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    });
+
+    expect(checklist.map((item) => [item.id, item.status])).toEqual([
+      ["project", "done"],
+      ["proposal", "active"],
+      ["decision", "waiting"],
+      ["build", "waiting"],
+      ["review", "waiting"],
+      ["log", "waiting"],
+    ]);
+    expect(checklist.find((item) => item.id === "proposal")?.detail).toBe(
+      "Support command recorded. Write one PR-sized hook command.",
+    );
+  });
+
+  it("keeps a completed PR loop complete when a support command is latest", () => {
+    const checklist = createPhaseChecklist({
+      ...demoWave,
+      proposals: [
+        {
+          ...demoWave.proposals[0],
+          id: "cmd-002",
+          title: "Draft launch scope note",
+          kind: "draft_response",
+          status: "approved",
+        },
+        demoWave.proposals[0],
+      ],
+    });
+
+    expect(checklist.map((item) => item.status)).toEqual(["done", "done", "done", "done", "done", "done"]);
+    expect(checklist.find((item) => item.id === "proposal")?.detail).toContain("cmd-001");
+  });
 });

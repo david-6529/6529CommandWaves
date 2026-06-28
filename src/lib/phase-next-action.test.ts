@@ -54,6 +54,33 @@ describe("phase next action", () => {
     });
   });
 
+  it("keeps support commands from becoming the PR build next action", () => {
+    const nextAction = createPhaseNextAction(
+      createPhaseChecklist({
+        ...demoWave,
+        proposals: [
+          {
+            ...demoWave.proposals[0],
+            id: "cmd-002",
+            title: "Draft launch scope note",
+            kind: "draft_response",
+            status: "approved",
+          },
+        ],
+        polls: [],
+        executions: [],
+        reviews: [],
+        ledger: [],
+      }),
+    );
+
+    expect(nextAction).toMatchObject({
+      status: "action",
+      stepLabel: "Propose work",
+      title: "Propose scoped hook work",
+    });
+  });
+
   it("surfaces blocked decisions before later waiting steps", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({

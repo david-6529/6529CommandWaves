@@ -24,14 +24,18 @@ function setupCanRunCode(wave: CommandWave) {
   return Boolean(waveText && repoLooksValid);
 }
 
+function latestPrProposal(wave: CommandWave) {
+  return wave.proposals.find((item) => item.kind === "open_pr") ?? null;
+}
+
 function latestExecution(wave: CommandWave) {
-  const proposal = wave.proposals[0] ?? null;
+  const proposal = latestPrProposal(wave);
 
   return proposal ? (wave.executions.find((item) => item.proposalId === proposal.id) ?? null) : null;
 }
 
 function latestReview(wave: CommandWave) {
-  const proposal = wave.proposals[0] ?? null;
+  const proposal = latestPrProposal(wave);
 
   return proposal ? (wave.reviews.find((item) => item.proposalId === proposal.id) ?? null) : null;
 }
@@ -73,7 +77,8 @@ function reviewStatus(
 
 export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
   const canRunCode = setupCanRunCode(wave);
-  const proposal = wave.proposals[0] ?? null;
+  const proposal = latestPrProposal(wave);
+  const supportProposal = proposal ? null : (wave.proposals[0] ?? null);
   const poll = proposal ? (wave.polls.find((item) => item.proposalId === proposal.id) ?? null) : null;
   const execution = latestExecution(wave);
   const review = latestReview(wave);
@@ -100,7 +105,11 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       id: "proposal",
       label: "Propose work",
       status: proposal ? "done" : canRunCode ? "active" : "waiting",
-      detail: proposal ? `${proposal.id}: ${proposal.title}` : "Write one PR-sized hook command.",
+      detail: proposal
+        ? `${proposal.id}: ${proposal.title}`
+        : supportProposal
+          ? "Support command recorded. Write one PR-sized hook command."
+          : "Write one PR-sized hook command.",
     },
     {
       id: "decision",
