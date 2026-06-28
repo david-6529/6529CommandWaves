@@ -13,6 +13,7 @@ import { createDeveloperFeePlan } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
+import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
@@ -558,6 +559,17 @@ export function CommandWavesConsole() {
       }),
     [activeExecution, activePoll, activeProposal, activeReview, wave],
   );
+  const launchPacket = useMemo(
+    () =>
+      createLaunchPacket({
+        wave,
+        proposal: activeProposal ?? null,
+        poll: activePoll ?? null,
+        execution: activeExecution ?? null,
+        review: activeReview ?? null,
+      }),
+    [activeExecution, activePoll, activeProposal, activeReview, wave],
+  );
   const recentLedgerEvents = wave.ledger.slice(0, 6);
   const isBusy = apiBusy !== null;
 
@@ -725,6 +737,15 @@ export function CommandWavesConsole() {
       setCopyNotice("Draft copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
+    }
+  }
+
+  async function copyLaunchPacket() {
+    try {
+      await navigator.clipboard.writeText(launchPacket.text);
+      setCopyNotice("Launch packet copied.");
+    } catch {
+      setCopyNotice("Copy failed. Select the packet text and copy it manually.");
     }
   }
 
@@ -1424,11 +1445,16 @@ export function CommandWavesConsole() {
           <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="text-sm leading-6 text-zinc-400">
-                Use this as a human-reviewed update for the builder wave. It is a draft, not an automatic post.
+                Share the short update in the builder wave. Keep the launch packet with the PR audit trail.
               </p>
-              <Button type="button" className="mt-3" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
-                Copy draft
-              </Button>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
+                  Copy wave update
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => void copyLaunchPacket()}>
+                  Copy launch packet
+                </Button>
+              </div>
               {copyNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{copyNotice}</p> : null}
             </div>
             <Textarea readOnly rows={12} value={waveUpdateDraft} className="min-h-72 resize-none font-mono text-xs" />

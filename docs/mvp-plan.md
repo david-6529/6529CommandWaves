@@ -69,7 +69,7 @@ Polls require a voter identity for every yes/no vote. Duplicate votes from the s
 6. The agent opens a PR with a Command Waves manifest.
 7. The GitHub reviewer gate checks the PR manifest, vote or receipt status, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
 8. A reviewer verifies tests, contract guardrails, and changed files before humans merge.
-9. The result, contribution activity, and manual developer fee evidence are drafted for a human to post back to the wave.
+9. The result, contribution activity, manual developer fee evidence, and launch packet are prepared for human review.
 
 ## Non-Goals For First Demo
 

@@ -23,6 +23,7 @@ Make the first public phase a clear community win:
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
 - Human-reviewed wave update draft.
+- Human-reviewed launch packet for the PR audit trail.
 
 ## Park For Later
 
@@ -65,6 +66,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 10. Humans merge only after review passes.
 11. Use the contribution report and fee plan as evidence for any separate payout vote.
 12. Post the wave update draft back to the builder wave.
+13. Keep the launch packet with the PR so later contributors can audit the loop.
 
 ## Success Criteria
 

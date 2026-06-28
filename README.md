@@ -105,6 +105,7 @@ The current app is a local prototype of the hook-building flow:
 - bounded hook parameter policy that requires explicit caps and bound-focused tests
 - transparent contribution report that does not grant permissions
 - manual developer fee plan that uses review evidence without moving funds
+- copyable launch packet for wave, PR, review, contribution, and fee evidence
 - safety rules by command type
 - command proposal form
 - first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
@@ -123,6 +124,7 @@ The current app is a local prototype of the hook-building flow:
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
 - review records store compact guardian proof material for later audit
 - human-reviewed wave update draft for posting results back to the builder wave
+- human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/rules/check expectations
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
