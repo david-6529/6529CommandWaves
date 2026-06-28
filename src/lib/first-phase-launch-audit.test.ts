@@ -23,18 +23,26 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: productionReadyChecks,
+      wave: demoWave,
     });
 
     expect(audit.status).toBe("ready");
     expect(audit.statusLabel).toBe("ready");
     expect(audit.blockers).toHaveLength(0);
     expect(audit.openItems).toHaveLength(0);
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "flow_wave_decision_receipt",
+        status: "ready",
+      }),
+    );
   });
 
   it("keeps launch in setup mode until readiness is checked", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: null,
+      wave: demoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -51,6 +59,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({}),
+      wave: demoWave,
     });
 
     expect(audit.status).toBe("blocked");
@@ -59,28 +68,52 @@ describe("first phase launch audit", () => {
   });
 
   it("reports unfinished flow steps without blocking local work", () => {
+    const wave = {
+      ...demoWave,
+      waveUrl: "",
+      repoUrl: "not github",
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    };
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist({
-        ...demoWave,
-        waveUrl: "",
-        repoUrl: "not github",
-        proposals: [],
-        polls: [],
-        executions: [],
-        reviews: [],
-        ledger: [],
-      }),
+      phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      wave,
     });
 
     expect(audit.status).toBe("needs_setup");
     expect(audit.openItems.map((item) => item.label)).toContain("Choose project");
   });
 
+  it("requires a builder wave decision receipt before public launch", () => {
+    const wave = {
+      ...demoWave,
+      polls: [{ ...demoWave.polls[0], decision: null }],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.openItems).toContainEqual(
+      expect.objectContaining({
+        id: "flow_wave_decision_receipt",
+        label: "Wave decision receipt",
+        status: "needed",
+      }),
+    );
+  });
+
   it("does not emit em dash characters", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({}),
+      wave: demoWave,
     });
 
     expect(JSON.stringify(audit)).not.toContain("\u2014");

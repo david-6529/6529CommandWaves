@@ -645,8 +645,9 @@ export function CommandWavesConsole() {
       createFirstPhaseLaunchAudit({
         phaseChecklist,
         readinessChecks: readiness?.checks ?? null,
+        wave,
       }),
-    [phaseChecklist, readiness],
+    [phaseChecklist, readiness, wave],
   );
   const launchAuditOpenItems = launchAudit.openItems.slice(0, 5);
   const waveUpdateDraft = useMemo(

@@ -1,3 +1,4 @@
+import type { CommandWave } from "./command-waves";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
 import type { ReadinessCheck } from "./system/readiness";
 
@@ -81,12 +82,47 @@ function openItemWeight(item: FirstPhaseLaunchAuditItem) {
   return item.status === "blocked" ? 0 : 1;
 }
 
+function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
+  const proposal = wave?.proposals.find((item) => item.kind === "open_pr") ?? null;
+
+  if (!proposal) {
+    return [];
+  }
+
+  const poll = wave?.polls.find((item) => item.proposalId === proposal.id) ?? null;
+  const receipt = poll?.decision ?? null;
+
+  if (receipt) {
+    return [
+      {
+        id: "flow_wave_decision_receipt",
+        label: "Wave decision receipt",
+        status: "ready",
+        detail: `Decision evidence recorded for ${proposal.id}.`,
+        source: "flow",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "flow_wave_decision_receipt",
+      label: "Wave decision receipt",
+      status: "needed",
+      detail: "Record the 6529 decision URL or drop id before public launch.",
+      source: "flow",
+    },
+  ];
+}
+
 export function createFirstPhaseLaunchAudit({
   phaseChecklist,
   readinessChecks,
+  wave,
 }: {
   phaseChecklist: PhaseChecklistItem[];
   readinessChecks?: ReadinessCheck[] | null;
+  wave?: CommandWave | null;
 }): FirstPhaseLaunchAudit {
   const flowItems: FirstPhaseLaunchAuditItem[] = phaseChecklist.map((item) => ({
     id: `flow_${item.id}`,
@@ -115,7 +151,7 @@ export function createFirstPhaseLaunchAudit({
         },
       ];
 
-  const items = [...flowItems, ...readinessItems];
+  const items = [...flowItems, ...decisionReceiptItem(wave), ...readinessItems];
   const blockers = items.filter((item) => item.status === "blocked");
   const openItems = items
     .filter((item) => item.status !== "ready")
