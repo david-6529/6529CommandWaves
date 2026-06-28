@@ -18,7 +18,9 @@ import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
-const commandKinds: Array<{ value: CommandKind; label: string; description: string }> = [
+type CommandKindOption = { value: CommandKind; label: string; description: string };
+
+const commandKinds: CommandKindOption[] = [
   { value: "read_context", label: "Read context", description: "Summarize or inspect wave/repo state." },
   { value: "draft_response", label: "Draft response", description: "Draft text without posting it." },
   { value: "post_to_wave", label: "Wave update", description: "Draft a public update for human posting." },
@@ -28,6 +30,11 @@ const commandKinds: Array<{ value: CommandKind; label: string; description: stri
   { value: "spend_money", label: "Spend money", description: "Use paid APIs, compute, bounties, or funds." },
   { value: "change_rules", label: "Change rules", description: "Modify governance or tool permissions." },
 ];
+
+const firstPhaseProposalKindValues: CommandKind[] = ["open_pr", "draft_response", "post_to_wave", "read_context"];
+const firstPhaseProposalKinds = firstPhaseProposalKindValues
+  .map((value) => commandKinds.find((item) => item.value === value))
+  .filter((item): item is CommandKindOption => Boolean(item));
 
 const hookGuardrails = [
   "No upgradeable hook contracts by default.",
@@ -971,7 +978,7 @@ export function CommandWavesConsole() {
               </Field>
               <Field label="What kind of work is this?">
                 <Select value={kind} onChange={(event) => setKind(event.target.value as CommandKind)}>
-                  {commandKinds.map((item) => (
+                  {firstPhaseProposalKinds.map((item) => (
                     <option key={item.value} value={item.value}>
                       {item.label}
                     </option>

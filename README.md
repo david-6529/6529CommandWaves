@@ -107,6 +107,7 @@ The current app is a local prototype of the hook-building flow:
 - manual developer fee plan that uses review evidence without moving funds
 - safety rules by command type
 - command proposal form
+- first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
 - automatic risk classification
 - high-risk classification for hook, fee, Solidity, proxy, deployment, and governance work
 - poll voting with one vote per voter identity
