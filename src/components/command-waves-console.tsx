@@ -13,11 +13,12 @@ import { createContributionReport } from "@/lib/contribution-report";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
+import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
 const commandKinds: Array<{ value: CommandKind; label: string; description: string }> = [
   { value: "read_context", label: "Read context", description: "Summarize or inspect wave/repo state." },
   { value: "draft_response", label: "Draft response", description: "Draft text without posting it." },
-  { value: "post_to_wave", label: "Post to wave", description: "Write a public update back to 6529." },
+  { value: "post_to_wave", label: "Wave update", description: "Draft a public update for human posting." },
   { value: "open_pr", label: "Open PR", description: "Use an agent harness to change code." },
   { value: "run_script", label: "Run script", description: "Execute an approved script or workflow." },
   { value: "deploy", label: "Deploy", description: "Promote an approved change." },
@@ -391,6 +392,7 @@ export function CommandWavesConsole() {
   const [apiBusy, setApiBusy] = useState<BusyState | null>(null);
   const [apiNotice, setApiNotice] = useState("Backend demo state is loading.");
   const [apiError, setApiError] = useState("");
+  const [copyNotice, setCopyNotice] = useState("");
   const [contextPreview, setContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -401,6 +403,17 @@ export function CommandWavesConsole() {
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
+  const waveUpdateDraft = useMemo(
+    () =>
+      createWaveUpdateDraft({
+        wave,
+        proposal: activeProposal ?? null,
+        poll: activePoll ?? null,
+        execution: activeExecution ?? null,
+        review: activeReview ?? null,
+      }),
+    [activeExecution, activePoll, activeProposal, activeReview, wave],
+  );
   const recentLedgerEvents = wave.ledger.slice(0, 6);
   const isBusy = apiBusy !== null;
 
@@ -543,6 +556,15 @@ export function CommandWavesConsole() {
 
   function resetDemo() {
     void runWaveAction("reset", () => requestWave("/api/command-wave", { method: "DELETE" }, accessKey), "Demo state reset.");
+  }
+
+  async function copyWaveUpdateDraft() {
+    try {
+      await navigator.clipboard.writeText(waveUpdateDraft);
+      setCopyNotice("Draft copied.");
+    } catch {
+      setCopyNotice("Copy failed. Select the draft text and copy it manually.");
+    }
   }
 
   function submitProposal() {
@@ -1072,6 +1094,21 @@ export function CommandWavesConsole() {
                 </div>
               ))}
             </div>
+          </div>
+        </Panel>
+
+        <Panel title="Wave update draft" eyebrow="Share back">
+          <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-sm leading-6 text-zinc-400">
+                Use this as a human-reviewed update for the builder wave. It is a draft, not an automatic post.
+              </p>
+              <Button type="button" className="mt-3" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
+                Copy draft
+              </Button>
+              {copyNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{copyNotice}</p> : null}
+            </div>
+            <Textarea readOnly rows={12} value={waveUpdateDraft} className="min-h-72 resize-none font-mono text-xs" />
           </div>
         </Panel>
 

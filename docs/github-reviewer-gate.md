@@ -5,7 +5,7 @@ The reviewer should become a merge gate, not just a comment.
 For code work, the safe path is:
 
 ```text
-Wave command -> rules check -> vote if needed -> agent PR -> reviewer gate -> merge -> deploy
+Wave command -> rules check -> vote if needed -> agent PR -> reviewer gate -> human merge -> downstream deploy
 ```
 
 ## MVP Gate

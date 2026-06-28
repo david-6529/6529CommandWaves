@@ -106,15 +106,15 @@ The current app is a local prototype of the hook-building flow:
 - high-risk classification for hook, fee, Solidity, proxy, deployment, and governance work
 - poll voting with one vote per voter identity
 - backend setup validation for 6529 wave links and GitHub repo links
-- controlled run placeholder
+- controlled local run record
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
 - deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
 - opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
 - review records store compact guardian proof material for later audit
+- human-reviewed wave update draft for posting results back to the builder wave
 - public setup proof endpoint for third-party verification of wave/repo/rules/check expectations
-- review placeholder
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
 - 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and context previews
