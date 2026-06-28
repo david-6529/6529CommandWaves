@@ -1,7 +1,7 @@
 import { handleRouteError, json } from "@/lib/api";
 import { requireAdminRequest } from "@/lib/admin-auth";
-import { getCommandWave, replaceCommandWave, resetCommandWave, updateCommandWaveSetup } from "@/lib/command-wave-store";
-import type { CommandWave } from "@/lib/command-waves";
+import { getCommandWave, resetCommandWave, updateCommandWaveSetup } from "@/lib/command-wave-store";
+import { rejectPhaseOneStateReplacement } from "@/lib/phase-one-api-policy";
 
 export async function GET() {
   return json({ wave: await getCommandWave() });
@@ -11,13 +11,7 @@ export async function PUT(request: Request) {
   try {
     requireAdminRequest(request);
 
-    const body = await request.json() as { wave?: CommandWave };
-
-    if (!body.wave) {
-      throw Object.assign(new Error("Missing wave."), { status: 400 });
-    }
-
-    return json({ wave: await replaceCommandWave(body.wave) });
+    rejectPhaseOneStateReplacement();
   } catch (error) {
     return handleRouteError(error);
   }
