@@ -618,9 +618,13 @@ export function CommandWavesConsole() {
   const activePoll = activeProposal ? wave.polls.find((poll) => poll.proposalId === activeProposal.id) : undefined;
   const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
+  const activeProposalIsPr = activeProposal?.kind === "open_pr";
+  const canBuildApprovedPr = Boolean(
+    activeProposal && activeProposal.kind === "open_pr" && activeProposal.status === "approved" && !activeExecution,
+  );
   const canCopyCodexPacket = Boolean(
     activeProposal &&
-      activeProposal.kind === "open_pr" &&
+      activeProposalIsPr &&
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
@@ -920,7 +924,7 @@ export function CommandWavesConsole() {
   }
 
   function launchOrchestrator() {
-    if (!activeProposal || activeProposal.status !== "approved") {
+    if (!activeProposal || !canBuildApprovedPr) {
       return;
     }
 
@@ -1510,7 +1514,11 @@ export function CommandWavesConsole() {
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
                     <p className="text-sm font-semibold text-zinc-100">Build PR</p>
                     <p className="mt-2 text-sm leading-6 text-zinc-400">
-                      {activeExecution?.summary ? humanizeLegacyCommandCopy(activeExecution.summary) : "Waiting for an approved command."}
+                      {activeExecution?.summary
+                        ? humanizeLegacyCommandCopy(activeExecution.summary)
+                        : activeProposalIsPr
+                          ? "Waiting for an approved PR command."
+                          : "Only PR commands use the agent build step in phase 1."}
                     </p>
                     {activeExecution?.artifacts.length ? (
                       <ul className="mt-2 space-y-1 text-sm text-zinc-300">
@@ -1522,10 +1530,10 @@ export function CommandWavesConsole() {
                     <Button
                       type="button"
                       className="mt-3"
-                      disabled={isBusy || activeProposal.status !== "approved" || Boolean(activeExecution)}
+                      disabled={isBusy || !canBuildApprovedPr}
                       onClick={launchOrchestrator}
                     >
-                      {apiBusy === "execute" ? "Building" : "Build approved PR"}
+                      {apiBusy === "execute" ? "Building" : activeProposalIsPr ? "Build approved PR" : "PR build not needed"}
                     </Button>
                     <Button
                       type="button"
@@ -1537,7 +1545,9 @@ export function CommandWavesConsole() {
                       {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
                     </Button>
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      Manual handoff for a prepared branch. It does not merge, deploy, or spend funds.
+                      {activeProposalIsPr
+                        ? "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
+                        : "Use support commands for context, drafts, or wave updates outside the PR build step."}
                     </p>
                     {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
                   </div>

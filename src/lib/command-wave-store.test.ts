@@ -261,6 +261,25 @@ describe("Command wave store", () => {
     });
   });
 
+  it("does not execute non-PR support commands in the phase 1 build step", async () => {
+    const submitted = await submitCommandProposal({
+      title: "Draft launch scope note",
+      proposer: "tester",
+      kind: "draft_response",
+      prompt: "Draft a note explaining phase 1 launch scope.",
+      spec: "Draft text only.",
+      budgetUsd: 0,
+    });
+
+    expect(submitted.proposals[0]).toMatchObject({
+      id: "cmd-002",
+      status: "approved",
+    });
+    await expect(executeProposal({ proposalId: "cmd-002" })).rejects.toThrow(
+      "Only approved PR commands can use the agent build step in phase 1.",
+    );
+  });
+
   it("rejects reviews unless the proposal is waiting for review", async () => {
     await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow("Proposal is not ready for review.");
 

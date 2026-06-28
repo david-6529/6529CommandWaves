@@ -404,7 +404,11 @@ export async function executeProposal(input: unknown) {
     throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });
   }
 
-  if (proposal.kind === "open_pr" && !validateSetupShape({ waveUrl: wave.waveUrl, repoUrl: wave.repoUrl }).canRunCode) {
+  if (proposal.kind !== "open_pr") {
+    throw Object.assign(new Error("Only approved PR commands can use the agent build step in phase 1."), { status: 409 });
+  }
+
+  if (!validateSetupShape({ waveUrl: wave.waveUrl, repoUrl: wave.repoUrl }).canRunCode) {
     throw Object.assign(new Error("A valid GitHub repo is required before opening PR commands can run."), { status: 409 });
   }
 
