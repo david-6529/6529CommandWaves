@@ -28,4 +28,23 @@ describe("Codex work packet", () => {
     expect(packet.text).toContain("drop-cmd-001-approval");
     expect(packet.text).not.toContain("\u2014");
   });
+
+  it("requires a builder wave decision receipt for PR work packets", () => {
+    const proposal = {
+      ...demoWave.proposals[0],
+      status: "approved" as const,
+    };
+    const poll = {
+      ...demoWave.polls[0],
+      decision: null,
+    };
+
+    expect(() =>
+      createCodexWorkPacket({
+        wave: demoWave,
+        proposal,
+        poll,
+      }),
+    ).toThrow("Record the builder wave decision receipt before creating a Codex work packet.");
+  });
 });

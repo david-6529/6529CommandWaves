@@ -1,4 +1,4 @@
-import type { CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
+import { pollApprovalPassed, type CommandWave, type ExecutionRecord, type GuardianReview, type PollState } from "./command-waves";
 
 export type PhaseChecklistStatus = "done" | "active" | "waiting" | "blocked";
 
@@ -10,7 +10,7 @@ export type PhaseChecklistItem = {
 };
 
 function isDecisionDone(proposalStatus: string, poll: PollState | null) {
-  return ["approved", "reviewing", "complete"].includes(proposalStatus) || poll?.status === "passed";
+  return ["reviewing", "complete"].includes(proposalStatus) || pollApprovalPassed(poll);
 }
 
 function setupCanRunCode(wave: CommandWave) {
@@ -53,7 +53,7 @@ function buildStatus(execution: ExecutionRecord | null, decisionDone: boolean): 
     return { status: "active", detail: "Approved work is ready for the PR build step." };
   }
 
-  return { status: "waiting", detail: "Build waits for a passed decision." };
+  return { status: "waiting", detail: "Build waits for a recorded wave decision." };
 }
 
 function reviewStatus(
@@ -123,7 +123,11 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
         : "waiting",
       detail: proposal
         ? poll
-          ? `Vote is ${poll.status}: ${poll.yesVotes} yes, ${poll.noVotes} no.`
+          ? poll.decision
+            ? `Receipt recorded: ${poll.decision.dropId ?? poll.decision.url ?? "wave decision"}.`
+            : poll.status === "passed"
+              ? "Vote passed locally. Record the 6529 decision receipt."
+              : `Vote is ${poll.status}: ${poll.yesVotes} yes, ${poll.noVotes} no.`
           : "No vote required by current rules."
         : "Decision waits for a proposal.",
     },

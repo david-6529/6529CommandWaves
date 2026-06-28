@@ -118,4 +118,20 @@ describe("Command Waves rule engine", () => {
     expect(evaluatePoll(poll).passed).toBe(false);
     expect(pollApprovalPassed(poll)).toBe(true);
   });
+
+  it("keeps local counted votes from approving PR execution without a receipt", () => {
+    const poll: PollState = {
+      proposalId: "cmd-test",
+      yesVotes: 3,
+      noVotes: 0,
+      quorumRequired: 3,
+      yesPercentRequired: 60,
+      status: "passed",
+      votes: [],
+      decision: null,
+    };
+
+    expect(evaluatePoll(poll).passed).toBe(true);
+    expect(pollApprovalPassed(poll)).toBe(false);
+  });
 });

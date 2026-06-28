@@ -42,7 +42,7 @@ export type CommandPrManifest = {
   allowedPermissions: ToolPermission[];
   runManifestHash: string;
   approval: {
-    status: "not_required" | "passed";
+    status: "not_required" | "pending" | "passed";
     yesVotes: number;
     noVotes: number;
     quorumRequired: number;
@@ -218,7 +218,7 @@ function isCommandPrManifest(value: unknown): value is CommandPrManifest {
       Array.isArray(manifest.allowedPermissions) &&
       typeof manifest.runManifestHash === "string" &&
       approval &&
-      (approval.status === "not_required" || approval.status === "passed") &&
+      (approval.status === "not_required" || approval.status === "pending" || approval.status === "passed") &&
       typeof approval.yesVotes === "number" &&
       typeof approval.noVotes === "number" &&
       typeof approval.quorumRequired === "number" &&
@@ -281,7 +281,7 @@ export function createCommandPrManifest({
     runManifestHash: runManifest.manifestHash,
     approval: poll
       ? {
-          status: approvalPassed ? "passed" : "not_required",
+          status: approvalPassed ? "passed" : "pending",
           yesVotes: poll.yesVotes,
           noVotes: poll.noVotes,
           quorumRequired: poll.quorumRequired,
@@ -451,7 +451,9 @@ export function validateCommandPrManifest({
       gate.needsPoll
         ? poll?.decision
           ? `Wave decision receipt ${approvalPassed ? "passed" : "has not passed"} for ${poll.decision.dropId ?? poll.decision.url ?? "recorded approval"}.`
-          : `Vote ${pollResult?.passed ? "passed" : "has not passed"} under quorum ${gate.rule.quorum} / yes ${gate.rule.yesPercent}%.`
+          : pollResult?.passed
+            ? "Local vote passed. Record a wave decision receipt before PR review can pass."
+            : `Vote has not passed under quorum ${gate.rule.quorum} / yes ${gate.rule.yesPercent}%.`
         : "No vote is required by the current rules.",
     ),
   );

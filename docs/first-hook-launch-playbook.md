@@ -17,7 +17,7 @@ Make the first public phase a clear community win:
 - One PR-sized command at a time.
 - Local or imported wave decisions for approvals.
 - Manual decision receipts that link approved work to a 6529 drop URL.
-- Copyable Codex work packets for approved PR commands.
+- Copyable Codex work packets for PR commands with a recorded wave decision receipt.
 - Draft PRs with Command Waves manifests.
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.

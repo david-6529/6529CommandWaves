@@ -105,6 +105,44 @@ describe("PR reviewer gate", () => {
     expect(result.checks.find((item) => item.id === "vote")?.status).toBe("pass");
   });
 
+  it("fails local counted vote approval without a wave decision receipt", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-local-votes-only",
+      status: "approved" as const,
+      prompt: "Use Codex to update documentation.",
+      spec: "Docs only.",
+      risk: "medium" as const,
+    };
+    const poll = {
+      proposalId: proposal.id,
+      yesVotes: 3,
+      noVotes: 0,
+      quorumRequired: 3,
+      yesPercentRequired: 60,
+      status: "passed" as const,
+      votes: [],
+      decision: null,
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["README.md"],
+    });
+    const voteCheck = result.checks.find((item) => item.id === "vote");
+
+    expect(manifest.approval.status).toBe("pending");
+    expect(result.status).toBe("fail");
+    expect(voteCheck).toMatchObject({
+      status: "fail",
+      message: "Local vote passed. Record a wave decision receipt before PR review can pass.",
+    });
+  });
+
   it("fails medium-risk commands that touch workflow enforcement", () => {
     const wave = approvedDemoWave();
     const proposal = {

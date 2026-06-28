@@ -48,6 +48,26 @@ describe("phase checklist", () => {
     });
   });
 
+  it("waits for a wave decision receipt after local votes pass", () => {
+    const checklist = createPhaseChecklist({
+      ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+      polls: [{ ...demoWave.polls[0], decision: null }],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    });
+
+    expect(checklist.find((item) => item.id === "decision")).toMatchObject({
+      status: "active",
+      detail: "Vote passed locally. Record the 6529 decision receipt.",
+    });
+    expect(checklist.find((item) => item.id === "build")).toMatchObject({
+      status: "waiting",
+      detail: "Build waits for a recorded wave decision.",
+    });
+  });
+
   it("keeps support commands outside the PR build checklist", () => {
     const checklist = createPhaseChecklist({
       ...demoWave,

@@ -264,11 +264,7 @@ export function evaluatePoll(poll: PollState) {
 }
 
 export function pollApprovalPassed(poll: PollState | null) {
-  if (!poll) {
-    return false;
-  }
-
-  return evaluatePoll(poll).passed || (poll.status === "passed" && Boolean(poll.decision));
+  return Boolean(poll?.status === "passed" && poll.decision);
 }
 
 function dropIdFromUrl(value: string) {

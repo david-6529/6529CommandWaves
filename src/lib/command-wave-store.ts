@@ -9,6 +9,7 @@ import {
   defaultRules,
   evaluateGate,
   evaluatePoll,
+  pollApprovalPassed,
   type CommandKind,
   type CommandProposal,
   type CommandVote,
@@ -475,6 +476,12 @@ export async function executeProposal(input: unknown) {
     throw Object.assign(new Error("Only approved PR commands can use the agent build step in phase 1."), { status: 409 });
   }
 
+  const poll = wave.polls.find((item) => item.proposalId === proposalId) ?? null;
+
+  if (!pollApprovalPassed(poll)) {
+    throw Object.assign(new Error("Record the builder wave decision receipt before running a PR command."), { status: 409 });
+  }
+
   if (!validateSetupShape({ waveUrl: wave.waveUrl, repoUrl: wave.repoUrl }).canRunCode) {
     throw Object.assign(new Error("A valid GitHub repo is required before opening PR commands can run."), { status: 409 });
   }
@@ -482,7 +489,7 @@ export async function executeProposal(input: unknown) {
   const execution = await getConfiguredOrchestratorAdapter().execute({
     wave,
     proposal,
-    poll: wave.polls.find((item) => item.proposalId === proposalId) ?? null,
+    poll,
   });
   const nextWave = appendLedger(
     {

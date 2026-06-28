@@ -6,7 +6,7 @@ Command Waves should not let a wave directly run arbitrary tools. The agent shou
 
 MVP execution path:
 
-1. Proposal passes the rule/poll gate.
+1. Proposal has a recorded builder wave decision receipt.
 2. Backend creates a `command_job` with the approved prompt, spec, rules version, repo URL, and budget cap.
 3. Worker creates an isolated worktree or clone for the target repo.
 4. Worker writes a run manifest with:
@@ -27,7 +27,7 @@ Current local adapter status:
 - Generates a deterministic run manifest artifact before mock execution.
 - Includes proposal ID, command kind, risk, rules version/hash, permissions, budget, prompt/spec hashes, target branch, max runtime, and max cost.
 - Generates a deterministic Codex handoff packet for PR commands.
-- Generates a copyable manual Codex work packet for approved PR commands.
+- Generates a copyable manual Codex work packet for PR commands with a recorded wave decision receipt.
 - The handoff packet records the target branch, permission set, budget, required evidence, forbidden actions, run manifest hash, and PR manifest hash.
 - The work packet gives a human operator the approved prompt, target branch, required evidence, forbidden actions, and PR manifest text to use in a prepared branch.
 - Includes the Command Waves PR manifest in the PR body for `open_pr` commands.

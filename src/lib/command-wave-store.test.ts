@@ -257,6 +257,37 @@ describe("Command wave store", () => {
     await expect(recordVote({ proposalId: "cmd-002", voterIdentity: "dave", vote: "yes" })).rejects.toThrow("Poll is not open.");
   });
 
+  it("requires a builder wave decision receipt before PR execution", async () => {
+    await submitCommandProposal({
+      title: "Open a PR",
+      proposer: "tester",
+      kind: "open_pr",
+      prompt: "Use Codex to add docs.",
+      spec: "Docs only.",
+      budgetUsd: 1,
+    });
+
+    await recordVote({ proposalId: "cmd-002", voterIdentity: "alice", vote: "yes" });
+    await recordVote({ proposalId: "cmd-002", voterIdentity: "bob", vote: "yes" });
+    await recordVote({ proposalId: "cmd-002", voterIdentity: "carol", vote: "yes" });
+
+    await expect(executeProposal({ proposalId: "cmd-002" })).rejects.toThrow(
+      "Record the builder wave decision receipt before running a PR command.",
+    );
+
+    await recordDecisionReceipt({
+      proposalId: "cmd-002",
+      reference: "https://6529.io/waves/new-command-wave/drops/drop-approval-002",
+      recordedBy: "david",
+    });
+
+    const executed = await executeProposal({ proposalId: "cmd-002" });
+
+    expect(executed.proposals.find((proposal) => proposal.id === "cmd-002")).toMatchObject({
+      status: "reviewing",
+    });
+  });
+
   it("executes approved proposals and lets the reviewer complete them", async () => {
     await makeSeedProposalReadyToBuild();
 

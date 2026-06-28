@@ -5,6 +5,7 @@ import { attachAdminApiKey } from "@/lib/admin-client";
 import {
   classifyRisk,
   evaluatePoll,
+  pollApprovalPassed,
   type CommandKind,
   type CommandWave,
 } from "@/lib/command-waves";
@@ -627,12 +628,18 @@ export function CommandWavesConsole() {
   const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
+  const activePrHasWaveDecision = Boolean(activeProposalIsPr && pollApprovalPassed(activePoll ?? null));
   const canBuildApprovedPr = Boolean(
-    activeProposal && activeProposal.kind === "open_pr" && activeProposal.status === "approved" && !activeExecution,
+    activeProposal &&
+      activeProposal.kind === "open_pr" &&
+      activeProposal.status === "approved" &&
+      activePrHasWaveDecision &&
+      !activeExecution,
   );
   const canCopyCodexPacket = Boolean(
     activeProposal &&
       activeProposalIsPr &&
+      activePrHasWaveDecision &&
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
@@ -1535,7 +1542,9 @@ export function CommandWavesConsole() {
                       {activeExecution?.summary
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
-                          ? "Waiting for an approved PR command."
+                          ? activePrHasWaveDecision
+                            ? "Waiting for an approved PR command."
+                            : "Record the wave decision receipt before the PR build step."
                           : "Only PR commands use the agent build step in phase 1."}
                     </p>
                     {activeExecution?.artifacts.length ? (
@@ -1551,7 +1560,13 @@ export function CommandWavesConsole() {
                       disabled={isBusy || !canBuildApprovedPr}
                       onClick={launchOrchestrator}
                     >
-                      {apiBusy === "execute" ? "Building" : activeProposalIsPr ? "Build approved PR" : "PR build not needed"}
+                      {apiBusy === "execute"
+                        ? "Building"
+                        : activeProposalIsPr
+                          ? activePrHasWaveDecision
+                            ? "Build approved PR"
+                            : "Decision receipt needed"
+                          : "PR build not needed"}
                     </Button>
                     <Button
                       type="button"

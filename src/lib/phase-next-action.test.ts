@@ -54,6 +54,26 @@ describe("phase next action", () => {
     });
   });
 
+  it("points local vote approval without a receipt back to decision", () => {
+    const nextAction = createPhaseNextAction(
+      createPhaseChecklist({
+        ...demoWave,
+        proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+        polls: [{ ...demoWave.polls[0], decision: null }],
+        executions: [],
+        reviews: [],
+        ledger: [],
+      }),
+    );
+
+    expect(nextAction).toMatchObject({
+      status: "action",
+      stepLabel: "Decide",
+      title: "Get the wave decision",
+      detail: "Vote or record the 6529 decision receipt before work runs.",
+    });
+  });
+
   it("keeps support commands from becoming the PR build next action", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
