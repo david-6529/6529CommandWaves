@@ -1249,11 +1249,20 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               ) : null}
-              <div className="grid gap-2">
-                <Button type="button" variant="danger" disabled={isBusy} onClick={resetDemo}>
-                  {apiBusy === "reset" ? "Resetting" : "Reset demo"}
-                </Button>
-              </div>
+              <details className="rounded-md border border-zinc-800 bg-black p-3">
+                <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+                  <span>Local demo controls</span>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-400">hidden</Badge>
+                </summary>
+                <div className="mt-3 grid gap-3">
+                  <p className="text-xs leading-5 text-zinc-500">
+                    Restore the built-in hook demo only when testing the local app.
+                  </p>
+                  <Button type="button" variant="danger" disabled={isBusy} onClick={resetDemo}>
+                    {apiBusy === "reset" ? "Resetting" : "Reset demo"}
+                  </Button>
+                </div>
+              </details>
             </div>
           </Panel>
 
