@@ -89,6 +89,7 @@ export type GuardianReviewProof = {
     pollHash: string | null;
     manifestHash: string | null;
     changedPathsHash: string;
+    changedFilesHash?: string;
     rulesHash: string;
   };
   resultHash: string;

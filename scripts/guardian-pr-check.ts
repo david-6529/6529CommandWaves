@@ -4,8 +4,8 @@ import type { CommandWave } from "../src/lib/command-waves";
 import { demoWave } from "../src/lib/demo-wave";
 import {
   assertGuardianWaveStateConfigured,
+  changedFilesFromGitHubFilesPayload,
   changedPathsFromEnv,
-  changedPathsFromGitHubFilesPayload,
   demoWaveStateAllowed,
   pullRequestEvidenceFromGitHubEvent,
   type GitHubPullRequestEvent,
@@ -13,13 +13,14 @@ import {
 } from "../src/lib/github/actions-pr-evidence";
 import { formatGuardianStepSummary } from "../src/lib/github/guardian-summary";
 import { createGuardianPullRequestAttestation } from "../src/lib/github/pr-reviewer-gate";
+import type { HookChangedFile } from "../src/lib/safety/hook-diff-policy";
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
 }
 
-async function fetchChangedPaths(filesUrl: string, token?: string) {
-  const paths: string[] = [];
+async function fetchChangedFiles(filesUrl: string, token?: string) {
+  const files: HookChangedFile[] = [];
 
   for (let page = 1; page <= 10; page += 1) {
     const url = new URL(filesUrl);
@@ -38,16 +39,16 @@ async function fetchChangedPaths(filesUrl: string, token?: string) {
       throw new Error(`Could not fetch PR files: ${response.status} ${response.statusText}`);
     }
 
-    const pagePaths = changedPathsFromGitHubFilesPayload(await response.json());
+    const pageFiles = changedFilesFromGitHubFilesPayload(await response.json());
 
-    paths.push(...pagePaths);
+    files.push(...pageFiles);
 
-    if (pagePaths.length < 100) {
+    if (pageFiles.length < 100) {
       break;
     }
   }
 
-  return paths;
+  return files;
 }
 
 async function loadWaveState() {
@@ -84,11 +85,15 @@ async function loadEvidence(event: GitHubPullRequestEvent) {
     return null;
   }
 
-  const changedPaths =
-    changedPathsFromEnv(process.env.COMMAND_WAVE_CHANGED_PATHS) ??
-    (pullRequest.files_url ? await fetchChangedPaths(pullRequest.files_url, process.env.GITHUB_TOKEN) : []);
+  const envChangedPaths = changedPathsFromEnv(process.env.COMMAND_WAVE_CHANGED_PATHS);
+  const changedFiles = envChangedPaths
+    ? []
+    : pullRequest.files_url
+      ? await fetchChangedFiles(pullRequest.files_url, process.env.GITHUB_TOKEN)
+      : [];
+  const changedPaths = envChangedPaths ?? changedFiles.map((file) => file.path);
 
-  return pullRequestEvidenceFromGitHubEvent(event, changedPaths);
+  return pullRequestEvidenceFromGitHubEvent(event, changedPaths, changedFiles);
 }
 
 function writeAttestation(path: string, value: unknown) {

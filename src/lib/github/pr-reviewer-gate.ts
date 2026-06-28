@@ -15,10 +15,17 @@ import {
   riskAllowsHookContractSignal,
   type HookContractSignal,
 } from "../safety/hook-contract-policy";
+import {
+  findHookPatchSignals,
+  normalizeChangedFiles,
+  riskAllowsHookPatchSignal,
+  type HookChangedFile,
+  type HookPatchSignal,
+} from "../safety/hook-diff-policy";
 import { evaluateHookParameterPolicy, type HookParameterPolicyCheck } from "../safety/hook-parameter-policy";
 import { toolPolicyForProposal, type ToolPermission } from "../safety/tool-policy";
 
-export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.3" as const;
+export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.4" as const;
 
 export type CommandPrManifest = {
   version: "command-wave-pr-v0.1";
@@ -61,6 +68,7 @@ export type ReviewerGateResult = {
   checks: ReviewerGateCheck[];
   diffSignals: PrDiffSignal[];
   hookSignals: HookContractSignal[];
+  hookPatchSignals: HookPatchSignal[];
   hookParameterChecks: HookParameterPolicyCheck[];
 };
 
@@ -80,6 +88,7 @@ export type GuardianAttestation = {
     pollHash: string | null;
     manifestHash: string | null;
     changedPathsHash: string;
+    changedFilesHash?: string;
     rulesHash: string;
   };
   result: ReviewerGateResult;
@@ -90,6 +99,7 @@ export type GuardianAttestation = {
 export type GuardianPullRequestEvidence = {
   pullRequestBody: string;
   changedPaths: string[];
+  changedFiles?: HookChangedFile[];
   generatedAt?: string;
 };
 
@@ -328,16 +338,19 @@ export function validateCommandPrManifest({
   poll,
   manifest,
   changedPaths = [],
+  changedFiles = [],
 }: {
   wave: CommandWave;
   proposal: CommandProposal | null;
   poll: PollState | null;
   manifest: CommandPrManifest | null;
   changedPaths?: string[];
+  changedFiles?: HookChangedFile[];
 }): ReviewerGateResult {
   const checks: ReviewerGateCheck[] = [];
   const diffSignals = findPrDiffSignals(changedPaths);
   const proposalText = proposal ? `${proposal.prompt}\n${proposal.spec}` : "";
+  const hookPatchSignals = findHookPatchSignals(changedFiles);
   const hookSignals = findHookContractSignals({
     changedPaths,
     proposalText,
@@ -351,12 +364,12 @@ export function validateCommandPrManifest({
 
   if (!proposal) {
     checks.push(check("proposal_exists", "fail", "No matching command proposal was found."));
-    return { status: "fail", checks, diffSignals, hookSignals, hookParameterChecks };
+    return { status: "fail", checks, diffSignals, hookSignals, hookPatchSignals, hookParameterChecks };
   }
 
   if (!manifest) {
     checks.push(check("manifest_exists", "fail", "PR is missing a Command Waves manifest."));
-    return { status: "fail", checks, diffSignals, hookSignals, hookParameterChecks };
+    return { status: "fail", checks, diffSignals, hookSignals, hookPatchSignals, hookParameterChecks };
   }
 
   const expected = createCommandPrManifest({ wave, proposal, poll });
@@ -469,6 +482,22 @@ export function validateCommandPrManifest({
     );
   }
 
+  for (const signal of hookPatchSignals) {
+    const allowed = riskAllowsHookPatchSignal({
+      risk: manifest.risk,
+      signal,
+      upgradeabilityExceptionApproved,
+    });
+
+    checks.push(
+      check(
+        `hook_patch_${signal.label}_${checkIdValue(signal.path)}_${checkIdValue(signal.line)}`,
+        allowed ? "pass" : "fail",
+        `${signal.path}: ${signal.reason}`,
+      ),
+    );
+  }
+
   checks.push(...hookParameterChecks);
 
   return {
@@ -476,6 +505,7 @@ export function validateCommandPrManifest({
     checks,
     diffSignals,
     hookSignals,
+    hookPatchSignals,
     hookParameterChecks,
   };
 }
@@ -486,6 +516,7 @@ export function createGuardianAttestation({
   poll,
   manifest,
   changedPaths = [],
+  changedFiles = [],
   generatedAt,
 }: {
   wave: CommandWave;
@@ -493,15 +524,18 @@ export function createGuardianAttestation({
   poll: PollState | null;
   manifest: CommandPrManifest | null;
   changedPaths?: string[];
+  changedFiles?: HookChangedFile[];
   generatedAt?: string;
 }): GuardianAttestation {
   const sortedChangedPaths = sortedPaths(changedPaths);
+  const sortedChangedFiles = normalizeChangedFiles(changedFiles);
   const result = validateCommandPrManifest({
     wave,
     proposal,
     poll,
     manifest,
     changedPaths: sortedChangedPaths,
+    changedFiles: sortedChangedFiles,
   });
   const resultHash = hashValue(result);
   const attestationBase = {
@@ -520,6 +554,7 @@ export function createGuardianAttestation({
       pollHash: poll ? hashValue(poll) : null,
       manifestHash: manifest ? hashValue(manifest) : null,
       changedPathsHash: hashValue(sortedChangedPaths),
+      changedFilesHash: hashValue(sortedChangedFiles),
       rulesHash: hashValue(wave.rules),
     },
     result,
@@ -538,6 +573,7 @@ export function verifyGuardianAttestation({
   poll,
   manifest,
   changedPaths = [],
+  changedFiles = [],
   attestation,
 }: {
   wave: CommandWave;
@@ -545,6 +581,7 @@ export function verifyGuardianAttestation({
   poll: PollState | null;
   manifest: CommandPrManifest | null;
   changedPaths?: string[];
+  changedFiles?: HookChangedFile[];
   attestation: GuardianAttestation;
 }) {
   const expected = createGuardianAttestation({
@@ -553,6 +590,7 @@ export function verifyGuardianAttestation({
     poll,
     manifest,
     changedPaths,
+    changedFiles,
     generatedAt: attestation.generatedAt,
   });
 
@@ -576,6 +614,7 @@ export function createGuardianPullRequestAttestation({
     poll,
     manifest,
     changedPaths: evidence.changedPaths,
+    changedFiles: evidence.changedFiles ?? [],
     generatedAt: evidence.generatedAt,
   });
 }
@@ -621,6 +660,15 @@ export function verifyGuardianPullRequestProof({
       "changed_paths_hash",
       expected.inputs.changedPathsHash === attestation.inputs.changedPathsHash ? "pass" : "fail",
       "Changed-paths hash matches the attestation input.",
+    ),
+    verificationCheck(
+      "changed_files_hash",
+      !attestation.inputs.changedFilesHash || expected.inputs.changedFilesHash === attestation.inputs.changedFilesHash
+        ? "pass"
+        : "fail",
+      attestation.inputs.changedFilesHash
+        ? "Changed-file patch hash matches the attestation input."
+        : "No changed-file patch hash is present on this legacy attestation.",
     ),
     verificationCheck(
       "result_hash",

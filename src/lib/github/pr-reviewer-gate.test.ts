@@ -143,10 +143,23 @@ describe("PR reviewer gate", () => {
       poll,
       manifest,
       changedPaths: ["contracts/HookParameters.sol"],
+      changedFiles: [
+        {
+          path: "contracts/HookParameters.sol",
+          patch: [
+            "@@",
+            "+uint16 public feeBps;",
+            "+function setFeeBps(uint16 nextFeeBps) external {",
+            "+  feeBps = nextFeeBps;",
+            "+}",
+          ].join("\n"),
+        },
+      ],
     });
 
     expect(result.status).toBe("pass");
     expect(result.hookSignals).toContainEqual(expect.objectContaining({ label: "parameter_change", risk: "high" }));
+    expect(result.hookPatchSignals).toContainEqual(expect.objectContaining({ label: "parameter_write", risk: "high" }));
     expect(result.hookParameterChecks.every((item) => item.status === "pass")).toBe(true);
   });
 
@@ -204,6 +217,47 @@ describe("PR reviewer gate", () => {
       expect.objectContaining({ label: "upgradeability", risk: "critical", defaultBlocked: true }),
     );
     expect(result.checks.find((item) => item.id.startsWith("hook_upgradeability"))?.status).toBe("fail");
+  });
+
+  it("blocks upgradeability added in Solidity patch content", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-patch-upgradeable",
+      risk: "critical" as const,
+      prompt: "Draft hook internals.",
+      spec: "No proxy or upgradeability exception is approved.",
+    };
+    const poll = {
+      ...wave.polls[0],
+      proposalId: proposal.id,
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["contracts/Hook.sol"],
+      changedFiles: [
+        {
+          path: "contracts/Hook.sol",
+          patch: [
+            "@@",
+            "+import {UUPSUpgradeable} from \"openzeppelin/proxy/utils/UUPSUpgradeable.sol\";",
+            "+contract Hook is UUPSUpgradeable {",
+            "+  function _authorizeUpgrade(address nextImplementation) internal override onlyOwner {}",
+            "+}",
+          ].join("\n"),
+        },
+      ],
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.hookPatchSignals).toContainEqual(
+      expect.objectContaining({ label: "upgradeability_pattern", risk: "critical", defaultBlocked: true }),
+    );
+    expect(result.checks.find((item) => item.id.startsWith("hook_patch_upgradeability_pattern"))?.status).toBe("fail");
   });
 
   it("requires critical approval for guardian proof code changes", () => {
@@ -281,6 +335,7 @@ describe("PR reviewer gate", () => {
     expect(attestation.inputs.proposalHash).toHaveLength(64);
     expect(attestation.inputs.pollHash).toHaveLength(64);
     expect(attestation.inputs.manifestHash).toHaveLength(64);
+    expect(attestation.inputs.changedFilesHash).toHaveLength(64);
   });
 
   it("fails PR evidence when the manifest is missing", () => {
@@ -307,12 +362,14 @@ describe("PR reviewer gate", () => {
     const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
     const manifest = createCommandPrManifest({ wave, proposal, poll });
     const changedPaths = ["README.md", "src/app/page.tsx"];
+    const changedFiles = [{ path: "src/app/page.tsx", patch: "@@\n+export default function Page() { return null; }" }];
     const attestation = createGuardianAttestation({
       wave,
       proposal,
       poll,
       manifest,
       changedPaths,
+      changedFiles,
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     const again = createGuardianAttestation({
@@ -321,13 +378,16 @@ describe("PR reviewer gate", () => {
       poll,
       manifest,
       changedPaths: [...changedPaths].reverse(),
+      changedFiles: [...changedFiles],
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
     expect(attestation).toEqual(again);
     expect(attestation.verifier.mode).toBe("deterministic");
     expect(attestation.result.status).toBe("pass");
-    expect(verifyGuardianAttestation({ wave, proposal, poll, manifest, changedPaths, attestation })).toBe(true);
+    expect(verifyGuardianAttestation({ wave, proposal, poll, manifest, changedPaths, changedFiles, attestation })).toBe(
+      true,
+    );
     expect(attestation.attestationHash).toHaveLength(64);
   });
 
@@ -368,6 +428,7 @@ describe("PR reviewer gate", () => {
     const evidence = {
       pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
       changedPaths: ["src/app/page.tsx", "README.md"],
+      changedFiles: [{ path: "src/app/page.tsx", patch: "@@\n+export default function Page() { return null; }" }],
     };
     const attestation = createGuardianPullRequestAttestation({
       wave,
@@ -390,6 +451,7 @@ describe("PR reviewer gate", () => {
     const evidence = {
       pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
       changedPaths: ["README.md"],
+      changedFiles: [{ path: "README.md", patch: "@@\n+first" }],
     };
     const attestation = createGuardianPullRequestAttestation({
       wave,
@@ -403,12 +465,14 @@ describe("PR reviewer gate", () => {
       evidence: {
         ...evidence,
         changedPaths: [".github/workflows/guardian-review.yml"],
+        changedFiles: [{ path: "README.md", patch: "@@\n+second" }],
       },
       attestation,
     });
 
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "changed_paths_hash")?.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "changed_files_hash")?.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "attestation_hash")?.status).toBe("fail");
   });
 });

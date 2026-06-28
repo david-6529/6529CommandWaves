@@ -19,7 +19,7 @@ Make the first public phase a clear community win:
 - Manual decision receipts that link approved work to a 6529 drop URL.
 - Copyable Codex work packets for approved PR commands.
 - Draft PRs with Command Waves manifests.
-- Reviewer gate checks for vote status, rules hashes, risky files, hook signals, and explicit parameter caps.
+- Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
 - Human-reviewed wave update draft.

@@ -121,6 +121,7 @@ The current app is a local prototype of the hook-building flow:
 - manual wave decision receipt that can anchor approval to a 6529 drop URL
 - opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals
+- patch-level Solidity checks for upgradeability, delegatecall, deployment, governance, and parameter writes when PR patches are available
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
 - review records store compact guardian proof material for later audit
 - human-reviewed wave update draft for posting results back to the builder wave

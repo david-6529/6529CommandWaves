@@ -14,6 +14,7 @@ export function formatGuardianStepSummary(attestation: GuardianAttestation) {
     `Rules hash: \`${attestation.inputs.rulesHash}\``,
     `Manifest hash: \`${attestation.inputs.manifestHash ?? "missing"}\``,
     `Changed paths hash: \`${attestation.inputs.changedPathsHash}\``,
+    `Changed files hash: \`${attestation.inputs.changedFilesHash ?? "missing"}\``,
     "",
     "## Checks",
     "",
@@ -26,6 +27,15 @@ export function formatGuardianStepSummary(attestation: GuardianAttestation) {
     lines.push("", "## Risky Paths", "", "| Risk | Path | Reason |", "| --- | --- | --- |");
     lines.push(
       ...attestation.result.diffSignals.map(
+        (signal) => `| ${signal.risk} | \`${signal.path}\` | ${signal.reason.replaceAll("|", "\\|")} |`,
+      ),
+    );
+  }
+
+  if (attestation.result.hookPatchSignals.length) {
+    lines.push("", "## Hook Patch Signals", "", "| Risk | Path | Reason |", "| --- | --- | --- |");
+    lines.push(
+      ...attestation.result.hookPatchSignals.map(
         (signal) => `| ${signal.risk} | \`${signal.path}\` | ${signal.reason.replaceAll("|", "\\|")} |`,
       ),
     );

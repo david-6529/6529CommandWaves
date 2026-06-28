@@ -89,6 +89,7 @@ The check fails if:
 - hook parameter work does not name an explicit numeric cap or bound-focused test evidence
 - REP, TDH, or holder threshold language is claimed as live authority before live weighting is wired
 - upgradeability appears without an explicit exception and critical approval
+- added Solidity patch content contains upgradeability, delegatecall, deployment, governance, or parameter-write patterns without the required approval
 
 The guardian should be deterministic. An LLM can help explain the result or suggest extra risks, but the merge-blocking
 decision should come from checks that anyone can rerun.
@@ -106,6 +107,7 @@ checks:
 - hook parameter, fee, bound, limit, and config changes: high risk
 - governance, owner, role, timelock, Safe, threshold, quorum, and TDH control changes: critical risk
 - proxy, UUPS, diamond, initializer, delegatecall, and upgradeability patterns: critical risk and blocked by default
+- added Solidity patch content is scanned for upgradeability, delegatecall, deployment, governance, and parameter writes when GitHub provides file patches
 
 The first phase defaults to immutable contracts. Upgradeability requires the approved command text to include an explicit
 upgradeability exception and the manifest must carry critical risk.
@@ -130,6 +132,7 @@ That is the core proof. The guardian output is an attestation with:
 - rules hash
 - manifest hash
 - changed-paths hash
+- changed-file patch hash when PR patch evidence is available
 - every check result
 - final pass/fail
 - attestation hash
@@ -152,6 +155,7 @@ The GitHub artifact should include these files:
 - `guardian-wave-state.json`: the exact wave snapshot used by the guardian. Its hash must match
   `inputs.waveStateHash` in the attestation.
 - `guardian-pr-evidence.json`: the exact PR body and changed paths used by the guardian.
+  When available, it also includes changed-file patches used for Solidity content checks.
 
 Replay the artifact with:
 

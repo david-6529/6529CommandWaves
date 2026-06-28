@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   assertGuardianWaveStateConfigured,
+  changedFilesFromGitHubFilesPayload,
   changedPathsFromEnv,
   changedPathsFromGitHubFilesPayload,
   demoWaveStateAllowed,
@@ -20,10 +21,12 @@ describe("GitHub Actions PR evidence", () => {
           },
         },
         ["src/app/page.tsx"],
+        [{ path: "src/app/page.tsx", patch: "@@\n+export default function Page() {}" }],
       ),
     ).toEqual({
       pullRequestBody: "PR body",
       changedPaths: ["src/app/page.tsx"],
+      changedFiles: [{ path: "src/app/page.tsx", patch: "@@\n+export default function Page() {}" }],
     });
   });
 
@@ -32,9 +35,16 @@ describe("GitHub Actions PR evidence", () => {
   });
 
   it("normalizes changed file payloads", () => {
-    expect(changedPathsFromGitHubFilesPayload([{ filename: "README.md" }, { filename: "src/app/page.tsx" }, {}])).toEqual([
-      "README.md",
-      "src/app/page.tsx",
+    const payload = [
+      { filename: "README.md" },
+      { filename: "contracts/Hook.sol", patch: "@@\n+contract Hook {}" },
+      {},
+    ];
+
+    expect(changedPathsFromGitHubFilesPayload(payload)).toEqual(["README.md", "contracts/Hook.sol"]);
+    expect(changedFilesFromGitHubFilesPayload(payload)).toEqual([
+      { path: "README.md", patch: null },
+      { path: "contracts/Hook.sol", patch: "@@\n+contract Hook {}" },
     ]);
   });
 

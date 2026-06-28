@@ -1,3 +1,5 @@
+import type { HookChangedFile } from "../safety/hook-diff-policy";
+
 export type GitHubPullRequestEvent = {
   pull_request?: {
     body?: string | null;
@@ -9,6 +11,7 @@ export type GitHubPullRequestEvent = {
 export type PullRequestEvidence = {
   pullRequestBody: string;
   changedPaths: string[];
+  changedFiles?: HookChangedFile[];
 };
 
 export type GuardianPrCheckEnv = Record<string, string | undefined>;
@@ -24,6 +27,7 @@ function asStringArray(value: unknown) {
 export function pullRequestEvidenceFromGitHubEvent(
   event: GitHubPullRequestEvent,
   changedPaths: string[],
+  changedFiles: HookChangedFile[] = [],
 ): PullRequestEvidence | null {
   const pullRequest = event.pull_request;
 
@@ -34,19 +38,29 @@ export function pullRequestEvidenceFromGitHubEvent(
   return {
     pullRequestBody: pullRequest.body ?? "",
     changedPaths,
+    ...(changedFiles.length ? { changedFiles } : {}),
   };
 }
 
-export function changedPathsFromGitHubFilesPayload(payload: unknown) {
+export function changedFilesFromGitHubFilesPayload(payload: unknown): HookChangedFile[] {
   const files = Array.isArray(payload) ? payload : [];
 
-  return files
-    .map((item) => {
-      const file = asRecord(item);
+  return files.flatMap((item) => {
+    const file = asRecord(item);
 
-      return typeof file.filename === "string" ? file.filename : null;
-    })
-    .filter((item): item is string => Boolean(item));
+    return typeof file.filename === "string"
+      ? [
+          {
+            path: file.filename,
+            patch: typeof file.patch === "string" ? file.patch : null,
+          },
+        ]
+      : [];
+  });
+}
+
+export function changedPathsFromGitHubFilesPayload(payload: unknown) {
+  return changedFilesFromGitHubFilesPayload(payload).map((file) => file.path);
 }
 
 export function changedPathsFromEnv(value: string | undefined) {

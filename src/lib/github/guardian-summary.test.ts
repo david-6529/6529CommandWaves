@@ -13,6 +13,7 @@ describe("guardian summary", () => {
       poll,
       manifest: createCommandPrManifest({ wave: demoWave, proposal, poll }),
       changedPaths: ["README.md"],
+      changedFiles: [{ path: "README.md", patch: "@@\n+doc update" }],
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     const summary = formatGuardianStepSummary(attestation);
@@ -21,6 +22,7 @@ describe("guardian summary", () => {
     expect(summary).toContain("Status: **PASS**");
     expect(summary).toContain(attestation.attestationHash);
     expect(summary).toContain(attestation.inputs.waveStateHash);
+    expect(summary).toContain(attestation.inputs.changedFilesHash ?? "");
     expect(summary).toContain("| Status | Check | Message |");
     expect(summary).toContain("`rules_hash`");
   });
