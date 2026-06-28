@@ -14,9 +14,10 @@ import {
   riskAllowsHookContractSignal,
   type HookContractSignal,
 } from "../safety/hook-contract-policy";
+import { evaluateHookParameterPolicy, type HookParameterPolicyCheck } from "../safety/hook-parameter-policy";
 import { toolPolicyForProposal, type ToolPermission } from "../safety/tool-policy";
 
-export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.1" as const;
+export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.2" as const;
 
 export type CommandPrManifest = {
   version: "command-wave-pr-v0.1";
@@ -59,6 +60,7 @@ export type ReviewerGateResult = {
   checks: ReviewerGateCheck[];
   diffSignals: PrDiffSignal[];
   hookSignals: HookContractSignal[];
+  hookParameterChecks: HookParameterPolicyCheck[];
 };
 
 export type GuardianAttestation = {
@@ -339,16 +341,21 @@ export function validateCommandPrManifest({
     changedPaths,
     proposalText,
   });
+  const hookParameterChecks = evaluateHookParameterPolicy({
+    changedPaths,
+    proposalText,
+    hookSignals,
+  });
   const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
 
   if (!proposal) {
     checks.push(check("proposal_exists", "fail", "No matching command proposal was found."));
-    return { status: "fail", checks, diffSignals, hookSignals };
+    return { status: "fail", checks, diffSignals, hookSignals, hookParameterChecks };
   }
 
   if (!manifest) {
     checks.push(check("manifest_exists", "fail", "PR is missing a Command Waves manifest."));
-    return { status: "fail", checks, diffSignals, hookSignals };
+    return { status: "fail", checks, diffSignals, hookSignals, hookParameterChecks };
   }
 
   const expected = createCommandPrManifest({ wave, proposal, poll });
@@ -449,11 +456,14 @@ export function validateCommandPrManifest({
     );
   }
 
+  checks.push(...hookParameterChecks);
+
   return {
     status: overall(checks),
     checks,
     diffSignals,
     hookSignals,
+    hookParameterChecks,
   };
 }
 

@@ -85,6 +85,8 @@ The check fails if:
 - the PR touches high-risk files without a high-risk or critical approval
 - the PR touches guardian/reviewer/proof code without a critical-risk approval
 - the PR or approved command touches hook contract deployment, parameters, governance, or upgradeability patterns without the required risk level
+- hook parameter work does not name an explicit numeric cap or bound-focused test evidence
+- REP, TDH, or holder threshold language is claimed as live authority before live weighting is wired
 - upgradeability appears without an explicit exception and critical approval
 
 The guardian should be deterministic. An LLM can help explain the result or suggest extra risks, but the merge-blocking
@@ -103,6 +105,10 @@ checks:
 
 The first phase defaults to immutable contracts. Upgradeability requires the approved command text to include an explicit
 upgradeability exception and the manifest must carry critical risk.
+
+Parameter changes are narrower than general contract changes. The approved command must name a numeric cap or upper bound,
+and it must ask for tests or equivalent reviewer evidence for that bound. REP, TDH, and holder thresholds can be recorded
+as planned governance notes, but they are not treated as enforceable authority until live weighting is connected.
 
 Fairness rule:
 

@@ -13,6 +13,7 @@ import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
+import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
@@ -29,7 +30,7 @@ const commandKinds: Array<{ value: CommandKind; label: string; description: stri
 
 const hookGuardrails = [
   "No upgradeable hook contracts by default.",
-  "Parameter changes need explicit bounds and review.",
+  ...hookParameterPolicySummary.slice(1),
   "Deployment, payments, and governance changes stay human controlled.",
   "Contribution scores are reports, not permissions.",
 ];
@@ -421,9 +422,11 @@ export function CommandWavesConsole() {
   const [proposer, setProposer] = useState("david");
   const [kind, setKind] = useState<CommandKind>("open_pr");
   const [title, setTitle] = useState("Draft the non-upgradeable hook scaffold");
-  const [prompt, setPrompt] = useState("Use Codex to draft a non-upgradeable 6529 hook scaffold with bounded fee parameters and tests.");
+  const [prompt, setPrompt] = useState(
+    "Use Codex to draft a non-upgradeable 6529 hook scaffold with fee parameters capped at 100 bps and tests.",
+  );
   const [spec, setSpec] = useState(
-    "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
+    "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.",
   );
   const [budgetUsd, setBudgetUsd] = useState("10");
   const [apiBusy, setApiBusy] = useState<BusyState | null>(null);

@@ -100,6 +100,7 @@ The current app is a local prototype of the hook-building flow:
 - GitHub repo link
 - participation gate notes that do not claim live REP/TDH enforcement
 - hook guardrails for immutable-by-default smart contract work
+- bounded hook parameter policy that requires explicit caps and bound-focused tests
 - transparent contribution report that does not grant permissions
 - safety rules by command type
 - command proposal form

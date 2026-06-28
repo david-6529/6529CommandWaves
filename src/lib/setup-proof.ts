@@ -191,6 +191,8 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
           "permissions",
           "vote",
           "risky_diff_paths",
+          "hook_contract_signals",
+          "hook_parameter_policy",
         ],
       }),
     },

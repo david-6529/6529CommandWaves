@@ -152,7 +152,7 @@ describe("Postgres command wave repository", () => {
             proof_json: {
               version: "guardian-attestation-v0.1",
               verifier: "Command Waves Guardian",
-              verifierVersion: "command-wave-reviewer-gate-v0.1",
+              verifierVersion: "command-wave-reviewer-gate-v0.2",
               mode: "deterministic",
               inputs: {
                 waveId: "demo-command-wave",

@@ -3,6 +3,7 @@ import { normalizeWaveId } from "./6529/client";
 import { createCommandPrManifest } from "./github/pr-reviewer-gate";
 import { createCommandRunManifest, hashValue, type CommandRunManifest } from "./run-manifest";
 import { findHookContractSignals } from "./safety/hook-contract-policy";
+import { hookParameterPolicySummary } from "./safety/hook-parameter-policy";
 import type { ToolPermission } from "./safety/tool-policy";
 
 export type AgentHandoffPacket = {
@@ -42,7 +43,7 @@ function contractEvidence(proposal: CommandProposal) {
   return [
     "Changed contract file list.",
     "Contract test output, for example forge test or an equivalent project test command.",
-    "Short note explaining parameter bounds, governance surfaces, and deployment files touched.",
+    "Short note explaining explicit parameter caps, governance surfaces, and deployment files touched.",
   ];
 }
 
@@ -81,6 +82,7 @@ export function createAgentHandoffPacket({
       "Keep secrets out of prompts, commits, logs, artifacts, and PR bodies.",
       "Open a draft PR only after the branch is prepared.",
       "Leave merges, deploys, payments, and governance changes to humans.",
+      ...hookParameterPolicySummary,
     ],
     requiredEvidence: [
       "Prepared branch name.",
@@ -96,6 +98,7 @@ export function createAgentHandoffPacket({
       "Do not spend funds.",
       "Do not change repo settings.",
       "Do not create upgradeable hook contracts by default.",
+      "Do not add or change hook parameters unless the approved command names explicit caps and bound-focused evidence.",
       "Do not use proxy, delegatecall, initializer, UUPS, or diamond patterns unless the approved command includes an explicit upgradeability exception.",
     ],
   });

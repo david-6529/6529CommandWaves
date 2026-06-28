@@ -11,9 +11,9 @@ const proposal: CommandProposal = {
   proposer: "david",
   kind: "open_pr",
   risk: "high",
-  prompt: "Use Codex to draft a non-upgradeable 6529 hook scaffold with bounded fee parameters and tests.",
+  prompt: "Use Codex to draft a non-upgradeable 6529 hook scaffold with fee parameters capped at 100 bps and tests.",
   spec:
-    "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
+    "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.",
   budgetUsd: 10,
   status: "complete",
 };
@@ -154,6 +154,10 @@ function createDemoReview(): GuardianReview {
       "Codex handoff packet matches the run manifest, target branch, permissions, and budget.",
       "Hook contract signals checked: contract code, parameter change.",
       "Hook contract signals fit the approved risk level.",
+      "Hook contracts stay immutable by default; only named parameter surfaces can change.",
+      "Hook parameter work names an explicit numeric cap or upper bound.",
+      "Hook parameter work includes bound-focused test or review evidence language.",
+      "REP, TDH, and holder threshold language is not treated as live authority unless explicitly wired.",
       `Guardian attestation hash: ${attestation.attestationHash}.`,
     ],
     summary: "Reviewer mock passed the execution against the approved hook proposal and current rules.",

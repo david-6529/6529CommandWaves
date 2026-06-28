@@ -62,7 +62,7 @@ Polls require a voter identity for every yes/no vote. Duplicate votes from the s
 ## First Real Demo
 
 1. A builder wave is linked to the 6529 hook smart contract repo.
-2. A member proposes: "Draft the non-upgradeable hook scaffold with bounded fee parameters and tests."
+2. A member proposes: "Draft the non-upgradeable hook scaffold with fee parameters capped at 100 bps and tests."
 3. The rule engine classifies it as `open_pr`, high risk, vote required.
 4. The wave decision approves the scoped work.
 5. The agent opens a PR with a Command Waves manifest.
@@ -78,6 +78,7 @@ Polls require a voter identity for every yes/no vote. Duplicate votes from the s
 - No token-weighted voting until manual gating works.
 - No broad multi-agent swarm marketplace.
 - No upgradeable hook contracts by default.
+- No parameter work without an explicit cap and bound-focused tests.
 - No AI contribution score as an authority source.
 
 ## Safety Boundaries
@@ -90,7 +91,7 @@ The first version assumes prompt injection will happen and that reputation alone
 - Each command kind maps to explicit tool permission classes such as `wave.read`, `repo.open_pr`, `deploy.run`, or `funds.spend`.
 - The agent can only run an approved proposal.
 - The reviewer must check artifacts before a command is marked complete.
-- Hook contract work must flag deployment files, governance changes, bounded parameters, and upgradeability patterns.
+- Hook contract work must flag deployment files, governance changes, explicit parameter caps, and upgradeability patterns.
 - Upgradeability requires an explicit exception and critical approval.
 - Every proposal, vote, execution, review, and setup change is logged.
 - External agent endpoints are out of scope until signed manifests, payload limits, timeouts, domain allowlists, and tool permissions exist.

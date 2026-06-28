@@ -106,6 +106,34 @@ describe("PR reviewer gate", () => {
 
     expect(result.status).toBe("pass");
     expect(result.hookSignals).toContainEqual(expect.objectContaining({ label: "parameter_change", risk: "high" }));
+    expect(result.hookParameterChecks.every((item) => item.status === "pass")).toBe(true);
+  });
+
+  it("fails hook parameter changes that do not name a cap", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-vague-params",
+      prompt: "Add tweakable fee parameters to the hook.",
+      spec: "Include tests for parameter behavior.",
+    };
+    const poll = {
+      ...wave.polls[0],
+      proposalId: proposal.id,
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["contracts/HookParameters.sol"],
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.hookParameterChecks.find((item) => item.id === "hook_parameter_explicit_bound")?.status).toBe(
+      "fail",
+    );
   });
 
   it("blocks upgradeable hook patterns without an explicit exception", () => {

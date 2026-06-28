@@ -21,6 +21,7 @@ import {
   proposalAllowsUpgradeabilityException,
   riskAllowsHookContractSignal,
 } from "./safety/hook-contract-policy";
+import { evaluateHookParameterPolicy } from "./safety/hook-parameter-policy";
 import { findDangerousPromptFlags, toolPolicyForProposal } from "./safety/tool-policy";
 
 function stableNumber(value: string) {
@@ -167,6 +168,10 @@ export const localGuardianAdapter: GuardianAdapter = {
     const dangerousFlags = findDangerousPromptFlags(proposalText);
     const touchesDangerousSurface = dangerousFlags.length > 0;
     const hookSignals = findHookContractSignals({ proposalText });
+    const hookParameterChecks = evaluateHookParameterPolicy({
+      proposalText,
+      hookSignals,
+    });
     const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
     const blockedHookSignals = hookSignals.filter(
       (signal) =>
@@ -176,7 +181,13 @@ export const localGuardianAdapter: GuardianAdapter = {
           upgradeabilityExceptionApproved,
         }),
     );
-    const needsChanges = touchesDangerousSurface || !manifestMatches || !handoffMatches || blockedHookSignals.length > 0;
+    const blockedParameterChecks = hookParameterChecks.filter((item) => item.status === "fail");
+    const needsChanges =
+      touchesDangerousSurface ||
+      !manifestMatches ||
+      !handoffMatches ||
+      blockedHookSignals.length > 0 ||
+      blockedParameterChecks.length > 0;
     const attestation =
       input.proposal.kind === "open_pr"
         ? createGuardianAttestation({
@@ -214,6 +225,7 @@ export const localGuardianAdapter: GuardianAdapter = {
         blockedHookSignals.length
           ? `Blocked hook signals: ${blockedHookSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
           : "Hook contract signals fit the approved risk level.",
+        ...hookParameterChecks.map((item) => item.message),
         ...(attestation ? [`Guardian attestation hash: ${attestation.attestationHash}.`] : []),
       ],
       summary: needsChanges

@@ -31,8 +31,9 @@ describe("agent handoff packet", () => {
     expect(packet.prManifestHash).toBe(hashValue(createCommandPrManifest({ wave: demoWave, proposal, poll })));
     expect(packet.requiredEvidence).toContain("Command Waves PR manifest in the PR body.");
     expect(packet.requiredEvidence).toContain(
-      "Short note explaining parameter bounds, governance surfaces, and deployment files touched.",
+      "Short note explaining explicit parameter caps, governance surfaces, and deployment files touched.",
     );
+    expect(packet.constraints).toContain("Any fee, limit, or config parameter change must name an explicit cap.");
     expect(packet.forbiddenActions).toContain("Do not deploy contracts.");
     expect(packet.packetHash).toHaveLength(64);
   });

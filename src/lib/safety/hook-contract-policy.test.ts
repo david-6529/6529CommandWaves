@@ -15,7 +15,7 @@ describe("hook contract policy", () => {
         "contracts/HookGovernor.sol",
         "contracts/UUPSProxy.sol",
       ],
-      proposalText: "Add bounded fee parameters to the hook contract.",
+      proposalText: "Add hook fee parameters capped at 100 bps.",
     });
 
     expect(signals).toContainEqual(expect.objectContaining({ label: "contract_code", risk: "medium" }));
@@ -35,6 +35,14 @@ describe("hook contract policy", () => {
     expect(signals.some((signal) => signal.label === "upgradeability")).toBe(false);
     expect(signals.some((signal) => signal.label === "deployment")).toBe(false);
     expect(signals.some((signal) => signal.label === "governance_change")).toBe(false);
+  });
+
+  it("does not treat negated parameter text as a parameter change request", () => {
+    const signals = findHookContractSignals({
+      proposalText: "Update docs only. No parameter changes.",
+    });
+
+    expect(signals.some((signal) => signal.label === "parameter_change")).toBe(false);
   });
 
   it("requires an explicit exception before allowing upgradeability", () => {

@@ -83,7 +83,7 @@ const proposalRules: Array<{
     risk: "high",
     pattern: /\b(fee|fees|bps|basis points?|parameter|parameters|bounds?|limit|limits|tweakable)\b/i,
     value: "parameter change",
-    reason: "The command mentions hook parameters that need explicit bounds.",
+    reason: "The command mentions hook parameters that need explicit caps or bounds.",
   },
   {
     label: "governance_change",
@@ -106,7 +106,7 @@ function removeNegatedHookClauses(value: string) {
   return value
     .replace(/\bnon[-\s]upgradeable\b/gi, " ")
     .replace(
-      /\b(?:do not|don't|no)\s+[^.!?\n]*(?:upgradeable|upgradeability|proxy|uups|delegatecall|initializer|deploy|deployment|governance|owner|access control|role|safe|timelock|threshold|quorum|tdh)[^.!?\n]*/gi,
+      /\b(?:do not|don't|no)\s+[^.!?\n]*(?:upgradeable|upgradeability|proxy|uups|delegatecall|initializer|deploy|deployment|governance|owner|access control|role|safe|timelock|threshold|quorum|tdh|fee|fees|bps|basis points?|parameter|parameters|bounds?|limit|limits|config|constant|tweakable)[^.!?\n]*/gi,
       " ",
     );
 }

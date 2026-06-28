@@ -62,7 +62,7 @@ export function createWaveUpdateDraft({
     pollLine(poll),
     buildLine(execution),
     reviewLine(review),
-    "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with bounded parameters only when explicitly approved.",
+    "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
     "Next step: review this draft, then post it in the builder wave if it matches the work.",
   ].join("\n");

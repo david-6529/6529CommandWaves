@@ -112,6 +112,31 @@ describe("local command adapters", () => {
     expect(review.proof?.attestationHash).toHaveLength(64);
   });
 
+  it("asks for changes when hook parameter work has no explicit cap", async () => {
+    const proposal = {
+      ...demoWave.proposals[0],
+      id: "cmd-vague-params",
+      prompt: "Use Codex to add tweakable hook fee parameters.",
+      spec: "Include tests for parameter behavior.",
+    };
+    const wave = {
+      ...demoWave,
+      proposals: [proposal],
+      polls: [{ ...demoWave.polls[0], proposalId: proposal.id }],
+    };
+    const execution = await localOrchestratorAdapter.execute({
+      wave,
+      proposal,
+      poll: wave.polls[0],
+    });
+    const review = await localGuardianAdapter.review({ wave, proposal, execution });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain(
+      "Hook parameter work must name an explicit numeric cap or upper bound in the approved command.",
+    );
+  });
+
   it("asks for changes when execution evidence has no run manifest", async () => {
     const proposal = demoWave.proposals[0];
     const review = await localGuardianAdapter.review({
