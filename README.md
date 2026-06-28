@@ -50,6 +50,7 @@ The first public phase:
 No auto-merges, autonomous deploys, spending, or live REP/TDH authority in the first phase.
 
 Launch operating notes are in [docs/first-hook-launch-playbook.md](docs/first-hook-launch-playbook.md).
+Contributor rules for the first hook phase are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Agent Handoff
 
@@ -123,6 +124,7 @@ The current app is a local prototype of the hook-building flow:
 - deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
 - manual wave decision receipt that can anchor approval to a 6529 drop URL
 - opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
+- contributor workflow and PR template for Command Waves manifest evidence
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals
 - patch-level Solidity checks for upgradeability, delegatecall, deployment, governance, and parameter writes when PR patches are available
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
