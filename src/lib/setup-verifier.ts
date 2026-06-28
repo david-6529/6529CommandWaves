@@ -16,6 +16,7 @@ export type SetupVerificationResult = {
 
 export type SetupVerificationOptions = {
   requireExternalGuardian?: boolean;
+  requireProductionStorage?: boolean;
 };
 
 function check(id: string, status: SetupVerificationCheck["status"], message: string): SetupVerificationCheck {
@@ -126,6 +127,7 @@ export function verifySetupProofAgainstGitHubPayloads(
   const requiredChecks = proof.github?.requiredChecks ?? [];
   const observedRequiredChecks = extractRequiredStatusChecks(payloads);
   const guardianEnforcementMode = proof.guardian?.enforcementMode;
+  const storageDurability = proof.storage?.durability;
   const checks: SetupVerificationCheck[] = [
     check("proof_hash", verifySetupProofHash(proof) ? "pass" : "fail", "Setup proof hashes are internally consistent."),
     check("github_repo", proof.github ? "pass" : "fail", "Setup proof names a GitHub repo."),
@@ -135,6 +137,13 @@ export function verifySetupProofAgainstGitHubPayloads(
       guardianEnforcementMode
         ? `Guardian enforcement mode is ${guardianEnforcementMode}.`
         : "Setup proof does not declare a guardian enforcement mode.",
+    ),
+    check(
+      "storage_declared",
+      proof.storage ? "pass" : "fail",
+      proof.storage
+        ? `Command-wave storage is ${proof.storage.mode} with ${proof.storage.durability} durability.`
+        : "Setup proof does not declare command-wave storage.",
     ),
   ];
 
@@ -146,6 +155,18 @@ export function verifySetupProofAgainstGitHubPayloads(
         guardianEnforcementMode === "external_github_app"
           ? "Guardian enforcement is external to the governed repo."
           : "Guardian enforcement is repo-local. This is acceptable for MVP, but not for strongest production verification.",
+      ),
+    );
+  }
+
+  if (options.requireProductionStorage) {
+    checks.push(
+      check(
+        "production_storage",
+        storageDurability === "production" ? "pass" : "fail",
+        storageDurability === "production"
+          ? "Command-wave storage is production durable."
+          : "Command-wave storage is not production durable. Use Postgres with DATABASE_URL before public launch.",
       ),
     );
   }

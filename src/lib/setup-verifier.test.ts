@@ -46,6 +46,9 @@ describe("setup verifier", () => {
 
     expect(result.status).toBe("pass");
     expect(result.observedRequiredChecks).toEqual(["Command Waves Guardian"]);
+    expect(result.checks.find((item) => item.id === "storage_declared")).toMatchObject({
+      status: "pass",
+    });
   });
 
   it("fails when the guardian check is not required", () => {
@@ -86,5 +89,53 @@ describe("setup verifier", () => {
     expect(result.checks.find((item) => item.id === "external_guardian")).toMatchObject({
       status: "fail",
     });
+  });
+
+  it("can require production storage for public launch audits", () => {
+    const localProof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      storage: {
+        mode: "file",
+        durability: "local",
+        databaseConfigured: false,
+      },
+    });
+    const localResult = verifySetupProofAgainstGitHubPayloads(
+      localProof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      { requireProductionStorage: true },
+    );
+    const productionProof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      storage: {
+        mode: "postgres",
+        durability: "production",
+        databaseConfigured: true,
+        limitation: null,
+      },
+    });
+    const productionResult = verifySetupProofAgainstGitHubPayloads(
+      productionProof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      { requireProductionStorage: true },
+    );
+
+    expect(localResult.status).toBe("fail");
+    expect(localResult.checks.find((item) => item.id === "production_storage")).toMatchObject({
+      status: "fail",
+    });
+    expect(productionResult.status).toBe("pass");
   });
 });

@@ -252,6 +252,7 @@ The proof includes:
 - Vercel production branch expectation
 - guardian enforcement mode
 - guardian proof artifact and replay command
+- command-wave storage mode and durability
 - rules version and rules hash
 - PR manifest schema hash
 - reviewer gate version and hash
@@ -280,6 +281,14 @@ To fail unless the setup uses an external guardian:
 
 ```text
 SETUP_REQUIRE_EXTERNAL_GUARDIAN=true \
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
+npm run setup:verify
+```
+
+To fail unless the setup uses production-durable storage:
+
+```text
+SETUP_REQUIRE_PRODUCTION_STORAGE=true \
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
 npm run setup:verify
 ```

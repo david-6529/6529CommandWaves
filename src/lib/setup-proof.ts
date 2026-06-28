@@ -5,6 +5,8 @@ import { REVIEWER_GATE_VERSION } from "./github/pr-reviewer-gate";
 import { hashValue } from "./run-manifest";
 
 export type GuardianEnforcementMode = "repo_local_github_action" | "external_github_app";
+export type SetupProofStorageMode = "memory" | "file" | "postgres";
+export type SetupProofStorageDurability = "volatile" | "local" | "production";
 
 export type SetupProofGuardian = {
   enforcementMode: GuardianEnforcementMode;
@@ -17,12 +19,20 @@ export type SetupProofGuardian = {
   recommendedUpgrade: "external_github_app" | null;
 };
 
+export type SetupProofStorage = {
+  mode: SetupProofStorageMode;
+  durability: SetupProofStorageDurability;
+  databaseConfigured: boolean;
+  limitation: string | null;
+};
+
 export type SetupProofOptions = {
   generatedAt?: string;
   protectedBranch?: string;
   requiredReviewerCheck?: string;
   vercelProductionBranch?: string;
   guardian?: Partial<SetupProofGuardian>;
+  storage?: Partial<SetupProofStorage>;
 };
 
 export type SetupProof = {
@@ -45,6 +55,7 @@ export type SetupProof = {
     mode: "expected" | "not_configured";
   };
   guardian: SetupProofGuardian;
+  storage: SetupProofStorage;
   governance: {
     rulesVersion: string;
     rulesHash: string;
@@ -117,8 +128,57 @@ function asGuardianMode(value: string | undefined): GuardianEnforcementMode | un
   return value === "repo_local_github_action" || value === "external_github_app" ? value : undefined;
 }
 
+function asStorageMode(value: string | undefined): SetupProofStorageMode | undefined {
+  return value === "memory" || value === "file" || value === "postgres" ? value : undefined;
+}
+
 function envValue(env: Record<string, string | undefined>, key: string) {
   return env[key]?.trim() || undefined;
+}
+
+function storageModeFromEnv(env: Record<string, string | undefined>): SetupProofStorageMode {
+  const configuredMode = asStorageMode(envValue(env, "COMMAND_WAVE_STORE"));
+
+  if (configuredMode) {
+    return configuredMode;
+  }
+
+  if (env.NODE_ENV === "production" && envValue(env, "DATABASE_URL")) {
+    return "postgres";
+  }
+
+  if (env.NODE_ENV === "development") {
+    return "file";
+  }
+
+  return "memory";
+}
+
+function storageProofForMode(mode: SetupProofStorageMode, databaseConfigured: boolean): SetupProofStorage {
+  if (mode === "postgres") {
+    return {
+      mode,
+      durability: databaseConfigured ? "production" : "volatile",
+      databaseConfigured,
+      limitation: databaseConfigured ? null : "Postgres storage is selected but DATABASE_URL is missing.",
+    };
+  }
+
+  if (mode === "file") {
+    return {
+      mode,
+      durability: "local",
+      databaseConfigured,
+      limitation: "Local file storage is useful for development, not production audit durability.",
+    };
+  }
+
+  return {
+    mode,
+    durability: "volatile",
+    databaseConfigured,
+    limitation: "In-memory storage resets when the server restarts.",
+  };
 }
 
 export function setupProofOptionsFromEnv(env: Record<string, string | undefined> = process.env): SetupProofOptions {
@@ -127,6 +187,8 @@ export function setupProofOptionsFromEnv(env: Record<string, string | undefined>
   const workflowPath = envValue(env, "COMMAND_WAVE_GUARDIAN_WORKFLOW_PATH");
   const proofArtifact = envValue(env, "COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT");
   const replayCommand = envValue(env, "COMMAND_WAVE_GUARDIAN_REPLAY_COMMAND");
+  const storageMode = storageModeFromEnv(env);
+  const databaseConfigured = Boolean(envValue(env, "DATABASE_URL"));
 
   return {
     protectedBranch: envValue(env, "COMMAND_WAVE_PROTECTED_BRANCH"),
@@ -139,6 +201,7 @@ export function setupProofOptionsFromEnv(env: Record<string, string | undefined>
       ...(proofArtifact ? { proofArtifact } : {}),
       ...(replayCommand ? { replayCommand } : {}),
     },
+    storage: storageProofForMode(storageMode, databaseConfigured),
   };
 }
 
@@ -150,6 +213,12 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
     ...defaultGuardian(requiredReviewerCheck, enforcementMode),
     ...options.guardian,
     requiredCheck: requiredReviewerCheck,
+  };
+  const storageMode = options.storage?.mode ?? "memory";
+  const databaseConfigured = options.storage?.databaseConfigured ?? false;
+  const storage = {
+    ...storageProofForMode(storageMode, databaseConfigured),
+    ...options.storage,
   };
   const repo = parseGitHubRepoUrl(wave.repoUrl);
   const baseProof = withoutHashes({
@@ -174,6 +243,7 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
       mode: "expected",
     },
     guardian,
+    storage,
     governance: {
       rulesVersion: wave.rules.version,
       rulesHash: hashValue(wave.rules),
@@ -194,6 +264,7 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
           "wave_decision_receipt",
           "risky_diff_paths",
           "hook_contract_signals",
+          "hook_patch_signals",
           "hook_parameter_policy",
         ],
       }),
@@ -212,6 +283,7 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
     github: baseProof.github,
     vercel: baseProof.vercel,
     guardian: baseProof.guardian,
+    storage: baseProof.storage,
     governance: baseProof.governance,
     verificationTargets: baseProof.verificationTargets,
   });
@@ -232,6 +304,7 @@ export function verifySetupProofHash(proof: SetupProof) {
     github: proof.github,
     vercel: proof.vercel,
     guardian: proof.guardian,
+    storage: proof.storage,
     governance: proof.governance,
     verificationTargets: proof.verificationTargets,
   });
@@ -242,6 +315,7 @@ export function verifySetupProofHash(proof: SetupProof) {
     github: proof.github,
     vercel: proof.vercel,
     guardian: proof.guardian,
+    storage: proof.storage,
     governance: proof.governance,
     verificationTargets: proof.verificationTargets,
     setupHash,

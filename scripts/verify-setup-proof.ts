@@ -72,6 +72,7 @@ async function main() {
   const payloads = await loadGitHubPayloads(proof);
   const result = verifySetupProofAgainstGitHubPayloads(proof, payloads, {
     requireExternalGuardian: process.env.SETUP_REQUIRE_EXTERNAL_GUARDIAN === "true",
+    requireProductionStorage: process.env.SETUP_REQUIRE_PRODUCTION_STORAGE === "true",
   });
 
   writeResult(process.env.SETUP_VERIFICATION_PATH, result);

@@ -31,6 +31,11 @@ describe("setup proof", () => {
         productionStrength: "mvp",
         recommendedUpgrade: "external_github_app",
       },
+      storage: {
+        mode: "memory",
+        durability: "volatile",
+        databaseConfigured: false,
+      },
       governance: {
         rulesVersion: demoWave.rules.version,
         manifestSchemaVersion: "command-wave-pr-v0.1",
@@ -96,5 +101,39 @@ describe("setup proof", () => {
       recommendedUpgrade: null,
     });
     expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("publishes production storage metadata from env", () => {
+    const proof = createSetupProof(
+      demoWave,
+      setupProofOptionsFromEnv({
+        COMMAND_WAVE_STORE: "postgres",
+        DATABASE_URL: "postgresql://example",
+      }),
+    );
+
+    expect(proof.storage).toMatchObject({
+      mode: "postgres",
+      durability: "production",
+      databaseConfigured: true,
+      limitation: null,
+    });
+    expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("discloses local file storage as local durability", () => {
+    const proof = createSetupProof(
+      demoWave,
+      setupProofOptionsFromEnv({
+        COMMAND_WAVE_STORE: "file",
+      }),
+    );
+
+    expect(proof.storage).toMatchObject({
+      mode: "file",
+      durability: "local",
+      databaseConfigured: false,
+    });
+    expect(proof.storage.limitation).toContain("not production audit durability");
   });
 });

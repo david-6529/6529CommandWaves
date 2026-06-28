@@ -126,7 +126,7 @@ The current app is a local prototype of the hook-building flow:
 - review records store compact guardian proof material for later audit
 - human-reviewed wave update draft for posting results back to the builder wave
 - human-reviewed launch packet for PR audit trails
-- public setup proof endpoint for third-party verification of wave/repo/rules/check expectations
+- public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
 - 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and context previews
@@ -220,6 +220,14 @@ For a stricter production audit that fails until the guardian is external to the
 
 ```bash
 SETUP_REQUIRE_EXTERNAL_GUARDIAN=true \
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
+npm run setup:verify
+```
+
+For a public launch audit that also requires production-durable storage:
+
+```bash
+SETUP_REQUIRE_PRODUCTION_STORAGE=true \
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
 npm run setup:verify
 ```
