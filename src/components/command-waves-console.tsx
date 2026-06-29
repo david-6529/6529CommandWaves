@@ -653,6 +653,8 @@ export function CommandWavesConsole() {
     activePoll?.status === "passed" && (!activePoll.decision || activeDecisionReferenceCheck?.ok === false),
   );
   const activePollDecisionRecorded = Boolean(activePoll?.decision && activeDecisionReferenceCheck?.ok !== false);
+  const activePollCanVote = activePoll?.status === "open";
+  const showDecisionRecorder = Boolean(activePoll && activePollNeedsWaveDecision);
   const activePollTitle = activePollNeedsWaveDecision
     ? "Wave decision needed"
     : activePollDecisionRecorded
@@ -1750,24 +1752,16 @@ export function CommandWavesConsole() {
                     <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-900">
                       <div className="h-full bg-cyan-300" style={{ width: `${Math.min(pollResult?.yesPercent ?? 0, 100)}%` }} />
                     </div>
-                    <div className="mt-3 flex gap-2">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={isBusy || activePoll.status !== "open"}
-                        onClick={() => vote("yes")}
-                      >
-                        Vote yes
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={isBusy || activePoll.status !== "open"}
-                        onClick={() => vote("no")}
-                      >
-                        Vote no
-                      </Button>
-                    </div>
+                    {activePollCanVote ? (
+                      <div className="mt-3 flex gap-2">
+                        <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
+                          Vote yes
+                        </Button>
+                        <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
+                          Vote no
+                        </Button>
+                      </div>
+                    ) : null}
                     {activePoll.decision ? (
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
                         <div className="flex flex-wrap items-center gap-2">
@@ -1792,21 +1786,23 @@ export function CommandWavesConsole() {
                         ) : null}
                       </div>
                     ) : null}
-                    <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-                      <Input
-                        value={decisionReference}
-                        placeholder={decisionReferencePlaceholder}
-                        onChange={(event) => setDecisionReference(event.target.value)}
-                      />
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={isBusy || !decisionReference.trim()}
-                        onClick={recordWaveDecision}
-                      >
-                        {apiBusy === "decision" ? "Recording" : "Record decision"}
-                      </Button>
-                    </div>
+                    {showDecisionRecorder ? (
+                      <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+                        <Input
+                          value={decisionReference}
+                          placeholder={decisionReferencePlaceholder}
+                          onChange={(event) => setDecisionReference(event.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          disabled={isBusy || !decisionReference.trim()}
+                          onClick={recordWaveDecision}
+                        >
+                          {apiBusy === "decision" ? "Recording" : "Record decision"}
+                        </Button>
+                      </div>
+                    ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
                       Manual evidence only. PR work needs the builder wave drop URL. This does not add live REP, TDH, or weighted voting.
                     </p>
