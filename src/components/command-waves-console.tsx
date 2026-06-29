@@ -787,7 +787,7 @@ export function CommandWavesConsole() {
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentBuildStatusLabel = activeReview?.status === "pass"
-    ? "review passed"
+    ? "ready for next proposal"
     : activeExecution
       ? "PR logged"
       : activePollDecisionRecorded
@@ -1723,8 +1723,11 @@ export function CommandWavesConsole() {
               </div>
             ) : activeReview ? (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-base leading-7 text-zinc-400">This change passed review. Share the result and open the next proposal.</p>
+                <p className="text-base leading-7 text-zinc-400">
+                  This change passed review. Share the result or propose the next hook change.
+                </p>
                 <JumpLink href="#share-back">Share update</JumpLink>
+                <JumpLink href="#start-building">Propose change</JumpLink>
                 <JumpLink href="#recent-activity">View log</JumpLink>
               </div>
             ) : (
