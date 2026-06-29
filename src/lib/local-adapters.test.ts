@@ -112,6 +112,42 @@ describe("local command adapters", () => {
     expect(review.proof?.attestationHash).toHaveLength(64);
   });
 
+  it("asks for changes when the guardian PR gate fails", async () => {
+    const proposal = {
+      ...demoWave.proposals[0],
+      id: "cmd-drop-id-only-receipt",
+      status: "approved" as const,
+      prompt: "Use Codex to update documentation.",
+      spec: "Docs only.",
+      risk: "medium" as const,
+    };
+    const poll = {
+      ...demoWave.polls[0],
+      proposalId: proposal.id,
+      decision: {
+        ...demoWave.polls[0].decision!,
+        dropId: "drop-manual-decision",
+        url: null,
+      },
+    };
+    const wave = {
+      ...demoWave,
+      proposals: [proposal],
+      polls: [poll],
+      executions: [],
+      reviews: [],
+    };
+    const execution = await localOrchestratorAdapter.execute({
+      wave,
+      proposal,
+      poll,
+    });
+    const review = await localGuardianAdapter.review({ wave, proposal, execution });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain("Guardian PR gate failed: vote.");
+  });
+
   it("asks for changes when hook parameter work has no explicit cap", async () => {
     const proposal = {
       ...demoWave.proposals[0],

@@ -182,12 +182,6 @@ export const localGuardianAdapter: GuardianAdapter = {
         }),
     );
     const blockedParameterChecks = hookParameterChecks.filter((item) => item.status === "fail");
-    const needsChanges =
-      touchesDangerousSurface ||
-      !manifestMatches ||
-      !handoffMatches ||
-      blockedHookSignals.length > 0 ||
-      blockedParameterChecks.length > 0;
     const attestation =
       input.proposal.kind === "open_pr"
         ? createGuardianAttestation({
@@ -198,6 +192,15 @@ export const localGuardianAdapter: GuardianAdapter = {
             changedPaths: [],
           })
         : null;
+    const failedGateChecks = attestation?.result.checks.filter((item) => item.status === "fail") ?? [];
+    const guardianGatePassed = !attestation || attestation.result.status === "pass";
+    const needsChanges =
+      touchesDangerousSurface ||
+      !manifestMatches ||
+      !handoffMatches ||
+      !guardianGatePassed ||
+      blockedHookSignals.length > 0 ||
+      blockedParameterChecks.length > 0;
 
     return {
       proposalId: input.proposal.id,
@@ -226,6 +229,13 @@ export const localGuardianAdapter: GuardianAdapter = {
           ? `Blocked hook signals: ${blockedHookSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
           : "Hook contract signals fit the approved risk level.",
         ...hookParameterChecks.map((item) => item.message),
+        ...(attestation
+          ? [
+              guardianGatePassed
+                ? "Guardian PR gate passed."
+                : `Guardian PR gate failed: ${failedGateChecks.map((item) => item.id).join(", ") || "unknown check"}.`,
+            ]
+          : []),
         ...(attestation ? [`Guardian attestation hash: ${attestation.attestationHash}.`] : []),
       ],
       summary: needsChanges
