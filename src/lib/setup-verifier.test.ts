@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createSetupProof } from "./setup-proof";
 import { extractRequiredStatusChecks, verifySetupProofAgainstGitHubPayloads } from "./setup-verifier";
@@ -137,5 +138,69 @@ describe("setup verifier", () => {
       status: "fail",
     });
     expect(productionResult.status).toBe("pass");
+  });
+
+  it("verifies the published command-wave state target when present", () => {
+    const proof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
+    });
+    const result = verifySetupProofAgainstGitHubPayloads(
+      proof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      {
+        commandWaveState: createCommandWaveStateSnapshot(demoWave, {
+          generatedAt: "2026-06-21T12:01:00.000Z",
+        }),
+      },
+    );
+
+    expect(result.status).toBe("pass");
+    expect(result.checks.find((item) => item.id === "command_wave_state_available")).toMatchObject({
+      status: "pass",
+    });
+    expect(result.checks.find((item) => item.id === "command_wave_state_identity")).toMatchObject({
+      status: "pass",
+    });
+    expect(result.checks.find((item) => item.id === "command_wave_state_hash")).toMatchObject({
+      status: "pass",
+    });
+  });
+
+  it("fails when the published command-wave state target points to another wave", () => {
+    const proof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
+    });
+    const otherWave = {
+      ...demoWave,
+      waveUrl: "https://6529.io/waves/other-hook-builder",
+    };
+    const result = verifySetupProofAgainstGitHubPayloads(
+      proof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      {
+        commandWaveState: createCommandWaveStateSnapshot(otherWave, {
+          generatedAt: "2026-06-21T12:01:00.000Z",
+        }),
+      },
+    );
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "command_wave_state_identity")).toMatchObject({
+      status: "fail",
+    });
   });
 });

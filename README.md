@@ -273,6 +273,9 @@ Verify a published setup proof against GitHub required-check payloads:
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
 ```
 
+When the setup proof includes `commandWaveStateUrl`, the same command also checks that the state URL returns the governed wave
+and a matching state hash.
+
 For a stricter production audit that fails until the guardian is external to the repo:
 
 ```bash

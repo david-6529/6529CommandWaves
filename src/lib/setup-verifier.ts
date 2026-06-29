@@ -1,5 +1,8 @@
+import { normalizeWaveId } from "./6529/client";
+import type { CommandWave } from "./command-waves";
 import type { SetupProof } from "./setup-proof";
 import { verifySetupProofHash } from "./setup-proof";
+import { hashValue } from "./run-manifest";
 
 export type SetupVerificationCheck = {
   id: string;
@@ -17,6 +20,7 @@ export type SetupVerificationResult = {
 export type SetupVerificationOptions = {
   requireExternalGuardian?: boolean;
   requireProductionStorage?: boolean;
+  commandWaveState?: unknown;
 };
 
 function check(id: string, status: SetupVerificationCheck["status"], message: string): SetupVerificationCheck {
@@ -29,6 +33,34 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function asString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function isCommandWave(value: unknown): value is CommandWave {
+  const record = isRecord(value) ? value : null;
+
+  return Boolean(
+    record &&
+      typeof record.id === "string" &&
+      typeof record.waveUrl === "string" &&
+      typeof record.repoUrl === "string" &&
+      isRecord(record.rules) &&
+      Array.isArray(record.proposals) &&
+      Array.isArray(record.polls) &&
+      Array.isArray(record.executions) &&
+      Array.isArray(record.reviews) &&
+      Array.isArray(record.ledger),
+  );
+}
+
+function commandWaveStateFromPayload(payload: unknown) {
+  const record = isRecord(payload) ? payload : null;
+  const wave = isCommandWave(record?.wave) ? record.wave : isCommandWave(payload) ? payload : null;
+  const waveStateHash = asString(record?.waveStateHash);
+
+  return {
+    wave,
+    waveStateHash,
+  };
 }
 
 function fromRequiredStatusCheckObject(value: unknown) {
@@ -169,6 +201,45 @@ export function verifySetupProofAgainstGitHubPayloads(
           : "Command-wave storage is not production durable. Use Postgres with DATABASE_URL before broad participation.",
       ),
     );
+  }
+
+  if (proof.verificationTargets.commandWaveStateUrl) {
+    const state = commandWaveStateFromPayload(options.commandWaveState);
+    const wave = state.wave;
+
+    checks.push(
+      check(
+        "command_wave_state_available",
+        wave ? "pass" : "fail",
+        wave
+          ? "Command-wave state URL returned a wave payload."
+          : "Command-wave state URL did not return a readable wave payload.",
+      ),
+    );
+
+    if (wave) {
+      const waveHash = hashValue(wave);
+      const waveIdentityMatches = normalizeWaveId(wave.waveUrl) === proof.wave.id && wave.waveUrl === proof.wave.url;
+
+      checks.push(
+        check(
+          "command_wave_state_identity",
+          waveIdentityMatches ? "pass" : "fail",
+          waveIdentityMatches
+            ? "Command-wave state matches the setup proof wave."
+            : "Command-wave state does not match the setup proof wave.",
+        ),
+      );
+      checks.push(
+        check(
+          "command_wave_state_hash",
+          state.waveStateHash === waveHash ? "pass" : "fail",
+          state.waveStateHash === waveHash
+            ? "Command-wave state hash matches the wave payload."
+            : "Command-wave state hash is missing or does not match the wave payload.",
+        ),
+      );
+    }
   }
 
   for (const requiredCheck of requiredChecks) {

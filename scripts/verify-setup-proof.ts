@@ -56,6 +56,12 @@ async function loadGitHubPayloads(proof: SetupProof) {
   return Promise.all(urls.map((url) => readJsonUrl<unknown>(url, process.env.GITHUB_TOKEN)));
 }
 
+async function loadCommandWaveState(proof: SetupProof) {
+  const url = proof.verificationTargets.commandWaveStateUrl;
+
+  return url ? readJsonUrl<unknown>(url) : undefined;
+}
+
 function writeResult(path: string | undefined, value: unknown) {
   if (!path?.trim()) {
     return;
@@ -70,9 +76,11 @@ function writeResult(path: string | undefined, value: unknown) {
 async function main() {
   const proof = await loadSetupProof();
   const payloads = await loadGitHubPayloads(proof);
+  const commandWaveState = await loadCommandWaveState(proof);
   const result = verifySetupProofAgainstGitHubPayloads(proof, payloads, {
     requireExternalGuardian: process.env.SETUP_REQUIRE_EXTERNAL_GUARDIAN === "true",
     requireProductionStorage: process.env.SETUP_REQUIRE_PRODUCTION_STORAGE === "true",
+    commandWaveState,
   });
 
   writeResult(process.env.SETUP_VERIFICATION_PATH, result);
