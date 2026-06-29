@@ -769,6 +769,7 @@ export function CommandWavesConsole() {
       ? phaseWork.prReview
       : (wave.reviews.find((review) => review.proposalId === activeProposal.id) ?? null)
     : null;
+  const readyForNextHookChange = activeReview?.status === "pass";
   const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
   const visibleSupportProposals = supportProposals.slice(0, 3);
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
@@ -805,8 +806,8 @@ export function CommandWavesConsole() {
       : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
-  const currentBuildStatusLabel = activeReview?.status === "pass"
-    ? "ready for next proposal"
+  const currentBuildStatusLabel = readyForNextHookChange
+    ? "ready for next change"
     : activeExecution
       ? "PR logged"
       : activePollDecisionRecorded
@@ -819,7 +820,7 @@ export function CommandWavesConsole() {
               ? "proposal ready"
               : "waiting";
   const currentBuildStatusClass =
-    activeReview?.status === "pass"
+    readyForNextHookChange
       ? statusClass("pass")
       : activeExecution
         ? statusClass("complete")
@@ -831,16 +832,16 @@ export function CommandWavesConsole() {
               ? statusClass(activeProposal.status)
               : "border-zinc-700 bg-zinc-900 text-zinc-400";
   const currentFocusTitle =
-    activeReview?.status === "pass"
+    readyForNextHookChange
       ? title.trim() || "Pick the next hook change"
       : activeProposal?.title ?? "Pick the next hook change";
   const currentFocusDescription =
-    activeReview?.status === "pass"
+    readyForNextHookChange
       ? "Ready to discuss this as the next PR-sized hook change."
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
-  const activePrLinkLabel = activeReview?.status === "pass" ? "Open last PR" : "Open PR";
+  const activePrLinkLabel = readyForNextHookChange ? "Open last PR" : "Open PR";
   const hookProgress = useMemo(() => createHookProgress(wave, title), [title, wave]);
   const canBuildApprovedPr = Boolean(
     activeProposal &&
@@ -1662,20 +1663,21 @@ export function CommandWavesConsole() {
                   </div>
                   {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
                 </div>
-              ) : activeReview ? (
+              ) : readyForNextHookChange ? (
                 <div className="mt-2 grid gap-3">
                   <p className="text-base leading-7 text-zinc-400">
-                    Share this proposal with builders, then add it when the room agrees.
+                    The last PR review passed. Bring the next small hook change to the room.
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                      Copy for room
+                      Copy for 6529
                     </Button>
+                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
                     <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                       {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                     </Button>
                     <JumpLink href="#start-building">Edit proposal</JumpLink>
-                    <JumpLink href="#recent-activity">Activity</JumpLink>
+                    {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open last PR</LinkButton> : null}
                   </div>
                   {proposalDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
                   {apiError ? <p className="text-sm leading-6 text-red-300">{apiError}</p> : null}
