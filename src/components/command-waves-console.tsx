@@ -1518,7 +1518,7 @@ export function CommandWavesConsole() {
           <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500">{participationAccessSummary}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <JumpLink href="#wave-room">Message swarm</JumpLink>
+            <JumpLink href="#wave-room">Message builders</JumpLink>
             <JumpLink href="#start-building">Propose change</JumpLink>
             <JumpLink href="#recent-activity">View activity</JumpLink>
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
@@ -1650,7 +1650,7 @@ export function CommandWavesConsole() {
         </section>
 
         <section id="wave-room" className="scroll-mt-4">
-          <Panel title="Talk with the swarm" eyebrow="Discussion">
+          <Panel title="Talk with builders" eyebrow="Discussion">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
@@ -1715,7 +1715,7 @@ export function CommandWavesConsole() {
                   </p>
                 )}
               </div>
-              <Field label="Message to the swarm">
+              <Field label="Message to builders">
                 <Textarea
                   rows={10}
                   value={waveRoomMessage}
@@ -1736,7 +1736,7 @@ export function CommandWavesConsole() {
             <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Proposal</p>
             <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Propose the next hook change</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Write one small change for the swarm to discuss, decide, and review.
+              Write one small change for builders to discuss, decide, and review.
             </p>
             <div className="mt-4 grid gap-3">
               <Field label="Your name or 6529 handle">
@@ -1834,7 +1834,7 @@ export function CommandWavesConsole() {
         <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Swarm</p>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Members</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
                 See active contributors and open their 6529 profiles.
