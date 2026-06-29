@@ -48,7 +48,7 @@ Current GitHub PR adapter status:
 - No wallet keys in prompts.
 - No arbitrary shell unless the command kind and policy allow `script.run`.
 - No automatic merge.
-- No automatic production posting except through `wave.post` policy.
+- No automatic production posting in phase 1. Wave updates are drafts for human posting.
 - Stop if the repo URL does not parse as a GitHub repo.
 - Stop if the proposal status is not approved at execution time.
 - Stop if the rules version changed after approval.

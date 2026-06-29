@@ -19,6 +19,12 @@ function proposal(prompt: string): CommandProposal {
 describe("tool policy", () => {
   it("maps command kinds to explicit tool permissions", () => {
     expect(toolPolicyForKind("read_context").permissions).toEqual(["wave.read", "repo.read"]);
+    expect(toolPolicyForKind("post_to_wave")).toMatchObject({
+      permissions: ["wave.read", "wave.draft"],
+      requiresGuardian: false,
+      reason: "Wave updates are drafted for human posting.",
+    });
+    expect(toolPolicyForKind("post_to_wave").permissions).not.toContain("wave.post");
     expect(toolPolicyForKind("open_pr").permissions).toEqual(["wave.read", "repo.read", "repo.open_pr"]);
     expect(toolPolicyForKind("deploy").permissions).toEqual(["wave.read", "repo.read", "deploy.run"]);
   });

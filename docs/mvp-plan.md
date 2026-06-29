@@ -97,7 +97,7 @@ The first version assumes prompt injection will happen and that reputation alone
 - Permissions are the security boundary.
 - Agents never receive wallet private keys, provider secrets, database credentials, or broad filesystem access through prompts.
 - Dangerous actions go through backend adapters with explicit rule checks.
-- Phase-one command kinds map to explicit tool permission classes such as `wave.read`, `wave.post`, and `repo.open_pr`.
+- Phase-one command kinds map to explicit tool permission classes such as `wave.read`, `wave.draft`, and `repo.open_pr`.
 - Deploy, funds, script, and rule-change permissions are reserved for later phases and stay blocked in the app.
 - The agent can only run an approved proposal.
 - The reviewer must check artifacts before a command is marked complete.
