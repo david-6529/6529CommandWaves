@@ -20,6 +20,7 @@ Make the first public phase a clear community win:
 - Copyable Codex work packets for PR commands with a recorded wave decision receipt.
 - Draft PRs with Command Waves manifests.
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
+- Copyable builder wave launch brief for the first public post.
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
 - Public launch audit during setup and again before inviting broad participation.
 - Contribution report as activity evidence.
@@ -58,8 +59,8 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 
 1. Pick the builder wave and GitHub repo.
 2. Run the public launch audit once to expose setup blockers.
-3. Publish the builder wave and repo link.
-4. Post the hook scope: immutable by default, capped parameters only, no deploys in phase 1.
+3. Copy the builder wave launch brief from setup.
+4. Post the brief with the builder wave, repo link, participation notes, and hook scope.
 5. Invite ideas in the general chat wave or thread.
 6. Turn one strong idea into a PR-sized command.
 7. Vote or approve through the builder wave.

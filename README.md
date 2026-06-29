@@ -103,6 +103,7 @@ The current app is a local prototype of the hook-building flow:
 - 6529 wave search by name or pasted wave URL/ID
 - GitHub repo link
 - editable participation gate notes that keep REP, TDH, holder, allowlist, and QnA claims advisory
+- copyable builder wave launch brief for the first public project post
 - hook guardrails for immutable-by-default smart contract work
 - bounded hook parameter policy that requires explicit caps and bound-focused tests
 - transparent contribution report for proposals, votes, decision receipts, and activity log evidence
