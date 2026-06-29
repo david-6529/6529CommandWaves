@@ -15,6 +15,10 @@ describe("contribution report", () => {
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
     expect(report.notes.join(" ")).toContain("review, and ledger evidence");
+    expect(report.coverage.included).toContain("Command proposals stored by this app.");
+    expect(report.coverage.included).toContain("Recorded GitHub PR links and Guardian review proof.");
+    expect(report.coverage.notIncluded).toContain("Live wave posts that have not been pulled into app state.");
+    expect(report.coverage.notIncluded).toContain("Manual payments, REP, TDH, off-app agreements, or private coordination.");
     expect(report.scoringRubric).toEqual([
       "Complete proposal: 6 report points.",
       "Reviewing proposal: 4 report points.",
@@ -63,6 +67,10 @@ describe("contribution report", () => {
     expect(draft).toContain("Generated: 2026-06-21T12:00:00.000Z");
     expect(draft).toContain("Evidence:");
     expect(draft).toContain("- 1 GitHub PR link");
+    expect(draft).toContain("Coverage included:");
+    expect(draft).toContain("- Command proposals stored by this app.");
+    expect(draft).toContain("Not included:");
+    expect(draft).toContain("- Live wave posts that have not been pulled into app state.");
     expect(draft).toContain("Contributors:");
     expect(draft).toContain("- david: report score");
     expect(draft).toContain("Report scores are an AI-readable activity report, not a permission system.");

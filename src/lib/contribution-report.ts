@@ -15,6 +15,10 @@ export type ContributionReport = {
   mode: "informational";
   generatedAt: string;
   summary: string;
+  coverage: {
+    included: string[];
+    notIncluded: string[];
+  };
   scoringRubric: string[];
   evidence: string[];
   contributors: ContributionContributor[];
@@ -89,6 +93,20 @@ const scoringRubric = [
   "Vote or attributed activity log event: 1 report point.",
 ];
 
+const coverage = {
+  included: [
+    "Command proposals stored by this app.",
+    "Votes and recorded 6529 decision receipts stored by this app.",
+    "Recorded GitHub PR links and Guardian review proof.",
+    "Attributed activity log events stored by this app.",
+  ],
+  notIncluded: [
+    "Live wave posts that have not been pulled into app state.",
+    "GitHub commits, comments, reviews, and merges that are not attached to recorded PR evidence.",
+    "Manual payments, REP, TDH, off-app agreements, or private coordination.",
+  ],
+};
+
 export function createContributionReport(
   wave: CommandWave,
   options: {
@@ -150,6 +168,7 @@ export function createContributionReport(
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
       : "No contributor activity has been recorded yet.",
+    coverage,
     scoringRubric,
     evidence: evidenceSummary(wave),
     contributors: sorted,
@@ -191,6 +210,12 @@ export function createContributionReportDraft(
     "",
     "Evidence:",
     ...report.evidence.map((item) => `- ${item}`),
+    "",
+    "Coverage included:",
+    ...report.coverage.included.map((item) => `- ${item}`),
+    "",
+    "Not included:",
+    ...report.coverage.notIncluded.map((item) => `- ${item}`),
     "",
     "Contributors:",
     ...contributors,

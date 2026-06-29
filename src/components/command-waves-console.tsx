@@ -2493,6 +2493,24 @@ export function CommandWavesConsole() {
                   </Badge>
                 ))}
               </div>
+              <div className="mt-3 grid gap-3 rounded-md border border-zinc-800 bg-black p-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Included</p>
+                  <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-500">
+                    {contributionReport.coverage.included.map((item) => (
+                      <li key={item}>- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Not included</p>
+                  <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-500">
+                    {contributionReport.coverage.notIncluded.map((item) => (
+                      <li key={item}>- {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
               <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Scoring rubric</p>
               <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-500">
                 {contributionReport.scoringRubric.map((item) => (
