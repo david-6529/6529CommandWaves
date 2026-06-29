@@ -1,32 +1,31 @@
 # 6529 Command Waves
 
-## ELI5
+## Short Version
 
-Command Waves is a builder swarm for creating open source hooks in public. The first proof project is the 6529 Hook.
+Command Waves is a shared workspace for building open source hooks in public. The first proof project is the 6529 Hook.
 
-For the first public phase, the product is simple: a gated set of builders joins a 6529 wave, shares ideas and code,
-and uses orchestration rules to decide what can become GitHub PR work. Low-risk work can move quickly. Important or risky
-changes need a visible wave decision before they enter the repo. A reviewer gate checks PRs in CI against the approved
-command, rules, risk, and hook guardrails before humans merge.
+For the first public phase, the product is simple: builders use one 6529 discussion and one GitHub repo to propose,
+approve, build, and review small hook changes. Low-risk work can move quickly. Important or risky changes need a visible
+6529 decision before they enter the repo. A reviewer gate checks PRs in CI against the approved command, rules, risk, and
+hook guardrails before humans merge.
 
 The same loop can become a reusable public open source protocol later. The first launch stays focused on one hook, one
-builder wave, and one GitHub smart contract repo. The 6529 wave remains the live conversation and decision surface. This
-app shows the project snapshot, recent wave context, GitHub PR state, code review evidence, launch evidence, and
-contribution reports.
+6529 discussion, and one GitHub smart contract repo. The app shows the current task, recent discussion context, GitHub PR
+state, code review evidence, activity log, and contribution report.
 
 The app keeps the loop visible:
 
-1. Gate who can play.
-2. Share ideas in the builder wave.
+1. Review who can participate.
+2. Share ideas in the 6529 discussion.
 3. Propose one PR-sized change.
-4. Classify risk and decide whether it should run.
-5. Build or open the PR.
-6. Review the result in CI before humans merge.
-7. Log the activity.
+4. Decide whether it should enter the repo.
+5. Build the PR.
+6. Review the result before humans merge.
+7. Log what happened.
 
 The simple project view is:
 
-`Gate -> Wave -> PR -> Review`
+`Access -> Discussion -> PR -> Review`
 
 ## Why This Exists
 
@@ -47,7 +46,7 @@ Command Waves make the answers visible:
 
 The first public phase:
 
-1. Choose one 6529 builder wave.
+1. Choose one 6529 discussion.
 2. Connect one GitHub smart contract repo for the 6529 hook.
 3. Record participation gates such as REP, TDH, allowlists, or QnA as advisory until live enforcement is wired.
 4. Propose hook work in plain English with clear limits.
@@ -64,7 +63,7 @@ Contributor rules for the first hook phase are in [CONTRIBUTING.md](CONTRIBUTING
 
 ## Trust Boundary
 
-The first public phase is a governed hook-building workflow controlled by a 6529 builder wave.
+The first public phase is a governed hook-building workflow controlled by one 6529 discussion.
 
 Current trust controls:
 
@@ -82,7 +81,7 @@ artifacts. Until then, the MVP is useful and auditable, but not the strongest po
 
 First launch tasks:
 
-1. Pick the first real builder wave and hook repo, then publish the launch playbook.
+1. Pick the first real 6529 discussion and hook repo, then publish the launch playbook.
 2. Wire live 6529 proposal and vote state into `COMMAND_WAVE_STATE_URL`.
 
 Hardening tasks after the first public loop:
@@ -111,11 +110,11 @@ setup and audit tools stay collapsed until a maintainer needs them.
 
 Default workspace:
 
-- Active hook status for proposal, decision, PR, and review.
-- Active change with one next action and links to the wave, PR, and activity log.
-- Swarm message composer with latest-post preview and copyable message draft.
+- Current hook task, next proposal, and project activity.
+- Links to the 6529 discussion, GitHub repo, current PR, and reviewed work.
+- Builder message composer with latest-post preview and copyable discussion draft.
 - Simple proposal form for one PR-sized hook change with limits and success criteria.
-- Swarm member list with 6529 profile links and informational activity points.
+- Builder list with 6529 profile links and informational activity points.
 
 Safety and review:
 
@@ -306,8 +305,8 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `DELETE /api/command-wave`: reset the local demo.
 - `POST /api/command-wave/proposals`: submit a command proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
-- `POST /api/command-wave/decision`: record a manual wave decision receipt. Body requires `proposalId` and `reference`. PR commands require a 6529 drop URL in the builder wave.
-- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded wave decision receipt.
+- `POST /api/command-wave/decision`: record a manual 6529 decision receipt. Body requires `proposalId` and `reference`. PR commands require a 6529 drop URL in the discussion.
+- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded 6529 decision receipt.
 - `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.
 
