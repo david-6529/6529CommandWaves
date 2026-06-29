@@ -1729,8 +1729,8 @@ export function CommandWavesConsole() {
               </div>
             ) : (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-base leading-7 text-zinc-400">Use the proposal tools for the next scoped change.</p>
-                <JumpLink href="#suggest-hook-work">Open proposal tools</JumpLink>
+                <p className="text-base leading-7 text-zinc-400">Use the proposal form for the next scoped change.</p>
+                <JumpLink href="#start-building">Propose change</JumpLink>
               </div>
             )}
           </div>
@@ -1915,11 +1915,17 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <details id="rules-of-game" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="more-tools" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Rules and access</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">reference</Badge>
+            <span>More tools</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
           </summary>
+          <div className="mt-4 grid gap-4">
+            <details id="rules-of-game" className="border-b border-zinc-800 pb-4">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
+                <span>Rules and access</span>
+                <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">reference</Badge>
+              </summary>
           <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1fr]">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Build rules</p>
@@ -1950,10 +1956,10 @@ export function CommandWavesConsole() {
               {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
             </div>
           </div>
-        </details>
+            </details>
 
-        <details id="project-details" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <details id="project-details" className="border-b border-zinc-800 pb-4">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
             <span>Project details</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
@@ -2102,10 +2108,10 @@ export function CommandWavesConsole() {
               );
             })}
           </div>
-        </details>
+            </details>
 
-        <details className="border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <details className="border-b border-zinc-800 pb-4">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
             <span>Launch checklist</span>
             <span className="flex flex-wrap justify-end gap-2">
               <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
@@ -2177,15 +2183,15 @@ export function CommandWavesConsole() {
               </li>
             ))}
           </ol>
-        </details>
+            </details>
 
         <details
           ref={setupControlsRef}
-          className="order-last border-t border-zinc-800 pt-3"
+          className="order-last border-b border-zinc-800 pb-4"
           open={setupControlsOpen}
           onToggle={(event) => setSetupControlsOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
             <span>Maintainer setup and guardrails</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-400">controls</Badge>
           </summary>
@@ -2620,8 +2626,8 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <details id="suggest-hook-work" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <details id="suggest-hook-work" className="border-b border-zinc-800 pb-4">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
             <span>Proposal tools</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
           </summary>
@@ -3013,6 +3019,8 @@ export function CommandWavesConsole() {
             )}
             </Panel>
           </section>
+            </details>
+          </div>
         </details>
 
         <section id="recent-activity" className="scroll-mt-4">
