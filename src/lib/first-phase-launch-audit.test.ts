@@ -169,7 +169,7 @@ describe("first phase launch audit", () => {
           ? {
               ...check,
               status: "warn",
-              message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before broad launch.",
+              message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before public launch.",
             }
           : check,
       ),
@@ -192,7 +192,7 @@ describe("first phase launch audit", () => {
         id: "setup_repo_file_github_pull_request_template_md",
         label: "PR template",
         status: "needed",
-        detail: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before broad launch.",
+        detail: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before public launch.",
       }),
     );
   });
