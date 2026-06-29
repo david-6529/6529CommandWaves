@@ -1,23 +1,17 @@
 import type { CommandWave } from "./command-waves";
 import type { PhaseNextAction } from "./phase-next-action";
 
-export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseNextAction) {
+export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseNextAction, message = "") {
+  const body = message.trim() || "[Write your message here.]";
+
   return [
-    "I want to talk about the 6529 hook build.",
+    "6529 hook message",
     "",
-    "Message:",
-    "[Write the question, answer, or small change here.]",
+    body,
     "",
-    "Current context:",
-    `- Focus: ${nextAction.title}`,
+    `Current task: ${nextAction.title}`,
     `- Status: ${nextAction.detail}`,
     `- Repo: ${wave.repoUrl}`,
     `- Builder wave: ${wave.waveUrl}`,
-    "",
-    "Rules I am following:",
-    "- Keep this tied to one PR-sized hook change.",
-    "- Do not treat this message as a vote, payout, deploy, or governance approval.",
-    "",
-    "Next step: post this in the builder wave. Record a decision URL only if the swarm approves work.",
   ].join("\n");
 }

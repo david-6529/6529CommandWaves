@@ -680,6 +680,7 @@ export function CommandWavesConsole() {
   const [contributionReportNotice, setContributionReportNotice] = useState("");
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
+  const [waveRoomMessage, setWaveRoomMessage] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
@@ -696,7 +697,6 @@ export function CommandWavesConsole() {
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const publicAppOrigin = useSyncExternalStore(subscribeToStaticOrigin, appOriginSnapshot, emptyAppOriginSnapshot);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
-  const waveRoomDraftRef = useRef<HTMLTextAreaElement>(null);
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -989,7 +989,10 @@ export function CommandWavesConsole() {
   );
   const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(setupDraftWave), [setupDraftWave]);
   const participationGuideDraft = useMemo(() => createParticipationGuideDraft(setupDraftWave), [setupDraftWave]);
-  const builderWaveChatDraft = useMemo(() => createBuilderWaveChatDraft(wave, phaseNextAction), [phaseNextAction, wave]);
+  const builderWaveChatDraft = useMemo(
+    () => createBuilderWaveChatDraft(wave, phaseNextAction, waveRoomMessage),
+    [phaseNextAction, wave, waveRoomMessage],
+  );
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -1353,8 +1356,13 @@ export function CommandWavesConsole() {
   }
 
   async function copyBuilderWaveChatDraft() {
+    if (!waveRoomMessage.trim()) {
+      setWaveRoomNotice("Write a message first.");
+      return;
+    }
+
     try {
-      await navigator.clipboard.writeText(waveRoomDraftRef.current?.value ?? builderWaveChatDraft);
+      await navigator.clipboard.writeText(builderWaveChatDraft);
       setWaveRoomNotice("Message copied.");
     } catch {
       setWaveRoomNotice("Copy failed. Select the message and copy it manually.");
@@ -1362,10 +1370,8 @@ export function CommandWavesConsole() {
   }
 
   function resetBuilderWaveChatDraft() {
-    if (waveRoomDraftRef.current) {
-      waveRoomDraftRef.current.value = builderWaveChatDraft;
-      setWaveRoomNotice("Message reset.");
-    }
+    setWaveRoomMessage("");
+    setWaveRoomNotice("Message cleared.");
   }
 
   async function copyBuilderWaveProposalDraft() {
@@ -1720,11 +1726,11 @@ export function CommandWavesConsole() {
                     {apiBusy === "context" ? "Loading" : "Read latest posts"}
                   </Button>
                   {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
-                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
-                    Copy message
+                  <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
+                    Copy for wave
                   </Button>
                   <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                    Reset message
+                    Clear
                   </Button>
                 </div>
                 {waveRoomNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{waveRoomNotice}</p> : null}
@@ -1767,12 +1773,15 @@ export function CommandWavesConsole() {
                   </p>
                 )}
               </div>
-              <Field label="Draft message">
+              <Field label="Message to the swarm">
                 <Textarea
-                  key={builderWaveChatDraft}
-                  inputRef={waveRoomDraftRef}
                   rows={10}
-                  defaultValue={builderWaveChatDraft}
+                  value={waveRoomMessage}
+                  placeholder="Ask a question, share context, or suggest a small hook change."
+                  onChange={(event) => {
+                    setWaveRoomMessage(event.target.value);
+                    setWaveRoomNotice("");
+                  }}
                   className="min-h-64 resize-none"
                 />
               </Field>
