@@ -123,11 +123,6 @@ type WaveContextPreview = {
   }>;
 };
 
-type ProjectContextPreviewState = {
-  projectId: string;
-  preview: WaveContextPreview;
-};
-
 type ContextPreviewResponse = ApiErrorPayload & {
   preview?: WaveContextPreview;
 };
@@ -608,7 +603,7 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
-  const [projectContextPreview, setProjectContextPreview] = useState<ProjectContextPreviewState | null>(null);
+  const [projectContextPreviews, setProjectContextPreviews] = useState<Record<string, WaveContextPreview>>({});
   const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
@@ -789,7 +784,7 @@ export function CommandWavesConsole() {
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
     setGateNotes(nextWave.gates.join("\n"));
-    setProjectContextPreview(null);
+    setProjectContextPreviews({});
     setSetupContextPreview(null);
     setLaunchBriefNotice("");
     setCodexPacketNotice("");
@@ -819,7 +814,10 @@ export function CommandWavesConsole() {
       const preview = await requestContextPreview(targetWaveUrl);
 
       if (target === "project") {
-        setProjectContextPreview({ projectId: projectId ?? targetWaveUrl, preview });
+        setProjectContextPreviews((previews) => ({
+          ...previews,
+          [projectId ?? targetWaveUrl]: preview,
+        }));
       } else {
         setSetupContextPreview(preview);
       }
@@ -1097,7 +1095,7 @@ export function CommandWavesConsole() {
           </div>
           <div className="grid gap-3">
             {activeHookProjects.map((project) => {
-              const contextPreview = projectContextPreview?.projectId === project.id ? projectContextPreview.preview : null;
+              const contextPreview = projectContextPreviews[project.id] ?? null;
 
               return (
                 <div key={project.id} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
