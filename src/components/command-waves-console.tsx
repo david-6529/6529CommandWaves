@@ -684,6 +684,7 @@ export function CommandWavesConsole() {
     activeProposal &&
       activeProposalIsPr &&
       activePrHasWaveDecision &&
+      !activeExecution &&
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
@@ -1844,15 +1845,17 @@ export function CommandWavesConsole() {
                         {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
                       </Button>
                     ) : null}
-                    <Button
-                      type="button"
-                      className="mt-2"
-                      variant="secondary"
-                      disabled={isBusy || !canCopyCodexPacket}
-                      onClick={() => void copyCodexWorkPacket()}
-                    >
-                      {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
-                    </Button>
+                    {canCopyCodexPacket ? (
+                      <Button
+                        type="button"
+                        className="mt-2"
+                        variant="secondary"
+                        disabled={isBusy}
+                        onClick={() => void copyCodexWorkPacket()}
+                      >
+                        {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
+                      </Button>
+                    ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
                       {activeProposalIsPr
                         ? "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
