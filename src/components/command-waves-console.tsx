@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
+import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timeline";
 import { createBuilderRoster } from "@/lib/builder-roster";
 import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
@@ -379,6 +380,22 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
 }
 
 function hookProgressStatusClass(status: HookProgressStatus) {
+  if (status === "done") {
+    return statusClass("complete");
+  }
+
+  if (status === "current") {
+    return statusClass("reviewing");
+  }
+
+  if (status === "blocked") {
+    return statusClass("blocked");
+  }
+
+  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+}
+
+function buildTimelineStatusClass(status: BuildTimelineStatus) {
   if (status === "done") {
     return statusClass("complete");
   }
@@ -996,9 +1013,8 @@ export function CommandWavesConsole() {
   );
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
+  const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
-  const recentLedgerEvents = orderedLedgerEvents.slice(0, 4);
-  const olderLedgerEvents = orderedLedgerEvents.slice(recentLedgerEvents.length);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
   const launchNextActionItemId = launchAudit.nextAction.itemId;
@@ -1935,38 +1951,55 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <section id="recent-activity" className="scroll-mt-4">
-          <Panel title="Project activity" eyebrow="Log">
-            <div className="divide-y divide-zinc-800">
-              {recentLedgerEvents.map((event) => (
-                <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                  <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                  <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                  <div>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                  </div>
-                </div>
-              ))}
+        <section id="recent-activity" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Activity</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Build timeline</h2>
+              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
+                The hook build in order, from proposal to review and the next change.
+              </p>
             </div>
-            {olderLedgerEvents.length ? (
-              <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
-                <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
-                <div className="mt-3 divide-y divide-zinc-900">
-                  {olderLedgerEvents.map((event) => (
-                    <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                      <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                      <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                      <div>
-                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                        <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                      </div>
-                    </div>
-                  ))}
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
+              {buildTimeline.filter((item) => item.status === "done").length} done
+            </Badge>
+          </div>
+          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+            {buildTimeline.map((item) => (
+              <div key={item.id} className="grid gap-3 py-4 md:grid-cols-[8rem_1fr_auto]">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
+                  <Badge className={buildTimelineStatusClass(item.status)}>{item.status}</Badge>
                 </div>
-              </details>
-            ) : null}
-          </Panel>
+                <div>
+                  <p className="text-lg font-semibold text-zinc-50">{humanizeLegacyCommandCopy(item.title)}</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-400">{humanizeLegacyCommandCopy(item.detail)}</p>
+                </div>
+                {item.href && item.hrefLabel ? (
+                  <div className="flex flex-wrap gap-2 md:justify-end">
+                    <LinkButton href={item.href}>{item.hrefLabel}</LinkButton>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+          {orderedLedgerEvents.length ? (
+            <details className="mt-4 border-y border-zinc-800 py-3">
+              <summary className="cursor-pointer text-base font-semibold text-zinc-100">Show raw log</summary>
+              <div className="mt-3 divide-y divide-zinc-800 border-t border-zinc-800">
+                {orderedLedgerEvents.map((event) => (
+                  <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                    <p className="text-sm font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                    <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                    <div>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                      <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ) : null}
         </section>
 
         <section id="active-builders" className="scroll-mt-4 border-b border-zinc-800 pb-5">
