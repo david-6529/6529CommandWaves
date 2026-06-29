@@ -9,6 +9,9 @@ export type BuilderWaveProposalDraftInput = {
   request: string;
   limits: string;
   budgetUsd: string;
+  risk: string;
+  decisionRoute: string;
+  ruleReason: string;
 };
 
 function cleanLine(value: string, fallback: string) {
@@ -23,6 +26,9 @@ export function createBuilderWaveProposalDraft({
   request,
   limits,
   budgetUsd,
+  risk,
+  decisionRoute,
+  ruleReason,
 }: BuilderWaveProposalDraftInput) {
   const budget = cleanLine(budgetUsd, "0");
 
@@ -34,6 +40,11 @@ export function createBuilderWaveProposalDraft({
     `Proposer: ${cleanLine(proposer, "unknown")}`,
     `Work type: ${commandKindLabel(kind)}`,
     `Title: ${cleanLine(title, "Untitled hook work")}`,
+    "",
+    "Orchestration check:",
+    `Risk: ${cleanLine(risk, "unknown")}`,
+    `Decision route: ${cleanLine(decisionRoute, "needs review")}`,
+    `Rule: ${cleanLine(ruleReason, "No rule reason recorded.")}`,
     "",
     "Request:",
     cleanLine(request, "No request written yet."),

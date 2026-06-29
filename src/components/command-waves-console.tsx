@@ -846,8 +846,11 @@ export function CommandWavesConsole() {
         request: prompt,
         limits: spec,
         budgetUsd,
+        risk: classifiedRisk,
+        decisionRoute: modeLabel(selectedRule.mode),
+        ruleReason: selectedRule.reason,
       }),
-    [budgetUsd, kind, prompt, proposer, spec, title, wave],
+    [budgetUsd, classifiedRisk, kind, prompt, proposer, selectedRule.mode, selectedRule.reason, spec, title, wave],
   );
   const builderWaveDecisionDraft = useMemo(
     () =>
@@ -1672,7 +1675,7 @@ export function CommandWavesConsole() {
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{phaseNextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <JumpLink href="#suggest-hook-work">Suggest work</JumpLink>
+                <JumpLink href="#suggest-hook-work">Orchestrate work</JumpLink>
                 <JumpLink href="#recent-activity">View activity</JumpLink>
               </div>
             </div>
@@ -2148,10 +2151,10 @@ export function CommandWavesConsole() {
         </details>
 
         <section id="suggest-hook-work" className="grid scroll-mt-4 gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-          <Panel title="Suggest hook work" eyebrow="Builder wave">
+          <Panel title="Orchestrate hook work" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Write one PR-sized change. Keep the request and limits clear so the wave knows what it is approving.
+                Shape one PR-sized change, classify the risk, and send the wave a clean decision brief.
               </p>
               <Field label="Title">
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -2165,7 +2168,7 @@ export function CommandWavesConsole() {
               <div className="rounded-md border border-zinc-800 bg-black p-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-semibold text-zinc-100">Preflight</p>
+                    <p className="text-sm font-semibold text-zinc-100">Hook expert preflight</p>
                     <p className="mt-1 text-xs leading-5 text-zinc-500">
                       {hookProposalPreflightRequired
                         ? hookProposalPreflight.summary
@@ -2234,15 +2237,15 @@ export function CommandWavesConsole() {
                     <Input value={budgetUsd} onChange={(event) => setBudgetUsd(event.target.value)} />
                   </Field>
                   <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
-                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Rule check</p>
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Orchestration rule</p>
                     <p className="mt-2 text-xs leading-5 text-zinc-500">{selectedRule.reason}</p>
                   </div>
                 </div>
               </details>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <p className="text-sm font-semibold text-zinc-100">Wave-first proposal</p>
+                <p className="text-sm font-semibold text-zinc-100">Orchestration brief</p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Copy this into the builder wave. Submit locally only after it matches the wave discussion.
+                  Copy this into the builder wave. Submit locally only after it matches the wave discussion and risk route.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
