@@ -106,80 +106,39 @@ Short version:
 
 ## Current App
 
-The current app is a local prototype of the hook-building flow:
+The current app is a local prototype of the first hook-building loop. The default screen is the product surface. Secondary
+setup and audit tools stay collapsed until a maintainer needs them.
 
-- simple public project room with the vision, rules drawer, proposal form, current build, swarm chat, members, and activity
-- large readable default UI that keeps secondary details collapsed until needed
-- first-screen jump actions for suggesting work, checking the current build, and talking to the swarm
-- beginner-friendly hook work proposal form with visible next steps
-- current build view with proposal, decision, PR, review, and one next action
-- builder wave chat area with latest-post preview and a copyable conversation note
-- swarm member list with 6529 profile links and informational contribution scores
-- project details drawer with the active hook, builder wave, repo evidence, gate notes, and repo action
-- launch checklist drawer with work state, launch state, and phase progress
-- advanced controls drawer for preflight, orchestration, voting, PR build, and review details
-- activity report drawer for contribution evidence and manual developer fee planning
-- share update drawer for the human-reviewed wave update draft and launch packet
-- collapsed maintainer setup and guardrail controls at the bottom of the page
-- project wave setup with simpler user-facing language
-- 6529 wave search by name or pasted wave URL/ID
-- GitHub repo link
-- editable participation gate notes that keep REP, TDH, holder, allowlist, and QnA claims advisory
-- copyable participation guide for joining the builder wave without claiming live gate enforcement
-- copyable builder wave launch brief for the first public project post
-- hook guardrails for immutable-by-default smart contract work
-- phase scope inventory that separates launch tools from parked ideas
-- bounded hook parameter policy that requires explicit caps and bound-focused tests
-- transparent contribution report for proposals, votes, decision receipts, and activity log evidence
-- per-contributor score basis so report points are auditable
-- contribution report coverage notes that separate scored app evidence from off-app activity
-- manual developer fee plan draft that uses review evidence without moving funds
-- copyable launch packet for wave, PR, review, contribution, and fee evidence
-- launch packet verification section with setup proof and state endpoints
-- copyable launch status note with next action, open items, and verification links
-- safety rules by command type
-- simple hook work proposal form with advanced command settings collapsed
-- backend command surface limited to context reads, drafts, wave updates, and PR commands
-- persisted older rule sets are normalized so scripts, deploys, spending, and rule changes stay parked
-- first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
-- hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims
-- automatic risk classification
-- high-risk classification for hook, fee, Solidity, proxy, deployment, and governance work
-- poll voting with one vote per voter identity
-- backend setup validation for 6529 wave links, GitHub repo links, contributor rules, and PR template
-- setup validation checks that the PR template includes Command Waves manifest markers
-- launch readiness checks for local mode, storage, 6529 mode, GitHub PRs, guardian wave state, and guardian mode
-- first-phase launch check with setup evidence and a single next action
-- automated U+2014 guard for project text
-- controlled local run record
-- copyable manual Codex work packet for PR commands with a recorded wave decision receipt
-- deterministic run manifest evidence with rules hash, tool permissions, and budget cap
-- deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
-- manual wave decision receipt that can anchor approval to a 6529 drop URL
-- PR decision receipt URL validation against the configured builder wave
-- orchestration proposal draft with risk and decision route for manual wave posting before local tracking
-- builder-wave decision request draft before PR work starts
-- builder-wave review request draft after PR evidence is recorded
-- opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
-- contributor workflow and PR template for Command Waves manifest evidence
-- PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals
-- patch-level Solidity checks for upgradeability, delegatecall, deployment, governance, and parameter writes when PR patches are available
-- deterministic guardian attestations with input hashes and rerunnable pass/fail results
-- review records store compact guardian proof material for later audit
-- human-reviewed wave update draft for manual sharing back to the builder wave
-- wave update draft verification links for setup proof, command-wave state, and launch audit status
-- copyable informational contribution report for manual sharing
-- human-reviewed launch packet for PR audit trails
-- public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
-- public command-wave state endpoint for `COMMAND_WAVE_STATE_URL`
-- public launch audit endpoint with setup, readiness, checklist, and next-action evidence
-- copyable setup proof, state, and launch audit URLs in launch readiness controls
-- recent activity view with full audit log export
-- local API routes for fetching/resetting state, proposals, votes, runs, and reviews
-- 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and capped context previews
-- direct 6529 drop links in wave context previews
-- local file persistence for command-wave state when `COMMAND_WAVE_STORE=file`
-- Postgres command-wave repository and schema in [db/001_command_waves.sql](db/001_command_waves.sql)
+Default workspace:
+
+- Active hook status for proposal, decision, PR, and review.
+- Active change with one next action and links to the wave, PR, and activity log.
+- Swarm message composer with latest-post preview and copyable message draft.
+- Simple proposal form for one PR-sized hook change with limits and success criteria.
+- Swarm member list with 6529 profile links and informational activity points.
+
+Safety and review:
+
+- Rules and access drawer with advisory gate notes.
+- Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
+- Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
+- Reviewer gate foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
+- PR patch checks for upgradeability, delegatecall, deployment, governance, and parameter writes when patch evidence exists.
+
+Audit and launch:
+
+- Recent activity log with export.
+- Activity report drawer for app evidence and manual planning context.
+- Launch checklist with setup, readiness, checklist, and next-action evidence.
+- Public setup proof, command-wave state, and launch audit endpoints.
+- Copyable wave update, launch packet, Codex work packet, decision request, and review request drafts.
+
+Maintainer setup:
+
+- Collapsed project setup and guardrail controls at the bottom of the page.
+- 6529 wave search by name or pasted wave URL/ID.
+- GitHub repo link and setup validation for contributor rules and PR template markers.
+- Local file persistence and Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
 ## Run Locally
 
