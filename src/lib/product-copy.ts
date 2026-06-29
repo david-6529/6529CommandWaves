@@ -1,8 +1,9 @@
 export const commandWaveProductCopy = {
-  eyebrow: "Builder swarm",
-  headline: "6529 Hook Builder Swarm",
+  eyebrow: "Public hook build",
+  headline: "Build a hook together",
   subhead:
-    "A gated builder wave, orchestration rules, GitHub PRs, and reviewer CI for building hooks together.",
-  positioning: "Start with the 6529 hook. Keep the loop reusable for public open source builds.",
-  simpleFlow: "Gate - Wave - PR - Review",
+    "A simple shared room for proposing, discussing, reviewing, and shipping the 6529 hook in public.",
+  positioning:
+    "You do not need to know Waves or 6529 to start. Read the rules, ask the swarm, or suggest one small change.",
+  simpleFlow: "Talk - Agree - Build - Review",
 } as const;

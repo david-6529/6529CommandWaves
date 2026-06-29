@@ -3,10 +3,12 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.eyebrow).toBe("Builder swarm");
-    expect(commandWaveProductCopy.headline).toBe("6529 Hook Builder Swarm");
-    expect(commandWaveProductCopy.positioning).toBe("Start with the 6529 hook. Keep the loop reusable for public open source builds.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Gate - Wave - PR - Review");
+    expect(commandWaveProductCopy.eyebrow).toBe("Public hook build");
+    expect(commandWaveProductCopy.headline).toBe("Build a hook together");
+    expect(commandWaveProductCopy.positioning).toBe(
+      "You do not need to know Waves or 6529 to start. Read the rules, ask the swarm, or suggest one small change.",
+    );
+    expect(commandWaveProductCopy.simpleFlow).toBe("Talk - Agree - Build - Review");
   });
 
   it("keeps unsafe authority claims out of the first-screen explanation", () => {
@@ -24,12 +26,11 @@ describe("Command Waves product copy", () => {
   });
 
   it("keeps the first hook ahead of the later reusable protocol", () => {
-    expect(commandWaveProductCopy.headline).toBe("6529 Hook Builder Swarm");
-    expect(commandWaveProductCopy.subhead).toContain("gated builder wave");
-    expect(commandWaveProductCopy.subhead).toContain("orchestration rules");
-    expect(commandWaveProductCopy.subhead).toContain("reviewer CI");
-    expect(commandWaveProductCopy.positioning).toContain("Start with the 6529 hook");
-    expect(commandWaveProductCopy.positioning).toContain("public open source builds");
+    expect(commandWaveProductCopy.headline).toBe("Build a hook together");
+    expect(commandWaveProductCopy.subhead).toContain("shared room");
+    expect(commandWaveProductCopy.subhead).toContain("6529 hook");
+    expect(commandWaveProductCopy.positioning).toContain("do not need to know Waves");
+    expect(commandWaveProductCopy.positioning).toContain("suggest one small change");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");
   });

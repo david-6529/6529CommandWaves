@@ -9,16 +9,17 @@ describe("builder wave chat draft", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
     const draft = createBuilderWaveChatDraft(demoWave, nextAction);
 
-    expect(draft).toContain("6529 hook wave note");
+    expect(draft).toContain("Swarm note");
+    expect(draft).toContain("I want to talk about the 6529 hook build.");
     expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
     expect(draft).toContain(`Focus: ${nextAction.title}`);
-    expect(draft).toContain(`Current status: ${nextAction.detail}`);
-    expect(draft).toContain("Question or reply:");
+    expect(draft).toContain(`Status: ${nextAction.detail}`);
+    expect(draft).toContain("Message:");
     expect(draft).toContain("- Keep this tied to one PR-sized hook change.");
     expect(draft).toContain("Do not treat this note as a vote, payout, deploy, or governance approval.");
-    expect(draft).toContain("post this manually in the builder wave");
-    expect(draft).toContain("Record the decision URL only if the wave approves work.");
+    expect(draft).toContain("post this in the builder wave");
+    expect(draft).toContain("Record a decision URL only if the swarm approves work.");
     expect(draft).not.toContain("\u2014");
   });
 });

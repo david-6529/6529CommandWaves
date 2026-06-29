@@ -68,6 +68,18 @@ const hookGuardrails = [
   "Deployment, payments, and governance changes stay human controlled.",
   "Contribution report scores are not permissions.",
 ];
+const swarmGameRules = [
+  "Start with one small hook change.",
+  "Talk in the swarm before code work starts.",
+  "The orchestration agent labels risk and keeps work inside the rules.",
+  "Important changes need a visible decision before a PR is built.",
+  "The reviewer agent checks the PR before humans merge.",
+];
+const newcomerPaths = [
+  "Ask a question in the swarm chat.",
+  "Suggest one small hook change.",
+  "Review the active PR or latest decision.",
+];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
   "hook_parameter_explicit_bound",
@@ -532,6 +544,12 @@ function JumpLink({ href, children }: { href: string; children: React.ReactNode 
       {children}
     </a>
   );
+}
+
+function memberProfileUrl(identity: string) {
+  const handle = identity.trim().replace(/^@/, "");
+
+  return `https://6529.io/${encodeURIComponent(handle || "6529")}`;
 }
 
 function downloadJson(filename: string, payload: unknown) {
@@ -1427,16 +1445,163 @@ export function CommandWavesConsole() {
                 </Badge>
               ))}
             </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
+              <JumpLink href="#rules-of-game">Read rules</JumpLink>
+              <JumpLink href="#swarm-members">See members</JumpLink>
+            </div>
           </div>
         </header>
+
+        <section id="rules-of-game" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">What this is</p>
+            <h2 className="mt-1 text-xl font-semibold text-zinc-50">A shared room for building the hook</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
+              The swarm talks in public, picks small changes, opens reviewed PRs, and keeps the decisions visible. You can
+              participate by asking a plain question first. The app handles the project structure so you do not need to know
+              6529 or Waves before you begin.
+            </p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {newcomerPaths.map((path) => (
+                <div key={path} className="border-t border-zinc-800 pt-2">
+                  <p className="text-sm font-semibold leading-6 text-zinc-100">{path}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Rules of the game</p>
+            <ol className="mt-3 grid gap-2">
+              {swarmGameRules.map((rule, index) => (
+                <li key={rule} className="grid grid-cols-[2rem_1fr] gap-3 border-t border-zinc-800 pt-2">
+                  <span className="text-sm font-semibold text-cyan-300">{index + 1}</span>
+                  <span className="text-sm leading-6 text-zinc-300">{rule}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section id="wave-room" className="scroll-mt-4">
+          <Panel title="Talk to the swarm" eyebrow="Chat">
+            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+              <div>
+                <p className="text-sm leading-6 text-zinc-400">
+                  Ask what matters, suggest a change, or reply to a decision. The app can read recent 6529 posts, but this
+                  room should still make sense if you have never used a Wave.
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isBusy || !primaryHookProject?.waveUrl}
+                    onClick={() =>
+                      void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                    }
+                  >
+                    {apiBusy === "context" ? "Loading" : "Read latest posts"}
+                  </Button>
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
+                    Copy note
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                    Reset note
+                  </Button>
+                </div>
+                {waveRoomNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{waveRoomNotice}</p> : null}
+                {primaryProjectContextPreview ? (
+                  <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
+                        {contextModeLabel(primaryProjectContextPreview)}
+                      </Badge>
+                      <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                        {primaryProjectContextPreview.dropCount} drops
+                      </Badge>
+                    </div>
+                    <div className="mt-2 grid gap-2">
+                      {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
+                        <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-xs font-semibold text-zinc-500">
+                              {drop.author} / {drop.id}
+                            </p>
+                            {drop.url ? (
+                              <a
+                                className="text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                                href={drop.url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Open drop
+                              </a>
+                            ) : null}
+                          </div>
+                          <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-xs leading-5 text-zinc-500">
+                    Load latest posts to see recent builder wave context here.
+                  </p>
+                )}
+              </div>
+              <Textarea
+                key={builderWaveChatDraft}
+                inputRef={waveRoomDraftRef}
+                rows={12}
+                defaultValue={builderWaveChatDraft}
+                className="min-h-72 resize-none font-mono text-xs"
+              />
+            </div>
+          </Panel>
+        </section>
+
+        <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">People</p>
+              <h2 className="mt-1 text-lg font-semibold text-zinc-50">Swarm members</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+                These are visible builders from the local project activity. Profile links open 6529 identity pages, and
+                report scores stay informational.
+              </p>
+            </div>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
+              {contributionReport.contributors.length} visible
+            </Badge>
+          </div>
+          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+            {contributionReport.contributors.slice(0, 4).map((contributor) => (
+              <div key={contributor.identity} className="grid gap-3 py-3 md:grid-cols-[1fr_auto]">
+                <div>
+                  <p className="text-sm font-semibold text-zinc-100">{contributor.identity}</p>
+                  <p className="mt-1 text-xs leading-5 text-zinc-500">{contributor.rationale.join(", ")}</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">score {contributor.score}</Badge>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                    {countLabel(contributor.proposals, "proposal")}
+                  </Badge>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{countLabel(contributor.votes, "vote")}</Badge>
+                  <LinkButton href={memberProfileUrl(contributor.identity)}>Open profile</LinkButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="grid gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in development</p>
-              <h2 className="mt-1 text-base font-semibold text-zinc-50">Project snapshot</h2>
+              <h2 className="mt-1 text-base font-semibold text-zinc-50">Project state</h2>
               <p className="mt-1 text-sm leading-6 text-zinc-500">
-                Start with the 6529 hook. Each row shows gate notes, orchestration state, PR evidence, reviews, and latest wave context.
+                Start with the 6529 hook. This section shows the active build, the chat source, and the code evidence.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1583,83 +1748,6 @@ export function CommandWavesConsole() {
               );
             })}
           </div>
-        </section>
-
-        <section id="wave-room" className="scroll-mt-4">
-          <Panel title="Builder wave room" eyebrow="Wave conversation">
-            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-              <div>
-                <p className="text-sm leading-6 text-zinc-400">
-                  Read recent drops, draft a short question or reply, then post it manually in the builder wave.
-                </p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={isBusy || !primaryHookProject?.waveUrl}
-                    onClick={() =>
-                      void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
-                    }
-                  >
-                    {apiBusy === "context" ? "Loading" : "Read latest posts"}
-                  </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
-                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
-                    Copy note
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                    Reset note
-                  </Button>
-                </div>
-                {waveRoomNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{waveRoomNotice}</p> : null}
-                {primaryProjectContextPreview ? (
-                  <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
-                        {contextModeLabel(primaryProjectContextPreview)}
-                      </Badge>
-                      <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                        {primaryProjectContextPreview.dropCount} drops
-                      </Badge>
-                    </div>
-                    <div className="mt-2 grid gap-2">
-                      {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
-                        <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-xs font-semibold text-zinc-500">
-                              {drop.author} / {drop.id}
-                            </p>
-                            {drop.url ? (
-                              <a
-                                className="text-xs font-semibold text-cyan-300 hover:text-cyan-200"
-                                href={drop.url}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Open drop
-                              </a>
-                            ) : null}
-                          </div>
-                          <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="mt-3 text-xs leading-5 text-zinc-500">
-                    Load latest posts to see recent builder wave context here.
-                  </p>
-                )}
-              </div>
-              <Textarea
-                key={builderWaveChatDraft}
-                inputRef={waveRoomDraftRef}
-                rows={12}
-                defaultValue={builderWaveChatDraft}
-                className="min-h-72 resize-none font-mono text-xs"
-              />
-            </div>
-          </Panel>
         </section>
 
         <section className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
