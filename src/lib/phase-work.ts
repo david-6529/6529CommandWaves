@@ -9,7 +9,8 @@ export type PhaseWork = {
 };
 
 export function selectPhaseWork(wave: CommandWave): PhaseWork {
-  const prProposal = wave.proposals.find((item) => item.kind === "open_pr") ?? null;
+  const prProposals = wave.proposals.filter((item) => item.kind === "open_pr");
+  const prProposal = prProposals.find((item) => item.status !== "complete") ?? prProposals[0] ?? null;
 
   return {
     prProposal,
