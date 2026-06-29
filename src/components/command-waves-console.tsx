@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
+import { createBuilderRoster } from "@/lib/builder-roster";
 import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
@@ -859,6 +860,7 @@ export function CommandWavesConsole() {
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
+  const builderRoster = useMemo(() => createBuilderRoster(contributionReport), [contributionReport]);
   const contributionReportDraft = useMemo(() => createContributionReportDraft(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const developerFeePlanDraft = useMemo(
@@ -1521,7 +1523,7 @@ export function CommandWavesConsole() {
             <JumpLink href="#wave-room">Room</JumpLink>
             <JumpLink href="#start-building">Propose</JumpLink>
             <JumpLink href="#active-hooks">Hooks</JumpLink>
-            <JumpLink href="#active-builders">Builders</JumpLink>
+            <JumpLink href="#active-builders">Members</JumpLink>
             <JumpLink href="#recent-activity">Activity</JumpLink>
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529 discussion</LinkButton> : null}
           </nav>
@@ -1570,7 +1572,7 @@ export function CommandWavesConsole() {
                     <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
                       Copy guide
                     </Button>
-                    <JumpLink href="#active-builders">Builders</JumpLink>
+                    <JumpLink href="#active-builders">Members</JumpLink>
                   </div>
                   {participationGuideNotice ? (
                     <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p>
@@ -1968,29 +1970,44 @@ export function CommandWavesConsole() {
         <section id="active-builders" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Contributors</h2>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Members</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Swarm members</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Visible contributors from proposals, decisions, votes, and activity. Scores are informational only.
+                People with visible activity in this hook room. Activity is a report, not permission.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
-              {contributionReport.contributors.length} visible
+              {builderRoster.length} visible
             </Badge>
           </div>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-            {contributionReport.contributors.slice(0, 3).map((contributor) => (
-              <div key={contributor.identity} className="grid gap-3 py-3 md:grid-cols-[1fr_auto]">
-                <div>
-                  <p className="text-base font-semibold text-zinc-100">{contributor.identity}</p>
-                  <p className="mt-1 text-base leading-7 text-zinc-500">{contributor.rationale[0]}</p>
+            {builderRoster.length ? (
+              builderRoster.map((member) => (
+                <div key={member.identity} className="grid gap-3 py-4 md:grid-cols-[1fr_auto]">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-xl font-semibold text-zinc-50">{member.identity}</p>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
+                    </div>
+                    <p className="mt-2 text-base leading-7 text-zinc-400">{member.activity}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">{member.detail}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.authorityNote}</Badge>
+                    <LinkButton href={memberProfileUrl(member.identity)}>Open 6529 profile</LinkButton>
+                    <JumpLink href="#wave-room">Message</JumpLink>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">report score {contributor.score}</Badge>
-                  <LinkButton href={memberProfileUrl(contributor.identity)}>Open profile</LinkButton>
-                </div>
+              ))
+            ) : (
+              <div className="py-4">
+                <p className="text-base font-semibold text-zinc-100">No visible members yet</p>
+                <p className="mt-1 text-base leading-7 text-zinc-500">
+                  Propose a change, vote, or record a decision to appear here.
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </section>
 
