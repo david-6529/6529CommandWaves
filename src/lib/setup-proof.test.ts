@@ -46,6 +46,7 @@ describe("setup proof", () => {
     expect(proof.attestationHash).toHaveLength(64);
     expect(proof.verificationTargets.githubRulesetsApi).toContain("/rulesets");
     expect(proof.verificationTargets.githubBranchRulesApi).toContain("/rules/branches/main");
+    expect(proof.verificationTargets.commandWaveStateUrl).toBeNull();
     expect(verifySetupProofHash(proof)).toBe(true);
   });
 
@@ -141,6 +142,31 @@ describe("setup proof", () => {
       databaseConfigured: true,
       limitation: null,
     });
+    expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("publishes the command-wave state URL from env", () => {
+    const proof = createSetupProof(
+      demoWave,
+      setupProofOptionsFromEnv({
+        NEXT_PUBLIC_APP_URL: "https://hooks.example/",
+      }),
+    );
+
+    expect(proof.verificationTargets.commandWaveStateUrl).toBe("https://hooks.example/api/command-wave/state");
+    expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("prefers an explicit command-wave state URL", () => {
+    const proof = createSetupProof(
+      demoWave,
+      setupProofOptionsFromEnv({
+        COMMAND_WAVE_STATE_URL: "https://state.example/wave.json",
+        NEXT_PUBLIC_APP_URL: "https://hooks.example",
+      }),
+    );
+
+    expect(proof.verificationTargets.commandWaveStateUrl).toBe("https://state.example/wave.json");
     expect(verifySetupProofHash(proof)).toBe(true);
   });
 

@@ -27,6 +27,7 @@ Use the 6529 wave for live discussion and decisions. Use this app for the projec
 - Copyable builder wave launch brief for the first public post.
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
 - Launch check during setup and again before inviting broad participation.
+- Public command-wave state URL for guardian PR checks.
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
 - Human-reviewed wave update draft.
@@ -72,13 +73,14 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 9. Record the decision drop URL as the manual approval receipt.
 10. Copy the Codex work packet and use it in a prepared branch.
 11. Run the agent only inside that approved packet.
-12. Open a draft PR using the repo template and Command Waves manifest.
-13. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-14. Humans merge only after review passes.
-15. Use the contribution report and fee plan as evidence for any separate payout vote.
-16. Review the wave update draft and share it manually in the builder wave.
-17. Keep the launch packet with the PR so later contributors can audit the loop.
-18. Run the launch check again and fix blockers before broad participation.
+12. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
+13. Open a draft PR using the repo template and Command Waves manifest.
+14. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+15. Humans merge only after review passes.
+16. Use the contribution report and fee plan as evidence for any separate payout vote.
+17. Review the wave update draft and share it manually in the builder wave.
+18. Keep the launch packet with the PR so later contributors can audit the loop.
+19. Run the launch check again and fix blockers before broad participation.
 
 The launch check focuses on the first public loop. Warning-only hardening items such as Postgres storage, the GitHub PR adapter,
 and required-check wave-state sources can wait until broader participation, but failed or misconfigured items still block.

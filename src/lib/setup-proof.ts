@@ -1,4 +1,5 @@
 import { normalizeWaveId } from "./6529/client";
+import { commandWaveStateUrlFromEnv } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { parseGitHubRepoUrl } from "./github/repo";
 import { REVIEWER_GATE_VERSION } from "./github/pr-reviewer-gate";
@@ -31,6 +32,7 @@ export type SetupProofOptions = {
   protectedBranch?: string;
   requiredReviewerCheck?: string;
   vercelProductionBranch?: string;
+  commandWaveStateUrl?: string | null;
   guardian?: Partial<SetupProofGuardian>;
   storage?: Partial<SetupProofStorage>;
 };
@@ -69,6 +71,7 @@ export type SetupProof = {
     githubRepoUrl: string | null;
     githubRulesetsApi: string | null;
     githubBranchRulesApi: string | null;
+    commandWaveStateUrl: string | null;
   };
   setupHash: string;
   attestationHash: string;
@@ -209,6 +212,7 @@ export function setupProofOptionsFromEnv(env: Record<string, string | undefined>
     protectedBranch: envValue(env, "COMMAND_WAVE_PROTECTED_BRANCH"),
     requiredReviewerCheck: requiredCheck,
     vercelProductionBranch: envValue(env, "COMMAND_WAVE_VERCEL_PRODUCTION_BRANCH"),
+    commandWaveStateUrl: commandWaveStateUrlFromEnv(env),
     guardian: {
       ...(enforcementMode ? { enforcementMode } : {}),
       ...(requiredCheck ? { requiredCheck } : {}),
@@ -291,6 +295,7 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
       githubBranchRulesApi: repo
         ? `https://api.github.com/repos/${repo.owner}/${repo.repo}/rules/branches/${protectedBranch}`
         : null,
+      commandWaveStateUrl: options.commandWaveStateUrl ?? null,
     },
   });
   const setupHash = hashValue({

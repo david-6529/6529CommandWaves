@@ -149,6 +149,7 @@ The current app is a local prototype of the hook-building flow:
 - human-reviewed wave update draft for manual sharing back to the builder wave
 - human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
+- public command-wave state endpoint for `COMMAND_WAVE_STATE_URL`
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
 - 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and capped context previews
@@ -290,12 +291,19 @@ npm run setup:verify
 
 For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
 
+Expose the current command-wave state to the guardian with:
+
+```bash
+COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
+```
+
 ## Local API
 
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
+- `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
 - `GET /api/command-wave`: return the current local command wave.
 - `PUT /api/command-wave`: disabled in phase 1. Use scoped setup, proposal, vote, decision, run, and review routes.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.
