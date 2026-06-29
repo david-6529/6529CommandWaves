@@ -86,6 +86,32 @@ describe("active hook projects", () => {
     });
   });
 
+  it("uses the newest ledger timestamp for latest activity", () => {
+    const projects = createActiveHookProjects({
+      ...demoWave,
+      ledger: [
+        {
+          id: "evt-newest",
+          at: "2026-06-20T13:00:00.000Z",
+          actor: "Reviewer",
+          type: "guardian_reviewed",
+          message: "Newest review event.",
+        },
+        {
+          id: "evt-oldest",
+          at: "2026-06-20T11:00:00.000Z",
+          actor: "Setup",
+          type: "wave_created",
+          message: "Old setup event.",
+        },
+      ],
+    });
+
+    expect(projects[0]).toMatchObject({
+      latestActivity: "Newest review event.",
+    });
+  });
+
   it("can list more than one hook project without merging wave or repo labels", () => {
     const projects = createActiveHookProjects([
       demoWave,

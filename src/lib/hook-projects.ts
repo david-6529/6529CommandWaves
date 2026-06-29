@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { ledgerEventsByRecency } from "./ledger";
 import { selectPhaseWork } from "./phase-work";
 
 export type ActiveHookProject = {
@@ -132,7 +133,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const phaseWork = selectPhaseWork(wave);
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook command.";
     const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim());
-    const latestActivity = wave.ledger.at(-1)?.message ?? "No activity logged yet.";
+    const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
 
     return {
       id: wave.id,
