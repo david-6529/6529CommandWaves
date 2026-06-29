@@ -967,7 +967,7 @@ export function CommandWavesConsole() {
     );
   }
 
-  function launchOrchestrator() {
+  function buildApprovedPr() {
     if (!activeProposal || !canBuildApprovedPr) {
       return;
     }
@@ -1614,7 +1614,7 @@ export function CommandWavesConsole() {
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
                           ? activePrHasWaveDecision
-                            ? "Waiting for an approved PR command."
+                            ? "Ready to build the approved PR."
                             : "Record the wave decision receipt before the PR build step."
                           : "Only PR commands use the agent build step in phase 1."}
                     </p>
@@ -1629,7 +1629,7 @@ export function CommandWavesConsole() {
                       type="button"
                       className="mt-3"
                       disabled={isBusy || !canBuildApprovedPr}
-                      onClick={launchOrchestrator}
+                      onClick={buildApprovedPr}
                     >
                       {apiBusy === "execute"
                         ? "Building"
