@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
+import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
 import { commandKindLabel } from "@/lib/command-kind-copy";
@@ -657,6 +658,7 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
+  const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
   const [proposalDraftNotice, setProposalDraftNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
   const [projectContextPreviews, setProjectContextPreviews] = useState<Record<string, WaveContextPreview>>({});
@@ -731,7 +733,7 @@ export function CommandWavesConsole() {
     ? "Local vote passed. Record the builder wave decision receipt before work runs."
     : activePollDecisionRecorded
       ? `Builder wave decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
-      : `Current vote: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
+      : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const canBuildApprovedPr = Boolean(
@@ -801,6 +803,17 @@ export function CommandWavesConsole() {
         budgetUsd,
       }),
     [budgetUsd, kind, prompt, proposer, spec, title, wave],
+  );
+  const builderWaveDecisionDraft = useMemo(
+    () =>
+      activeProposal
+        ? createBuilderWaveDecisionDraft({
+            wave,
+            proposal: activeProposal,
+            poll: activePoll ?? null,
+          })
+        : "",
+    [activePoll, activeProposal, wave],
   );
   const launchPacket = useMemo(
     () =>
@@ -921,6 +934,7 @@ export function CommandWavesConsole() {
     setGateNotes(nextWave.gates.join("\n"));
     setProjectContextPreviews({});
     setSetupContextPreview(null);
+    setDecisionDraftNotice("");
     setLaunchBriefNotice("");
     setLaunchLinkNotice("");
     setProposalDraftNotice("");
@@ -1107,6 +1121,19 @@ export function CommandWavesConsole() {
       setProposalDraftNotice("Proposal draft copied.");
     } catch {
       setProposalDraftNotice("Copy failed. Select the proposal text and copy it manually.");
+    }
+  }
+
+  async function copyBuilderWaveDecisionDraft() {
+    if (!builderWaveDecisionDraft) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(builderWaveDecisionDraft);
+      setDecisionDraftNotice("Decision request copied.");
+    } catch {
+      setDecisionDraftNotice("Copy failed. Select the decision request and copy it manually.");
     }
   }
 
@@ -2040,11 +2067,26 @@ export function CommandWavesConsole() {
                     {activePollCanVote ? (
                       <div className="mt-3 flex gap-2">
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
-                          Vote yes
+                          Log yes
                         </Button>
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
-                          Vote no
+                          Log no
                         </Button>
+                      </div>
+                    ) : null}
+                    {!activePoll.decision ? (
+                      <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                        <p className="text-sm font-semibold text-zinc-100">Builder wave request</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">
+                          Copy this to ask the builder wave for the actual decision, then record the 6529 drop URL.
+                        </p>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
+                            Copy request
+                          </Button>
+                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+                        </div>
+                        {decisionDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{decisionDraftNotice}</p> : null}
                       </div>
                     ) : null}
                     {activePoll.decision ? (
