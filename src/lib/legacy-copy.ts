@@ -1,4 +1,5 @@
 const copyReplacements: Array<[RegExp, string]> = [
+  [/\b6529 Hook Builder\b/g, "6529 Hook Project"],
   [/\bGenesis Agent\b/g, "Setup"],
   [/\bOrchestrator Agent\b/g, "Agent"],
   [/\borchestrator execution\b/gi, "agent run"],
