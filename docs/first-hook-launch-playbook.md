@@ -78,7 +78,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 15. Use the contribution report and fee plan as evidence for any separate payout vote.
 16. Post the wave update draft back to the builder wave.
 17. Keep the launch packet with the PR so later contributors can audit the loop.
-18. Run the public launch audit again and fix blockers before public launch.
+18. Run the public launch audit again and fix blockers before broad participation.
 
 ## Success Criteria
 

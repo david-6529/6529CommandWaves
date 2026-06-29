@@ -1,8 +1,8 @@
 # Command Wave Data Model
 
-The app can use local JSON persistence for development and Postgres for public launch storage. The Postgres repository
-keeps the same command-wave state machine while making the setup, proposals, decisions, PR evidence, reviews, and ledger
-durable.
+The app can use local JSON persistence for development and the first small loop. Before broad participation, Postgres
+keeps the same command-wave state machine while making setup, proposals, decisions, PR evidence, reviews, and ledger
+events durable.
 
 The SQL schema is in [../db/001_command_waves.sql](../db/001_command_waves.sql).
 

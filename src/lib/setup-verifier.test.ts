@@ -91,7 +91,7 @@ describe("setup verifier", () => {
     });
   });
 
-  it("can require production storage for public launch audits", () => {
+  it("can require production storage for broad participation audits", () => {
     const localProof = createSetupProof(demoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       storage: {

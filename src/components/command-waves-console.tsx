@@ -1119,7 +1119,7 @@ export function CommandWavesConsole() {
               <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in development</p>
               <h2 className="mt-1 text-base font-semibold text-zinc-50">Project snapshot</h2>
               <p className="mt-1 text-sm leading-6 text-zinc-500">
-                Start with the 6529 hook. Each row connects a builder wave to its repo, PR evidence, review state, and latest activity.
+                Start with the 6529 hook. Each row connects a builder wave to its repo, recent wave context, PR evidence, reviews, and latest activity.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1304,7 +1304,7 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Start with one project wave. You can paste a wave link directly or search by name.
+                Set the first hook project wave and repo. The same shape can list more public hooks after the first loop works.
               </p>
               <Field label="6529 wave">
                 <Input

@@ -166,7 +166,7 @@ export function verifySetupProofAgainstGitHubPayloads(
         storageDurability === "production" ? "pass" : "fail",
         storageDurability === "production"
           ? "Command-wave storage is production durable."
-          : "Command-wave storage is not production durable. Use Postgres with DATABASE_URL before public launch.",
+          : "Command-wave storage is not production durable. Use Postgres with DATABASE_URL before broad participation.",
       ),
     );
   }

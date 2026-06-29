@@ -15,7 +15,7 @@ The proposal path should ask for the change, limits, and success criteria first.
 The simplest product view is:
 
 ```text
-Wave snapshot -> Code state -> PR -> Review
+Wave snapshot -> Repo state -> PR -> Review
 ```
 
 ## Roles
@@ -112,7 +112,7 @@ The external app should be the control panel for setup, rules, queue status, and
 
 Initial adapters:
 
-1. 6529 API adapter for wave search, posting, and reading.
+1. 6529 API adapter for wave search, reading, and human-reviewed update drafts.
 2. GitHub adapter for repo metadata and draft PR creation from prepared branches.
 3. Agent adapter for Codex runs.
 4. Reviewer adapter for PR diff review, rule compliance, and smart contract safety checks.

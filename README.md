@@ -19,9 +19,9 @@ The app keeps the loop visible:
 5. Review the result.
 6. Log the activity.
 
-The simplest view is:
+The simple project view is:
 
-`Wave snapshot -> Code state -> PR -> Review`
+`Wave snapshot -> Repo state -> PR -> Review`
 
 ## Why This Exists
 
@@ -172,10 +172,11 @@ Before opening a PR, run the local app gate:
 npm run verify
 ```
 
-## Production Storage
+## Durable Storage
 
-For public launch, use Postgres so the wave setup, proposals, votes, decisions, PR evidence, reviews, and ledger survive
-server restarts.
+For a small first loop, local file storage can prove the wave-to-PR workflow while 6529 holds the public discussion and
+decision receipts. Before broad participation, use Postgres so setup, proposals, votes, decisions, PR evidence, reviews,
+and ledger events survive server restarts.
 
 1. Create a Postgres database.
 2. Apply the schema:
@@ -276,7 +277,7 @@ SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
 npm run setup:verify
 ```
 
-For a public launch audit that also requires production-durable storage:
+For a stricter durable-storage audit before broad participation:
 
 ```bash
 SETUP_REQUIRE_PRODUCTION_STORAGE=true \
@@ -315,8 +316,8 @@ API errors include an `errorId` so a user-visible error can be matched to server
 
 ## Next Production Steps
 
-1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify production storage.
-2. Wire live 6529 setup, proposal, vote, and result-posting flows.
+1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
+2. Wire live 6529 setup, proposal, vote, and human-posted result update flows.
 3. Finish controlled GitHub branch, commit, PR comment, and CI-state operations.
 4. Add controlled Codex execution using [docs/agent-harness-plan.md](docs/agent-harness-plan.md).
 5. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.

@@ -3,10 +3,10 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.eyebrow).toBe("Project site");
-    expect(commandWaveProductCopy.headline).toBe("6529 Hook");
-    expect(commandWaveProductCopy.positioning).toBe("One wave. One repo. One public build.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Wave - Code - PR - Review");
+    expect(commandWaveProductCopy.eyebrow).toBe("Public hook build");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Project");
+    expect(commandWaveProductCopy.positioning).toBe("One hook project today. A repeatable public build loop later.");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Wave - Repo - PR - Review");
   });
 
   it("keeps internal role names out of the first-screen explanation", () => {
@@ -23,10 +23,11 @@ describe("Command Waves product copy", () => {
   });
 
   it("keeps the standalone project ahead of the later reusable infrastructure", () => {
-    expect(commandWaveProductCopy.headline).toBe("6529 Hook");
-    expect(commandWaveProductCopy.subhead).toContain("The 6529 wave holds discussion and decisions");
-    expect(commandWaveProductCopy.subhead).toContain("GitHub work easy to inspect");
-    expect(commandWaveProductCopy.positioning).toContain("One wave");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Project");
+    expect(commandWaveProductCopy.subhead).toContain("builder wave is deciding");
+    expect(commandWaveProductCopy.subhead).toContain("happening in GitHub");
+    expect(commandWaveProductCopy.positioning).toContain("One hook project today");
+    expect(commandWaveProductCopy.positioning).toContain("repeatable public build loop later");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");
   });
