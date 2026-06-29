@@ -1882,7 +1882,7 @@ export function CommandWavesConsole() {
                 inputRef={waveRoomDraftRef}
                 rows={12}
                 defaultValue={builderWaveChatDraft}
-                className="min-h-72 resize-none font-mono text-xs"
+                className="min-h-72 resize-none font-mono text-sm"
               />
             </div>
           </Panel>
@@ -1891,11 +1891,10 @@ export function CommandWavesConsole() {
         <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">People</p>
-              <h2 className="mt-1 text-lg font-semibold text-zinc-50">Swarm members</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
-                These are visible builders from the local project activity. Profile links open 6529 identity pages, and
-                report scores stay informational.
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">People</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Swarm members</h2>
+              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
+                See who is active, open their 6529 profile, and keep contribution scores informational.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1903,18 +1902,14 @@ export function CommandWavesConsole() {
             </Badge>
           </div>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-            {contributionReport.contributors.slice(0, 4).map((contributor) => (
+            {contributionReport.contributors.slice(0, 3).map((contributor) => (
               <div key={contributor.identity} className="grid gap-3 py-3 md:grid-cols-[1fr_auto]">
                 <div>
-                  <p className="text-sm font-semibold text-zinc-100">{contributor.identity}</p>
-                  <p className="mt-1 text-xs leading-5 text-zinc-500">{contributor.rationale.join(", ")}</p>
+                  <p className="text-base font-semibold text-zinc-100">{contributor.identity}</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-500">{contributor.rationale[0]}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:justify-end">
                   <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">score {contributor.score}</Badge>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
-                    {countLabel(contributor.proposals, "proposal")}
-                  </Badge>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{countLabel(contributor.votes, "vote")}</Badge>
                   <LinkButton href={memberProfileUrl(contributor.identity)}>Open profile</LinkButton>
                 </div>
               </div>
@@ -1922,20 +1917,17 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <section className="grid gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in development</p>
-              <h2 className="mt-1 text-base font-semibold text-zinc-50">Project state</h2>
-              <p className="mt-1 text-sm leading-6 text-zinc-500">
-                Start with the 6529 hook. This section shows the active build, the chat source, and the code evidence.
-              </p>
-            </div>
+        <details id="project-details" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>Project details</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
-          </div>
-          <div className="grid gap-3">
+          </summary>
+          <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
+            Active hook, builder wave, repo evidence, gate notes, and the next repo action.
+          </p>
+          <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
               const contextPreview = projectContextPreviews[project.id] ?? null;
 
@@ -2075,18 +2067,15 @@ export function CommandWavesConsole() {
               );
             })}
           </div>
-        </section>
+        </details>
 
-        <section className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Current state</p>
-              <h2 className="mt-1 text-base font-semibold text-zinc-50">Next actions</h2>
-            </div>
+        <details className="border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>Launch checklist</span>
             <Badge className="border-zinc-700 bg-black text-zinc-300">
               {completedPhaseCount}/{phaseChecklist.length} done
             </Badge>
-          </div>
+          </summary>
 
           {showApiNotice ? (
             <div className="mt-3 rounded-md border border-zinc-800 bg-black px-3 py-2 text-sm text-zinc-300">
@@ -2150,7 +2139,7 @@ export function CommandWavesConsole() {
               </li>
             ))}
           </ol>
-        </section>
+        </details>
 
         <details
           ref={setupControlsRef}
@@ -2583,8 +2572,13 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <section id="suggest-hook-work" className="grid scroll-mt-4 gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-          <Panel title="Advanced proposal check" eyebrow="Builder wave">
+        <details id="suggest-hook-work" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>Advanced controls</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
+          </summary>
+          <section className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+            <Panel title="Advanced proposal check" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
                 Review the risk route and wave brief before adding the work to the project log.
@@ -2969,8 +2963,9 @@ export function CommandWavesConsole() {
             ) : (
               <p className="text-sm text-zinc-400">No commands yet. Propose one to start.</p>
             )}
-          </Panel>
-        </section>
+            </Panel>
+          </section>
+        </details>
 
         <section id="recent-activity" className="scroll-mt-4">
           <Panel title="Recent activity" eyebrow="Log">
@@ -3006,9 +3001,15 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <Panel title="Contribution report" eyebrow="Informational">
-          <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-            <div>
+        <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>Reports and fees</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">informational</Badge>
+          </summary>
+          <div className="mt-4 grid gap-5">
+            <Panel title="Contribution report" eyebrow="Informational">
+              <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+                <div>
               <p className="text-sm leading-6 text-zinc-400">{contributionReport.summary}</p>
               <p className="mt-2 text-xs leading-5 text-zinc-500">
                 This report summarizes visible app activity. It does not grant REP, TDH, payouts, permissions, or merge rights.
@@ -3084,13 +3085,13 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </Panel>
+                </div>
+              </div>
+            </Panel>
 
-        <Panel title="Developer fee plan" eyebrow="Manual payout">
-          <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
+            <Panel title="Developer fee plan" eyebrow="Manual payout">
+              <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+                <div>
               <p className="text-sm leading-6 text-zinc-400">{developerFeePlan.summary}</p>
               <p className="mt-2 text-xs leading-5 text-zinc-500">
                 Planning evidence only. Humans approve the budget and move funds outside this app.
@@ -3110,12 +3111,19 @@ export function CommandWavesConsole() {
               <CompactList title="Evidence" items={developerFeePlan.evidenceInputs} />
               <CompactList title="Decisions" items={developerFeePlan.requiredDecisions} />
               <CompactList title="Blocked" items={developerFeePlan.blockedActions} />
-            </div>
+                </div>
+              </div>
+            </Panel>
           </div>
-        </Panel>
+        </details>
 
-        <section id="share-back" className="scroll-mt-4">
-          <Panel title="Wave update draft" eyebrow="Share back">
+        <details id="share-back" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>Share update</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>
+          </summary>
+          <div className="mt-4">
+            <Panel title="Wave update draft" eyebrow="Share back">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
@@ -3164,11 +3172,12 @@ export function CommandWavesConsole() {
                 inputRef={waveUpdateDraftRef}
                 rows={12}
                 defaultValue={waveUpdateDraft}
-                className="min-h-72 resize-none font-mono text-xs"
+                className="min-h-72 resize-none font-mono text-sm"
               />
             </div>
-          </Panel>
-        </section>
+            </Panel>
+          </div>
+        </details>
 
       </div>
     </main>
