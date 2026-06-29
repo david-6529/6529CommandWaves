@@ -2,6 +2,7 @@ import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
 import { demoWave } from "./demo-wave";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
+import { normalizeParticipationGates } from "./participation-gates";
 import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
@@ -127,12 +128,17 @@ function withFirstPhaseRules(wave: CommandWave) {
     rulesByKind[kind] = defaultRules.rulesByKind[kind];
   }
 
-  if (!changed) {
+  const gates = normalizeParticipationGates(wave.gates, []);
+  const gatesChanged =
+    gates.length !== wave.gates.length || gates.some((gate: string, index: number) => gate !== wave.gates[index]);
+
+  if (!changed && !gatesChanged) {
     return wave;
   }
 
   return {
     ...wave,
+    gates,
     rules: {
       ...wave.rules,
       rulesByKind,
@@ -263,6 +269,7 @@ export async function updateCommandWaveSetup(input: unknown) {
       ...wave,
       waveUrl: `https://6529.io/waves/${validation.waveId}`,
       repoUrl: validation.repo?.htmlUrl ?? wave.repoUrl,
+      gates: normalizeParticipationGates(body.gates, wave.gates),
     },
     {
       actor: "Setup",

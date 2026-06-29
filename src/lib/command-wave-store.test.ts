@@ -67,6 +67,19 @@ describe("Command wave store", () => {
     });
   });
 
+  it("saves participation notes without claiming live gate authority", async () => {
+    const wave = await updateCommandWaveSetup({
+      waveUrl: "https://6529.io/waves/new-command-wave",
+      repoUrl: "https://github.com/6529-Collections/new-command-wave",
+      gates: ["AMM QnA pass required", "REP or TDH planned, not enforced here"],
+    });
+
+    expect(wave.gates).toEqual([
+      "AMM QnA pass required (manual note only, not enforced by this app)",
+      "REP or TDH planned, not enforced here",
+    ]);
+  });
+
   it("rejects invalid setup before saving", async () => {
     await expect(updateCommandWaveSetup({
       waveUrl: "",

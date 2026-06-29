@@ -2,6 +2,7 @@ import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, Pol
 import { createWaveDecisionReceipt, defaultRules } from "./command-waves";
 import { createAgentHandoffPacket, formatAgentHandoffArtifact } from "./agent-handoff";
 import { createCommandPrManifest, createGuardianAttestation } from "./github/pr-reviewer-gate";
+import { defaultParticipationGates } from "./participation-gates";
 import { pullRequestUrl } from "./github/repo";
 import { createCommandRunManifest, formatRunManifestArtifact } from "./run-manifest";
 
@@ -53,11 +54,7 @@ const preExecutionWave: CommandWave = {
   name: "6529 Hook Builder",
   waveUrl: "https://6529.io/waves/6529-hook-builder",
   repoUrl: "https://github.com/6529-Collections/6529-hook",
-  gates: [
-    "Builder wave allowlist for phase 1",
-    "REP or TDH gates are planned, not enforced here",
-    "AI contribution scores are reports, not permissions",
-  ],
+  gates: [...defaultParticipationGates],
   rules: defaultRules,
   proposals: [reviewingProposal],
   polls: [poll],

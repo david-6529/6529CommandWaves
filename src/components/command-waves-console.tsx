@@ -594,6 +594,7 @@ export function CommandWavesConsole() {
   const [wave, setWave] = useState<CommandWave>(() => cloneDemoWave());
   const [waveUrl, setWaveUrl] = useState(wave.waveUrl);
   const [repoUrl, setRepoUrl] = useState(wave.repoUrl);
+  const [gateNotes, setGateNotes] = useState(() => wave.gates.join("\n"));
   const [waveSearchQuery, setWaveSearchQuery] = useState("");
   const [waveSearchResults, setWaveSearchResults] = useState<WaveSearchResult[]>([]);
   const [accessKey, setAccessKey] = useState(() =>
@@ -765,6 +766,7 @@ export function CommandWavesConsole() {
     setWave(nextWave);
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
+    setGateNotes(nextWave.gates.join("\n"));
     setCodexPacketNotice("");
   }
 
@@ -868,7 +870,11 @@ export function CommandWavesConsole() {
       () =>
         requestWave("/api/command-wave", {
           method: "PATCH",
-          body: JSON.stringify({ waveUrl, repoUrl }),
+          body: JSON.stringify({
+            waveUrl,
+            repoUrl,
+            gates: gateNotes.split("\n"),
+          }),
         }, accessKey),
       "Setup saved to the backend ledger.",
     );
@@ -1150,7 +1156,15 @@ export function CommandWavesConsole() {
               ) : null}
               <div>
                 <p className="mb-2 text-sm font-semibold text-zinc-200">Who can participate</p>
-                <div className="flex flex-wrap gap-2">
+                <Textarea
+                  value={gateNotes}
+                  className="min-h-20"
+                  onChange={(event) => setGateNotes(event.target.value)}
+                />
+                <p className="mt-2 text-xs leading-5 text-zinc-500">
+                  One note per line. REP, TDH, holder, allowlist, and QnA notes are advisory until live enforcement is wired.
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
                   {wave.gates.map((gate) => (
                     <Badge key={gate} className="border-zinc-700 bg-zinc-900 text-zinc-200">
                       {gate}
