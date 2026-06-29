@@ -21,7 +21,7 @@ describe("launch status draft", () => {
     const draft = createLaunchStatusDraft({ wave: demoWave, audit, verificationTargets });
 
     expect(draft).toContain("6529 hook launch status");
-    expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");

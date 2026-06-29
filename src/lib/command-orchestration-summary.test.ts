@@ -33,7 +33,7 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary.decisionRoute).toBe(
-      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Wave decision URL must match the configured builder wave.",
+      "vote required, quorum 3, yes threshold 60%, receipt needs fix: 6529 decision URL must match the configured discussion.",
     );
   });
 
@@ -52,7 +52,7 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary.decisionRoute).toBe(
-      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Wave decision URL is required for PR work.",
+      "vote required, quorum 3, yes threshold 60%, receipt needs fix: 6529 decision URL is required for PR work.",
     );
   });
 

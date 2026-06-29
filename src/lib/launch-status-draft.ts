@@ -27,7 +27,7 @@ export function createLaunchStatusDraft({
   return [
     "6529 hook launch status",
     "",
-    `Builder wave: ${wave.waveUrl}`,
+    `6529 discussion: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,
     `Status: ${audit.statusLabel}`,
     audit.summary,

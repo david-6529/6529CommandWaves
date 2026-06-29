@@ -127,7 +127,7 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
           ? poll.decision
             ? decisionReferenceCheck?.ok
               ? `Receipt recorded: ${poll.decision.url ?? poll.decision.dropId ?? "wave decision"}.`
-              : (decisionReferenceCheck?.message ?? "Wave decision receipt is not valid.")
+              : (decisionReferenceCheck?.message ?? "6529 decision receipt is not valid.")
             : poll.status === "passed"
               ? "Vote passed locally. Record the 6529 decision URL."
               : `Vote is ${poll.status}: ${poll.yesVotes} yes, ${poll.noVotes} no.`

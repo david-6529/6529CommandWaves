@@ -57,7 +57,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Review: waiting for execution evidence.");
   });
 
-  it("keeps local vote approval waiting for a wave decision receipt", () => {
+  it("keeps local vote approval waiting for a 6529 decision receipt", () => {
     const draft = createWaveUpdateDraft({
       wave: demoWave,
       proposal: {

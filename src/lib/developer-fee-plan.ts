@@ -52,7 +52,7 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
   return [
     "6529 hook developer fee plan",
     "",
-    `Builder wave: ${wave.waveUrl}`,
+    `6529 discussion: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,
     plan.summary,
     "",

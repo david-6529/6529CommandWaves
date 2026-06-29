@@ -29,7 +29,7 @@ describe("Codex work packet", () => {
     expect(packet.text).not.toContain("\u2014");
   });
 
-  it("requires a builder wave decision receipt for PR work packets", () => {
+  it("requires a 6529 decision receipt for PR work packets", () => {
     const proposal = {
       ...demoWave.proposals[0],
       status: "approved" as const,
@@ -45,10 +45,10 @@ describe("Codex work packet", () => {
         proposal,
         poll,
       }),
-    ).toThrow("Record the builder wave decision receipt before creating a Codex work packet.");
+    ).toThrow("Record the 6529 decision receipt before creating a Codex work packet.");
   });
 
-  it("requires a builder wave URL for PR work packet receipts", () => {
+  it("requires a 6529 discussion URL for PR work packet receipts", () => {
     const proposal = {
       ...demoWave.proposals[0],
       status: "approved" as const,
@@ -68,6 +68,6 @@ describe("Codex work packet", () => {
         proposal,
         poll,
       }),
-    ).toThrow("Record the builder wave decision receipt before creating a Codex work packet.");
+    ).toThrow("Record the 6529 decision receipt before creating a Codex work packet.");
   });
 });

@@ -87,7 +87,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:40:00.000Z",
       actor: "Wave Poll",
       type: "poll_passed",
-      message: "cmd-001 passed with 5 yes, 1 no, and a builder wave decision receipt.",
+      message: "cmd-001 passed with 5 yes, 1 no, and a 6529 decision receipt.",
     },
   ],
 };

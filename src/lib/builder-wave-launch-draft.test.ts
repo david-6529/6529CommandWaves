@@ -7,11 +7,11 @@ describe("builder wave launch draft", () => {
     const draft = createBuilderWaveLaunchDraft(demoWave);
 
     expect(draft).toContain("6529 hook launch brief");
-    expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Contributor rules: https://github.com/6529-Collections/6529-hook/blob/main/CONTRIBUTING.md");
-    expect(draft).toContain("run the first builder swarm for a non-upgradeable 6529 hook");
-    expect(draft).toContain("Wait for a builder wave decision before PR work starts.");
+    expect(draft).toContain("coordinate the first public build for a non-upgradeable 6529 hook");
+    expect(draft).toContain("Wait for a 6529 decision before PR work starts.");
     expect(draft).toContain("Open draft PRs with the repo template and Command Waves manifest.");
     expect(draft).toContain("Let reviewer CI check the PR before humans merge.");
     expect(draft).toContain("Gates decide who can play");

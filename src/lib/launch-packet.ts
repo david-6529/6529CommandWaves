@@ -145,12 +145,12 @@ function decisionLines(poll: PollState | null) {
   const voteLine = `- Vote: ${poll.status}, ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;
 
   if (!poll.decision) {
-    return [voteLine, "- Wave decision receipt: not recorded yet."];
+    return [voteLine, "- 6529 decision receipt: not recorded yet."];
   }
 
   return [
     voteLine,
-    `- Wave decision receipt: ${poll.decision.summary}`,
+    `- 6529 decision receipt: ${poll.decision.summary}`,
     `- Receipt source: ${poll.decision.source}`,
     `- Receipt reference: ${poll.decision.url ?? poll.decision.dropId ?? "recorded"}`,
   ];

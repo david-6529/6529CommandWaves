@@ -23,7 +23,7 @@ export function createBuilderWaveDecisionDraft({ wave, proposal, poll }: Builder
   return [
     "6529 hook decision request",
     "",
-    `Builder wave: ${wave.waveUrl}`,
+    `6529 discussion: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,
     `Command: ${proposal.id} - ${cleanLine(proposal.title)}`,
     `Work type: ${commandKindLabel(proposal.kind)}`,
@@ -36,7 +36,7 @@ export function createBuilderWaveDecisionDraft({ wave, proposal, poll }: Builder
     "",
     localTallyLine(poll),
     "",
-    "Decision needed: approve, reject, or ask for edits in this builder wave.",
+    "Decision needed: approve, reject, or ask for edits in the 6529 discussion.",
     "If approved, link the 6529 decision drop URL back into Command Waves before PR work starts.",
     "Guardrails: no deploy, payout, proxy, delegatecall, governance change, or uncapped parameter change in phase 1.",
   ].join("\n");

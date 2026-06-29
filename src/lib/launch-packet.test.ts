@@ -34,11 +34,11 @@ describe("launch packet", () => {
     expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision receipt recorded.");
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence");
-    expect(packet.text).toContain("Wave decision receipt:");
+    expect(packet.text).toContain("6529 decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("## Contribution Report");
     expect(packet.text).toContain("Complete proposal: 6 report points.");
-    expect(packet.text).toContain("Wave decision receipt: 2 report points.");
+    expect(packet.text).toContain("6529 decision receipt: 2 report points.");
     expect(packet.text).toContain("david: report score 10");
     expect(packet.text).toContain("Proposal work: 6 report points");
     expect(packet.text).toContain("Decision receipts: 2 report points");
@@ -139,7 +139,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("Participation gate:");
   });
 
-  it("keeps local vote approval waiting for a wave decision receipt", () => {
+  it("keeps local vote approval waiting for a 6529 decision receipt", () => {
     const packet = createLaunchPacket({
       wave: demoWave,
       proposal: {
@@ -155,7 +155,7 @@ describe("launch packet", () => {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
-    expect(packet.text).toContain("Wave decision receipt: not recorded yet.");
+    expect(packet.text).toContain("6529 decision receipt: not recorded yet.");
     expect(packet.text).toContain("Build: waiting for a recorded wave decision.");
   });
 

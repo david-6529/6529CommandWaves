@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createBuilderWaveDecisionDraft } from "./builder-wave-decision-draft";
 import { demoWave } from "./demo-wave";
 
-describe("builder wave decision draft", () => {
+describe("6529 decision draft", () => {
   it("creates a concise decision request for the builder wave", () => {
     const draft = createBuilderWaveDecisionDraft({
       wave: demoWave,
@@ -11,7 +11,7 @@ describe("builder wave decision draft", () => {
     });
 
     expect(draft).toContain("6529 hook decision request");
-    expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
     expect(draft).toContain(`Command: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
     expect(draft).toContain("Local tally: 5 yes, 1 no.");

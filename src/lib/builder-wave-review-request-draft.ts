@@ -34,7 +34,7 @@ export function createBuilderWaveReviewRequestDraft({
   return [
     "6529 hook review request",
     "",
-    `Builder wave: ${wave.waveUrl}`,
+    `6529 discussion: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,
     `Command: ${proposal.id} - ${proposal.title}`,
     `PR: ${prUrl(execution) ?? "not recorded yet"}`,
@@ -49,11 +49,11 @@ export function createBuilderWaveReviewRequestDraft({
     ...buildEvidenceLines(execution),
     "",
     "Review checklist:",
-    "- PR matches the approved builder wave command and limits.",
-    "- Command Waves manifest and wave decision receipt are present.",
+    "- PR matches the approved command and limits.",
+    "- Command Waves manifest and 6529 decision receipt are present.",
     "- Tests cover capped hook parameters and guardrails.",
     "- No proxy, delegatecall, deploy, payment, or governance change is introduced.",
-    "- Findings should be posted in the PR and summarized back to the builder wave.",
+    "- Findings should be posted in the PR and summarized back to the 6529 discussion.",
     "",
     "Guardrails: this request does not merge, deploy, approve payouts, or change governance.",
   ].join("\n");

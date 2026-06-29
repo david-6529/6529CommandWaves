@@ -96,7 +96,7 @@ function evidenceSummary(wave: CommandWave) {
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "command proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
-    ...(decisionCount ? [countLabel(decisionCount, "wave decision receipt")] : []),
+    ...(decisionCount ? [countLabel(decisionCount, "6529 decision receipt")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
     ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
@@ -109,7 +109,7 @@ const scoringRubric = [
   "Complete proposal: 6 report points.",
   "Reviewing proposal: 4 report points.",
   "Other proposal: 3 report points.",
-  "Wave decision receipt: 2 report points.",
+  "6529 decision receipt: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
 ];
 
@@ -158,7 +158,7 @@ export function createContributionReport(
       contributor.decisions += 1;
       contributor.score += 2;
       addScoreBasis(contributor, "Decision receipts", 2);
-      addRationale(contributor, "Recorded wave decision evidence");
+      addRationale(contributor, "Recorded 6529 decision evidence");
     }
 
     for (const vote of poll.votes ?? []) {

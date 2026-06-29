@@ -35,7 +35,7 @@ import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
-import { normalizeParticipationGates, summarizeParticipationAccess } from "@/lib/participation-gates";
+import { normalizeParticipationGates } from "@/lib/participation-gates";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -839,7 +839,6 @@ export function CommandWavesConsole() {
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
   const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
-  const participationAccessSummary = useMemo(() => summarizeParticipationAccess(wave.gates), [wave.gates]);
   const currentProjectFacts = primaryHookProject
     ? [
         { label: "Hook", value: primaryHookProject.name },
@@ -1479,256 +1478,262 @@ export function CommandWavesConsole() {
   return (
     <main className="min-h-screen bg-black text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-800 pb-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-4xl">
-              <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
-                {commandWaveProductCopy.headline}
-              </h1>
-              <p className="mt-3 max-w-3xl text-lg leading-8 text-zinc-200">
-                {commandWaveProductCopy.subhead} {commandWaveProductCopy.positioning}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 lg:justify-end">
-              <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
-            </div>
+        <header className="border-b border-zinc-800 pb-4">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+              {commandWaveProductCopy.headline}
+            </h1>
+            <p className="mt-2 text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
           </div>
-
-          {currentProjectFacts.length ? (
-            <div className="mt-5 grid divide-y divide-zinc-800 border-y border-zinc-800 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
-              {currentProjectFacts.map((fact) => (
-                <div key={fact.label} className="py-3 sm:px-3 sm:first:pl-0 lg:last:pr-0">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{fact.label}</p>
-                  {fact.href ? (
-                    <a
-                      className="mt-1 block break-words text-base font-semibold leading-7 text-zinc-100 hover:text-cyan-200"
-                      href={fact.href}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {fact.value}
-                    </a>
-                  ) : (
-                    <p className="mt-1 break-words text-base font-semibold leading-7 text-zinc-100">{fact.value}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : null}
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500">{participationAccessSummary}</p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <JumpLink href="#wave-room">Message builders</JumpLink>
-            <JumpLink href="#start-building">Propose change</JumpLink>
-            <JumpLink href="#recent-activity">View activity</JumpLink>
+          <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-400">{commandWaveProductCopy.positioning}</p>
+          <nav className="mt-4 flex flex-wrap gap-2" aria-label="Workspace sections">
+            <JumpLink href="#wave-room">Builder room</JumpLink>
+            <JumpLink href="#start-building">New proposal</JumpLink>
+            <JumpLink href="#recent-activity">Activity</JumpLink>
+            <JumpLink href="#swarm-members">Members</JumpLink>
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
-            {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
-          </div>
+          </nav>
         </header>
 
-        <section id="current-build" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">
-                {activeReview?.status === "pass" ? "Latest reviewed change" : "Active change"}
-              </p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">
-                {activeProposal ? activeProposal.title : "No active hook change yet"}
-              </h2>
-              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                {activeProposal
-                  ? humanizeLegacyCommandCopy(activeProposal.prompt)
-                  : "Propose one small change and the room will track the decision, code, and review here."}
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
-            {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
-            <JumpLink href="#recent-activity">View activity</JumpLink>
-          </div>
-          <div className="mt-4 border-t border-zinc-800 pt-4">
-            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
-            {!activeProposal ? (
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-base leading-7 text-zinc-400">Start with one PR-sized hook change.</p>
-                <JumpLink href="#start-building">Propose change</JumpLink>
-              </div>
-            ) : activePollCanVote ? (
-              <div className="mt-2 grid gap-3">
-                <p className="text-base leading-7 text-zinc-400">
-                  Ask the 6529 discussion for a decision before code work starts.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
-                    Copy decision request
-                  </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
-                  <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
-                    Log local yes
-                  </Button>
-                  <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
-                    Log local no
-                  </Button>
-                </div>
-                {decisionDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
-              </div>
-            ) : showDecisionRecorder ? (
-              <div className="mt-2 grid gap-3">
-                <p className="text-base leading-7 text-zinc-400">
-                  Add the 6529 decision URL so the code work has a source of truth.
-                </p>
-                <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-                  <Input
-                    value={decisionReference}
-                    placeholder={decisionReferencePlaceholder}
-                    onChange={(event) => setDecisionReference(event.target.value)}
-                  />
-                  <Button type="button" variant="secondary" disabled={isBusy || !decisionReference.trim()} onClick={recordWaveDecision}>
-                    {apiBusy === "decision" ? "Recording" : "Record decision"}
-                  </Button>
-                </div>
-              </div>
-            ) : showBuildAction ? (
-              <div className="mt-2 grid gap-3">
-                <p className="text-base leading-7 text-zinc-400">
-                  Build only after the approved 6529 decision is recorded.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" disabled={isBusy || !canBuildApprovedPr} onClick={buildApprovedPr}>
-                    {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
-                  </Button>
-                  {canCopyCodexPacket ? (
-                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void copyCodexWorkPacket()}>
-                      {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
-                    </Button>
-                  ) : null}
-                </div>
-                {codexPacketNotice ? <p className="text-sm leading-6 text-cyan-300">{codexPacketNotice}</p> : null}
-              </div>
-            ) : canRunReview ? (
-              <div className="mt-2 grid gap-3">
-                <p className="text-base leading-7 text-zinc-400">
-                  Review the PR evidence against the approved proposal.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
-                    Copy review request
-                  </Button>
-                  {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
-                  <Button type="button" variant="secondary" disabled={isBusy} onClick={runGuardianReview}>
-                    {apiBusy === "review" ? "Reviewing" : "Review result"}
-                  </Button>
-                </div>
-                {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
-              </div>
-            ) : activeReview ? (
-              <div className="mt-2 grid gap-3">
-                <p className="text-base leading-7 text-zinc-400">
-                  Ready to discuss the next proposal: {title.trim() || "Add one small hook change"}.
-                </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                    Copy for discussion
-                  </Button>
-                  <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                    {apiBusy === "proposal" ? "Adding" : "Add proposal"}
-                  </Button>
-                  <JumpLink href="#start-building">Edit proposal</JumpLink>
-                  <JumpLink href="#recent-activity">View activity</JumpLink>
-                </div>
-                {proposalDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
-                {apiError ? <p className="text-sm leading-6 text-red-300">{apiError}</p> : null}
-              </div>
-            ) : (
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-base leading-7 text-zinc-400">Use the proposal form for the next scoped change.</p>
-                <JumpLink href="#start-building">Propose change</JumpLink>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section id="wave-room" className="scroll-mt-4">
-          <Panel title="Talk with builders" eyebrow="Discussion">
-            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+        <section id="workspace" className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+          <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm leading-6 text-zinc-400">
-                  Ask a question, share context, or suggest the next hook change.
-                </p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={isBusy || !primaryHookProject?.waveUrl}
-                    onClick={() =>
-                      void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
-                    }
-                  >
-                    {apiBusy === "context" ? "Loading" : "Read latest posts"}
-                  </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
-                  <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                    Copy for discussion
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                    Clear
-                  </Button>
-                </div>
-                {waveRoomNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{waveRoomNotice}</p> : null}
-                {primaryProjectContextPreview ? (
-                  <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
-                        {contextModeLabel(primaryProjectContextPreview)}
-                      </Badge>
-                      <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                        {primaryProjectContextPreview.dropCount} drops
-                      </Badge>
-                    </div>
-                    <div className="mt-2 grid gap-2">
-                      {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
-                        <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-xs font-semibold text-zinc-500">
-                              {drop.author} / {drop.id}
-                            </p>
-                            {drop.url ? (
-                              <a
-                                className="text-xs font-semibold text-cyan-300 hover:text-cyan-200"
-                                href={drop.url}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                Open drop
-                              </a>
-                            ) : null}
-                          </div>
-                          <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="mt-3 text-xs leading-5 text-zinc-500">
-                    Load latest posts to see recent 6529 discussion context here.
-                  </p>
-                )}
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current hook task</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">
+                  {activeProposal ? activeProposal.title : "Choose the next hook change"}
+                </h2>
               </div>
-              <Field label="Message to builders">
+              <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+            </div>
+            <p className="mt-3 text-base leading-7 text-zinc-400">
+              {activeProposal
+                ? humanizeLegacyCommandCopy(activeProposal.prompt)
+                : "Use the room and proposal box to agree on one PR-sized change."}
+            </p>
+
+            {currentProjectFacts.length ? (
+              <dl className="mt-4 grid divide-y divide-zinc-800 border-y border-zinc-800 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+                {currentProjectFacts.map((fact) => (
+                  <div key={fact.label} className="py-3 sm:px-3 sm:first:pl-0">
+                    <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{fact.label}</dt>
+                    <dd className="mt-1">
+                      {fact.href ? (
+                        <a
+                          className="block break-words text-base font-semibold leading-7 text-zinc-100 hover:text-cyan-200"
+                          href={fact.href}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {fact.value}
+                        </a>
+                      ) : (
+                        <span className="block break-words text-base font-semibold leading-7 text-zinc-100">{fact.value}</span>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
+              <JumpLink href="#recent-activity">Activity</JumpLink>
+              <JumpLink href="#more-tools">Rules</JumpLink>
+            </div>
+
+            <div className="mt-4 border-t border-zinc-800 pt-4">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
+              {!activeProposal ? (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <p className="text-base leading-7 text-zinc-400">Start with one small, testable hook change.</p>
+                  <JumpLink href="#start-building">New proposal</JumpLink>
+                </div>
+              ) : activePollCanVote ? (
+                <div className="mt-2 grid gap-3">
+                  <p className="text-base leading-7 text-zinc-400">
+                    Ask the 6529 discussion for a decision before code work starts.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
+                      Copy decision request
+                    </Button>
+                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
+                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
+                      Log local yes
+                    </Button>
+                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
+                      Log local no
+                    </Button>
+                  </div>
+                  {decisionDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
+                </div>
+              ) : showDecisionRecorder ? (
+                <div className="mt-2 grid gap-3">
+                  <p className="text-base leading-7 text-zinc-400">
+                    Add the 6529 decision URL so the code work has a source of truth.
+                  </p>
+                  <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                    <Input
+                      value={decisionReference}
+                      placeholder={decisionReferencePlaceholder}
+                      onChange={(event) => setDecisionReference(event.target.value)}
+                    />
+                    <Button type="button" variant="secondary" disabled={isBusy || !decisionReference.trim()} onClick={recordWaveDecision}>
+                      {apiBusy === "decision" ? "Recording" : "Record decision"}
+                    </Button>
+                  </div>
+                </div>
+              ) : showBuildAction ? (
+                <div className="mt-2 grid gap-3">
+                  <p className="text-base leading-7 text-zinc-400">
+                    Build only after the approved 6529 decision is recorded.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" disabled={isBusy || !canBuildApprovedPr} onClick={buildApprovedPr}>
+                      {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
+                    </Button>
+                    {canCopyCodexPacket ? (
+                      <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void copyCodexWorkPacket()}>
+                        {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
+                      </Button>
+                    ) : null}
+                  </div>
+                  {codexPacketNotice ? <p className="text-sm leading-6 text-cyan-300">{codexPacketNotice}</p> : null}
+                </div>
+              ) : canRunReview ? (
+                <div className="mt-2 grid gap-3">
+                  <p className="text-base leading-7 text-zinc-400">
+                    Review the PR evidence against the approved proposal.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
+                      Copy review request
+                    </Button>
+                    {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
+                    <Button type="button" variant="secondary" disabled={isBusy} onClick={runGuardianReview}>
+                      {apiBusy === "review" ? "Reviewing" : "Review result"}
+                    </Button>
+                  </div>
+                  {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
+                </div>
+              ) : activeReview ? (
+                <div className="mt-2 grid gap-3">
+                  <p className="text-base leading-7 text-zinc-400">
+                    Ready to discuss the next proposal: {title.trim() || "Add one small hook change"}.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
+                      Copy for discussion
+                    </Button>
+                    <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
+                      {apiBusy === "proposal" ? "Adding" : "Add proposal"}
+                    </Button>
+                    <JumpLink href="#start-building">Edit proposal</JumpLink>
+                    <JumpLink href="#recent-activity">Activity</JumpLink>
+                  </div>
+                  {proposalDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
+                  {apiError ? <p className="text-sm leading-6 text-red-300">{apiError}</p> : null}
+                </div>
+              ) : (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <p className="text-base leading-7 text-zinc-400">Use the proposal form for the next scoped change.</p>
+                  <JumpLink href="#start-building">New proposal</JumpLink>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section id="wave-room" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builder room</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk about the hook</h2>
+                <p className="mt-2 text-base leading-7 text-zinc-400">
+                  Ask a question, share context, or suggest the next scoped change.
+                </p>
+              </div>
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
+            </div>
+
+            <div className="mt-4">
+              <Field label="Message">
                 <Textarea
-                  rows={10}
+                  rows={7}
                   value={waveRoomMessage}
                   placeholder="Ask a question, share context, or suggest a small hook change."
                   onChange={(event) => {
                     setWaveRoomMessage(event.target.value);
                     setWaveRoomNotice("");
                   }}
-                  className="min-h-64 resize-none"
+                  className="min-h-44 resize-none"
                 />
               </Field>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
+                  Copy for discussion
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isBusy || !primaryHookProject?.waveUrl}
+                  onClick={() =>
+                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                  }
+                >
+                  {apiBusy === "context" ? "Loading" : "Read latest posts"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                  Clear
+                </Button>
+              </div>
+              {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
             </div>
-          </Panel>
+
+            <div className="mt-4 border-t border-zinc-800 pt-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest discussion</p>
+                {primaryProjectContextPreview ? (
+                  <span className="flex flex-wrap gap-2">
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
+                      {contextModeLabel(primaryProjectContextPreview)}
+                    </Badge>
+                    <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                      {primaryProjectContextPreview.dropCount} drops
+                    </Badge>
+                  </span>
+                ) : null}
+              </div>
+              {primaryProjectContextPreview ? (
+                <div className="mt-3 grid gap-3">
+                  {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
+                    <div key={drop.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold text-zinc-300">
+                          {drop.author} / {drop.id}
+                        </p>
+                        {drop.url ? (
+                          <a
+                            className="text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                            href={drop.url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Open drop
+                          </a>
+                        ) : null}
+                      </div>
+                      <p className="mt-1 text-sm leading-6 text-zinc-400">{drop.preview}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-zinc-500">
+                  Load posts to see recent 6529 discussion context here.
+                </p>
+              )}
+            </div>
+          </section>
         </section>
 
         <section id="start-building" className="scroll-mt-4 border-b border-zinc-800 pb-5">

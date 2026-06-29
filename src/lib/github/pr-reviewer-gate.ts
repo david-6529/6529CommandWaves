@@ -410,7 +410,7 @@ export function validateCommandPrManifest({
       "poll_drop_id",
       manifest.pollDropId === expected.pollDropId ? "pass" : "fail",
       expected.pollDropId
-        ? "Manifest poll drop id matches the wave decision receipt."
+        ? "Manifest poll drop id matches the 6529 decision receipt."
         : "No poll drop id is required by the approved command.",
     ),
   );
@@ -465,10 +465,10 @@ export function validateCommandPrManifest({
       gate.needsPoll
         ? poll?.decision
           ? decisionReferenceCheck?.ok
-            ? `Wave decision receipt ${approvalPassed ? "passed" : "has not passed"} for ${poll.decision.dropId ?? poll.decision.url ?? "recorded approval"}.`
-            : (decisionReferenceCheck?.message ?? "Wave decision receipt is not valid.")
+            ? `6529 decision receipt ${approvalPassed ? "passed" : "has not passed"} for ${poll.decision.dropId ?? poll.decision.url ?? "recorded approval"}.`
+            : (decisionReferenceCheck?.message ?? "6529 decision receipt is not valid.")
           : pollResult?.passed
-            ? "Local vote passed. Record a wave decision receipt before PR review can pass."
+            ? "Local vote passed. Record a 6529 decision receipt before PR review can pass."
             : `Vote has not passed under quorum ${gate.rule.quorum} / yes ${gate.rule.yesPercent}%.`
         : "No vote is required by the current rules.",
     ),

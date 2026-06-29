@@ -2,6 +2,7 @@ const copyReplacements: Array<[RegExp, string]> = [
   [/\b6529 Hook Builder\b/g, "6529 Hook Project"],
   [/\bWave Poll\b/g, "Decision"],
   [/\bbuilder wave decision receipt\b/gi, "6529 decision receipt"],
+  [/\bbuilder 6529 decision receipt\b/gi, "6529 decision receipt"],
   [/\bbuilder wave plus GitHub repo\b/gi, "6529 discussion and GitHub repo"],
   [/\bGenesis Agent\b/g, "Setup"],
   [/\bOrchestrator Agent\b/g, "Agent"],

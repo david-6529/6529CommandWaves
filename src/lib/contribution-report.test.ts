@@ -23,7 +23,7 @@ describe("contribution report", () => {
       "Complete proposal: 6 report points.",
       "Reviewing proposal: 4 report points.",
       "Other proposal: 3 report points.",
-      "Wave decision receipt: 2 report points.",
+      "6529 decision receipt: 2 report points.",
       "Vote or attributed activity log event: 1 report point.",
     ]);
     expect(report.evidence).toContain("1 GitHub PR link");
@@ -40,7 +40,7 @@ describe("contribution report", () => {
       proposals: 1,
       decisions: 1,
     });
-    expect(report.contributors[0].rationale).toContain("Recorded wave decision evidence");
+    expect(report.contributors[0].rationale).toContain("Recorded 6529 decision evidence");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
   });
 

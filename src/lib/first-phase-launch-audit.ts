@@ -107,7 +107,7 @@ function summaryFor(status: FirstPhaseLaunchAuditStatus) {
 const launchActionCopyByItemId: Record<string, string> = {
   flow_project: "Set builder wave and repo",
   flow_proposal: "Propose one PR-sized hook command",
-  flow_decision: "Record the builder wave decision",
+  flow_decision: "Record the 6529 decision",
   flow_build: "Build the approved PR",
   flow_review: "Review the PR result",
   flow_log: "Share the result back to the wave",
@@ -151,7 +151,7 @@ function createNextAction({
       statusLabel,
       itemId: null,
       title: "Start the first public loop",
-      detail: "Post the launch brief, invite contributors, and keep each PR tied to a builder wave decision.",
+      detail: "Post the launch brief, invite contributors, and keep each PR tied to a 6529 decision.",
     };
   }
 
@@ -265,7 +265,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
       return [
         {
           id: "flow_wave_decision_receipt",
-          label: "Wave decision receipt",
+          label: "6529 decision receipt",
           status: "blocked",
           detail: referenceCheck.message,
           source: "flow",
@@ -276,7 +276,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
     return [
       {
         id: "flow_wave_decision_receipt",
-        label: "Wave decision receipt",
+        label: "6529 decision receipt",
         status: "ready",
         detail: `Decision evidence recorded for ${proposal.id}.`,
         source: "flow",
@@ -287,7 +287,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   return [
     {
       id: "flow_wave_decision_receipt",
-      label: "Wave decision receipt",
+      label: "6529 decision receipt",
       status: "needed",
       detail: "Record the 6529 decision URL before the PR work is launch-ready.",
       source: "flow",

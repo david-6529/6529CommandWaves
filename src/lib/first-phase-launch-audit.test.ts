@@ -282,7 +282,7 @@ describe("first phase launch audit", () => {
     expect(audit.openItems.map((item) => item.label)).toContain("Choose project");
   });
 
-  it("requires a builder wave decision receipt before the first loop", () => {
+  it("requires a 6529 decision receipt before the first loop", () => {
     const wave = {
       ...demoWave,
       polls: [{ ...demoWave.polls[0], decision: null }],
@@ -303,7 +303,7 @@ describe("first phase launch audit", () => {
     expect(audit.openItems).toContainEqual(
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
-        label: "Wave decision receipt",
+        label: "6529 decision receipt",
         status: "needed",
       }),
     );
@@ -340,7 +340,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
         status: "blocked",
-        detail: "Wave decision URL must match the configured builder wave.",
+        detail: "6529 decision URL must match the configured discussion.",
       }),
     );
   });
@@ -376,7 +376,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
         status: "blocked",
-        detail: "Wave decision URL is required for PR work.",
+        detail: "6529 decision URL is required for PR work.",
       }),
     );
   });
