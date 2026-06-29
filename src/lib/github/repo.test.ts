@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { commandBranchName, parseGitHubRepoUrl, pullRequestUrl } from "./repo";
+import {
+  commandBranchName,
+  getGitHubRepoRequiredFiles,
+  parseGitHubRepoUrl,
+  pullRequestUrl,
+} from "./repo";
+
+function response(body: string, init: ResponseInit = {}) {
+  return new Response(body, {
+    status: 200,
+    headers: {
+      "content-type": "application/json",
+    },
+    ...init,
+  });
+}
 
 describe("GitHub repo helpers", () => {
   it("parses HTTPS, SSH, and owner/repo GitHub references", () => {
@@ -27,5 +42,41 @@ describe("GitHub repo helpers", () => {
       "https://github.com/6529-Collections/6529CommandWaves/pull/12",
     );
     expect(pullRequestUrl("not a repo", 12)).toBeNull();
+  });
+
+  it("checks required hook repo files on the default branch", async () => {
+    const calls: string[] = [];
+    const files = await getGitHubRepoRequiredFiles("6529-Collections/6529-hook", {
+      apiBaseUrl: "https://api.example.test",
+      ref: "main",
+      fetchImpl: async (input) => {
+        const url = String(input);
+
+        calls.push(url);
+
+        if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
+          return response("not found", { status: 404, statusText: "Not Found" });
+        }
+
+        return response("{}");
+      },
+    });
+
+    expect(calls).toEqual([
+      "https://api.example.test/repos/6529-Collections/6529-hook/contents/CONTRIBUTING.md?ref=main",
+      "https://api.example.test/repos/6529-Collections/6529-hook/contents/.github/PULL_REQUEST_TEMPLATE.md?ref=main",
+    ]);
+    expect(files).toEqual([
+      expect.objectContaining({
+        path: "CONTRIBUTING.md",
+        label: "Contributor rules",
+        exists: true,
+      }),
+      expect.objectContaining({
+        path: ".github/PULL_REQUEST_TEMPLATE.md",
+        label: "PR template",
+        exists: false,
+      }),
+    ]);
   });
 });

@@ -148,6 +148,13 @@ type SetupValidation = {
     private: boolean | null;
     archived: boolean | null;
   } | null;
+  repoRequiredFiles: Array<{
+    path: string;
+    label: string;
+    exists: boolean;
+    status: number;
+    message: string;
+  }>;
   checks: Array<{
     id: string;
     label: string;

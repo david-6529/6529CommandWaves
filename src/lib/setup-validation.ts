@@ -1,6 +1,14 @@
 import { getWave, normalizeWaveId } from "./6529/client";
 import { is6529MockMode } from "./6529/mock";
-import { getGitHubRepoMetadata, parseGitHubRepoUrl, type GitHubRepoMetadata, type GitHubRepoRef } from "./github/repo";
+import {
+  getGitHubRepoMetadata,
+  getGitHubRepoRequiredFiles,
+  parseGitHubRepoUrl,
+  type GitHubRepoApiOptions,
+  type GitHubRepoMetadata,
+  type GitHubRepoRef,
+  type GitHubRepoRequiredFile,
+} from "./github/repo";
 
 export type SetupCheckStatus = "pass" | "warn" | "fail";
 
@@ -20,6 +28,7 @@ export type SetupValidation = {
   waveId: string | null;
   repo: GitHubRepoRef | null;
   repoMetadata: GitHubRepoMetadata | null;
+  repoRequiredFiles: GitHubRepoRequiredFile[];
   checks: SetupCheck[];
   canSave: boolean;
   canRunCode: boolean;
@@ -28,6 +37,7 @@ export type SetupValidation = {
 type ValidationOptions = {
   checkWaveRemote?: boolean;
   checkRepoRemote?: boolean;
+  githubApi?: GitHubRepoApiOptions;
 };
 
 function asText(value: unknown) {
@@ -40,6 +50,10 @@ function check(id: string, label: string, status: SetupCheckStatus, message: str
 
 function hasFailures(checks: SetupCheck[]) {
   return checks.some((item) => item.status === "fail");
+}
+
+function repoFileCheckId(path: string) {
+  return `repo_file_${path.replaceAll(/[^a-z0-9]+/gi, "_").replaceAll(/^_+|_+$/g, "").toLowerCase()}`;
 }
 
 export function validateSetupShape(input: SetupValidationInput): SetupValidation {
@@ -65,6 +79,7 @@ export function validateSetupShape(input: SetupValidationInput): SetupValidation
     waveId: waveId || null,
     repo,
     repoMetadata: null,
+    repoRequiredFiles: [],
     checks,
     canSave: !hasFailures(checks),
     canRunCode: !hasFailures(checks) && Boolean(repo),
@@ -78,6 +93,7 @@ export async function validateCommandWaveSetup(
   const validation = validateSetupShape(input);
   const checks = [...validation.checks];
   let repoMetadata: GitHubRepoMetadata | null = null;
+  let repoRequiredFiles: GitHubRepoRequiredFile[] = [];
 
   if (options.checkWaveRemote && validation.waveId) {
     try {
@@ -104,7 +120,7 @@ export async function validateCommandWaveSetup(
 
   if (options.checkRepoRemote && validation.repo) {
     try {
-      repoMetadata = await getGitHubRepoMetadata(validation.repo.htmlUrl);
+      repoMetadata = await getGitHubRepoMetadata(validation.repo.htmlUrl, options.githubApi);
       checks.push(
         check(
           "repo_reachable",
@@ -115,6 +131,34 @@ export async function validateCommandWaveSetup(
             : `GitHub repo exists. Default branch: ${repoMetadata.defaultBranch ?? "unknown"}.`,
         ),
       );
+
+      try {
+        repoRequiredFiles = await getGitHubRepoRequiredFiles(validation.repo.htmlUrl, {
+          ...options.githubApi,
+          ref: options.githubApi?.ref ?? repoMetadata.defaultBranch,
+        });
+        checks.push(
+          ...repoRequiredFiles.map((file) =>
+            check(
+              repoFileCheckId(file.path),
+              file.label,
+              file.exists ? "pass" : "warn",
+              file.exists ? `${file.path} is present.` : `${file.path} is missing. Add it before broad launch.`,
+            ),
+          ),
+        );
+      } catch (error) {
+        checks.push(
+          check(
+            "repo_required_files",
+            "Required repo files",
+            "warn",
+            error instanceof Error
+              ? `Could not verify CONTRIBUTING.md and PR template: ${error.message}`
+              : "Could not verify CONTRIBUTING.md and PR template.",
+          ),
+        );
+      }
     } catch (error) {
       checks.push(
         check(
@@ -130,6 +174,7 @@ export async function validateCommandWaveSetup(
   return {
     ...validation,
     repoMetadata,
+    repoRequiredFiles,
     checks,
     canSave: !hasFailures(checks),
     canRunCode: !hasFailures(checks) && Boolean(validation.repo),
