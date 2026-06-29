@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "6529 Hook",
-  description: "Coordinate the active hook change with swarm chat, decisions, PR evidence, and review status.",
+  title: "6529 Hook Workspace",
+  description: "Coordinate the next hook change with swarm chat, decisions, PR evidence, and review status.",
 };
 
 export default function RootLayout({
