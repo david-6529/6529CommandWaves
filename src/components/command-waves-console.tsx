@@ -801,12 +801,12 @@ export function CommandWavesConsole() {
     }
   }
 
-  async function previewContext() {
+  async function previewContext(targetWaveUrl = waveUrl) {
     setApiBusy("context");
     setApiError("");
 
     try {
-      const preview = await requestContextPreview(waveUrl);
+      const preview = await requestContextPreview(targetWaveUrl);
 
       setContextPreview(preview);
       setApiNotice(`Context preview loaded for ${preview.dropCount} drops.`);
@@ -1091,7 +1091,12 @@ export function CommandWavesConsole() {
                     <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave to talk</LinkButton> : null}
-                      <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext()}>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={isBusy || !project.waveUrl}
+                        onClick={() => void previewContext(project.waveUrl)}
+                      >
                         {apiBusy === "context" ? "Loading" : "Read wave posts"}
                       </Button>
                     </div>
