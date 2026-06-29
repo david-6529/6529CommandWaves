@@ -113,7 +113,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
         ? githubPrConfigured
           ? "GitHub PR creation is enabled and credentialed."
           : "GitHub PR creation is enabled but no token is configured."
-        : "Local PR mock is active. Set COMMAND_WAVE_REPO_ADAPTER=github before production PR creation.",
+        : "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before production PR creation.",
     },
     {
       id: "guardian_wave_state",

@@ -76,7 +76,7 @@ Next production tasks:
 1. Pick the first real builder wave and hook repo, then publish the launch playbook.
 2. Wire live 6529 proposal and vote state into `COMMAND_WAVE_STATE_URL`.
 3. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
-4. Replace local mock PR execution with a controlled Codex harness that prepares branches.
+4. Replace local PR adapter execution with a controlled Codex harness that prepares branches.
 5. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
 
 ## Lessons Reused From `6529arena`

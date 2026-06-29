@@ -21,6 +21,8 @@ describe("launch packet", () => {
     });
     expect(packet.text).toContain("# 6529 Hook Builder launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
+    expect(packet.text).toContain("Participation notes (advisory):");
+    expect(packet.text).toContain("manual note only");
     expect(packet.text).toContain("Wave decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("## Contribution Report");
@@ -62,6 +64,23 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Build: waiting for an approved PR command.");
     expect(packet.text).toContain("Review: waiting for execution evidence.");
     expect(packet.text).toContain("Choose one PR-sized hook command.");
+  });
+
+  it("does not imply empty participation notes are enforced gates", () => {
+    const packet = createLaunchPacket({
+      wave: {
+        ...demoWave,
+        gates: [],
+      },
+      proposal: null,
+      poll: null,
+      execution: null,
+      review: null,
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+
+    expect(packet.text).toContain("Participation notes (advisory): none recorded");
+    expect(packet.text).not.toContain("Participation gate:");
   });
 
   it("keeps local vote approval waiting for a wave decision receipt", () => {

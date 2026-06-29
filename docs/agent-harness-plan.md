@@ -24,7 +24,7 @@ MVP execution path:
 
 Current local adapter status:
 
-- Generates a deterministic run manifest artifact before mock execution.
+- Generates a deterministic run manifest artifact before local adapter execution.
 - Includes proposal ID, command kind, risk, rules version/hash, permissions, budget, prompt/spec hashes, target branch, max runtime, and max cost.
 - Generates a deterministic Codex handoff packet for PR commands.
 - Generates a copyable manual Codex work packet for PR commands with a recorded wave decision receipt.

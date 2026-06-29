@@ -13,6 +13,10 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
       status: "fail",
     });
+    expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
+      status: "warn",
+      message: "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before production PR creation.",
+    });
   });
 
   it("passes configured production basics while warning when posting is disabled", () => {

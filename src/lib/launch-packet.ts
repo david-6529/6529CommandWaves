@@ -258,7 +258,7 @@ export function createLaunchPacket({
     `- Wave: ${wave.waveUrl}`,
     `- Repo: ${wave.repoUrl}`,
     `- Rules: ${wave.rules.version}`,
-    `- Participation gate: ${wave.gates.join(", ") || "not set"}`,
+    `- Participation notes (advisory): ${wave.gates.join(", ") || "none recorded"}`,
     "",
     "## Command",
     ...proposalLines(proposal),
