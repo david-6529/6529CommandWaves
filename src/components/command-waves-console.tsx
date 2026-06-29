@@ -460,10 +460,14 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+function Textarea({
+  inputRef,
+  ...props
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { inputRef?: React.Ref<HTMLTextAreaElement> }) {
   return (
     <textarea
       {...props}
+      ref={inputRef}
       className={`min-h-24 w-full resize-y rounded-md border border-zinc-800 bg-black px-3 py-2 text-sm leading-6 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
@@ -661,6 +665,7 @@ export function CommandWavesConsole() {
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const publicAppOrigin = useSyncExternalStore(subscribeToStaticOrigin, appOriginSnapshot, emptyAppOriginSnapshot);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
+  const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
@@ -1055,12 +1060,19 @@ export function CommandWavesConsole() {
     setApiError("");
 
     try {
-      await navigator.clipboard.writeText(waveUpdateDraft);
+      await navigator.clipboard.writeText(waveUpdateDraftRef.current?.value ?? waveUpdateDraft);
       setCopyNotice("Draft copied.");
       setApiNotice("Wave update draft copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
       setApiNotice("Copy failed. Select the wave update draft and copy it manually.");
+    }
+  }
+
+  function resetWaveUpdateDraft() {
+    if (waveUpdateDraftRef.current) {
+      waveUpdateDraftRef.current.value = waveUpdateDraft;
+      setCopyNotice("Draft reset.");
     }
   }
 
@@ -2263,14 +2275,17 @@ export function CommandWavesConsole() {
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
-                  Review the short update, share it manually in the builder wave, and keep the launch packet with the PR audit trail.
+                  Edit the short update, share it manually in the builder wave, and keep the launch packet with the PR audit trail.
                 </p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
                   <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
                     Copy wave update
                   </Button>
+                  <Button type="button" variant="secondary" onClick={resetWaveUpdateDraft}>
+                    Reset draft
+                  </Button>
                   <Button type="button" variant="secondary" onClick={() => void copyLaunchPacket()}>
-                    Copy launch packet
+                    Copy packet
                   </Button>
                 </div>
                 {copyNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{copyNotice}</p> : null}
@@ -2299,7 +2314,13 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               </div>
-              <Textarea readOnly rows={12} value={waveUpdateDraft} className="min-h-72 resize-none font-mono text-xs" />
+              <Textarea
+                key={waveUpdateDraft}
+                inputRef={waveUpdateDraftRef}
+                rows={12}
+                defaultValue={waveUpdateDraft}
+                className="min-h-72 resize-none font-mono text-xs"
+              />
             </div>
           </Panel>
         </section>
