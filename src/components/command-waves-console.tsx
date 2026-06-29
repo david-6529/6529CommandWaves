@@ -1268,6 +1268,16 @@ export function CommandWavesConsole() {
                       </div>
                       <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
                     </div>
+                    <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Next launch action</p>
+                        <Badge className={launchAuditStatusClass(launchAudit.nextAction.status)}>
+                          {launchAudit.nextAction.statusLabel}
+                        </Badge>
+                      </div>
+                      <p className="mt-2 text-sm font-semibold text-zinc-100">{launchAudit.nextAction.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-zinc-500">{launchAudit.nextAction.detail}</p>
+                    </div>
                     {launchAuditOpenItems.length ? (
                       <div className="mt-3 grid gap-2">
                         {launchAuditOpenItems.map((item) => (

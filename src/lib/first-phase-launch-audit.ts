@@ -14,10 +14,19 @@ export type FirstPhaseLaunchAuditItem = {
   source: "flow" | "readiness";
 };
 
+export type FirstPhaseLaunchNextAction = {
+  status: FirstPhaseLaunchAuditStatus;
+  statusLabel: string;
+  itemId: string | null;
+  title: string;
+  detail: string;
+};
+
 export type FirstPhaseLaunchAudit = {
   status: FirstPhaseLaunchAuditStatus;
   statusLabel: string;
   summary: string;
+  nextAction: FirstPhaseLaunchNextAction;
   items: FirstPhaseLaunchAuditItem[];
   readyItems: FirstPhaseLaunchAuditItem[];
   blockers: FirstPhaseLaunchAuditItem[];
@@ -79,6 +88,73 @@ function summaryFor(status: FirstPhaseLaunchAuditStatus) {
   }
 
   return "The local flow is usable. Public launch still needs setup.";
+}
+
+const launchActionCopyByItemId: Record<string, string> = {
+  flow_project: "Set builder wave and repo",
+  flow_proposal: "Propose one PR-sized hook command",
+  flow_decision: "Record the builder wave decision",
+  flow_build: "Build the approved PR",
+  flow_review: "Review the PR result",
+  flow_log: "Share the result back to the wave",
+  flow_wave_decision_receipt: "Record the 6529 decision URL",
+  flow_participation_notes: "Make participation notes advisory",
+  flow_audit_packet: "Prepare the launch packet",
+  readiness_not_checked: "Run readiness",
+};
+
+function launchActionTitle(item: FirstPhaseLaunchAuditItem) {
+  const explicitTitle = launchActionCopyByItemId[item.id];
+
+  if (explicitTitle) {
+    return explicitTitle;
+  }
+
+  if (item.status === "blocked") {
+    return `Fix ${item.label}`;
+  }
+
+  return `Complete ${item.label}`;
+}
+
+function createNextAction({
+  status,
+  statusLabel,
+  openItems,
+}: {
+  status: FirstPhaseLaunchAuditStatus;
+  statusLabel: string;
+  openItems: FirstPhaseLaunchAuditItem[];
+}): FirstPhaseLaunchNextAction {
+  if (status === "ready") {
+    return {
+      status,
+      statusLabel,
+      itemId: null,
+      title: "Start the public hook loop",
+      detail: "Post the launch brief, invite contributors, and keep each PR tied to a builder wave decision.",
+    };
+  }
+
+  const item = openItems[0];
+
+  if (!item) {
+    return {
+      status,
+      statusLabel,
+      itemId: null,
+      title: "Check launch state",
+      detail: "Run the public launch audit again before inviting contributors.",
+    };
+  }
+
+  return {
+    status,
+    statusLabel,
+    itemId: item.id,
+    title: launchActionTitle(item),
+    detail: item.detail,
+  };
 }
 
 function openItemWeight(item: FirstPhaseLaunchAuditItem) {
@@ -279,11 +355,13 @@ export function createFirstPhaseLaunchAudit({
     .filter((item) => item.status !== "ready")
     .toSorted((left, right) => openItemWeight(left) - openItemWeight(right));
   const status: FirstPhaseLaunchAuditStatus = blockers.length ? "blocked" : openItems.length ? "needs_setup" : "ready";
+  const statusText = statusLabel(status);
 
   return {
     status,
-    statusLabel: statusLabel(status),
+    statusLabel: statusText,
     summary: summaryFor(status),
+    nextAction: createNextAction({ status, statusLabel: statusText, openItems }),
     items,
     readyItems,
     blockers,

@@ -29,6 +29,11 @@ describe("first phase launch audit", () => {
 
     expect(audit.status).toBe("ready");
     expect(audit.statusLabel).toBe("ready");
+    expect(audit.nextAction).toMatchObject({
+      status: "ready",
+      itemId: null,
+      title: "Start the public hook loop",
+    });
     expect(audit.blockers).toHaveLength(0);
     expect(audit.openItems).toHaveLength(0);
     expect(audit.readyItems.length).toBeGreaterThan(0);
@@ -62,6 +67,11 @@ describe("first phase launch audit", () => {
     });
 
     expect(audit.status).toBe("needs_setup");
+    expect(audit.nextAction).toMatchObject({
+      status: "needs_setup",
+      itemId: "readiness_not_checked",
+      title: "Run readiness",
+    });
     expect(audit.openItems).toEqual([
       expect.objectContaining({
         id: "readiness_not_checked",
@@ -79,6 +89,11 @@ describe("first phase launch audit", () => {
     });
 
     expect(audit.status).toBe("blocked");
+    expect(audit.nextAction).toMatchObject({
+      status: "blocked",
+      itemId: "readiness_admin_api_key",
+      title: "Fix Admin API key",
+    });
     expect(audit.blockers.map((item) => item.label)).toEqual(["Admin API key", "Cron secret", "Rate-limit salt"]);
     expect(audit.openItems.slice(0, 3).map((item) => item.status)).toEqual(["blocked", "blocked", "blocked"]);
   });
@@ -116,6 +131,11 @@ describe("first phase launch audit", () => {
     });
 
     expect(audit.status).toBe("needs_setup");
+    expect(audit.nextAction).toMatchObject({
+      status: "needs_setup",
+      itemId: "flow_wave_decision_receipt",
+      title: "Record the 6529 decision URL",
+    });
     expect(audit.openItems).toContainEqual(
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
