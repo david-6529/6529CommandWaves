@@ -2277,10 +2277,11 @@ export function CommandWavesConsole() {
                 <p className="text-sm leading-6 text-zinc-400">
                   Edit the short update, share it manually in the builder wave, and keep the launch packet with the PR audit trail.
                 </p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
-                    Copy wave update
+                    Copy update
                   </Button>
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
                   <Button type="button" variant="secondary" onClick={resetWaveUpdateDraft}>
                     Reset draft
                   </Button>
