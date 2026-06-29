@@ -190,6 +190,8 @@ function contributionLines(report: ContributionReport) {
 
   return [
     `- Summary: ${report.summary}`,
+    "- Evidence used:",
+    ...limitedList(report.evidence, 6, "No app evidence recorded yet."),
     "- Visible contributors:",
     ...limitedList(contributors, 6, "No visible contributors yet."),
     "- Notes:",

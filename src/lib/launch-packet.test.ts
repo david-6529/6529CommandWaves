@@ -24,6 +24,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Wave decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("## Contribution Report");
+    expect(packet.text).toContain("1 Guardian review proof");
     expect(packet.text).toContain("## Developer Fee Evidence");
     expect(packet.text).toContain("Run manifest recorded.");
     expect(packet.text).toContain("PR manifest in body.");

@@ -15,6 +15,7 @@ export type ContributionReport = {
   mode: "informational";
   generatedAt: string;
   summary: string;
+  evidence: string[];
   contributors: ContributionContributor[];
   notes: string[];
 };
@@ -45,6 +46,38 @@ function addRationale(contributor: ContributionContributor, rationale: string) {
   if (!contributor.rationale.includes(rationale)) {
     contributor.rationale.push(rationale);
   }
+}
+
+function countLabel(count: number, singular: string) {
+  return `${count} ${count === 1 ? singular : `${singular}s`}`;
+}
+
+function githubPrLinkCount(wave: CommandWave) {
+  return wave.executions.reduce(
+    (count, execution) =>
+      count +
+      execution.artifacts.filter((artifact) =>
+        /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
+      ).length,
+    0,
+  );
+}
+
+function evidenceSummary(wave: CommandWave) {
+  const voteCount = wave.polls.reduce((count, poll) => count + (poll.votes?.length ?? 0), 0);
+  const decisionCount = wave.polls.filter((poll) => poll.decision).length;
+  const prLinkCount = githubPrLinkCount(wave);
+  const reviewProofCount = wave.reviews.filter((review) => review.proof).length;
+  const evidence = [
+    ...(wave.proposals.length ? [countLabel(wave.proposals.length, "command proposal")] : []),
+    ...(voteCount ? [countLabel(voteCount, "vote")] : []),
+    ...(decisionCount ? [countLabel(decisionCount, "wave decision receipt")] : []),
+    ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
+    ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
+    ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
+  ];
+
+  return evidence.length ? evidence : ["No app evidence recorded yet."];
 }
 
 export function createContributionReport(
@@ -108,11 +141,12 @@ export function createContributionReport(
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
       : "No contributor activity has been recorded yet.",
+    evidence: evidenceSummary(wave),
     contributors: sorted,
     notes: [
       "Scores are an AI-readable activity report, not a permission system.",
       "REP, TDH, payouts, and merge rights must use separate human-approved rules.",
-      "The report only uses proposals, votes, decision receipts, and ledger events currently stored by this app.",
+      "The report only uses proposal, vote, decision, PR, review, and ledger evidence currently stored by this app.",
       "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
     ],
   };

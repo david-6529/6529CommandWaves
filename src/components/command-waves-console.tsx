@@ -1712,6 +1712,14 @@ export function CommandWavesConsole() {
                   </Badge>
                 ))}
               </div>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Evidence used</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {contributionReport.evidence.map((item) => (
+                  <Badge key={item} className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                    {item}
+                  </Badge>
+                ))}
+              </div>
             </div>
             <div className="divide-y divide-zinc-800 rounded-md border border-zinc-800 bg-black">
               {contributionReport.contributors.map((contributor) => (

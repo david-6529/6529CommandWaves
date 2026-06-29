@@ -14,7 +14,9 @@ describe("contribution report", () => {
     });
     expect(report.notes.join(" ")).toContain("not a permission system");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
-    expect(report.notes.join(" ")).toContain("decision receipts");
+    expect(report.notes.join(" ")).toContain("review, and ledger evidence");
+    expect(report.evidence).toContain("1 GitHub PR link");
+    expect(report.evidence).toContain("1 Guardian review proof");
     expect(report.contributors[0]).toMatchObject({
       identity: "david",
       proposals: 1,
@@ -28,5 +30,19 @@ describe("contribution report", () => {
     const report = createContributionReport(demoWave);
 
     expect(report.generatedAt).toBe("2026-06-20T12:50:00.000Z");
+  });
+
+  it("reports no evidence before app activity exists", () => {
+    const report = createContributionReport({
+      ...demoWave,
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    });
+
+    expect(report.summary).toBe("No contributor activity has been recorded yet.");
+    expect(report.evidence).toEqual(["No app evidence recorded yet."]);
   });
 });
