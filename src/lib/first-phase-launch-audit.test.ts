@@ -123,10 +123,12 @@ describe("first phase launch audit", () => {
     });
 
     expect(audit.status).toBe("needs_setup");
+    expect(audit.statusLabel).toBe("checks needed");
     expect(audit.nextAction).toMatchObject({
       status: "needs_setup",
       itemId: "setup_not_checked",
-      title: "Check setup",
+      title: "Run launch setup check",
+      detail: "Verify the wave, repo, contributor rules, and PR template before public launch.",
     });
   });
 
@@ -139,6 +141,7 @@ describe("first phase launch audit", () => {
     });
 
     expect(audit.status).toBe("needs_setup");
+    expect(audit.statusLabel).toBe("checks needed");
     expect(audit.nextAction).toMatchObject({
       status: "needs_setup",
       itemId: "readiness_not_checked",

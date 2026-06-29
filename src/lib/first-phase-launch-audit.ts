@@ -73,7 +73,7 @@ function readinessItemStatus(status: ReadinessCheck["status"]): FirstPhaseLaunch
 
 function statusLabel(status: FirstPhaseLaunchAuditStatus) {
   if (status === "needs_setup") {
-    return "needs setup";
+    return "checks needed";
   }
 
   return status;
@@ -101,7 +101,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_wave_decision_receipt: "Record the 6529 decision URL",
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Prepare the launch packet",
-  setup_not_checked: "Check setup",
+  setup_not_checked: "Run launch setup check",
   setup_repo_required_files: "Check launch repo files",
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",
@@ -185,7 +185,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_not_checked",
         label: "Setup check",
         status: "needed",
-        detail: "Run setup check before public launch.",
+        detail: "Verify the wave, repo, contributor rules, and PR template before public launch.",
         source: "setup",
       },
     ];
