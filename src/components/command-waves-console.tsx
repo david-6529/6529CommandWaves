@@ -35,6 +35,7 @@ import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
+import { normalizeParticipationGates } from "@/lib/participation-gates";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -952,6 +953,7 @@ export function CommandWavesConsole() {
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
+  const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -1589,6 +1591,7 @@ export function CommandWavesConsole() {
             <div className="mt-4 flex flex-wrap gap-2">
               <JumpLink href="#start-building">Suggest a change</JumpLink>
               <JumpLink href="#current-build">Current build</JumpLink>
+              <JumpLink href="#who-can-play">Who can play</JumpLink>
               <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
               <JumpLink href="#rules-of-game">Read rules</JumpLink>
               <JumpLink href="#swarm-members">See members</JumpLink>
@@ -1623,6 +1626,47 @@ export function CommandWavesConsole() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section id="who-can-play" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1fr_0.9fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">Who can play</p>
+            <h2 className="mt-1 text-xl font-semibold text-zinc-50">Join through the builder wave</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              Phase 1 keeps access simple and human-readable. Builders use the 6529 wave to ask questions, answer any
+              manual prompt, and propose scoped hook work.
+            </p>
+            <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+              {participationGateNotes.map((gate) => (
+                <div key={gate} className="py-3">
+                  <p className="text-sm leading-6 text-zinc-300">{gate}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
+                Copy guide
+              </Button>
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+              <JumpLink href="#start-building">Suggest work</JumpLink>
+            </div>
+            {participationGuideNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p> : null}
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Enforced now</p>
+            <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+              {[
+                ["Social source", "The 6529 wave is where people discuss and approve work."],
+                ["Manual gates", "Allowlist, REP, TDH, holder, or QnA notes are advisory until live checks are wired."],
+                ["Human control", "Humans keep merge, deploy, payment, and governance authority."],
+              ].map(([label, detail]) => (
+                <div key={label} className="py-3">
+                  <p className="text-sm font-semibold text-zinc-100">{label}</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-400">{detail}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
