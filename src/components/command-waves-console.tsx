@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
+import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
@@ -659,6 +660,7 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [contributionReportNotice, setContributionReportNotice] = useState("");
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
+  const [waveRoomNotice, setWaveRoomNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
@@ -672,6 +674,7 @@ export function CommandWavesConsole() {
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const publicAppOrigin = useSyncExternalStore(subscribeToStaticOrigin, appOriginSnapshot, emptyAppOriginSnapshot);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
+  const waveRoomDraftRef = useRef<HTMLTextAreaElement>(null);
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -766,6 +769,10 @@ export function CommandWavesConsole() {
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
+  const primaryHookProject = activeHookProjects[0] ?? null;
+  const primaryProjectContextPreview = primaryHookProject
+    ? (projectContextPreviews[primaryHookProject.id] ?? null)
+    : null;
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -799,6 +806,7 @@ export function CommandWavesConsole() {
     [activeExecution, activePoll, activeProposal, activeReview, launchVerificationTargets, wave],
   );
   const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(wave), [wave]);
+  const builderWaveChatDraft = useMemo(() => createBuilderWaveChatDraft(wave, phaseNextAction), [phaseNextAction, wave]);
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -942,6 +950,7 @@ export function CommandWavesConsole() {
     setGateNotes(nextWave.gates.join("\n"));
     setContributionReportNotice("");
     setDeveloperFeePlanNotice("");
+    setWaveRoomNotice("");
     setProjectContextPreviews({});
     setSetupContextPreview(null);
     setDecisionDraftNotice("");
@@ -1122,6 +1131,22 @@ export function CommandWavesConsole() {
       setLaunchBriefNotice("Launch brief copied.");
     } catch {
       setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
+    }
+  }
+
+  async function copyBuilderWaveChatDraft() {
+    try {
+      await navigator.clipboard.writeText(waveRoomDraftRef.current?.value ?? builderWaveChatDraft);
+      setWaveRoomNotice("Wave note copied.");
+    } catch {
+      setWaveRoomNotice("Copy failed. Select the wave note and copy it manually.");
+    }
+  }
+
+  function resetBuilderWaveChatDraft() {
+    if (waveRoomDraftRef.current) {
+      waveRoomDraftRef.current.value = builderWaveChatDraft;
+      setWaveRoomNotice("Wave note reset.");
     }
   }
 
@@ -1366,7 +1391,7 @@ export function CommandWavesConsole() {
                         >
                           {apiBusy === "context" ? "Loading" : "Read latest posts"}
                         </Button>
-                        <JumpLink href="#share-back">Draft wave post</JumpLink>
+                        <JumpLink href="#wave-room">Draft wave post</JumpLink>
                       </div>
                       {contextPreview ? (
                         <div className="mt-3 border-t border-zinc-800 pt-3">
@@ -1441,6 +1466,83 @@ export function CommandWavesConsole() {
               );
             })}
           </div>
+        </section>
+
+        <section id="wave-room" className="scroll-mt-4">
+          <Panel title="Builder wave room" eyebrow="Wave conversation">
+            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+              <div>
+                <p className="text-sm leading-6 text-zinc-400">
+                  Read recent drops, draft a short question or reply, then post it in the builder wave.
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isBusy || !primaryHookProject?.waveUrl}
+                    onClick={() =>
+                      void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                    }
+                  >
+                    {apiBusy === "context" ? "Loading" : "Read latest posts"}
+                  </Button>
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
+                    Copy note
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                    Reset note
+                  </Button>
+                </div>
+                {waveRoomNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{waveRoomNotice}</p> : null}
+                {primaryProjectContextPreview ? (
+                  <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
+                        {contextModeLabel(primaryProjectContextPreview)}
+                      </Badge>
+                      <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                        {primaryProjectContextPreview.dropCount} drops
+                      </Badge>
+                    </div>
+                    <div className="mt-2 grid gap-2">
+                      {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
+                        <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-xs font-semibold text-zinc-500">
+                              {drop.author} / {drop.id}
+                            </p>
+                            {drop.url ? (
+                              <a
+                                className="text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                                href={drop.url}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Open drop
+                              </a>
+                            ) : null}
+                          </div>
+                          <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-xs leading-5 text-zinc-500">
+                    Load latest posts to see recent builder wave context here.
+                  </p>
+                )}
+              </div>
+              <Textarea
+                key={builderWaveChatDraft}
+                inputRef={waveRoomDraftRef}
+                rows={12}
+                defaultValue={builderWaveChatDraft}
+                className="min-h-72 resize-none font-mono text-xs"
+              />
+            </div>
+          </Panel>
         </section>
 
         <section className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
