@@ -611,7 +611,7 @@ export function CommandWavesConsole() {
   const [budgetUsd, setBudgetUsd] = useState("10");
   const [decisionReference, setDecisionReference] = useState("");
   const [apiBusy, setApiBusy] = useState<BusyState | null>(null);
-  const [apiNotice, setApiNotice] = useState("Backend demo state is loading.");
+  const [apiNotice, setApiNotice] = useState("Project state is loading.");
   const [apiError, setApiError] = useState("");
   const [copyNotice, setCopyNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
@@ -731,7 +731,7 @@ export function CommandWavesConsole() {
           setWave(nextWave);
           setWaveUrl(nextWave.waveUrl);
           setRepoUrl(nextWave.repoUrl);
-          setApiNotice("Backend demo state loaded.");
+          setApiNotice("Project state loaded.");
         })
         .catch((error: unknown) => {
           if (!controller.signal.aborted) {
@@ -874,8 +874,8 @@ export function CommandWavesConsole() {
     );
   }
 
-  function resetDemo() {
-    void runWaveAction("reset", () => requestWave("/api/command-wave", { method: "DELETE" }, accessKey), "Demo state reset.");
+  function resetStarterState() {
+    void runWaveAction("reset", () => requestWave("/api/command-wave", { method: "DELETE" }, accessKey), "Starter state restored.");
   }
 
   async function copyWaveUpdateDraft() {
@@ -1312,15 +1312,15 @@ export function CommandWavesConsole() {
               ) : null}
               <details className="rounded-md border border-zinc-800 bg-black p-3">
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
-                  <span>Local demo controls</span>
+                  <span>Local test controls</span>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-400">hidden</Badge>
                 </summary>
                 <div className="mt-3 grid gap-3">
                   <p className="text-xs leading-5 text-zinc-500">
-                    Restore the built-in hook demo only when testing the local app.
+                    Restore the starter hook project only when testing the local app.
                   </p>
-                  <Button type="button" variant="danger" disabled={isBusy} onClick={resetDemo}>
-                    {apiBusy === "reset" ? "Resetting" : "Reset demo"}
+                  <Button type="button" variant="danger" disabled={isBusy} onClick={resetStarterState}>
+                    {apiBusy === "reset" ? "Resetting" : "Reset starter"}
                   </Button>
                 </div>
               </details>
