@@ -16,6 +16,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("6529 Hook Builder update");
     expect(draft).toContain(`Command: ${proposal.id} - ${proposal.title}`);
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
+    expect(draft).toContain("receipt https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval.");
     expect(draft).toContain("humans keep merge, deploy, payment, and governance authority");
     expect(draft).toContain("Scores are informational only.");
     expect(draft).toContain("Developer fee plan:");

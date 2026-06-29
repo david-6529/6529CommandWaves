@@ -2,13 +2,17 @@ import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, Pol
 import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan } from "./developer-fee-plan";
 
+function decisionReference(poll: PollState) {
+  return poll.decision?.url ?? poll.decision?.dropId ?? "recorded";
+}
+
 function pollLine(poll: PollState | null) {
   if (!poll) {
     return "Decision: no vote required by current rules.";
   }
 
   if (poll.decision) {
-    return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, receipt ${poll.decision.dropId ?? poll.decision.url ?? "recorded"}.`;
+    return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, receipt ${decisionReference(poll)}.`;
   }
 
   return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;
