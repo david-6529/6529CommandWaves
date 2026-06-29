@@ -100,7 +100,7 @@ Short version:
 The current app is a local prototype of the hook-building flow:
 
 - first-screen hook dashboard: wave snapshot, code state, PR, review, and progress
-- active 6529 Hook status board with wave, repo, PR, review, and evidence state
+- hooks-in-development snapshot for the 6529 Hook with wave, repo, PR, review, and evidence state
 - compact current-state area with work, launch, and progress guidance
 - recent activity log placed near the core build flow
 - collapsed maintainer setup and guardrail controls at the bottom of the page
@@ -157,7 +157,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open the local URL printed by Next. In this workspace it is currently `http://localhost:5010`.
+Open the local URL printed by Next.
 
 6529 mock mode is the safe default. Set `6529_MOCK_MODE=false` only when you are ready to use the live 6529 API.
 
