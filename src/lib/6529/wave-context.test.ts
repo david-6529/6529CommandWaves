@@ -49,6 +49,7 @@ describe("6529 wave context", () => {
     });
     expect(preview.sampleDrops.at(-1)).toMatchObject({
       id: "drop-003",
+      url: "https://6529.io/waves/mock-command-wave/drops/drop-003",
       author: "reviewer-agent",
     });
   });

@@ -121,6 +121,7 @@ type WaveContextPreview = {
   };
   sampleDrops: Array<{
     id: string;
+    url: string | null;
     author: string;
     sourceWaveRole: string | null;
     preview: string;
@@ -1351,9 +1352,21 @@ export function CommandWavesConsole() {
                           <div className="mt-2 grid gap-2">
                             {contextPreview.sampleDrops.slice(-3).map((drop) => (
                               <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
-                                <p className="text-xs font-semibold text-zinc-500">
-                                  {drop.author} / {drop.id}
-                                </p>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <p className="text-xs font-semibold text-zinc-500">
+                                    {drop.author} / {drop.id}
+                                  </p>
+                                  {drop.url ? (
+                                    <a
+                                      className="text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                                      href={drop.url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      Open drop
+                                    </a>
+                                  ) : null}
+                                </div>
                                 <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
                               </div>
                             ))}
@@ -1783,9 +1796,21 @@ export function CommandWavesConsole() {
                   <div className="mt-3 space-y-2">
                     {setupContextPreview.sampleDrops.slice(-3).map((drop) => (
                       <div key={drop.id} className="border-t border-zinc-900 pt-2">
-                        <p className="text-xs font-semibold text-zinc-500">
-                          {drop.author} / {drop.id}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-xs font-semibold text-zinc-500">
+                            {drop.author} / {drop.id}
+                          </p>
+                          {drop.url ? (
+                            <a
+                              className="text-xs font-semibold text-cyan-300 hover:text-cyan-200"
+                              href={drop.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Open drop
+                            </a>
+                          ) : null}
+                        </div>
                         <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
                       </div>
                     ))}

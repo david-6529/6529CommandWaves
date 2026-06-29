@@ -130,6 +130,14 @@ function dropAuthor(drop: WaveDrop) {
   return drop.author?.handle ?? drop.author?.display ?? drop.author?.primary_wallet ?? "unknown";
 }
 
+function dropUrl(waveId: string | null | undefined, dropId: string) {
+  const normalizedWaveId = waveId ? normalizeWaveId(waveId) : "";
+
+  return normalizedWaveId && dropId
+    ? `https://6529.io/waves/${encodeURIComponent(normalizedWaveId)}/drops/${encodeURIComponent(dropId)}`
+    : null;
+}
+
 function sortDropsChronologically(drops: WaveDrop[]) {
   return [...drops].sort((a, b) => {
     const aCreated = dropCreatedAtMs(a) ?? 0;
@@ -322,15 +330,20 @@ export async function previewWaveContext(params: WaveContextParams) {
     fromDropId: ordered[0]?.id ?? null,
     toDropId: ordered.at(-1)?.id ?? null,
     context: waveContext.context,
-    sampleDrops: ordered.slice(-5).map((drop) => ({
-      id: drop.id,
-      serialNo: drop.serial_no ?? null,
-      author: dropAuthor(drop),
-      createdAt: drop.created_at ? new Date(drop.created_at).toISOString() : null,
-      sourceWaveId: drop.source_wave_id ?? normalizeWaveId(params.waveId),
-      sourceWaveName: drop.source_wave_name ?? null,
-      sourceWaveRole: drop.source_wave_role ?? null,
-      preview: (drop.content ?? "").replace(/\s+/g, " ").trim().slice(0, 220),
-    })),
+    sampleDrops: ordered.slice(-5).map((drop) => {
+      const sourceWaveId = drop.source_wave_id ?? normalizeWaveId(params.waveId);
+
+      return {
+        id: drop.id,
+        url: dropUrl(sourceWaveId, drop.id),
+        serialNo: drop.serial_no ?? null,
+        author: dropAuthor(drop),
+        createdAt: drop.created_at ? new Date(drop.created_at).toISOString() : null,
+        sourceWaveId,
+        sourceWaveName: drop.source_wave_name ?? null,
+        sourceWaveRole: drop.source_wave_role ?? null,
+        preview: (drop.content ?? "").replace(/\s+/g, " ").trim().slice(0, 220),
+      };
+    }),
   };
 }
