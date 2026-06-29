@@ -1,0 +1,30 @@
+import { describe, expect, it } from "vitest";
+import { createBuilderWaveLaunchDraft } from "./builder-wave-launch-draft";
+import { demoWave } from "./demo-wave";
+
+describe("builder wave launch draft", () => {
+  it("creates a concise first post for the hook builder wave", () => {
+    const draft = createBuilderWaveLaunchDraft(demoWave);
+
+    expect(draft).toContain("6529 Hook Builder launch brief");
+    expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain("build one non-upgradeable 6529 hook in public");
+    expect(draft).toContain("Wait for a builder wave decision before PR work starts.");
+    expect(draft).toContain("Use GitHub PRs for code and reviews.");
+    expect(draft).toContain("No proxy, delegatecall, deployment, spending, payouts, or governance changes in phase 1.");
+    expect(draft).toContain("Participation notes (advisory):");
+    expect(draft).toContain("not REP, TDH, payments, permissions, or merge rights");
+    expect(draft).not.toContain("\u2014");
+  });
+
+  it("handles projects without participation notes", () => {
+    const draft = createBuilderWaveLaunchDraft({
+      ...demoWave,
+      gates: [],
+    });
+
+    expect(draft).toContain("Participation notes: none recorded yet.");
+    expect(draft).not.toContain("Participation notes (advisory):");
+  });
+});

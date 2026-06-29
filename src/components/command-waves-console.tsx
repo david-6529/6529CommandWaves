@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
+import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import {
   classifyRisk,
   evaluatePoll,
@@ -615,6 +616,7 @@ export function CommandWavesConsole() {
   const [apiNotice, setApiNotice] = useState("Project state is loading.");
   const [apiError, setApiError] = useState("");
   const [copyNotice, setCopyNotice] = useState("");
+  const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
   const [contextPreview, setContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
@@ -705,6 +707,7 @@ export function CommandWavesConsole() {
       }),
     [activeExecution, activePoll, activeProposal, activeReview, wave],
   );
+  const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(wave), [wave]);
   const launchPacket = useMemo(
     () =>
       createLaunchPacket({
@@ -767,6 +770,7 @@ export function CommandWavesConsole() {
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
     setGateNotes(nextWave.gates.join("\n"));
+    setLaunchBriefNotice("");
     setCodexPacketNotice("");
   }
 
@@ -890,6 +894,15 @@ export function CommandWavesConsole() {
       setCopyNotice("Draft copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
+    }
+  }
+
+  async function copyBuilderWaveLaunchDraft() {
+    try {
+      await navigator.clipboard.writeText(builderWaveLaunchDraft);
+      setLaunchBriefNotice("Launch brief copied.");
+    } catch {
+      setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
     }
   }
 
@@ -1211,6 +1224,22 @@ export function CommandWavesConsole() {
                   Export activity
                 </Button>
               </div>
+              <details className="rounded-md border border-zinc-800 bg-black p-3">
+                <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+                  <span>Builder wave launch brief</span>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-400">copyable</Badge>
+                </summary>
+                <div className="mt-3 grid gap-3">
+                  <p className="text-xs leading-5 text-zinc-500">
+                    Post this after setup so contributors see the scope, repo, participation notes, and phase 1 guardrails.
+                  </p>
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveLaunchDraft()}>
+                    Copy launch brief
+                  </Button>
+                  {launchBriefNotice ? <p className="text-xs leading-5 text-zinc-500">{launchBriefNotice}</p> : null}
+                  <Textarea readOnly rows={10} value={builderWaveLaunchDraft} className="min-h-60 resize-none font-mono text-xs" />
+                </div>
+              </details>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
                   <span>Launch readiness</span>
