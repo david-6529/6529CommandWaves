@@ -54,7 +54,62 @@ function artifactSummary(artifact: string) {
     return `PR link: ${artifact}`;
   }
 
+  if (artifact === "PR body includes Command Waves manifest") {
+    return "PR manifest in body.";
+  }
+
   return humanizeLegacyCommandCopy(artifact);
+}
+
+function artifactPriority(artifact: string) {
+  if (artifact.startsWith("run-manifest:")) {
+    return 0;
+  }
+
+  if (artifact.startsWith("agent-handoff:")) {
+    return 1;
+  }
+
+  if (artifact === "PR body includes Command Waves manifest") {
+    return 2;
+  }
+
+  if (artifact.startsWith("https://github.com/")) {
+    return 3;
+  }
+
+  if (artifact.startsWith("head ")) {
+    return 4;
+  }
+
+  if (/\btest\b/i.test(artifact)) {
+    return 5;
+  }
+
+  if (artifact.startsWith("rules ")) {
+    return 6;
+  }
+
+  if (artifact.startsWith("permissions ")) {
+    return 7;
+  }
+
+  if (artifact.startsWith("budget cap ")) {
+    return 8;
+  }
+
+  if (/^PR #\d+\b/.test(artifact)) {
+    return 9;
+  }
+
+  return 10;
+}
+
+function buildEvidenceItems(artifacts: string[]) {
+  return artifacts
+    .map((artifact, index) => ({ artifact, index }))
+    .toSorted((left, right) => artifactPriority(left.artifact) - artifactPriority(right.artifact) || left.index - right.index)
+    .map((item) => artifactSummary(item.artifact));
 }
 
 function proposalLines(proposal: CommandProposal | null) {
@@ -107,7 +162,7 @@ function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
     `- Harness: ${execution.harness}`,
     `- Summary: ${humanizeLegacyCommandCopy(execution.summary)}`,
     "- Build evidence:",
-    ...limitedList(execution.artifacts.map(artifactSummary), 6, "No build artifacts recorded."),
+    ...limitedList(buildEvidenceItems(execution.artifacts), 6, "No build artifacts recorded."),
   ];
 }
 

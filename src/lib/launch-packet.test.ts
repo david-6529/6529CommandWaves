@@ -26,6 +26,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("## Contribution Report");
     expect(packet.text).toContain("## Developer Fee Evidence");
     expect(packet.text).toContain("Run manifest recorded.");
+    expect(packet.text).toContain("PR manifest in body.");
+    expect(packet.text).toContain("PR link: https://github.com/6529-Collections/6529-hook/pull/12");
+    expect(packet.text).toContain("Head commit recorded.");
+    expect(packet.text).toContain("forge test passed");
     expect(packet.text).not.toContain("run-manifest:{");
     expect(packet.text).toContain("No automatic payouts.");
     expect(packet.text).toContain("This packet does not grant REP, TDH, payouts, permissions, or merge rights.");
