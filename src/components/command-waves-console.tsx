@@ -76,11 +76,6 @@ const swarmGameRules = [
   "Important changes need a visible decision before a PR is built.",
   "The reviewer agent checks the PR before humans merge.",
 ];
-const newcomerPaths = [
-  "Ask a question in the swarm chat.",
-  "Suggest one small hook change.",
-  "Review the active PR or latest decision.",
-];
 const plainNextSteps = [
   {
     title: "Share it",
@@ -444,7 +439,7 @@ function isLaunchAuditEvidenceItem(item: FirstPhaseLaunchAuditItem) {
 
 function Badge({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${className}`}>
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-sm font-semibold ${className}`}>
       {children}
     </span>
   );
@@ -455,8 +450,8 @@ function Panel({ title, eyebrow, children }: { title: string; eyebrow?: string; 
     <section className="rounded-lg border border-zinc-800 bg-zinc-950/75 p-4 shadow-sm shadow-black/20">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          {eyebrow ? <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">{eyebrow}</p> : null}
-          <h2 className="text-lg font-semibold text-zinc-50">{title}</h2>
+          {eyebrow ? <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">{eyebrow}</p> : null}
+          <h2 className="text-xl font-semibold text-zinc-50">{title}</h2>
         </div>
       </div>
       {children}
@@ -467,8 +462,8 @@ function Panel({ title, eyebrow, children }: { title: string; eyebrow?: string; 
 function CompactList({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="rounded-md border border-zinc-800 bg-black p-3">
-      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{title}</p>
-      <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+      <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{title}</p>
+      <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-400">
         {items.map((item) => (
           <li key={item}>- {item}</li>
         ))}
@@ -479,8 +474,8 @@ function CompactList({ title, items }: { title: string; items: string[] }) {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block text-sm font-semibold text-zinc-200">
-      <span className="mb-1 block">{label}</span>
+    <label className="block text-base font-semibold text-zinc-200">
+      <span className="mb-2 block">{label}</span>
       {children}
     </label>
   );
@@ -490,7 +485,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`h-10 w-full rounded-md border border-zinc-800 bg-black px-3 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
+      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -503,7 +498,7 @@ function Textarea({
     <textarea
       {...props}
       ref={inputRef}
-      className={`min-h-24 w-full resize-y rounded-md border border-zinc-800 bg-black px-3 py-2 text-sm leading-6 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
+      className={`min-h-28 w-full resize-y rounded-md border border-zinc-800 bg-black px-4 py-3 text-base leading-7 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -512,7 +507,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`h-10 w-full rounded-md border border-zinc-800 bg-black px-3 text-sm text-zinc-100 outline-none transition focus:border-cyan-500 ${props.className ?? ""}`}
+      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base text-zinc-100 outline-none transition focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -532,7 +527,7 @@ function Button({
   return (
     <button
       {...props}
-      className={`inline-flex h-10 cursor-pointer items-center justify-center rounded-md border px-3 text-sm font-semibold transition disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 ${variantClass} ${className}`}
+      className={`inline-flex h-11 cursor-pointer items-center justify-center rounded-md border px-4 text-base font-semibold transition disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 ${variantClass} ${className}`}
     />
   );
 }
@@ -540,7 +535,7 @@ function Button({
 function LinkButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
-      className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-800"
+      className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-4 text-base font-semibold text-zinc-100 transition hover:bg-zinc-800"
       href={href}
       target="_blank"
       rel="noreferrer"
@@ -553,7 +548,7 @@ function LinkButton({ href, children }: { href: string; children: React.ReactNod
 function JumpLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
-      className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-800"
+      className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-4 text-base font-semibold text-zinc-100 transition hover:bg-zinc-800"
       href={href}
     >
       {children}
@@ -1570,18 +1565,18 @@ export function CommandWavesConsole() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-zinc-100">
+    <main className="min-h-screen bg-black text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-800 pb-5">
           <div className="max-w-4xl">
             <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">{commandWaveProductCopy.eyebrow}</p>
-            <h1 className="mt-2 max-w-4xl text-2xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+            <h1 className="mt-2 max-w-4xl text-3xl font-semibold tracking-normal text-zinc-50 sm:text-5xl">
               {commandWaveProductCopy.headline}
             </h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-400">{commandWaveProductCopy.subhead}</p>
-            <p className="mt-2 text-sm leading-6 text-zinc-500">{commandWaveProductCopy.positioning}</p>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-zinc-300">{commandWaveProductCopy.subhead}</p>
+            <p className="mt-2 text-base leading-7 text-zinc-500">{commandWaveProductCopy.positioning}</p>
             <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Flow</span>
+              <span className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</span>
               {commandWaveProductCopy.simpleFlow.split(" - ").map((step) => (
                 <Badge key={step} className="border-zinc-700 bg-zinc-950 text-zinc-200">
                   {step}
@@ -1591,90 +1586,53 @@ export function CommandWavesConsole() {
             <div className="mt-4 flex flex-wrap gap-2">
               <JumpLink href="#start-building">Suggest a change</JumpLink>
               <JumpLink href="#current-build">Current build</JumpLink>
-              <JumpLink href="#who-can-play">Who can play</JumpLink>
               <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
-              <JumpLink href="#rules-of-game">Read rules</JumpLink>
-              <JumpLink href="#swarm-members">See members</JumpLink>
             </div>
           </div>
         </header>
 
-        <section id="rules-of-game" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">What this is</p>
-            <h2 className="mt-1 text-xl font-semibold text-zinc-50">A shared room for building the hook</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
-              The swarm talks in public, picks small changes, opens reviewed PRs, and keeps the decisions visible. You can
-              participate by asking a plain question first. The app handles the project structure so you do not need to know
-              6529 or Waves before you begin.
-            </p>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {newcomerPaths.map((path) => (
-                <div key={path} className="border-t border-zinc-800 pt-2">
-                  <p className="text-sm font-semibold leading-6 text-zinc-100">{path}</p>
-                </div>
-              ))}
+        <details id="rules-of-game" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>How it works</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">details</Badge>
+          </summary>
+          <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1fr]">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Rules</p>
+              <ol className="mt-3 grid gap-2">
+                {swarmGameRules.map((rule, index) => (
+                  <li key={rule} className="grid grid-cols-[2rem_1fr] gap-3 border-t border-zinc-800 pt-2">
+                    <span className="text-base font-semibold text-cyan-300">{index + 1}</span>
+                    <span className="text-base leading-7 text-zinc-300">{rule}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div id="who-can-play">
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Who can play</p>
+              <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+                {participationGateNotes.map((gate) => (
+                  <div key={gate} className="py-3">
+                    <p className="text-base leading-7 text-zinc-300">{gate}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
+                  Copy guide
+                </Button>
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+              </div>
+              {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
             </div>
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Rules of the game</p>
-            <ol className="mt-3 grid gap-2">
-              {swarmGameRules.map((rule, index) => (
-                <li key={rule} className="grid grid-cols-[2rem_1fr] gap-3 border-t border-zinc-800 pt-2">
-                  <span className="text-sm font-semibold text-cyan-300">{index + 1}</span>
-                  <span className="text-sm leading-6 text-zinc-300">{rule}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section id="who-can-play" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1fr_0.9fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">Who can play</p>
-            <h2 className="mt-1 text-xl font-semibold text-zinc-50">Join through the builder wave</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
-              Phase 1 keeps access simple and human-readable. Builders use the 6529 wave to ask questions, answer any
-              manual prompt, and propose scoped hook work.
-            </p>
-            <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-              {participationGateNotes.map((gate) => (
-                <div key={gate} className="py-3">
-                  <p className="text-sm leading-6 text-zinc-300">{gate}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
-                Copy guide
-              </Button>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
-              <JumpLink href="#start-building">Suggest work</JumpLink>
-            </div>
-            {participationGuideNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p> : null}
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Enforced now</p>
-            <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
-              {[
-                ["Social source", "The 6529 wave is where people discuss and approve work."],
-                ["Manual gates", "Allowlist, REP, TDH, holder, or QnA notes are advisory until live checks are wired."],
-                ["Human control", "Humans keep merge, deploy, payment, and governance authority."],
-              ].map(([label, detail]) => (
-                <div key={label} className="py-3">
-                  <p className="text-sm font-semibold text-zinc-100">{label}</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">{detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        </details>
 
         <section id="start-building" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">Participate</p>
-            <h2 className="mt-1 text-xl font-semibold text-zinc-50">Suggest one small change</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Participate</p>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest one small change</h2>
+            <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
               You can help by naming a concrete hook change and the limits it must respect. The app turns that into a
               proposal the swarm can discuss, approve, build, and review.
             </p>
@@ -1700,7 +1658,7 @@ export function CommandWavesConsole() {
                   {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
                 </Badge>
               </div>
-              <p className="mt-2 text-xs leading-5 text-zinc-500">{simplePreflightMessage}</p>
+              <p className="mt-2 text-sm leading-6 text-zinc-500">{simplePreflightMessage}</p>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
@@ -1711,18 +1669,18 @@ export function CommandWavesConsole() {
               </Button>
               <JumpLink href="#wave-room">Talk first</JumpLink>
             </div>
-            {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
-            {apiError ? <p className="mt-2 text-xs leading-5 text-red-300">{apiError}</p> : null}
+            {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
+            {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">What happens next</p>
+            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">What happens next</p>
             <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
               {plainNextSteps.map((step, index) => (
                 <div key={step.title} className="grid grid-cols-[2rem_1fr] gap-3 py-3">
-                  <span className="text-sm font-semibold text-cyan-300">{index + 1}</span>
+                  <span className="text-base font-semibold text-cyan-300">{index + 1}</span>
                   <div>
-                    <p className="text-sm font-semibold text-zinc-100">{step.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">{step.detail}</p>
+                    <p className="text-base font-semibold text-zinc-100">{step.title}</p>
+                    <p className="mt-1 text-base leading-7 text-zinc-400">{step.detail}</p>
                   </div>
                 </div>
               ))}
@@ -1733,11 +1691,11 @@ export function CommandWavesConsole() {
         <section id="current-build" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">Current build</p>
-              <h2 className="mt-1 text-xl font-semibold text-zinc-50">
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current build</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">
                 {activeProposal ? activeProposal.title : "No active hook change yet"}
               </h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
                 {activeProposal
                   ? humanizeLegacyCommandCopy(activeProposal.prompt)
                   : "The next accepted suggestion will appear here with its decision, PR, and review state."}
@@ -1754,24 +1712,24 @@ export function CommandWavesConsole() {
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {currentBuildRows.map((row) => (
               <div key={row.label} className="grid gap-2 py-3 md:grid-cols-[9rem_8rem_1fr]">
-                <p className="text-sm font-semibold text-zinc-100">{row.label}</p>
+                <p className="text-base font-semibold text-zinc-100">{row.label}</p>
                 <div>
                   <Badge className={row.className}>{row.status}</Badge>
                 </div>
-                <p className="text-sm leading-6 text-zinc-400">{row.detail}</p>
+                <p className="text-base leading-7 text-zinc-400">{row.detail}</p>
               </div>
             ))}
           </div>
           <div className="mt-4 border-t border-zinc-800 pt-4">
-            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
+            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
             {!activeProposal ? (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-sm leading-6 text-zinc-400">Start by suggesting one PR-sized hook change.</p>
+                <p className="text-base leading-7 text-zinc-400">Start by suggesting one PR-sized hook change.</p>
                 <JumpLink href="#start-building">Suggest a change</JumpLink>
               </div>
             ) : activePollCanVote ? (
               <div className="mt-2 grid gap-3">
-                <p className="text-sm leading-6 text-zinc-400">
+                <p className="text-base leading-7 text-zinc-400">
                   Ask the wave for a decision. Local yes or no logs are manual evidence only and do not replace the 6529 decision.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -1786,11 +1744,11 @@ export function CommandWavesConsole() {
                     Log local no
                   </Button>
                 </div>
-                {decisionDraftNotice ? <p className="text-xs leading-5 text-zinc-500">{decisionDraftNotice}</p> : null}
+                {decisionDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
               </div>
             ) : showDecisionRecorder ? (
               <div className="mt-2 grid gap-3">
-                <p className="text-sm leading-6 text-zinc-400">
+                <p className="text-base leading-7 text-zinc-400">
                   Add the 6529 decision URL so PR work can use the wave as the source of truth.
                 </p>
                 <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
@@ -1806,7 +1764,7 @@ export function CommandWavesConsole() {
               </div>
             ) : showBuildAction ? (
               <div className="mt-2 grid gap-3">
-                <p className="text-sm leading-6 text-zinc-400">
+                <p className="text-base leading-7 text-zinc-400">
                   Build only after the approved wave decision is recorded. This logs PR evidence without merging, deploying, or spending.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -1819,11 +1777,11 @@ export function CommandWavesConsole() {
                     </Button>
                   ) : null}
                 </div>
-                {codexPacketNotice ? <p className="text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
+                {codexPacketNotice ? <p className="text-sm leading-6 text-cyan-300">{codexPacketNotice}</p> : null}
               </div>
             ) : canRunReview ? (
               <div className="mt-2 grid gap-3">
-                <p className="text-sm leading-6 text-zinc-400">
+                <p className="text-base leading-7 text-zinc-400">
                   Reviewer check is next. It checks the PR evidence against the approved proposal and current rules.
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -1835,17 +1793,17 @@ export function CommandWavesConsole() {
                     {apiBusy === "review" ? "Reviewing" : "Review result"}
                   </Button>
                 </div>
-                {reviewRequestNotice ? <p className="text-xs leading-5 text-zinc-500">{reviewRequestNotice}</p> : null}
+                {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
               </div>
             ) : activeReview ? (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-sm leading-6 text-zinc-400">This loop is reviewed. Share the status back to the wave.</p>
+                <p className="text-base leading-7 text-zinc-400">This loop is reviewed. Share the status back to the wave.</p>
                 <JumpLink href="#share-back">Share update</JumpLink>
                 <JumpLink href="#recent-activity">View log</JumpLink>
               </div>
             ) : (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-sm leading-6 text-zinc-400">The next step is tracked in the detailed work panel.</p>
+                <p className="text-base leading-7 text-zinc-400">The next step is tracked in the detailed work panel.</p>
                 <JumpLink href="#suggest-hook-work">Open detailed controls</JumpLink>
               </div>
             )}
