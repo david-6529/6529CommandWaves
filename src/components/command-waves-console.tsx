@@ -1853,7 +1853,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">People</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Swarm members</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                See who is active, open their 6529 profile, and keep contribution scores informational.
+                See who is active, open their 6529 profile, and treat activity points as context only.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1868,7 +1868,7 @@ export function CommandWavesConsole() {
                   <p className="mt-1 text-base leading-7 text-zinc-500">{contributor.rationale[0]}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">score {contributor.score}</Badge>
+                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">activity {contributor.score}</Badge>
                   <LinkButton href={memberProfileUrl(contributor.identity)}>Open profile</LinkButton>
                 </div>
               </div>
@@ -3076,11 +3076,11 @@ export function CommandWavesConsole() {
                   <div>
                     <p className="text-sm font-semibold text-zinc-100">{contributor.identity}</p>
                     <p className="mt-1 text-xs leading-5 text-zinc-500">{contributor.rationale.join(", ")}</p>
-                    <p className="mt-1 text-xs leading-5 text-zinc-500">Score basis: {contributor.scoreBasis.join(", ")}</p>
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">Activity basis: {contributor.scoreBasis.join(", ")}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                     <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
-                      report score {contributor.score}
+                      report activity {contributor.score}
                     </Badge>
                     <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
                       {countLabel(contributor.proposals, "proposal")}

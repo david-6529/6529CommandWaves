@@ -16,7 +16,7 @@ export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseN
     "",
     "Rules I am following:",
     "- Keep this tied to one PR-sized hook change.",
-    "- Do not treat this note as a vote, payout, deploy, or governance approval.",
+    "- Do not treat this message as a vote, payout, deploy, or governance approval.",
     "",
     "Next step: post this in the builder wave. Record a decision URL only if the swarm approves work.",
   ].join("\n");
