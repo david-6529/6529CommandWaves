@@ -255,7 +255,7 @@ The setup proof can advertise the production guardian by setting:
 
 Before making `Command Waves Guardian` a required GitHub check, configure one real wave-state source for the workflow:
 
-- `COMMAND_WAVE_STATE_URL`
+- `COMMAND_WAVE_STATE_URL`, usually `https://your-app.example/api/command-wave/state`
 - `COMMAND_WAVE_STATE_PATH`
 
 To open real GitHub PRs from prepared agent branches, configure:

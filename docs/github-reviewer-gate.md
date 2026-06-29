@@ -258,6 +258,7 @@ The proof includes:
 - PR manifest schema hash
 - reviewer gate version and hash
 - GitHub API URLs a third party can query to inspect rulesets and branch rules
+- command-wave state URL when configured
 - stable `setupHash`
 - timestamped `attestationHash`
 
@@ -275,8 +276,9 @@ Anyone can verify the current setup proof with:
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
 ```
 
-The verifier checks the proof hashes and confirms the proof's required GitHub check appears in GitHub required status-check
-payloads. For offline verification, provide `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
+The verifier checks the proof hashes, confirms the proof's required GitHub check appears in GitHub required status-check
+payloads, and verifies `commandWaveStateUrl` when the proof includes one. For offline verification, provide
+`SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
 
 To fail unless the setup uses an external guardian:
 

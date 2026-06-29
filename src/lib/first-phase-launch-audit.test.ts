@@ -14,7 +14,7 @@ const productionReadyChecks = getReadinessChecks({
   COMMAND_WAVE_STORE: "postgres",
   COMMAND_WAVE_REPO_ADAPTER: "github",
   COMMAND_WAVE_GITHUB_TOKEN: "token",
-  COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave",
+  COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave/state",
 });
 
 const productionSetupValidation: SetupValidation = {

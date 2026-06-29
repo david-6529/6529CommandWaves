@@ -36,6 +36,8 @@ describe("readiness checks", () => {
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",
+      message:
+        "Missing COMMAND_WAVE_STATE_URL. Set it to https://command-waves.example.com/api/command-wave/state for guardian PR checks.",
     });
     expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
       status: "pass",
@@ -46,7 +48,7 @@ describe("readiness checks", () => {
   it("passes guardian wave-state readiness when a source is configured", () => {
     const checks = getReadinessChecks({
       NODE_ENV: "production",
-      COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave",
+      COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave/state",
     });
 
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({

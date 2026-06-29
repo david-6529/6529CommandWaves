@@ -1,3 +1,5 @@
+import { commandWaveStateUrlFromEnv } from "../command-wave-state";
+
 export type ReadinessCheck = {
   id: string;
   label: string;
@@ -26,6 +28,20 @@ function productionMode(env: Record<string, string | undefined>) {
 
 function guardianWaveStateConfigured(env: Record<string, string | undefined>) {
   return hasValue(env.COMMAND_WAVE_STATE_PATH) || hasValue(env.COMMAND_WAVE_STATE_URL);
+}
+
+function guardianWaveStateMessage(env: Record<string, string | undefined>, configured: boolean) {
+  if (configured) {
+    return "Guardian PR checks have a real wave-state source.";
+  }
+
+  const suggestedUrl = commandWaveStateUrlFromEnv(env);
+
+  if (suggestedUrl) {
+    return `Missing COMMAND_WAVE_STATE_URL. Set it to ${suggestedUrl} for guardian PR checks.`;
+  }
+
+  return "Missing COMMAND_WAVE_STATE_PATH or COMMAND_WAVE_STATE_URL. PR guardian checks cannot verify real wave state.";
 }
 
 function githubPrAdapterEnabled(env: Record<string, string | undefined>) {
@@ -121,10 +137,10 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       id: "guardian_wave_state",
       label: "Guardian wave state",
       status: hasGuardianWaveState ? "pass" : productionMode(env) ? "fail" : "warn",
-      message: hasGuardianWaveState
-        ? "Guardian PR checks have a real wave-state source."
-        : productionMode(env)
-          ? "Missing COMMAND_WAVE_STATE_PATH or COMMAND_WAVE_STATE_URL. PR guardian checks cannot verify real wave state."
+      message: productionMode(env)
+        ? guardianWaveStateMessage(env, hasGuardianWaveState)
+        : hasGuardianWaveState
+          ? guardianWaveStateMessage(env, true)
           : "Not configured. Fine for local development, required before using the guardian as a required PR check.",
     },
     {
