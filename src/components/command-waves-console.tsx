@@ -1042,8 +1042,11 @@ export function CommandWavesConsole() {
         <section className="grid gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Project snapshot</p>
-              <h2 className="mt-1 text-base font-semibold text-zinc-50">What is happening now</h2>
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Active hook</p>
+              <h2 className="mt-1 text-base font-semibold text-zinc-50">6529 hook build status</h2>
+              <p className="mt-1 text-sm leading-6 text-zinc-500">
+                A compact view of the wave, repo, PR, review, and evidence trail.
+              </p>
             </div>
           </div>
           <div className="grid gap-3">
@@ -1061,13 +1064,13 @@ export function CommandWavesConsole() {
 
                 <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                   <div className="border-t border-zinc-800 pt-3">
-                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">6529 wave snapshot</p>
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Wave activity</p>
                     <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
                     <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave to talk</LinkButton> : null}
                       <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext()}>
-                        {apiBusy === "context" ? "Loading" : "Preview wave here"}
+                        {apiBusy === "context" ? "Loading" : "Read wave posts"}
                       </Button>
                     </div>
                     {contextPreview ? (
@@ -1097,7 +1100,7 @@ export function CommandWavesConsole() {
                   </div>
 
                   <div className="border-t border-zinc-800 pt-3">
-                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Codebase visibility</p>
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">GitHub evidence</p>
                     <p className="mt-2 text-sm leading-6 text-zinc-300">{project.platformRole}</p>
                     <dl className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
                       <div>
@@ -1105,7 +1108,7 @@ export function CommandWavesConsole() {
                         <dd>{project.currentFocus}</dd>
                       </div>
                       <div>
-                        <dt className="font-semibold text-zinc-300">Code</dt>
+                        <dt className="font-semibold text-zinc-300">PR state</dt>
                         <dd>{project.codeStatus}</dd>
                       </div>
                       <div>
