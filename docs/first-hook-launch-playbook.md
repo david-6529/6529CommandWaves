@@ -67,20 +67,21 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 3. Confirm the hook repo has `CONTRIBUTING.md` and a PR template with Command Waves manifest markers.
 4. Copy the builder wave launch brief from setup.
 5. Post the brief with the builder wave, repo link, participation notes, and hook scope.
-6. Invite ideas in the general chat wave or thread.
-7. Turn one strong idea into a PR-sized command.
-8. Vote or approve through the builder wave.
-9. Record the decision drop URL as the manual approval receipt.
-10. Copy the Codex work packet and use it in a prepared branch.
-11. Run the agent only inside that approved packet.
-12. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
-13. Open a draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
-14. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-15. Humans merge only after review passes.
-16. Use the contribution report and fee plan as evidence for any separate payout vote.
-17. Review the wave update draft and share it manually in the builder wave.
-18. Keep the launch packet with the PR so later contributors can audit the loop.
-19. Run the launch check again and fix blockers before broad participation.
+6. Copy the participation guide and share it where new contributors will see it.
+7. Invite ideas in the general chat wave or thread.
+8. Turn one strong idea into a PR-sized command.
+9. Vote or approve through the builder wave.
+10. Record the decision drop URL as the manual approval receipt.
+11. Copy the Codex work packet and use it in a prepared branch.
+12. Run the agent only inside that approved packet.
+13. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
+14. Open a draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
+15. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+16. Humans merge only after review passes.
+17. Use the contribution report and fee plan as evidence for any separate payout vote.
+18. Review the wave update draft and share it manually in the builder wave.
+19. Keep the launch packet with the PR so later contributors can audit the loop.
+20. Run the launch check again and fix blockers before broad participation.
 
 The launch check focuses on the first public loop. Warning-only hardening items such as Postgres storage, the GitHub PR adapter,
 and required-check wave-state sources can wait until broader participation, but failed or misconfigured items still block.

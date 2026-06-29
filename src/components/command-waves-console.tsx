@@ -33,6 +33,7 @@ import { createActiveHookProjects } from "@/lib/hook-projects";
 import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
+import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -664,6 +665,7 @@ export function CommandWavesConsole() {
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
+  const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
@@ -822,7 +824,17 @@ export function CommandWavesConsole() {
       }),
     [activeExecution, activePoll, activeProposal, activeReview, launchVerificationTargets, wave],
   );
-  const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(wave), [wave]);
+  const setupDraftWave = useMemo<CommandWave>(
+    () => ({
+      ...wave,
+      waveUrl,
+      repoUrl,
+      gates: gateNotes.split("\n"),
+    }),
+    [gateNotes, repoUrl, wave, waveUrl],
+  );
+  const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(setupDraftWave), [setupDraftWave]);
+  const participationGuideDraft = useMemo(() => createParticipationGuideDraft(setupDraftWave), [setupDraftWave]);
   const builderWaveChatDraft = useMemo(() => createBuilderWaveChatDraft(wave, phaseNextAction), [phaseNextAction, wave]);
   const builderWaveProposalDraft = useMemo(
     () =>
@@ -983,6 +995,7 @@ export function CommandWavesConsole() {
     setSetupContextPreview(null);
     setDecisionDraftNotice("");
     setLaunchBriefNotice("");
+    setParticipationGuideNotice("");
     setLaunchStatusNotice("");
     setLaunchLinkNotice("");
     setProposalDraftNotice("");
@@ -1161,6 +1174,15 @@ export function CommandWavesConsole() {
       setLaunchBriefNotice("Launch brief copied.");
     } catch {
       setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
+    }
+  }
+
+  async function copyParticipationGuideDraft() {
+    try {
+      await navigator.clipboard.writeText(participationGuideDraft);
+      setParticipationGuideNotice("Participation guide copied.");
+    } catch {
+      setParticipationGuideNotice("Copy failed. Select the participation guide text and copy it manually.");
     }
   }
 
@@ -1791,6 +1813,19 @@ export function CommandWavesConsole() {
                     </Badge>
                   ))}
                 </div>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => void copyParticipationGuideDraft()}
+                  >
+                    Copy participation guide
+                  </Button>
+                  <LinkButton href={waveUrl}>Open builder wave</LinkButton>
+                </div>
+                {participationGuideNotice ? (
+                  <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p>
+                ) : null}
               </div>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
