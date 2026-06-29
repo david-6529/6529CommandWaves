@@ -131,6 +131,7 @@ The current app is a local prototype of the hook-building flow:
 - phase scope inventory that separates launch tools from parked ideas
 - bounded hook parameter policy that requires explicit caps and bound-focused tests
 - transparent contribution report for proposals, votes, decision receipts, and activity log evidence
+- per-contributor score basis so report points are auditable
 - contribution report coverage notes that separate scored app evidence from off-app activity
 - manual developer fee plan draft that uses review evidence without moving funds
 - copyable launch packet for wave, PR, review, contribution, and fee evidence

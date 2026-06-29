@@ -39,6 +39,8 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Complete proposal: 6 report points.");
     expect(packet.text).toContain("Wave decision receipt: 2 report points.");
     expect(packet.text).toContain("david: report score 10");
+    expect(packet.text).toContain("Proposal work: 6 report points");
+    expect(packet.text).toContain("Decision receipts: 2 report points");
     expect(packet.text).toContain("1 Guardian review proof");
     expect(packet.text).toContain("## Developer Fee Evidence");
     expect(packet.text).toContain("## Verification");

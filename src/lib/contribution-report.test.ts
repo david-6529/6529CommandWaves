@@ -30,6 +30,13 @@ describe("contribution report", () => {
     expect(report.evidence).toContain("1 Guardian review proof");
     expect(report.contributors[0]).toMatchObject({
       identity: "david",
+      score: 10,
+      scoreBasis: [
+        "Proposal work: 6 report points",
+        "Decision receipts: 2 report points",
+        "Votes: 1 report point",
+        "Activity log: 1 report point",
+      ],
       proposals: 1,
       decisions: 1,
     });
@@ -73,6 +80,8 @@ describe("contribution report", () => {
     expect(draft).toContain("- Live wave posts that have not been pulled into app state.");
     expect(draft).toContain("Contributors:");
     expect(draft).toContain("- david: report score");
+    expect(draft).toContain("Proposal work: 6 report points");
+    expect(draft).toContain("Decision receipts: 2 report points");
     expect(draft).toContain("Report scores are an AI-readable activity report, not a permission system.");
     expect(draft).toContain("REP, TDH, payouts, and merge rights must use separate human-approved rules.");
     expect(draft).not.toContain("\u2014");

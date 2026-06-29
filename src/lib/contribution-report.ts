@@ -4,6 +4,7 @@ import { latestLedgerTimestamp } from "./ledger";
 export type ContributionContributor = {
   identity: string;
   score: number;
+  scoreBasis: string[];
   proposals: number;
   votes: number;
   decisions: number;
@@ -36,6 +37,7 @@ function addContributor(map: Map<string, ContributionContributor>, identity: str
   const contributor: ContributionContributor = {
     identity: normalized,
     score: 0,
+    scoreBasis: [],
     proposals: 0,
     votes: 0,
     decisions: 0,
@@ -55,6 +57,24 @@ function addRationale(contributor: ContributionContributor, rationale: string) {
 
 function countLabel(count: number, singular: string) {
   return `${count} ${count === 1 ? singular : `${singular}s`}`;
+}
+
+function scoreLabel(points: number, source: string) {
+  return `${source}: ${points} report point${points === 1 ? "" : "s"}`;
+}
+
+function addScoreBasis(contributor: ContributionContributor, source: string, points: number) {
+  const existingIndex = contributor.scoreBasis.findIndex((item) => item.startsWith(`${source}: `));
+
+  if (existingIndex >= 0) {
+    const current = contributor.scoreBasis[existingIndex];
+    const currentPoints = Number(current.match(/: (\d+) report point/)?.[1] ?? 0);
+
+    contributor.scoreBasis[existingIndex] = scoreLabel(currentPoints + points, source);
+    return;
+  }
+
+  contributor.scoreBasis.push(scoreLabel(points, source));
 }
 
 function githubPrLinkCount(wave: CommandWave) {
@@ -120,7 +140,10 @@ export function createContributionReport(
     const contributor = addContributor(contributors, proposal.proposer);
 
     contributor.proposals += 1;
-    contributor.score += proposal.status === "complete" ? 6 : proposal.status === "reviewing" ? 4 : 3;
+    const points = proposal.status === "complete" ? 6 : proposal.status === "reviewing" ? 4 : 3;
+
+    contributor.score += points;
+    addScoreBasis(contributor, "Proposal work", points);
     addRationale(contributor, "Proposed scoped work");
 
     if (proposal.status === "complete") {
@@ -134,6 +157,7 @@ export function createContributionReport(
 
       contributor.decisions += 1;
       contributor.score += 2;
+      addScoreBasis(contributor, "Decision receipts", 2);
       addRationale(contributor, "Recorded wave decision evidence");
     }
 
@@ -142,6 +166,7 @@ export function createContributionReport(
 
       contributor.votes += 1;
       contributor.score += 1;
+      addScoreBasis(contributor, "Votes", 1);
       addRationale(contributor, "Participated in decisions");
     }
   }
@@ -155,6 +180,7 @@ export function createContributionReport(
 
     contributor.ledgerEvents += 1;
     contributor.score += 1;
+    addScoreBasis(contributor, "Activity log", 1);
     addRationale(contributor, "Appears in the activity log");
   }
 
@@ -198,7 +224,7 @@ export function createContributionReportDraft(
           countLabel(contributor.ledgerEvents, "activity log event"),
         ].join(", ");
 
-        return `- ${contributor.identity}: report score ${contributor.score}; ${counts}; ${contributor.rationale.join(", ")}`;
+        return `- ${contributor.identity}: report score ${contributor.score}; ${contributor.scoreBasis.join(", ")}; ${counts}; ${contributor.rationale.join(", ")}`;
       })
     : ["- No visible contributors yet."];
 

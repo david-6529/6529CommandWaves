@@ -2651,6 +2651,7 @@ export function CommandWavesConsole() {
                   <div>
                     <p className="text-sm font-semibold text-zinc-100">{contributor.identity}</p>
                     <p className="mt-1 text-xs leading-5 text-zinc-500">{contributor.rationale.join(", ")}</p>
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">Score basis: {contributor.scoreBasis.join(", ")}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                     <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
