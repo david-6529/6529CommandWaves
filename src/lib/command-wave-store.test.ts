@@ -74,7 +74,7 @@ describe("Command wave store", () => {
     })).rejects.toThrow("Fix the 6529 wave and GitHub repo before saving setup.");
   });
 
-  it("submits poll-gated proposals and approves them after quorum passes", async () => {
+  it("keeps PR work waiting for a wave receipt after local quorum passes", async () => {
     const submitted = await submitCommandProposal({
       title: "Open a PR",
       proposer: "tester",
@@ -96,14 +96,17 @@ describe("Command wave store", () => {
 
     await recordVote({ proposalId: "cmd-002", voterIdentity: "alice", vote: "yes" });
     await recordVote({ proposalId: "cmd-002", voterIdentity: "bob", vote: "yes" });
-    const approved = await recordVote({ proposalId: "cmd-002", voterIdentity: "carol", vote: "yes" });
+    const voted = await recordVote({ proposalId: "cmd-002", voterIdentity: "carol", vote: "yes" });
 
-    expect(approved.proposals[0].status).toBe("approved");
-    expect(approved.polls[0]).toMatchObject({
+    expect(voted.proposals[0].status).toBe("ready_for_vote");
+    expect(voted.polls[0]).toMatchObject({
       yesVotes: 3,
       status: "passed",
     });
-    expect(approved.polls[0].votes.map((vote) => vote.voterIdentity)).toEqual(["carol", "bob", "alice"]);
+    expect(voted.polls[0].votes.map((vote) => vote.voterIdentity)).toEqual(["carol", "bob", "alice"]);
+    expect(voted.ledger[0].message).toBe(
+      "cmd-002 local vote passed. Record the builder wave decision receipt before work can run.",
+    );
   });
 
   it("rejects PR proposals that fail hook preflight", async () => {

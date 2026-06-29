@@ -43,4 +43,23 @@ describe("wave update draft", () => {
     expect(draft).toContain("Build: waiting for an approved PR command.");
     expect(draft).toContain("Review: waiting for execution evidence.");
   });
+
+  it("keeps local vote approval waiting for a wave decision receipt", () => {
+    const draft = createWaveUpdateDraft({
+      wave: demoWave,
+      proposal: {
+        ...demoWave.proposals[0],
+        status: "ready_for_vote",
+      },
+      poll: {
+        ...demoWave.polls[0],
+        decision: null,
+      },
+      execution: null,
+      review: null,
+    });
+
+    expect(draft).toContain("Decision: passed with 5 yes, 1 no");
+    expect(draft).toContain("Build: waiting for a recorded wave decision.");
+  });
 });

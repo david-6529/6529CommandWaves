@@ -51,7 +51,7 @@ describe("phase checklist", () => {
   it("waits for a wave decision receipt after local votes pass", () => {
     const checklist = createPhaseChecklist({
       ...demoWave,
-      proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+      proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
       polls: [{ ...demoWave.polls[0], decision: null }],
       executions: [],
       reviews: [],

@@ -56,4 +56,24 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Review: waiting for execution evidence.");
     expect(packet.text).toContain("Choose one PR-sized hook command.");
   });
+
+  it("keeps local vote approval waiting for a wave decision receipt", () => {
+    const packet = createLaunchPacket({
+      wave: demoWave,
+      proposal: {
+        ...demoWave.proposals[0],
+        status: "ready_for_vote",
+      },
+      poll: {
+        ...demoWave.polls[0],
+        decision: null,
+      },
+      execution: null,
+      review: null,
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+
+    expect(packet.text).toContain("Wave decision receipt: not recorded yet.");
+    expect(packet.text).toContain("Build: waiting for a recorded wave decision.");
+  });
 });

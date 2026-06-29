@@ -629,6 +629,7 @@ export function CommandWavesConsole() {
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
   const activePrHasWaveDecision = Boolean(activeProposalIsPr && pollApprovalPassed(activePoll ?? null));
+  const activePollNeedsWaveDecision = Boolean(activePoll?.status === "passed" && !activePoll.decision);
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -1450,12 +1451,17 @@ export function CommandWavesConsole() {
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-zinc-100">Vote needed</p>
-                        <p className="mt-1 text-xs text-zinc-500">
-                          Current vote: {activePoll.yesVotes} yes, {activePoll.noVotes} no. Needs{" "}
-                          {activePoll.quorumRequired} total votes and {activePoll.yesPercentRequired}% yes.
+                        <p className="text-sm font-semibold text-zinc-100">
+                          {activePollNeedsWaveDecision ? "Wave decision needed" : "Vote needed"}
                         </p>
-                        <p className="mt-1 text-xs text-zinc-500">Voting as {proposer || "unnamed voter"}.</p>
+                        <p className="mt-1 text-xs text-zinc-500">
+                          {activePollNeedsWaveDecision
+                            ? "Local vote passed. Record the builder wave decision receipt before work runs."
+                            : `Current vote: ${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Needs ${activePoll.quorumRequired} total votes and ${activePoll.yesPercentRequired}% yes.`}
+                        </p>
+                        {activePoll.status === "open" ? (
+                          <p className="mt-1 text-xs text-zinc-500">Voting as {proposer || "unnamed voter"}.</p>
+                        ) : null}
                       </div>
                       <Badge className={statusClass(activePoll.status)}>{activePoll.status.replaceAll("_", " ")}</Badge>
                     </div>

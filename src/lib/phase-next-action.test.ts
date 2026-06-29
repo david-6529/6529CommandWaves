@@ -58,7 +58,7 @@ describe("phase next action", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
         ...demoWave,
-        proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+        proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
         polls: [{ ...demoWave.polls[0], decision: null }],
         executions: [],
         reviews: [],

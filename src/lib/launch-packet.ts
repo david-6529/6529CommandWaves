@@ -92,8 +92,12 @@ function decisionLines(poll: PollState | null) {
   ];
 }
 
-function buildLines(execution: ExecutionRecord | null) {
+function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
+    if (poll?.status === "passed" && !poll.decision) {
+      return ["- Build: waiting for a recorded wave decision."];
+    }
+
     return ["- Build: waiting for an approved PR command."];
   }
 
@@ -203,7 +207,7 @@ export function createLaunchPacket({
     ...decisionLines(poll),
     "",
     "## Build",
-    ...buildLines(execution),
+    ...buildLines(poll, execution),
     "",
     "## Review",
     ...reviewLines(review),

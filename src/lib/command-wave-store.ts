@@ -395,20 +395,17 @@ export async function recordVote(input: unknown) {
   });
   const updatedPoll = updatedPolls.find((item) => item.proposalId === proposalId);
   const passed = updatedPoll ? evaluatePoll(updatedPoll).passed : false;
-  const updatedProposals = wave.proposals.map((item) =>
-    item.id === proposalId && passed ? { ...item, status: "approved" as const } : item,
-  );
   const nextWave = appendLedger(
     {
       ...wave,
       polls: updatedPolls,
-      proposals: updatedProposals,
+      proposals: wave.proposals,
     },
     {
       actor: voterIdentity,
       type: passed ? "poll_passed" : "rule_check",
       message: passed
-        ? `${proposal.id} passed and is approved to run.`
+        ? `${proposal.id} local vote passed. Record the builder wave decision receipt before work can run.`
         : `Recorded ${vote} vote from ${voterIdentity} for ${proposal.id}.`,
     },
   );
@@ -475,10 +472,6 @@ export async function executeProposal(input: unknown) {
     throw Object.assign(new Error("Proposal not found."), { status: 404 });
   }
 
-  if (proposal.status !== "approved") {
-    throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });
-  }
-
   if (proposal.kind !== "open_pr") {
     throw Object.assign(new Error("Only approved PR commands can use the agent build step in phase 1."), { status: 409 });
   }
@@ -486,7 +479,15 @@ export async function executeProposal(input: unknown) {
   const poll = wave.polls.find((item) => item.proposalId === proposalId) ?? null;
 
   if (!pollApprovalPassed(poll)) {
-    throw Object.assign(new Error("Record the builder wave decision receipt before running a PR command."), { status: 409 });
+    if (proposal.status === "approved" || poll?.status === "passed") {
+      throw Object.assign(new Error("Record the builder wave decision receipt before running a PR command."), { status: 409 });
+    }
+
+    throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });
+  }
+
+  if (proposal.status !== "approved") {
+    throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });
   }
 
   if (!validateSetupShape({ waveUrl: wave.waveUrl, repoUrl: wave.repoUrl }).canRunCode) {

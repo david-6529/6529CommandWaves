@@ -14,8 +14,12 @@ function pollLine(poll: PollState | null) {
   return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;
 }
 
-function buildLine(execution: ExecutionRecord | null) {
+function buildLine(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
+    if (poll?.status === "passed" && !poll.decision) {
+      return "Build: waiting for a recorded wave decision.";
+    }
+
     return "Build: waiting for an approved PR command.";
   }
 
@@ -72,7 +76,7 @@ export function createWaveUpdateDraft({
     proposal ? `Command: ${proposal.id} - ${proposal.title}` : "Command: none selected yet.",
     proposal ? `Status: ${proposal.status}` : "Status: setup",
     pollLine(poll),
-    buildLine(execution),
+    buildLine(poll, execution),
     reviewLine(review),
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
