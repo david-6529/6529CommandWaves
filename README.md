@@ -319,6 +319,14 @@ npm run setup:verify
 
 For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH`.
 
+Verify the first-loop launch audit:
+
+```bash
+LAUNCH_AUDIT_URL=https://your-app.example/api/command-wave/launch/audit npm run launch:audit
+```
+
+The command exits nonzero until the launch audit is ready. For offline verification, set `LAUNCH_AUDIT_PATH`.
+
 Expose the current command-wave state to the guardian with:
 
 ```bash
