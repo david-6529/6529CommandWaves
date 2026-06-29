@@ -19,8 +19,9 @@ describe("active hook projects", () => {
         participation: "Read the wave, draft replies here, and track repo work.",
         waveRole: "Live discussion, proposals, decisions, and updates.",
         platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
-        waveSnapshotLabel: "decision recorded",
-        codeSnapshotLabel: "review logged",
+        gateSnapshotLabel: "manual gate",
+        orchestrationSnapshotLabel: "high approved",
+        codeSnapshotLabel: "PR reviewed",
         nextActionStatus: "ready",
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
@@ -52,7 +53,8 @@ describe("active hook projects", () => {
       nextActionTitle: "Set the project",
       nextActionDetail: "Confirm one builder wave and one GitHub repo before proposals start.",
       waveStatus: "Wave has not selected a PR-sized hook command yet.",
-      waveSnapshotLabel: "needs command",
+      gateSnapshotLabel: "manual gate",
+      orchestrationSnapshotLabel: "needs idea",
       codeStatus: "No PR-sized hook command yet.",
       codeSnapshotLabel: "no PR yet",
     });
@@ -68,7 +70,8 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       waveStatus: "Wave decision recorded with 5 yes and 1 no.",
-      waveSnapshotLabel: "decision recorded",
+      gateSnapshotLabel: "manual gate",
+      orchestrationSnapshotLabel: "high approved",
       codeStatus: "Approved PR command is ready to build.",
       codeSnapshotLabel: "ready to build",
       nextActionTitle: "Build the approved PR",
@@ -89,6 +92,22 @@ describe("active hook projects", () => {
       codeStatus: "PR evidence is ready for review.",
       codeSnapshotLabel: "PR ready",
       reviewStatusLabel: "ready for review",
+    });
+  });
+
+  it("shows unset gates and open orchestration before participation notes exist", () => {
+    const projects = createActiveHookProjects({
+      ...demoWave,
+      gates: [],
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+    });
+
+    expect(projects[0]).toMatchObject({
+      gateSnapshotLabel: "gate unset",
+      orchestrationSnapshotLabel: "needs idea",
     });
   });
 

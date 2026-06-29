@@ -17,7 +17,8 @@ export type ActiveHookProject = {
   participation: string;
   waveRole: string;
   platformRole: string;
-  waveSnapshotLabel: string;
+  gateSnapshotLabel: string;
+  orchestrationSnapshotLabel: string;
   codeSnapshotLabel: string;
   nextActionStatus: PhaseNextActionStatus;
   nextActionLabel: string;
@@ -90,28 +91,46 @@ function waveStatus(wave: CommandWave) {
   return "No vote required by current rules.";
 }
 
-function waveSnapshotLabel(wave: CommandWave) {
+function gateSnapshotLabel(wave: CommandWave) {
+  const gates = wave.gates.map((gate) => gate.trim()).filter(Boolean);
+
+  if (!gates.length) {
+    return "gate unset";
+  }
+
+  if (gates.some((gate) => /\b(rep|tdh|holder|allowlist|qna|quiz|manual|advisory|not enforced)\b/i.test(gate))) {
+    return "manual gate";
+  }
+
+  return "open gate";
+}
+
+function orchestrationSnapshotLabel(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal;
   const poll = phaseWork.prPoll;
 
   if (!proposal) {
-    return "needs command";
+    return "needs idea";
   }
 
   if (poll?.decision?.url) {
-    return "decision recorded";
+    return `${proposal.risk} approved`;
   }
 
   if (poll?.status === "passed") {
     return "needs receipt";
   }
 
-  if (poll) {
-    return `${poll.status} vote`;
+  if (poll?.status === "open") {
+    return `${proposal.risk} vote`;
   }
 
-  return "no vote needed";
+  if (poll?.status === "failed") {
+    return "vote failed";
+  }
+
+  return `${proposal.risk} allowed`;
 }
 
 function codeStatus(wave: CommandWave) {
@@ -140,7 +159,7 @@ function codeSnapshotLabel(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
 
   if (phaseWork.prReview?.status === "pass") {
-    return "review logged";
+    return "PR reviewed";
   }
 
   if (phaseWork.prExecution?.status === "complete") {
@@ -203,7 +222,8 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       participation: "Read the wave, draft replies here, and track repo work.",
       waveRole: "Live discussion, proposals, decisions, and updates.",
       platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
-      waveSnapshotLabel: waveSnapshotLabel(wave),
+      gateSnapshotLabel: gateSnapshotLabel(wave),
+      orchestrationSnapshotLabel: orchestrationSnapshotLabel(wave),
       codeSnapshotLabel: codeSnapshotLabel(wave),
       nextActionStatus: nextAction.status,
       nextActionLabel: nextAction.statusLabel,

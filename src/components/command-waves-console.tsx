@@ -1423,7 +1423,7 @@ export function CommandWavesConsole() {
               <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in development</p>
               <h2 className="mt-1 text-base font-semibold text-zinc-50">Project snapshot</h2>
               <p className="mt-1 text-sm leading-6 text-zinc-500">
-                Start with the 6529 hook. Each row connects a builder wave to its repo, recent wave context, PR evidence, reviews, and latest activity.
+                Start with the 6529 hook. Each row shows gate notes, orchestration state, PR evidence, reviews, and latest wave context.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1452,10 +1452,10 @@ export function CommandWavesConsole() {
 
                   <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     {[
-                      ["Wave", project.waveSnapshotLabel],
-                      ["Repo", project.codeSnapshotLabel],
+                      ["Gate", project.gateSnapshotLabel],
+                      ["Orchestration", project.orchestrationSnapshotLabel],
+                      ["PR", project.codeSnapshotLabel],
                       ["Review", project.reviewStatusLabel],
-                      ["Next", project.nextActionLabel],
                     ].map(([label, value]) => (
                       <div key={label} className="border-t border-zinc-800 pt-2">
                         <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
