@@ -963,11 +963,15 @@ export function CommandWavesConsole() {
   }
 
   async function copyWaveUpdateDraft() {
+    setApiError("");
+
     try {
       await navigator.clipboard.writeText(waveUpdateDraft);
       setCopyNotice("Draft copied.");
+      setApiNotice("Wave update draft copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
+      setApiNotice("Copy failed. Select the wave update draft and copy it manually.");
     }
   }
 
@@ -1171,6 +1175,9 @@ export function CommandWavesConsole() {
                           onClick={() => void previewContext(project.waveUrl, "project", project.id)}
                         >
                           {apiBusy === "context" ? "Loading" : "Read latest posts"}
+                        </Button>
+                        <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
+                          Copy update draft
                         </Button>
                       </div>
                       {contextPreview ? (
