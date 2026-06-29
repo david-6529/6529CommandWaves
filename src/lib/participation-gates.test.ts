@@ -48,7 +48,7 @@ describe("participation gates", () => {
   it("creates a compact participation snapshot for the workspace", () => {
     expect(createParticipationAccessSnapshot(defaultParticipationGates)).toMatchObject({
       label: "manual review",
-      summary: "REP, TDH, QnA, and report scores are not live permissions here.",
+      summary: "Ask in the room to join. REP, TDH, QnA, and report scores are not live permissions here.",
     });
     expect(createParticipationAccessSnapshot(["Community builders welcome"])).toMatchObject({
       label: "open",

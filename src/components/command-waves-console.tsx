@@ -1586,6 +1586,7 @@ export function CommandWavesConsole() {
                   </div>
                   <p className="mt-1 text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
+                    <JumpLink href="#wave-room">Ask to join</JumpLink>
                     <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
                       Copy guide
                     </Button>

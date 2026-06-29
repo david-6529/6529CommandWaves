@@ -109,7 +109,7 @@ export function createParticipationAccessSnapshot(input: unknown) {
   if (manual) {
     return {
       label: "manual review",
-      summary: "REP, TDH, QnA, and report scores are not live permissions here.",
+      summary: "Ask in the room to join. REP, TDH, QnA, and report scores are not live permissions here.",
       notes: gates.slice(0, 2),
     };
   }
