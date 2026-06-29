@@ -9,6 +9,7 @@ describe("phase checklist", () => {
     expect(checklist.map((item) => item.id)).toEqual(["project", "proposal", "decision", "build", "review", "log"]);
     expect(checklist.map((item) => item.status)).toEqual(["done", "done", "done", "done", "done", "done"]);
     expect(checklist.find((item) => item.id === "log")?.detail).toContain("wave update draft");
+    expect(checklist.find((item) => item.id === "log")?.detail).toContain("launch packet");
   });
 
   it("shows setup as active before a valid repo is configured", () => {

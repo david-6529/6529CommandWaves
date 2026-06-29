@@ -95,6 +95,6 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
     statusLabel: statusLabel("ready"),
     stepLabel: "Log",
     title: "Loop complete",
-    detail: "The approved hook work has PR, review, and update evidence.",
+    detail: "The approved hook work has PR, review, wave update, and launch packet evidence.",
   };
 }

@@ -12,6 +12,7 @@ describe("phase next action", () => {
       statusLabel: "ready",
       stepLabel: "Log",
       title: "Loop complete",
+      detail: "The approved hook work has PR, review, wave update, and launch packet evidence.",
     });
   });
 

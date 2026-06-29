@@ -150,7 +150,9 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       id: "log",
       label: "Log",
       status: loggedReview ? "done" : review?.status === "pass" ? "active" : "waiting",
-      detail: loggedReview ? "Audit log and wave update draft are ready." : "Log the result before sharing it back.",
+      detail: loggedReview
+        ? "Audit log, wave update draft, and launch packet are ready."
+        : "Log the result before sharing it back.",
     },
   ];
 }
