@@ -132,6 +132,20 @@ function asStorageMode(value: string | undefined): SetupProofStorageMode | undef
   return value === "memory" || value === "file" || value === "postgres" ? value : undefined;
 }
 
+function normalizeGuardianProof(guardian: SetupProofGuardian): SetupProofGuardian {
+  if (guardian.enforcementMode !== "external_github_app") {
+    return guardian;
+  }
+
+  return {
+    ...guardian,
+    workflowPath: null,
+    productionStrength: "strong",
+    limitation: null,
+    recommendedUpgrade: null,
+  };
+}
+
 function envValue(env: Record<string, string | undefined>, key: string) {
   return env[key]?.trim() || undefined;
 }
@@ -184,7 +198,8 @@ function storageProofForMode(mode: SetupProofStorageMode, databaseConfigured: bo
 export function setupProofOptionsFromEnv(env: Record<string, string | undefined> = process.env): SetupProofOptions {
   const enforcementMode = asGuardianMode(envValue(env, "COMMAND_WAVE_GUARDIAN_MODE"));
   const requiredCheck = envValue(env, "COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK");
-  const workflowPath = envValue(env, "COMMAND_WAVE_GUARDIAN_WORKFLOW_PATH");
+  const workflowPath =
+    enforcementMode === "external_github_app" ? undefined : envValue(env, "COMMAND_WAVE_GUARDIAN_WORKFLOW_PATH");
   const proofArtifact = envValue(env, "COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT");
   const replayCommand = envValue(env, "COMMAND_WAVE_GUARDIAN_REPLAY_COMMAND");
   const storageMode = storageModeFromEnv(env);
@@ -209,11 +224,11 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
   const protectedBranch = options.protectedBranch ?? "main";
   const requiredReviewerCheck = options.guardian?.requiredCheck ?? options.requiredReviewerCheck ?? "Command Waves Guardian";
   const enforcementMode = options.guardian?.enforcementMode ?? "repo_local_github_action";
-  const guardian = {
+  const guardian = normalizeGuardianProof({
     ...defaultGuardian(requiredReviewerCheck, enforcementMode),
     ...options.guardian,
     requiredCheck: requiredReviewerCheck,
-  };
+  });
   const storageMode = options.storage?.mode ?? "memory";
   const databaseConfigured = options.storage?.databaseConfigured ?? false;
   const storage = {

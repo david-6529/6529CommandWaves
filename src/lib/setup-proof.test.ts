@@ -82,6 +82,7 @@ describe("setup proof", () => {
       setupProofOptionsFromEnv({
         COMMAND_WAVE_GUARDIAN_MODE: "external_github_app",
         COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK: "Command Waves Guardian App",
+        COMMAND_WAVE_GUARDIAN_WORKFLOW_PATH: ".github/workflows/guardian-review.yml",
         COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT: "guardian-app-proof",
         COMMAND_WAVE_GUARDIAN_REPLAY_COMMAND: "npm run guardian:verify-proof",
         COMMAND_WAVE_PROTECTED_BRANCH: "main",
@@ -97,6 +98,28 @@ describe("setup proof", () => {
       requiredCheck: "Command Waves Guardian App",
       productionStrength: "strong",
       proofArtifact: "guardian-app-proof",
+      workflowPath: null,
+      limitation: null,
+      recommendedUpgrade: null,
+    });
+    expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("normalizes direct external guardian options to strong external metadata", () => {
+    const proof = createSetupProof(demoWave, {
+      guardian: {
+        enforcementMode: "external_github_app",
+        workflowPath: ".github/workflows/guardian-review.yml",
+        productionStrength: "mvp",
+        limitation: "stale repo-local limitation",
+        recommendedUpgrade: "external_github_app",
+      },
+    });
+
+    expect(proof.guardian).toMatchObject({
+      enforcementMode: "external_github_app",
+      workflowPath: null,
+      productionStrength: "strong",
       limitation: null,
       recommendedUpgrade: null,
     });
