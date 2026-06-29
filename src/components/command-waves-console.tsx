@@ -1558,49 +1558,24 @@ export function CommandWavesConsole() {
         </details>
 
         <section className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-          <Panel title="Propose hook work" eyebrow="Builder wave">
+          <Panel title="Suggest hook work" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Describe one PR-sized change. Keep the limits clear so the wave knows what it is approving.
+                Write one PR-sized change. Keep the request and limits clear so the wave knows what it is approving.
               </p>
-              <Field label="Your name or agent">
-                <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
-              </Field>
-              <Field label="What kind of work is this?">
-                <Select value={kind} onChange={(event) => setKind(event.target.value as CommandKind)}>
-                  {firstPhaseProposalKinds.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
               <Field label="Title">
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} />
               </Field>
-              <Field label="Command">
+              <Field label="Request">
                 <Textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} />
               </Field>
               <Field label="Limits and success criteria">
                 <Textarea value={spec} onChange={(event) => setSpec(event.target.value)} />
               </Field>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="Budget cap">
-                  <Input value={budgetUsd} onChange={(event) => setBudgetUsd(event.target.value)} />
-                </Field>
-                <div className="rounded-md border border-zinc-800 bg-black p-3">
-                  <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Safety check</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
-                    <Badge className={statusClass(selectedRule.mode)}>{modeLabel(selectedRule.mode)}</Badge>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-zinc-500">{selectedRule.reason}</p>
-                </div>
-              </div>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-semibold text-zinc-100">Hook proposal preflight</p>
+                    <p className="text-sm font-semibold text-zinc-100">Preflight</p>
                     <p className="mt-1 text-xs leading-5 text-zinc-500">
                       {hookProposalPreflightRequired
                         ? hookProposalPreflight.summary
@@ -1644,6 +1619,36 @@ export function CommandWavesConsole() {
                   </p>
                 ) : null}
               </div>
+              <details className="rounded-md border border-zinc-800 bg-black p-3">
+                <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+                  <span>Advanced proposal settings</span>
+                  <span className="flex flex-wrap justify-end gap-1.5">
+                    <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
+                    <Badge className={statusClass(selectedRule.mode)}>{modeLabel(selectedRule.mode)}</Badge>
+                  </span>
+                </summary>
+                <div className="mt-3 grid gap-3">
+                  <Field label="Contributor">
+                    <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
+                  </Field>
+                  <Field label="Work type">
+                    <Select value={kind} onChange={(event) => setKind(event.target.value as CommandKind)}>
+                      {firstPhaseProposalKinds.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+                  <Field label="Budget cap">
+                    <Input value={budgetUsd} onChange={(event) => setBudgetUsd(event.target.value)} />
+                  </Field>
+                  <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Rule check</p>
+                    <p className="mt-2 text-xs leading-5 text-zinc-500">{selectedRule.reason}</p>
+                  </div>
+                </div>
+              </details>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Proposing" : "Propose work"}
               </Button>

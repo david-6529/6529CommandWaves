@@ -10,6 +10,7 @@ The underlying workflow should be reusable for future public hook projects. The 
 
 6529 remains the live conversation and decision layer. The app should act as a snapshot and project dashboard: recent wave context, approved commands, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
 Maintainer setup, guardrails, and readiness checks should stay available without leading the public project experience.
+The proposal path should ask for the change, limits, and success criteria first. Command type, proposer identity, and budget settings can stay available as advanced controls.
 
 The simplest product view is:
 

@@ -115,7 +115,7 @@ The current app is a local prototype of the hook-building flow:
 - manual developer fee plan that uses review evidence without moving funds
 - copyable launch packet for wave, PR, review, contribution, and fee evidence
 - safety rules by command type
-- command proposal form
+- simple hook work proposal form with advanced command settings collapsed
 - backend command surface limited to context reads, drafts, wave updates, and PR commands
 - persisted older rule sets are normalized so scripts, deploys, spending, and rule changes stay parked
 - first-phase proposal picker focused on PRs, drafts, wave updates, and context reads
