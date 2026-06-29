@@ -1450,6 +1450,20 @@ export function CommandWavesConsole() {
                     </Badge>
                   </div>
 
+                  <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                    {[
+                      ["Wave", project.waveSnapshotLabel],
+                      ["Repo", project.codeSnapshotLabel],
+                      ["Review", project.reviewStatusLabel],
+                      ["Next", project.nextActionLabel],
+                    ].map(([label, value]) => (
+                      <div key={label} className="border-t border-zinc-800 pt-2">
+                        <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
+                        <dd className="mt-1 text-sm font-semibold text-zinc-100">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+
                   <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                     <div className="border-t border-zinc-800 pt-3">
                       <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Wave activity</p>

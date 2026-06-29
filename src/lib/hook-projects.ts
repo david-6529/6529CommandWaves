@@ -17,6 +17,8 @@ export type ActiveHookProject = {
   participation: string;
   waveRole: string;
   platformRole: string;
+  waveSnapshotLabel: string;
+  codeSnapshotLabel: string;
   nextActionStatus: PhaseNextActionStatus;
   nextActionLabel: string;
   nextActionTitle: string;
@@ -88,6 +90,30 @@ function waveStatus(wave: CommandWave) {
   return "No vote required by current rules.";
 }
 
+function waveSnapshotLabel(wave: CommandWave) {
+  const phaseWork = selectPhaseWork(wave);
+  const proposal = phaseWork.prProposal;
+  const poll = phaseWork.prPoll;
+
+  if (!proposal) {
+    return "needs command";
+  }
+
+  if (poll?.decision?.url) {
+    return "decision recorded";
+  }
+
+  if (poll?.status === "passed") {
+    return "needs receipt";
+  }
+
+  if (poll) {
+    return `${poll.status} vote`;
+  }
+
+  return "no vote needed";
+}
+
 function codeStatus(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
 
@@ -108,6 +134,28 @@ function codeStatus(wave: CommandWave) {
   }
 
   return "No PR-sized hook command yet.";
+}
+
+function codeSnapshotLabel(wave: CommandWave) {
+  const phaseWork = selectPhaseWork(wave);
+
+  if (phaseWork.prReview?.status === "pass") {
+    return "review logged";
+  }
+
+  if (phaseWork.prExecution?.status === "complete") {
+    return "PR ready";
+  }
+
+  if (phaseWork.prProposal?.status === "approved") {
+    return "ready to build";
+  }
+
+  if (phaseWork.prProposal) {
+    return "needs approval";
+  }
+
+  return "no PR yet";
 }
 
 function reviewStatus(wave: CommandWave) {
@@ -155,6 +203,8 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       participation: "Read the wave, draft replies here, and track repo work.",
       waveRole: "Live discussion, proposals, decisions, and updates.",
       platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+      waveSnapshotLabel: waveSnapshotLabel(wave),
+      codeSnapshotLabel: codeSnapshotLabel(wave),
       nextActionStatus: nextAction.status,
       nextActionLabel: nextAction.statusLabel,
       nextActionTitle: nextAction.title,

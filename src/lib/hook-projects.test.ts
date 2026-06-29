@@ -19,6 +19,8 @@ describe("active hook projects", () => {
         participation: "Read the wave, draft replies here, and track repo work.",
         waveRole: "Live discussion, proposals, decisions, and updates.",
         platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+        waveSnapshotLabel: "decision recorded",
+        codeSnapshotLabel: "review logged",
         nextActionStatus: "ready",
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
@@ -50,7 +52,9 @@ describe("active hook projects", () => {
       nextActionTitle: "Set the project",
       nextActionDetail: "Confirm one builder wave and one GitHub repo before proposals start.",
       waveStatus: "Wave has not selected a PR-sized hook command yet.",
+      waveSnapshotLabel: "needs command",
       codeStatus: "No PR-sized hook command yet.",
+      codeSnapshotLabel: "no PR yet",
     });
   });
 
@@ -64,7 +68,9 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       waveStatus: "Wave decision recorded with 5 yes and 1 no.",
+      waveSnapshotLabel: "decision recorded",
       codeStatus: "Approved PR command is ready to build.",
+      codeSnapshotLabel: "ready to build",
       nextActionTitle: "Build the approved PR",
       nextActionDetail: "Use the approved packet or prepared branch, then record the PR evidence.",
       latestPrUrl: null,
@@ -81,6 +87,7 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       codeStatus: "PR evidence is ready for review.",
+      codeSnapshotLabel: "PR ready",
       reviewStatusLabel: "ready for review",
     });
   });
