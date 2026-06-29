@@ -1,4 +1,5 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
+import { commandKindLabel } from "./command-kind-copy";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
@@ -120,7 +121,7 @@ function proposalLines(proposal: CommandProposal | null) {
   return [
     `- Command: ${proposal.id} - ${proposal.title}`,
     `- Status: ${proposal.status}`,
-    `- Kind: ${proposal.kind.replaceAll("_", " ")}`,
+    `- Kind: ${commandKindLabel(proposal.kind)}`,
     `- Risk: ${proposal.risk}`,
     `- Proposer: ${proposal.proposer}`,
     `- Budget cap: $${proposal.budgetUsd}`,

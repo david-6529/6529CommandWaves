@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
+import { commandKindLabel } from "@/lib/command-kind-copy";
 import {
   classifyRisk,
   evaluatePoll,
@@ -39,14 +40,14 @@ import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 type CommandKindOption = { value: CommandKind; label: string; description: string };
 
 const commandKinds: CommandKindOption[] = [
-  { value: "read_context", label: "Read context", description: "Summarize or inspect wave/repo state." },
-  { value: "draft_response", label: "Draft response", description: "Draft text without posting it." },
-  { value: "post_to_wave", label: "Wave update", description: "Draft a public update for human posting." },
-  { value: "open_pr", label: "Open PR", description: "Use an agent harness to change code." },
-  { value: "run_script", label: "Run script", description: "Execute an approved script or workflow." },
-  { value: "deploy", label: "Deploy", description: "Promote an approved change." },
-  { value: "spend_money", label: "Spend money", description: "Use paid APIs, compute, bounties, or funds." },
-  { value: "change_rules", label: "Change rules", description: "Modify governance or tool permissions." },
+  { value: "read_context", label: commandKindLabel("read_context"), description: "Summarize or inspect wave/repo state." },
+  { value: "draft_response", label: commandKindLabel("draft_response"), description: "Draft text without posting it." },
+  { value: "post_to_wave", label: commandKindLabel("post_to_wave"), description: "Draft a public update for human posting." },
+  { value: "open_pr", label: commandKindLabel("open_pr"), description: "Use an agent harness to change code." },
+  { value: "run_script", label: commandKindLabel("run_script"), description: "Execute an approved script or workflow." },
+  { value: "deploy", label: commandKindLabel("deploy"), description: "Promote an approved change." },
+  { value: "spend_money", label: commandKindLabel("spend_money"), description: "Use paid APIs, compute, bounties, or funds." },
+  { value: "change_rules", label: commandKindLabel("change_rules"), description: "Modify governance or tool permissions." },
 ];
 
 const firstPhaseProposalKindValues: CommandKind[] = ["open_pr", "draft_response", "post_to_wave", "read_context"];
@@ -1780,7 +1781,7 @@ export function CommandWavesConsole() {
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge className={statusClass(activeProposal.status)}>{activeProposal.status.replaceAll("_", " ")}</Badge>
                     <Badge className={riskClass(activeProposal.risk)}>{activeProposal.risk} risk</Badge>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-200">{activeProposal.kind.replaceAll("_", " ")}</Badge>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-200">{commandKindLabel(activeProposal.kind)}</Badge>
                   </div>
                   <h3 className="mt-3 text-lg font-semibold text-zinc-50">{activeProposal.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(activeProposal.prompt)}</p>
@@ -1807,7 +1808,7 @@ export function CommandWavesConsole() {
                         <div key={proposal.id} className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <Badge className={statusClass(proposal.status)}>{proposal.status.replaceAll("_", " ")}</Badge>
-                            <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{proposal.kind.replaceAll("_", " ")}</Badge>
+                            <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{commandKindLabel(proposal.kind)}</Badge>
                           </div>
                           <p className="text-sm font-semibold text-zinc-100">{proposal.title}</p>
                         </div>

@@ -67,6 +67,37 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Choose one PR-sized hook command.");
   });
 
+  it("labels wave update support commands without implying automatic posting", () => {
+    const proposal = {
+      ...demoWave.proposals[0],
+      id: "cmd-wave-update",
+      title: "Draft wave update",
+      kind: "post_to_wave" as const,
+      risk: "medium" as const,
+      status: "approved" as const,
+      prompt: "Draft an update for human posting.",
+      spec: "Do not post automatically.",
+    };
+    const packet = createLaunchPacket({
+      wave: {
+        ...demoWave,
+        proposals: [proposal],
+        polls: [],
+        executions: [],
+        reviews: [],
+      },
+      proposal,
+      poll: null,
+      execution: null,
+      review: null,
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+
+    expect(packet.text).toContain("- Kind: Wave update");
+    expect(packet.text).not.toContain("- Kind: post to wave");
+    expect(packet.text).not.toContain("automatically posted");
+  });
+
   it("does not imply empty participation notes are enforced gates", () => {
     const packet = createLaunchPacket({
       wave: {
