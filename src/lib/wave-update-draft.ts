@@ -30,6 +30,14 @@ function buildLine(poll: PollState | null, execution: ExecutionRecord | null) {
   return `Build: ${execution.status}. ${execution.summary}`;
 }
 
+function prLine(execution: ExecutionRecord | null) {
+  const prUrl = execution?.artifacts.find((artifact) =>
+    /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
+  );
+
+  return prUrl ? `PR: ${prUrl}` : null;
+}
+
 function reviewLine(review: GuardianReview | null) {
   if (!review) {
     return "Review: waiting for execution evidence.";
@@ -72,6 +80,8 @@ export function createWaveUpdateDraft({
   execution: ExecutionRecord | null;
   review: GuardianReview | null;
 }) {
+  const pr = prLine(execution);
+
   return [
     "6529 Hook Builder update",
     "",
@@ -81,6 +91,7 @@ export function createWaveUpdateDraft({
     proposal ? `Status: ${proposal.status}` : "Status: setup",
     pollLine(poll),
     buildLine(poll, execution),
+    ...(pr ? [pr] : []),
     reviewLine(review),
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
