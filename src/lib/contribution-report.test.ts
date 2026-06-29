@@ -23,4 +23,10 @@ describe("contribution report", () => {
     expect(report.contributors[0].rationale).toContain("Recorded wave decision evidence");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
   });
+
+  it("defaults generatedAt to the newest ledger event", () => {
+    const report = createContributionReport(demoWave);
+
+    expect(report.generatedAt).toBe("2026-06-20T12:50:00.000Z");
+  });
 });

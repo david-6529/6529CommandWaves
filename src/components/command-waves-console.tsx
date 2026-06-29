@@ -21,6 +21,7 @@ import {
   type FirstPhaseLaunchAuditStatus,
 } from "@/lib/first-phase-launch-audit";
 import { createHookProposalPreflight, type HookProposalPreflightCheck } from "@/lib/hook-proposal-preflight";
+import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
@@ -709,7 +710,9 @@ export function CommandWavesConsole() {
       }),
     [activeExecution, activePoll, activeProposal, activeReview, wave],
   );
-  const recentLedgerEvents = wave.ledger.slice(0, 6);
+  const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
+  const recentLedgerEvents = orderedLedgerEvents.slice(0, 6);
+  const olderLedgerEvents = orderedLedgerEvents.slice(recentLedgerEvents.length);
   const isBusy = apiBusy !== null;
 
   useEffect(() => {
@@ -1787,11 +1790,11 @@ export function CommandWavesConsole() {
               </div>
             ))}
           </div>
-          {wave.ledger.length > recentLedgerEvents.length ? (
+          {olderLedgerEvents.length ? (
             <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
               <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
               <div className="mt-3 divide-y divide-zinc-900">
-                {wave.ledger.slice(recentLedgerEvents.length).map((event) => (
+                {olderLedgerEvents.map((event) => (
                   <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
                     <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
                     <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>

@@ -76,4 +76,17 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Wave decision receipt: not recorded yet.");
     expect(packet.text).toContain("Build: waiting for a recorded wave decision.");
   });
+
+  it("defaults generatedAt to the newest ledger event", () => {
+    const packet = createLaunchPacket({
+      wave: demoWave,
+      proposal: demoWave.proposals[0],
+      poll: demoWave.polls[0],
+      execution: demoWave.executions[0],
+      review: demoWave.reviews[0],
+    });
+
+    expect(packet.generatedAt).toBe("2026-06-20T12:50:00.000Z");
+    expect(packet.text).toContain("Generated: 2026-06-20T12:50:00.000Z");
+  });
 });

@@ -2,6 +2,7 @@ import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, Pol
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
+import { latestLedgerTimestamp } from "./ledger";
 
 export type LaunchPacket = {
   version: "command-wave-launch-packet-v0.1";
@@ -177,7 +178,7 @@ export function createLaunchPacket({
   poll,
   execution,
   review,
-  generatedAt = wave.ledger[0]?.at ?? new Date(0).toISOString(),
+  generatedAt = latestLedgerTimestamp(wave.ledger),
 }: {
   wave: CommandWave;
   proposal: CommandProposal | null;

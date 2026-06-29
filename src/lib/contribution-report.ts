@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { latestLedgerTimestamp } from "./ledger";
 
 export type ContributionContributor = {
   identity: string;
@@ -103,7 +104,7 @@ export function createContributionReport(
 
   return {
     mode: "informational",
-    generatedAt: options.generatedAt ?? wave.ledger[0]?.at ?? new Date(0).toISOString(),
+    generatedAt: options.generatedAt ?? latestLedgerTimestamp(wave.ledger),
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
       : "No contributor activity has been recorded yet.",
