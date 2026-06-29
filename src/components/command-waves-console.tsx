@@ -1344,7 +1344,7 @@ export function CommandWavesConsole() {
   async function copyBuilderWaveProposalDraft() {
     try {
       await navigator.clipboard.writeText(builderWaveProposalDraft);
-      setProposalDraftNotice("Proposal draft copied.");
+      setProposalDraftNotice("Proposal post copied.");
     } catch {
       setProposalDraftNotice("Copy failed. Select the proposal text and copy it manually.");
     }
@@ -1686,7 +1686,7 @@ export function CommandWavesConsole() {
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                      Copy for 6529
+                      Copy proposal post
                     </Button>
                     {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
                     <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
@@ -1803,7 +1803,7 @@ export function CommandWavesConsole() {
               </Field>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                  Copy for 6529
+                  Copy message
                 </Button>
                 <Button
                   type="button"
@@ -1862,7 +1862,7 @@ export function CommandWavesConsole() {
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                Copy for room
+                Copy proposal post
               </Button>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Saving" : "Save proposal"}
