@@ -96,6 +96,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
     const referenceCheck = validateWaveDecisionReference({
       reference: receipt.url ?? receipt.dropId ?? "",
       waveUrl: wave?.waveUrl ?? "",
+      requireUrl: true,
     });
 
     if (!referenceCheck.ok) {
@@ -126,7 +127,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
       id: "flow_wave_decision_receipt",
       label: "Wave decision receipt",
       status: "needed",
-      detail: "Record the 6529 decision URL or drop id before public launch.",
+      detail: "Record the 6529 decision URL before public launch.",
       source: "flow",
     },
   ];

@@ -47,4 +47,27 @@ describe("Codex work packet", () => {
       }),
     ).toThrow("Record the builder wave decision receipt before creating a Codex work packet.");
   });
+
+  it("requires a builder wave URL for PR work packet receipts", () => {
+    const proposal = {
+      ...demoWave.proposals[0],
+      status: "approved" as const,
+    };
+    const poll = {
+      ...demoWave.polls[0],
+      decision: {
+        ...demoWave.polls[0].decision!,
+        dropId: "drop-cmd-001-approval",
+        url: null,
+      },
+    };
+
+    expect(() =>
+      createCodexWorkPacket({
+        wave: demoWave,
+        proposal,
+        poll,
+      }),
+    ).toThrow("Record the builder wave decision receipt before creating a Codex work packet.");
+  });
 });

@@ -126,7 +126,7 @@ The current app is a local prototype of the hook-building flow:
 - deterministic run manifest evidence with rules hash, tool permissions, and budget cap
 - deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
 - manual wave decision receipt that can anchor approval to a 6529 drop URL
-- decision receipt URL validation against the configured builder wave
+- PR decision receipt URL validation against the configured builder wave
 - opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
 - contributor workflow and PR template for Command Waves manifest evidence
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals
@@ -261,7 +261,7 @@ For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH
 - `DELETE /api/command-wave`: reset the local demo.
 - `POST /api/command-wave/proposals`: submit a command proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
-- `POST /api/command-wave/decision`: record a manual wave decision receipt. Body requires `proposalId` and `reference`.
+- `POST /api/command-wave/decision`: record a manual wave decision receipt. Body requires `proposalId` and `reference`. PR commands require a 6529 drop URL in the builder wave.
 - `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded wave decision receipt.
 - `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.

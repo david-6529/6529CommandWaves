@@ -70,7 +70,7 @@ describe("phase next action", () => {
       status: "action",
       stepLabel: "Decide",
       title: "Get the wave decision",
-      detail: "Vote or record the 6529 decision receipt before work runs.",
+      detail: "Vote or record the 6529 decision URL before work runs.",
     });
   });
 

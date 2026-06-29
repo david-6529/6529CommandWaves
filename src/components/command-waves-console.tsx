@@ -5,7 +5,8 @@ import { attachAdminApiKey } from "@/lib/admin-client";
 import {
   classifyRisk,
   evaluatePoll,
-  pollApprovalPassed,
+  pollApprovalPassedForWave,
+  validateWaveDecisionReference,
   type CommandKind,
   type CommandWave,
 } from "@/lib/command-waves";
@@ -628,8 +629,20 @@ export function CommandWavesConsole() {
   const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
   const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
-  const activePrHasWaveDecision = Boolean(activeProposalIsPr && pollApprovalPassed(activePoll ?? null));
-  const activePollNeedsWaveDecision = Boolean(activePoll?.status === "passed" && !activePoll.decision);
+  const activeDecisionReferenceCheck = activePoll?.decision
+    ? validateWaveDecisionReference({
+        reference: activePoll.decision.url ?? activePoll.decision.dropId ?? "",
+        waveUrl: wave.waveUrl,
+        requireUrl: Boolean(activeProposalIsPr),
+      })
+    : null;
+  const activePrHasWaveDecision = Boolean(
+    activeProposalIsPr && pollApprovalPassedForWave(activePoll ?? null, wave.waveUrl, { requireUrl: true }),
+  );
+  const decisionReferencePlaceholder = activeProposalIsPr ? "6529 decision URL" : "6529 decision URL or drop id";
+  const activePollNeedsWaveDecision = Boolean(
+    activePoll?.status === "passed" && (!activePoll.decision || activeDecisionReferenceCheck?.ok === false),
+  );
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -1502,6 +1515,9 @@ export function CommandWavesConsole() {
                           <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{activePoll.decision.source}</Badge>
                         </div>
                         <p className="mt-2 text-xs leading-5 text-zinc-500">{activePoll.decision.summary}</p>
+                        {activeDecisionReferenceCheck?.ok === false ? (
+                          <p className="mt-2 text-xs leading-5 text-amber-200">{activeDecisionReferenceCheck.message}</p>
+                        ) : null}
                         {activePoll.decision.url ? (
                           <a
                             className="mt-2 block break-all text-xs font-semibold text-cyan-300 hover:text-cyan-200"
@@ -1519,7 +1535,7 @@ export function CommandWavesConsole() {
                     <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
                       <Input
                         value={decisionReference}
-                        placeholder="6529 decision URL or drop id"
+                        placeholder={decisionReferencePlaceholder}
                         onChange={(event) => setDecisionReference(event.target.value)}
                       />
                       <Button
@@ -1532,7 +1548,7 @@ export function CommandWavesConsole() {
                       </Button>
                     </div>
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      Manual evidence only. This does not add live REP, TDH, or weighted voting.
+                      Manual evidence only. PR work needs the builder wave drop URL. This does not add live REP, TDH, or weighted voting.
                     </p>
                   </div>
                 ) : (

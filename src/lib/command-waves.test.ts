@@ -153,6 +153,16 @@ describe("Command Waves rule engine", () => {
     ).toEqual({ ok: true });
     expect(
       validateWaveDecisionReference({
+        reference: "drop-123",
+        waveUrl,
+        requireUrl: true,
+      }),
+    ).toEqual({
+      ok: false,
+      message: "Wave decision URL is required for PR work.",
+    });
+    expect(
+      validateWaveDecisionReference({
         reference: "https://6529.io/waves/other-wave/drops/drop-123",
         waveUrl,
       }),

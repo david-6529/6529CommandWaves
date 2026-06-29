@@ -27,7 +27,7 @@ const actionCopyByStep: Record<
   },
   decision: {
     title: "Get the wave decision",
-    detail: "Vote or record the 6529 decision receipt before work runs.",
+    detail: "Vote or record the 6529 decision URL before work runs.",
   },
   build: {
     title: "Build the approved PR",

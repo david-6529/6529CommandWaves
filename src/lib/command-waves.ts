@@ -286,9 +286,11 @@ function is6529Host(hostname: string) {
 export function validateWaveDecisionReference({
   reference,
   waveUrl,
+  requireUrl = false,
 }: {
   reference: string;
   waveUrl: string;
+  requireUrl?: boolean;
 }): { ok: true } | { ok: false; message: string } {
   const trimmedReference = reference.trim();
 
@@ -296,7 +298,13 @@ export function validateWaveDecisionReference({
     return { ok: false, message: "Wave decision URL or drop id is required." };
   }
 
-  if (!/^https?:\/\//i.test(trimmedReference)) {
+  const isUrl = /^https?:\/\//i.test(trimmedReference);
+
+  if (!isUrl && requireUrl) {
+    return { ok: false, message: "Wave decision URL is required for PR work." };
+  }
+
+  if (!isUrl) {
     return { ok: true };
   }
 
@@ -328,6 +336,24 @@ export function validateWaveDecisionReference({
   }
 
   return { ok: true };
+}
+
+export function pollApprovalPassedForWave(
+  poll: PollState | null,
+  waveUrl: string,
+  options: { requireUrl?: boolean } = {},
+) {
+  if (!pollApprovalPassed(poll)) {
+    return false;
+  }
+
+  const reference = poll?.decision?.url ?? poll?.decision?.dropId ?? "";
+
+  return validateWaveDecisionReference({
+    reference,
+    waveUrl,
+    requireUrl: options.requireUrl,
+  }).ok;
 }
 
 export function createWaveDecisionReceipt({

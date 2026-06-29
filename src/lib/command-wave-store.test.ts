@@ -250,6 +250,51 @@ describe("Command wave store", () => {
     ).rejects.toThrow("Wave decision URL is not valid.");
   });
 
+  it("requires a decision URL for PR command receipts", async () => {
+    await submitCommandProposal({
+      title: "Open a PR",
+      proposer: "tester",
+      kind: "open_pr",
+      prompt: "Use Codex to add docs.",
+      spec: "Docs only.",
+      budgetUsd: 1,
+    });
+
+    await expect(
+      recordDecisionReceipt({
+        proposalId: "cmd-002",
+        reference: "drop-approval-002",
+        recordedBy: "david",
+      }),
+    ).rejects.toThrow("Wave decision URL is required for PR work.");
+  });
+
+  it("allows drop id receipts for support decisions", async () => {
+    const submitted = await submitCommandProposal({
+      title: "Post launch update",
+      proposer: "tester",
+      kind: "post_to_wave",
+      prompt: "Post a launch update.",
+      spec: "Use approved text only.",
+      budgetUsd: 0,
+    });
+
+    const approved = await recordDecisionReceipt({
+      proposalId: submitted.proposals[0].id,
+      reference: "drop-support-approval",
+      recordedBy: "david",
+    });
+
+    expect(approved.polls[0]).toMatchObject({
+      proposalId: submitted.proposals[0].id,
+      status: "passed",
+      decision: {
+        dropId: "drop-support-approval",
+        url: null,
+      },
+    });
+  });
+
   it("rejects blocked command kinds without opening a poll", async () => {
     const wave = await getCommandWave();
 

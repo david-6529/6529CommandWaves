@@ -1,4 +1,11 @@
-import { pollApprovalPassed, type CommandWave, type ExecutionRecord, type GuardianReview, type PollState } from "./command-waves";
+import {
+  pollApprovalPassedForWave,
+  validateWaveDecisionReference,
+  type CommandWave,
+  type ExecutionRecord,
+  type GuardianReview,
+  type PollState,
+} from "./command-waves";
 
 export type PhaseChecklistStatus = "done" | "active" | "waiting" | "blocked";
 
@@ -9,8 +16,8 @@ export type PhaseChecklistItem = {
   detail: string;
 };
 
-function isDecisionDone(proposalStatus: string, poll: PollState | null) {
-  return ["reviewing", "complete"].includes(proposalStatus) || pollApprovalPassed(poll);
+function isDecisionDone(proposalStatus: string, poll: PollState | null, waveUrl: string) {
+  return ["reviewing", "complete"].includes(proposalStatus) || pollApprovalPassedForWave(poll, waveUrl, { requireUrl: true });
 }
 
 function setupCanRunCode(wave: CommandWave) {
@@ -82,7 +89,14 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
   const poll = proposal ? (wave.polls.find((item) => item.proposalId === proposal.id) ?? null) : null;
   const execution = latestExecution(wave);
   const review = latestReview(wave);
-  const decisionDone = proposal ? isDecisionDone(proposal.status, poll) : false;
+  const decisionDone = proposal ? isDecisionDone(proposal.status, poll, wave.waveUrl) : false;
+  const decisionReferenceCheck = poll?.decision
+    ? validateWaveDecisionReference({
+        reference: poll.decision.url ?? poll.decision.dropId ?? "",
+        waveUrl: wave.waveUrl,
+        requireUrl: true,
+      })
+    : null;
   const build = buildStatus(execution, decisionDone);
   const reviewItem = reviewStatus(execution, review);
   const loggedReview = Boolean(
@@ -124,9 +138,11 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       detail: proposal
         ? poll
           ? poll.decision
-            ? `Receipt recorded: ${poll.decision.dropId ?? poll.decision.url ?? "wave decision"}.`
+            ? decisionReferenceCheck?.ok
+              ? `Receipt recorded: ${poll.decision.url ?? poll.decision.dropId ?? "wave decision"}.`
+              : (decisionReferenceCheck?.message ?? "Wave decision receipt is not valid.")
             : poll.status === "passed"
-              ? "Vote passed locally. Record the 6529 decision receipt."
+              ? "Vote passed locally. Record the 6529 decision URL."
               : `Vote is ${poll.status}: ${poll.yesVotes} yes, ${poll.noVotes} no.`
           : "No vote required by current rules."
         : "Decision waits for a proposal.",

@@ -192,6 +192,56 @@ describe("PR reviewer gate", () => {
     });
   });
 
+  it("fails a PR receipt that has only a drop id", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-drop-id-only-receipt",
+      status: "approved" as const,
+      prompt: "Use Codex to update documentation.",
+      spec: "Docs only.",
+      risk: "medium" as const,
+    };
+    const poll = {
+      proposalId: proposal.id,
+      yesVotes: 3,
+      noVotes: 0,
+      quorumRequired: 3,
+      yesPercentRequired: 60,
+      status: "passed" as const,
+      votes: [],
+      decision: {
+        source: "manual" as const,
+        dropId: "drop-manual-decision",
+        url: null,
+        recordedBy: "david",
+        recordedAt: "2026-06-20T18:00:00.000Z",
+        summary: "Builder wave approved the work.",
+      },
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest: {
+        ...manifest,
+        approval: {
+          ...manifest.approval,
+          status: "passed",
+        },
+      },
+      changedPaths: ["README.md"],
+    });
+
+    expect(manifest.approval.status).toBe("pending");
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "vote")).toMatchObject({
+      status: "fail",
+      message: "Wave decision URL is required for PR work.",
+    });
+  });
+
   it("fails medium-risk commands that touch workflow enforcement", () => {
     const wave = approvedDemoWave();
     const proposal = {

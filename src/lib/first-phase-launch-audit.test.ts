@@ -144,6 +144,41 @@ describe("first phase launch audit", () => {
     );
   });
 
+  it("blocks public launch when a PR receipt has only a drop id", () => {
+    const decision = demoWave.polls[0].decision;
+
+    if (!decision) {
+      throw new Error("Expected demo decision receipt.");
+    }
+
+    const wave = {
+      ...demoWave,
+      polls: [
+        {
+          ...demoWave.polls[0],
+          decision: {
+            ...decision,
+            url: null,
+          },
+        },
+      ],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_wave_decision_receipt",
+        status: "blocked",
+        detail: "Wave decision URL is required for PR work.",
+      }),
+    );
+  });
+
   it("does not emit em dash characters", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),

@@ -60,7 +60,35 @@ describe("phase checklist", () => {
 
     expect(checklist.find((item) => item.id === "decision")).toMatchObject({
       status: "active",
-      detail: "Vote passed locally. Record the 6529 decision receipt.",
+      detail: "Vote passed locally. Record the 6529 decision URL.",
+    });
+    expect(checklist.find((item) => item.id === "build")).toMatchObject({
+      status: "waiting",
+      detail: "Build waits for a recorded wave decision.",
+    });
+  });
+
+  it("does not treat a PR drop id receipt as a wave decision URL", () => {
+    const checklist = createPhaseChecklist({
+      ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+      polls: [
+        {
+          ...demoWave.polls[0],
+          decision: {
+            ...demoWave.polls[0].decision!,
+            url: null,
+          },
+        },
+      ],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    });
+
+    expect(checklist.find((item) => item.id === "decision")).toMatchObject({
+      status: "active",
+      detail: "Wave decision URL is required for PR work.",
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",

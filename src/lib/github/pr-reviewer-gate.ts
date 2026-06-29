@@ -1,7 +1,7 @@
 import {
   evaluateGate,
   evaluatePoll,
-  pollApprovalPassed,
+  pollApprovalPassedForWave,
   validateWaveDecisionReference,
   type CommandKind,
   type CommandProposal,
@@ -247,13 +247,8 @@ function validatePollDecisionReference(poll: PollState | null, waveUrl: string) 
   return validateWaveDecisionReference({
     reference: poll.decision.url ?? poll.decision.dropId ?? "",
     waveUrl,
+    requireUrl: true,
   });
-}
-
-function pollApprovalPassedForWave(poll: PollState | null, waveUrl: string) {
-  const referenceCheck = validatePollDecisionReference(poll, waveUrl);
-
-  return pollApprovalPassed(poll) && Boolean(referenceCheck?.ok);
 }
 
 export function findPrDiffSignals(paths: string[] = []): PrDiffSignal[] {
@@ -281,7 +276,7 @@ export function createCommandPrManifest({
   pollDropId?: string | null;
 }): CommandPrManifest {
   const runManifest = createCommandRunManifest({ wave, proposal });
-  const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl);
+  const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true });
 
   return {
     version: "command-wave-pr-v0.1",
@@ -394,7 +389,7 @@ export function validateCommandPrManifest({
   const gate = evaluateGate(proposal, wave.rules);
   const pollResult = poll ? evaluatePoll(poll) : null;
   const decisionReferenceCheck = validatePollDecisionReference(poll, wave.waveUrl);
-  const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl);
+  const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true });
 
   checks.push(
     check(

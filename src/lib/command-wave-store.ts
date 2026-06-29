@@ -9,7 +9,7 @@ import {
   defaultRules,
   evaluateGate,
   evaluatePoll,
-  pollApprovalPassed,
+  pollApprovalPassedForWave,
   validateWaveDecisionReference,
   type CommandKind,
   type CommandProposal,
@@ -431,7 +431,11 @@ export async function recordDecisionReceipt(input: unknown) {
     throw Object.assign(new Error("Wave decision URL or drop id is required."), { status: 400 });
   }
 
-  const referenceCheck = validateWaveDecisionReference({ reference, waveUrl: wave.waveUrl });
+  const referenceCheck = validateWaveDecisionReference({
+    reference,
+    waveUrl: wave.waveUrl,
+    requireUrl: proposal.kind === "open_pr",
+  });
 
   if (!referenceCheck.ok) {
     throw Object.assign(new Error(referenceCheck.message), { status: 400 });
@@ -478,7 +482,7 @@ export async function executeProposal(input: unknown) {
 
   const poll = wave.polls.find((item) => item.proposalId === proposalId) ?? null;
 
-  if (!pollApprovalPassed(poll)) {
+  if (!pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     if (proposal.status === "approved" || poll?.status === "passed") {
       throw Object.assign(new Error("Record the builder wave decision receipt before running a PR command."), { status: 409 });
     }

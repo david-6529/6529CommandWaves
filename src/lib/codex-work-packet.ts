@@ -1,4 +1,4 @@
-import { pollApprovalPassed, type CommandProposal, type CommandWave, type PollState } from "./command-waves";
+import { pollApprovalPassedForWave, type CommandProposal, type CommandWave, type PollState } from "./command-waves";
 import { createAgentHandoffPacket } from "./agent-handoff";
 import {
   createCommandPrManifest,
@@ -40,7 +40,7 @@ export function createCodexWorkPacket({
   runManifest?: CommandRunManifest;
   baseBranch?: string;
 }): CodexWorkPacket {
-  if (proposal.kind === "open_pr" && !pollApprovalPassed(poll)) {
+  if (proposal.kind === "open_pr" && !pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     throw Object.assign(new Error("Record the builder wave decision receipt before creating a Codex work packet."), {
       status: 409,
     });
