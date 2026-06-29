@@ -106,6 +106,7 @@ The current app is a local prototype of the hook-building flow:
 - hooks-in-development snapshot for the 6529 Hook with wave, repo, PR, review, and evidence state
 - automatic latest-wave preview for the active hook project
 - first-screen wave update draft copy action for human sharing in the builder wave
+- first-screen jump actions for suggesting work and reading activity
 - compact current-state area with work, launch, and progress guidance
 - recent activity log placed near the core build flow
 - collapsed maintainer setup and guardrail controls at the bottom of the page

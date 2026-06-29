@@ -509,6 +509,17 @@ function LinkButton({ href, children }: { href: string; children: React.ReactNod
   );
 }
 
+function JumpLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-800"
+      href={href}
+    >
+      {children}
+    </a>
+  );
+}
+
 function downloadJson(filename: string, payload: unknown) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -1313,6 +1324,10 @@ export function CommandWavesConsole() {
               </div>
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{phaseNextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <JumpLink href="#suggest-hook-work">Suggest work</JumpLink>
+                <JumpLink href="#recent-activity">View activity</JumpLink>
+              </div>
             </div>
 
             <div className="border-t border-zinc-800 pt-3 lg:border-t-0 lg:pl-3">
@@ -1728,7 +1743,7 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <section className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+        <section id="suggest-hook-work" className="grid scroll-mt-4 gap-4 lg:grid-cols-[0.85fr_1.15fr]">
           <Panel title="Suggest hook work" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
@@ -2063,37 +2078,39 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <Panel title="Recent activity" eyebrow="Log">
-          <div className="divide-y divide-zinc-800">
-            {recentLedgerEvents.map((event) => (
-              <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                <div>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {olderLedgerEvents.length ? (
-            <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
-              <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
-              <div className="mt-3 divide-y divide-zinc-900">
-                {olderLedgerEvents.map((event) => (
-                  <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                    <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                    <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                    <div>
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                      <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                    </div>
+        <section id="recent-activity" className="scroll-mt-4">
+          <Panel title="Recent activity" eyebrow="Log">
+            <div className="divide-y divide-zinc-800">
+              {recentLedgerEvents.map((event) => (
+                <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                  <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                  <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                  <div>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
                   </div>
-                ))}
-              </div>
-            </details>
-          ) : null}
-        </Panel>
+                </div>
+              ))}
+            </div>
+            {olderLedgerEvents.length ? (
+              <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+                <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
+                <div className="mt-3 divide-y divide-zinc-900">
+                  {olderLedgerEvents.map((event) => (
+                    <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                      <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                      <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                      <div>
+                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                        <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+          </Panel>
+        </section>
 
         <Panel title="Contribution report" eyebrow="Informational">
           <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
