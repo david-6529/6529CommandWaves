@@ -150,6 +150,7 @@ The current app is a local prototype of the hook-building flow:
 - human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - public command-wave state endpoint for `COMMAND_WAVE_STATE_URL`
+- copyable setup proof and state URLs in launch readiness controls
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
 - 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and capped context previews

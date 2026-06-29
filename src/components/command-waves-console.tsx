@@ -171,6 +171,8 @@ type CodexWorkPacketResponse = ApiErrorPayload & {
 
 const accessKeyStorageKey = "command-waves-access-key";
 const wavePreviewMaxMessages = 50;
+const setupProofPath = "/api/command-wave/setup/proof";
+const commandWaveStatePath = "/api/command-wave/state";
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
   const headers = new Headers(init?.headers);
@@ -531,6 +533,14 @@ function downloadJson(filename: string, payload: unknown) {
   URL.revokeObjectURL(url);
 }
 
+function appUrl(path: string) {
+  if (typeof window === "undefined") {
+    return path;
+  }
+
+  return new URL(path, window.location.origin).toString();
+}
+
 function modeLabel(mode: string) {
   if (mode === "auto") {
     return "can run";
@@ -625,6 +635,7 @@ export function CommandWavesConsole() {
   const [apiError, setApiError] = useState("");
   const [copyNotice, setCopyNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
+  const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
   const [projectContextPreviews, setProjectContextPreviews] = useState<Record<string, WaveContextPreview>>({});
   const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
@@ -865,6 +876,7 @@ export function CommandWavesConsole() {
     setProjectContextPreviews({});
     setSetupContextPreview(null);
     setLaunchBriefNotice("");
+    setLaunchLinkNotice("");
     setCodexPacketNotice("");
   }
 
@@ -1032,6 +1044,15 @@ export function CommandWavesConsole() {
       setLaunchBriefNotice("Launch brief copied.");
     } catch {
       setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
+    }
+  }
+
+  async function copyLaunchUrl(path: string, label: string) {
+    try {
+      await navigator.clipboard.writeText(appUrl(path));
+      setLaunchLinkNotice(`${label} copied.`);
+    } catch {
+      setLaunchLinkNotice(`Copy failed. Select the ${label.toLowerCase()} manually.`);
     }
   }
 
@@ -1554,6 +1575,32 @@ export function CommandWavesConsole() {
                   <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkReadiness()}>
                     {apiBusy === "readiness" ? "Checking" : "Check readiness"}
                   </Button>
+                  <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Guardian URLs</p>
+                    <div className="mt-3 grid gap-3 lg:grid-cols-2">
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">Wave state</p>
+                        <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{commandWaveStatePath}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Button type="button" variant="secondary" onClick={() => void copyLaunchUrl(commandWaveStatePath, "State URL")}>
+                            Copy state URL
+                          </Button>
+                          <LinkButton href={commandWaveStatePath}>Open state</LinkButton>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">Setup proof</p>
+                        <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{setupProofPath}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Button type="button" variant="secondary" onClick={() => void copyLaunchUrl(setupProofPath, "Setup proof URL")}>
+                            Copy proof URL
+                          </Button>
+                          <LinkButton href={setupProofPath}>Open proof</LinkButton>
+                        </div>
+                      </div>
+                    </div>
+                    {launchLinkNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{launchLinkNotice}</p> : null}
+                  </div>
                   <div className="border-t border-zinc-900 pt-3">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
