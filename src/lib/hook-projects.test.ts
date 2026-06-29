@@ -86,6 +86,37 @@ describe("active hook projects", () => {
     });
   });
 
+  it("can list more than one hook project without merging wave or repo labels", () => {
+    const projects = createActiveHookProjects([
+      demoWave,
+      {
+        ...demoWave,
+        id: "cw-community-hook",
+        name: "Community Hook",
+        waveUrl: "https://6529.io/waves/community-hook-builder",
+        repoUrl: "https://github.com/6529-Collections/community-hook",
+        proposals: [],
+        polls: [],
+        executions: [],
+        reviews: [],
+      },
+    ]);
+
+    expect(projects).toHaveLength(2);
+    expect(projects[0]).toMatchObject({
+      id: demoWave.id,
+      waveLabel: "6529-hook-builder",
+      repoLabel: "6529-Collections/6529-hook",
+    });
+    expect(projects[1]).toMatchObject({
+      id: "cw-community-hook",
+      name: "Community Hook",
+      waveLabel: "community-hook-builder",
+      repoLabel: "6529-Collections/community-hook",
+      currentFocus: "Choose the first PR-sized hook command.",
+    });
+  });
+
   it("does not emit U+2014 characters", () => {
     expect(JSON.stringify(createActiveHookProjects(demoWave))).not.toContain("\u2014");
   });

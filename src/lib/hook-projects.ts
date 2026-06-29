@@ -125,14 +125,16 @@ function reviewStatus(wave: CommandWave) {
   return "not reviewed";
 }
 
-export function createActiveHookProjects(wave: CommandWave): ActiveHookProject[] {
-  const phaseWork = selectPhaseWork(wave);
-  const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook command.";
-  const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim());
-  const latestActivity = wave.ledger.at(-1)?.message ?? "No activity logged yet.";
+export function createActiveHookProjects(input: CommandWave | CommandWave[]): ActiveHookProject[] {
+  const waves = Array.isArray(input) ? input : [input];
 
-  return [
-    {
+  return waves.map((wave) => {
+    const phaseWork = selectPhaseWork(wave);
+    const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook command.";
+    const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim());
+    const latestActivity = wave.ledger.at(-1)?.message ?? "No activity logged yet.";
+
+    return {
       id: wave.id,
       name: hookName(wave),
       status: hasProject ? "active" : "setup",
@@ -155,6 +157,6 @@ export function createActiveHookProjects(wave: CommandWave): ActiveHookProject[]
         countLabel(wave.reviews.length, "review"),
       ].join(", "),
       latestActivity,
-    },
-  ];
+    };
+  });
 }
