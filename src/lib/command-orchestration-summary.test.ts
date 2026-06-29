@@ -19,6 +19,43 @@ describe("command orchestration summary", () => {
     });
   });
 
+  it("flags a recorded PR receipt from the wrong wave", () => {
+    const summary = createCommandOrchestrationSummary({
+      wave: demoWave,
+      proposal: demoWave.proposals[0],
+      poll: {
+        ...demoWave.polls[0],
+        decision: {
+          ...demoWave.polls[0].decision!,
+          url: "https://6529.io/waves/other-wave/drops/drop-cmd-001-approval",
+        },
+      },
+    });
+
+    expect(summary.decisionRoute).toBe(
+      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Wave decision URL must match the configured builder wave.",
+    );
+  });
+
+  it("requires a 6529 drop URL for PR work receipts", () => {
+    const summary = createCommandOrchestrationSummary({
+      wave: demoWave,
+      proposal: demoWave.proposals[0],
+      poll: {
+        ...demoWave.polls[0],
+        decision: {
+          ...demoWave.polls[0].decision!,
+          url: null,
+          dropId: "drop-cmd-001-approval",
+        },
+      },
+    });
+
+    expect(summary.decisionRoute).toBe(
+      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Wave decision URL is required for PR work.",
+    );
+  });
+
   it("keeps support commands outside the PR review route", () => {
     const summary = createCommandOrchestrationSummary({
       wave: demoWave,

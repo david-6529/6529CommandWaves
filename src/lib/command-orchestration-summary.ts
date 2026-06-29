@@ -1,5 +1,11 @@
 import { commandKindLabel } from "./command-kind-copy";
-import type { CommandProposal, CommandWave, PollState, RiskLevel } from "./command-waves";
+import {
+  validateWaveDecisionReference,
+  type CommandProposal,
+  type CommandWave,
+  type PollState,
+  type RiskLevel,
+} from "./command-waves";
 
 export type CommandOrchestrationSummary = {
   workType: string;
@@ -27,10 +33,20 @@ function routeForRule(wave: CommandWave, proposal: CommandProposal) {
   return `vote required, quorum ${rule.quorum}, yes threshold ${rule.yesPercent}%`;
 }
 
-function routeForPoll(poll: PollState) {
+function routeForPoll(wave: CommandWave, proposal: CommandProposal, poll: PollState) {
   const route = `vote required, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%`;
 
   if (poll.decision) {
+    const referenceCheck = validateWaveDecisionReference({
+      reference: poll.decision.url ?? poll.decision.dropId ?? "",
+      waveUrl: wave.waveUrl,
+      requireUrl: proposal.kind === "open_pr",
+    });
+
+    if (!referenceCheck.ok) {
+      return `${route}, receipt needs fix: ${referenceCheck.message}`;
+    }
+
     return `${route}, decision receipt recorded`;
   }
 
@@ -73,7 +89,7 @@ export function createCommandOrchestrationSummary({
   return {
     workType: commandKindLabel(proposal.kind),
     risk: proposal.risk,
-    decisionRoute: poll ? routeForPoll(poll) : routeForRule(wave, proposal),
+    decisionRoute: poll ? routeForPoll(wave, proposal, poll) : routeForRule(wave, proposal),
     ruleReason: rule?.reason ?? "No rule reason recorded.",
     reviewerRoute:
       proposal.kind === "open_pr"
