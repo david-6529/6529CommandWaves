@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
@@ -612,6 +612,8 @@ export function CommandWavesConsole() {
   const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
+  const [setupControlsOpen, setSetupControlsOpen] = useState(false);
+  const setupControlsRef = useRef<HTMLDetailsElement>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const hookProposalPreflight = useMemo(
@@ -909,6 +911,13 @@ export function CommandWavesConsole() {
 
   function resetStarterState() {
     void runWaveAction("reset", () => requestWave("/api/command-wave", { method: "DELETE" }, accessKey), "Starter state restored.");
+  }
+
+  function openSetupControls() {
+    setSetupControlsOpen(true);
+    window.requestAnimationFrame(() => {
+      setupControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }
 
   async function copyWaveUpdateDraft() {
@@ -1223,6 +1232,11 @@ export function CommandWavesConsole() {
               </div>
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
+              {launchAudit.status !== "ready" ? (
+                <Button type="button" variant="secondary" className="mt-3" onClick={openSetupControls}>
+                  Open launch controls
+                </Button>
+              ) : null}
             </div>
           </div>
 
@@ -1241,7 +1255,12 @@ export function CommandWavesConsole() {
           </ol>
         </section>
 
-        <details className="order-last border-t border-zinc-800 pt-3">
+        <details
+          ref={setupControlsRef}
+          className="order-last border-t border-zinc-800 pt-3"
+          open={setupControlsOpen}
+          onToggle={(event) => setSetupControlsOpen(event.currentTarget.open)}
+        >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
             <span>Maintainer setup and guardrails</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-400">controls</Badge>
