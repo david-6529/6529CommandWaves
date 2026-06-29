@@ -1192,7 +1192,7 @@ export function CommandWavesConsole() {
           </ol>
         </section>
 
-        <details className="border-t border-zinc-800 pt-3">
+        <details className="order-last border-t border-zinc-800 pt-3">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
             <span>Maintainer setup and guardrails</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-400">controls</Badge>

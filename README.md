@@ -102,7 +102,7 @@ The current app is a local prototype of the hook-building flow:
 - first-screen hook dashboard: wave snapshot, code state, PR, review, and progress
 - 6529 Hook project snapshot with wave, repo, PR, review, and evidence state
 - compact current-state area with work, launch, and progress guidance
-- collapsed maintainer setup and guardrail controls below the public project view
+- collapsed maintainer setup and guardrail controls at the bottom of the page
 - project wave setup with simpler user-facing language
 - 6529 wave search by name or pasted wave URL/ID
 - GitHub repo link
