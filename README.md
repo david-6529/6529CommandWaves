@@ -74,13 +74,16 @@ The most important production hardening step is moving from the repo-local GitHu
 should own the required check, read the 6529 wave state, replay the same deterministic verifier, and publish the same proof
 artifacts. Until then, the MVP is useful and auditable, but not the strongest possible trust boundary.
 
-Next production tasks:
+First launch tasks:
 
 1. Pick the first real builder wave and hook repo, then publish the launch playbook.
 2. Wire live 6529 proposal and vote state into `COMMAND_WAVE_STATE_URL`.
-3. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
-4. Replace local PR adapter execution with a controlled Codex harness that prepares branches.
-5. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
+
+Hardening tasks after the first public loop:
+
+1. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
+2. Replace local PR adapter execution with a controlled Codex harness that prepares branches.
+3. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
 
 ## Lessons Reused From `6529arena`
 

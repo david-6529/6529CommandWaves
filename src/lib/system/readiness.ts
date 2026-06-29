@@ -38,8 +38,10 @@ function githubPrAdapterEnabled(env: Record<string, string | undefined>) {
   return env.COMMAND_WAVE_REPO_ADAPTER === "github";
 }
 
-function externalGuardianEnabled(env: Record<string, string | undefined>) {
-  return env.COMMAND_WAVE_GUARDIAN_MODE === "external_github_app";
+function guardianMode(env: Record<string, string | undefined>) {
+  const mode = env.COMMAND_WAVE_GUARDIAN_MODE?.trim() || "repo_local_github_action";
+
+  return mode === "repo_local_github_action" || mode === "external_github_app" ? mode : "unknown";
 }
 
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
@@ -51,7 +53,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
   const hasPostgresStore = postgresStoreEnabled(env);
   const hasGuardianWaveState = guardianWaveStateConfigured(env);
   const hasGithubPrAdapter = githubPrAdapterEnabled(env);
-  const hasExternalGuardian = externalGuardianEnabled(env);
+  const guardianModeValue = guardianMode(env);
 
   return [
     hasValue(appUrl)
@@ -124,10 +126,13 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
     {
       id: "guardian_mode",
       label: "Guardian mode",
-      status: hasExternalGuardian ? "pass" : "warn",
-      message: hasExternalGuardian
-        ? "External GitHub App guardian mode is configured."
-        : "Repo-local guardian mode is MVP strength. Use COMMAND_WAVE_GUARDIAN_MODE=external_github_app for the strongest launch boundary.",
+      status: guardianModeValue === "unknown" ? "warn" : "pass",
+      message:
+        guardianModeValue === "external_github_app"
+          ? "External GitHub App guardian mode is configured."
+          : guardianModeValue === "repo_local_github_action"
+            ? "Repo-local guardian mode is configured at MVP strength. External GitHub App is a later hardening step."
+            : "Unknown guardian mode. Use repo_local_github_action or external_github_app.",
     },
   ];
 }

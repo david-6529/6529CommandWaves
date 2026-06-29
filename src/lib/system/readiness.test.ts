@@ -6,7 +6,7 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 0, warn: 7, fail: 3 });
+    expect(summary).toEqual({ pass: 1, warn: 6, fail: 3 });
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "database")).toMatchObject({
       status: "warn",
@@ -32,13 +32,14 @@ describe("readiness checks", () => {
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 7, warn: 2, fail: 1 });
+    expect(summary).toEqual({ pass: 8, warn: 1, fail: 1 });
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",
     });
     expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
-      status: "warn",
+      status: "pass",
+      message: "Repo-local guardian mode is configured at MVP strength. External GitHub App is a later hardening step.",
     });
   });
 
@@ -72,6 +73,17 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
       status: "pass",
       message: "External GitHub App guardian mode is configured.",
+    });
+  });
+
+  it("warns for unknown guardian modes", () => {
+    const checks = getReadinessChecks({
+      COMMAND_WAVE_GUARDIAN_MODE: "custom",
+    });
+
+    expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
+      status: "warn",
+      message: "Unknown guardian mode. Use repo_local_github_action or external_github_app.",
     });
   });
 });
