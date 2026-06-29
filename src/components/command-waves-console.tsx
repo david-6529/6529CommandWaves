@@ -1490,6 +1490,7 @@ export function CommandWavesConsole() {
             <JumpLink href="#wave-room">Builder room</JumpLink>
             <JumpLink href="#start-building">New proposal</JumpLink>
             <JumpLink href="#active-hooks">Hooks</JumpLink>
+            <JumpLink href="#active-builders">Builders</JumpLink>
             <JumpLink href="#recent-activity">Activity</JumpLink>
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
           </nav>
@@ -1884,13 +1885,13 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <section id="active-builders" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Members</h2>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Contributors</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                See active contributors and open their 6529 profiles.
+                Visible contributors from proposals, decisions, votes, and activity. Scores are informational only.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1905,7 +1906,7 @@ export function CommandWavesConsole() {
                   <p className="mt-1 text-base leading-7 text-zinc-500">{contributor.rationale[0]}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">activity {contributor.score}</Badge>
+                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">report score {contributor.score}</Badge>
                   <LinkButton href={memberProfileUrl(contributor.identity)}>Open profile</LinkButton>
                 </div>
               </div>
