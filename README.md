@@ -147,6 +147,7 @@ The current app is a local prototype of the hook-building flow:
 - PR decision receipt URL validation against the configured builder wave
 - wave-first proposal draft for manual posting before local tracking
 - builder-wave decision request draft before PR work starts
+- builder-wave review request draft after PR evidence is recorded
 - opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
 - contributor workflow and PR template for Command Waves manifest evidence
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals

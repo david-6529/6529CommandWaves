@@ -7,6 +7,7 @@ import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
+import { createBuilderWaveReviewRequestDraft } from "@/lib/builder-wave-review-request-draft";
 import { commandKindLabel } from "@/lib/command-kind-copy";
 import {
   classifyRisk,
@@ -667,6 +668,7 @@ export function CommandWavesConsole() {
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
   const [proposalDraftNotice, setProposalDraftNotice] = useState("");
+  const [reviewRequestNotice, setReviewRequestNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
   const [projectContextPreviews, setProjectContextPreviews] = useState<Record<string, WaveContextPreview>>({});
   const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
@@ -703,6 +705,10 @@ export function CommandWavesConsole() {
       ? phaseWork.prExecution
       : (wave.executions.find((execution) => execution.proposalId === activeProposal.id) ?? null)
     : null;
+  const activeExecutionPrUrl =
+    activeExecution?.artifacts.find((artifact) =>
+      /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
+    ) ?? null;
   const activeReview = activeProposal
     ? activeProposal.kind === "open_pr"
       ? phaseWork.prReview
@@ -842,6 +848,17 @@ export function CommandWavesConsole() {
         : "",
     [activePoll, activeProposal, wave],
   );
+  const builderWaveReviewRequestDraft = useMemo(
+    () =>
+      activeProposal
+        ? createBuilderWaveReviewRequestDraft({
+            wave,
+            proposal: activeProposal,
+            execution: activeExecution ?? null,
+          })
+        : "",
+    [activeExecution, activeProposal, wave],
+  );
   const launchPacket = useMemo(
     () =>
       createLaunchPacket({
@@ -969,6 +986,7 @@ export function CommandWavesConsole() {
     setLaunchStatusNotice("");
     setLaunchLinkNotice("");
     setProposalDraftNotice("");
+    setReviewRequestNotice("");
     setCodexPacketNotice("");
   }
 
@@ -1190,6 +1208,19 @@ export function CommandWavesConsole() {
       setDecisionDraftNotice("Decision request copied.");
     } catch {
       setDecisionDraftNotice("Copy failed. Select the decision request and copy it manually.");
+    }
+  }
+
+  async function copyBuilderWaveReviewRequestDraft() {
+    if (!builderWaveReviewRequestDraft) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(builderWaveReviewRequestDraft);
+      setReviewRequestNotice("Review request copied.");
+    } catch {
+      setReviewRequestNotice("Copy failed. Select the review request and copy it manually.");
     }
   }
 
@@ -2410,6 +2441,15 @@ export function CommandWavesConsole() {
                         </p>
                       </div>
                     ) : null}
+                    {activeExecution && !activeReview ? (
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
+                          Copy review request
+                        </Button>
+                        {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
+                      </div>
+                    ) : null}
+                    {reviewRequestNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{reviewRequestNotice}</p> : null}
                     {canRunReview ? (
                       <Button
                         type="button"
