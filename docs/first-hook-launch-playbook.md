@@ -21,7 +21,7 @@ Make the first public phase a clear community win:
 - Draft PRs with Command Waves manifests.
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
-- Public launch audit for launch blockers before inviting broad participation.
+- Public launch audit during setup and again before inviting broad participation.
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
 - Human-reviewed wave update draft.
@@ -56,21 +56,23 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 
 ## Launch Sequence
 
-1. Publish the builder wave and repo link.
-2. Post the hook scope: immutable by default, capped parameters only, no deploys in phase 1.
-3. Invite ideas in the general chat wave or thread.
-4. Turn one strong idea into a PR-sized command.
-5. Vote or approve through the builder wave.
-6. Record the decision drop URL as the manual approval receipt.
-7. Copy the Codex work packet and use it in a prepared branch.
-8. Run the agent only inside that approved packet.
-9. Open a draft PR using the repo template and Command Waves manifest.
-10. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-11. Humans merge only after review passes.
-12. Use the contribution report and fee plan as evidence for any separate payout vote.
-13. Post the wave update draft back to the builder wave.
-14. Keep the launch packet with the PR so later contributors can audit the loop.
-15. Run the public launch audit and fix blockers before broad launch.
+1. Pick the builder wave and GitHub repo.
+2. Run the public launch audit once to expose setup blockers.
+3. Publish the builder wave and repo link.
+4. Post the hook scope: immutable by default, capped parameters only, no deploys in phase 1.
+5. Invite ideas in the general chat wave or thread.
+6. Turn one strong idea into a PR-sized command.
+7. Vote or approve through the builder wave.
+8. Record the decision drop URL as the manual approval receipt.
+9. Copy the Codex work packet and use it in a prepared branch.
+10. Run the agent only inside that approved packet.
+11. Open a draft PR using the repo template and Command Waves manifest.
+12. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+13. Humans merge only after review passes.
+14. Use the contribution report and fee plan as evidence for any separate payout vote.
+15. Post the wave update draft back to the builder wave.
+16. Keep the launch packet with the PR so later contributors can audit the loop.
+17. Run the public launch audit again and fix blockers before broad launch.
 
 ## Success Criteria
 
@@ -79,4 +81,5 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 - The hook stays non-upgradeable by default.
 - Parameter changes name explicit caps and tests.
 - Fees and contribution scores are evidence, not automatic authority.
+- Public launch blockers are fixed before broad participation.
 - The first merged PR feels simple, auditable, and worth repeating.
