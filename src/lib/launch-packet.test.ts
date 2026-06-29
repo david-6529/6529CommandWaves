@@ -12,8 +12,8 @@ describe("launch packet", () => {
       execution: demoWave.executions[0],
       review: demoWave.reviews[0],
       verificationTargets: {
-        setupProofUrl: "/api/command-wave/setup/proof",
-        commandWaveStateUrl: "/api/command-wave/state",
+        setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
+        commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
       },
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
@@ -36,9 +36,9 @@ describe("launch packet", () => {
     expect(packet.text).toContain("1 Guardian review proof");
     expect(packet.text).toContain("## Developer Fee Evidence");
     expect(packet.text).toContain("## Verification");
-    expect(packet.text).toContain("Setup proof: /api/command-wave/setup/proof");
-    expect(packet.text).toContain("Command-wave state: /api/command-wave/state");
-    expect(packet.text).toContain("SETUP_PROOF_URL=/api/command-wave/setup/proof npm run setup:verify");
+    expect(packet.text).toContain("Setup proof: https://hooks.example/api/command-wave/setup/proof");
+    expect(packet.text).toContain("Command-wave state: https://hooks.example/api/command-wave/state");
+    expect(packet.text).toContain("SETUP_PROOF_URL=https://hooks.example/api/command-wave/setup/proof npm run setup:verify");
     expect(packet.text).toContain("Run manifest recorded.");
     expect(packet.text).toContain("PR manifest in body.");
     expect(packet.text).toContain("PR link: https://github.com/6529-Collections/6529-hook/pull/12");

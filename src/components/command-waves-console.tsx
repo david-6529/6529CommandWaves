@@ -541,6 +541,10 @@ function appUrl(path: string) {
   return new URL(path, window.location.origin).toString();
 }
 
+function appUrlFromOrigin(path: string, origin: string) {
+  return origin ? new URL(path, origin).toString() : path;
+}
+
 function modeLabel(mode: string) {
   if (mode === "auto") {
     return "can run";
@@ -643,6 +647,7 @@ export function CommandWavesConsole() {
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
+  const [publicAppOrigin] = useState(() => (typeof window === "undefined" ? "" : window.location.origin));
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -757,6 +762,13 @@ export function CommandWavesConsole() {
     [activeExecution, activePoll, activeProposal, activeReview, wave],
   );
   const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(wave), [wave]);
+  const launchVerificationTargets = useMemo(
+    () => ({
+      setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
+      commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
+    }),
+    [publicAppOrigin],
+  );
   const launchPacket = useMemo(
     () =>
       createLaunchPacket({
@@ -765,12 +777,9 @@ export function CommandWavesConsole() {
         poll: activePoll ?? null,
         execution: activeExecution ?? null,
         review: activeReview ?? null,
-        verificationTargets: {
-          setupProofUrl: setupProofPath,
-          commandWaveStateUrl: commandWaveStatePath,
-        },
+        verificationTargets: launchVerificationTargets,
       }),
-    [activeExecution, activePoll, activeProposal, activeReview, wave],
+    [activeExecution, activePoll, activeProposal, activeReview, launchVerificationTargets, wave],
   );
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
