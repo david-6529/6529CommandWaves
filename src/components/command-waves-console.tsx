@@ -1231,10 +1231,10 @@ export function CommandWavesConsole() {
     try {
       await navigator.clipboard.writeText(waveUpdateDraftRef.current?.value ?? waveUpdateDraft);
       setCopyNotice("Draft copied.");
-      setApiNotice("Wave update draft copied.");
+      setApiNotice("Discussion update draft copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
-      setApiNotice("Copy failed. Select the wave update draft and copy it manually.");
+      setApiNotice("Copy failed. Select the discussion update draft and copy it manually.");
     }
   }
 
@@ -2558,7 +2558,7 @@ export function CommandWavesConsole() {
             <Panel title="Safety rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
-                Phase 1 accepts reads, drafts, wave updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
+                Phase 1 accepts reads, drafts, discussion updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
               </p>
               <div className="grid gap-3 lg:grid-cols-2">
                 <CompactList title="Use now" items={firstPhaseScopeInventory.useNow} />
@@ -2678,7 +2678,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">No PR opened</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Use this command for context, drafts, or wave updates. PR commands still need hook preflight.
+                          Use this command for context, drafts, or discussion updates. PR commands still need hook preflight.
                         </p>
                       </div>
                     </div>
@@ -2787,7 +2787,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">Support commands</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Context, drafts, and wave updates stay separate from the PR build target.
+                          Context, drafts, and discussion updates stay separate from the PR build target.
                         </p>
                       </div>
                       <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
@@ -2953,7 +2953,7 @@ export function CommandWavesConsole() {
                         ? activeExecution
                           ? "Logged PR evidence only. It does not merge, deploy, or spend funds."
                           : "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
-                        : "Use support commands for context, drafts, or wave updates outside the PR build step."}
+                        : "Use support commands for context, drafts, or discussion updates outside the PR build step."}
                     </p>
                     {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
                   </div>
@@ -3143,7 +3143,7 @@ export function CommandWavesConsole() {
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>
           </summary>
           <div className="mt-4">
-            <Panel title="Wave update draft" eyebrow="Share back">
+            <Panel title="Discussion update draft" eyebrow="Share back">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">

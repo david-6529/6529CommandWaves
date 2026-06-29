@@ -3,7 +3,7 @@ import type { CommandKind } from "./command-waves";
 const commandKindLabels: Record<CommandKind, string> = {
   read_context: "Read context",
   draft_response: "Draft response",
-  post_to_wave: "Wave update",
+  post_to_wave: "Discussion update",
   open_pr: "Open PR",
   run_script: "Run script",
   deploy: "Deploy",

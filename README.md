@@ -30,7 +30,7 @@ The simple project view is:
 ## Why This Exists
 
 Agents are useful, but broad tool access gets dangerous when a group is moving at prompt speed. In phase 1, agents only
-help with reads, drafts, wave updates, and PR commands.
+help with reads, drafts, discussion updates, and PR commands.
 
 Command Waves make the answers visible:
 
@@ -130,7 +130,7 @@ Audit and launch:
 - Activity report drawer for app evidence and manual planning context.
 - Launch checklist with setup, readiness, checklist, and next-action evidence.
 - Public setup proof, command-wave state, and launch audit endpoints.
-- Copyable wave update, launch packet, Codex work packet, decision request, and review request drafts.
+- Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 
 Maintainer setup:
 

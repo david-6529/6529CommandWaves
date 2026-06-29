@@ -22,7 +22,7 @@ describe("tool policy", () => {
     expect(toolPolicyForKind("post_to_wave")).toMatchObject({
       permissions: ["wave.read", "wave.draft"],
       requiresGuardian: false,
-      reason: "Wave updates are drafted for human posting.",
+      reason: "Discussion updates are drafted for human posting.",
     });
     expect(toolPolicyForKind("post_to_wave").permissions).not.toContain("wave.post");
     expect(toolPolicyForKind("open_pr").permissions).toEqual(["wave.read", "repo.read", "repo.open_pr"]);

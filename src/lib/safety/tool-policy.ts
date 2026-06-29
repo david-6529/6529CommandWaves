@@ -35,7 +35,7 @@ const policies: Record<CommandKind, ToolPolicy> = {
     commandKind: "post_to_wave",
     permissions: ["wave.read", "wave.draft"],
     requiresGuardian: false,
-    reason: "Wave updates are drafted for human posting.",
+    reason: "Discussion updates are drafted for human posting.",
   },
   open_pr: {
     commandKind: "open_pr",

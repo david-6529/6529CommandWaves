@@ -33,7 +33,7 @@ export function createBuilderWaveProposalDraft({
   const budget = cleanLine(budgetUsd, "0");
 
   return [
-    "Swarm proposal",
+    "Hook proposal",
     "",
     "I want to propose one small change for the 6529 hook build.",
     "",
@@ -49,7 +49,7 @@ export function createBuilderWaveProposalDraft({
     "Limits and success criteria:",
     cleanLine(limits, "No limits written yet."),
     "",
-    "How the app routes it:",
+    "Review path:",
     `Risk: ${cleanLine(risk, "unknown")}`,
     `Decision route: ${cleanLine(decisionRoute, "needs review")}`,
     `Rule: ${cleanLine(ruleReason, "No rule reason recorded.")}`,

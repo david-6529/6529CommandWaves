@@ -12,7 +12,7 @@ describe("phase next action", () => {
       statusLabel: "ready",
       stepLabel: "Log",
       title: "Loop complete",
-      detail: "The approved hook work has PR, review, wave update, and launch packet evidence.",
+      detail: "The approved hook work has PR, review, discussion update, and launch packet evidence.",
     });
   });
 
@@ -87,7 +87,7 @@ describe("phase next action", () => {
       status: "action",
       stepLabel: "Log",
       title: "Share the result",
-      detail: "Review the wave update draft, share it manually, and keep the launch packet with the PR audit trail.",
+      detail: "Review the discussion update draft, share it manually, and keep the launch packet with the PR audit trail.",
     });
     expect(nextAction.detail.toLowerCase()).not.toContain("automatic");
   });

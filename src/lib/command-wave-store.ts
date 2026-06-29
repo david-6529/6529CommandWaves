@@ -193,7 +193,7 @@ function isCommandKind(value: unknown): value is CommandKind {
 function assertFirstPhaseCommandKind(kind: CommandKind) {
   if (!firstPhaseCommandKinds.has(kind)) {
     throw Object.assign(
-      new Error("This phase accepts only context reads, drafts, wave updates, and PR commands."),
+      new Error("This phase accepts only context reads, drafts, discussion updates, and PR commands."),
       { status: 400 },
     );
   }

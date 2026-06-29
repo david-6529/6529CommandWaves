@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "6529 Hook Workspace",
-  description: "Coordinate the next hook change with swarm chat, decisions, PR evidence, and review status.",
+  description: "Coordinate the next hook change with the builder room, decisions, PR evidence, and review status.",
 };
 
 export default function RootLayout({

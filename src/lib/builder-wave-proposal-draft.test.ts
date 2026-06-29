@@ -17,14 +17,14 @@ describe("6529 discussion proposal draft", () => {
       ruleReason: "Code changes need visible approval before execution.",
     });
 
-    expect(draft).toContain("Swarm proposal");
+    expect(draft).toContain("Hook proposal");
     expect(draft).toContain("I want to propose one small change for the 6529 hook build.");
     expect(draft).toContain("Small change: Draft hook scaffold");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Work type: Open PR");
     expect(draft).toContain("What should happen:");
-    expect(draft).toContain("How the app routes it:");
+    expect(draft).toContain("Review path:");
     expect(draft).toContain("Risk: high");
     expect(draft).toContain("Decision route: needs vote");
     expect(draft).toContain("Rule: Code changes need visible approval before execution.");

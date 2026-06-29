@@ -160,7 +160,7 @@ export const defaultRules: CommandWaveRules = {
       quorum: 3,
       yesPercent: 60,
       expiresHours: 24,
-      reason: "Wave updates are drafted for human posting after approval.",
+      reason: "Discussion updates are drafted for human posting after approval.",
     },
     open_pr: {
       mode: "poll",

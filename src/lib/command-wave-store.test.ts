@@ -174,7 +174,7 @@ describe("Command wave store", () => {
           spec: "Not available in phase 1.",
           budgetUsd: 1,
         }),
-      ).rejects.toThrow("This phase accepts only context reads, drafts, wave updates, and PR commands.");
+      ).rejects.toThrow("This phase accepts only context reads, drafts, discussion updates, and PR commands.");
     },
   );
 

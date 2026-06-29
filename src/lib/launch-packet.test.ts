@@ -91,11 +91,11 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Command-wave state: not attached.");
   });
 
-  it("labels wave update support commands without implying automatic posting", () => {
+  it("labels discussion update support commands without implying automatic posting", () => {
     const proposal = {
       ...demoWave.proposals[0],
       id: "cmd-wave-update",
-      title: "Draft wave update",
+      title: "Draft discussion update",
       kind: "post_to_wave" as const,
       risk: "medium" as const,
       status: "approved" as const,
@@ -117,7 +117,7 @@ describe("launch packet", () => {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
-    expect(packet.text).toContain("- Kind: Wave update");
+    expect(packet.text).toContain("- Kind: Discussion update");
     expect(packet.text).not.toContain("- Kind: post to wave");
     expect(packet.text).not.toContain("automatically posted");
   });

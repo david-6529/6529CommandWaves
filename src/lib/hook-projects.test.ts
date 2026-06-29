@@ -30,7 +30,7 @@ describe("active hook projects", () => {
         nextActionStatus: "ready",
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
-        nextActionDetail: "The approved hook work has PR, review, wave update, and launch packet evidence.",
+        nextActionDetail: "The approved hook work has PR, review, discussion update, and launch packet evidence.",
         waveStatus: "Wave decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",

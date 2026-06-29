@@ -39,7 +39,7 @@ const actionCopyByStep: Record<
   },
   log: {
     title: "Share the result",
-    detail: "Review the wave update draft, share it manually, and keep the launch packet with the PR audit trail.",
+    detail: "Review the discussion update draft, share it manually, and keep the launch packet with the PR audit trail.",
   },
 };
 
@@ -95,6 +95,6 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
     statusLabel: statusLabel("ready"),
     stepLabel: "Log",
     title: "Loop complete",
-    detail: "The approved hook work has PR, review, wave update, and launch packet evidence.",
+    detail: "The approved hook work has PR, review, discussion update, and launch packet evidence.",
   };
 }

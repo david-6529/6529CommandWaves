@@ -3,7 +3,7 @@ import { commandKindLabel } from "./command-kind-copy";
 
 describe("command kind copy", () => {
   it("uses human labels for public command kinds", () => {
-    expect(commandKindLabel("post_to_wave")).toBe("Wave update");
+    expect(commandKindLabel("post_to_wave")).toBe("Discussion update");
     expect(commandKindLabel("open_pr")).toBe("Open PR");
     expect(commandKindLabel("post_to_wave")).not.toBe("post to wave");
   });
