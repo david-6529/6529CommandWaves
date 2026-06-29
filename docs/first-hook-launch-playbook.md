@@ -86,6 +86,6 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 - Every code change traces back to a visible wave decision.
 - The hook stays non-upgradeable by default.
 - Parameter changes name explicit caps and tests.
-- Fees and contribution scores are evidence, not automatic authority.
+- Fees and contribution report scores are evidence, not automatic authority.
 - Public launch blockers are fixed before broad participation.
 - The first merged PR feels simple, auditable, and worth repeating.

@@ -1,7 +1,7 @@
 export const defaultParticipationGates = [
   "Builder wave allowlist for phase 1, manual note only",
   "REP or TDH gates are planned, not enforced here",
-  "AI contribution scores are reports, not permissions",
+  "AI contribution report scores are not permissions",
 ] as const;
 
 const advisoryPattern = /\b(planned|not enforced|not live|manual|advisory|note only|notes only|informational|outside this app)\b/i;

@@ -19,6 +19,6 @@ export const firstPhaseScopeInventory: PhaseScopeInventory = {
     "Broad swarm marketplace flows or external agent endpoints.",
     "Upgradeable hook contracts by default.",
     "Parameter changes without explicit caps and bound-focused tests.",
-    "AI scores as permissions, payouts, REP, TDH, or merge rights.",
+    "AI report scores as permissions, payouts, REP, TDH, or merge rights.",
   ],
 } as const;

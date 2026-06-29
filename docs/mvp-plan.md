@@ -88,7 +88,7 @@ Later phases can add stricter approval paths for parked command kinds after the 
 - No broad multi-agent swarm marketplace.
 - No upgradeable hook contracts by default.
 - No parameter work without an explicit cap and bound-focused tests.
-- No AI contribution score as an authority source.
+- No AI contribution report score as an authority source.
 
 ## Safety Boundaries
 

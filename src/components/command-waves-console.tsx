@@ -58,7 +58,7 @@ const hookGuardrails = [
   "No upgradeable hook contracts by default.",
   ...hookParameterPolicySummary.slice(1),
   "Deployment, payments, and governance changes stay human controlled.",
-  "Contribution scores are reports, not permissions.",
+  "Contribution report scores are not permissions.",
 ];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
@@ -1071,12 +1071,15 @@ export function CommandWavesConsole() {
         <section className="grid gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Active hook</p>
-              <h2 className="mt-1 text-base font-semibold text-zinc-50">6529 hook build status</h2>
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in development</p>
+              <h2 className="mt-1 text-base font-semibold text-zinc-50">Project snapshot</h2>
               <p className="mt-1 text-sm leading-6 text-zinc-500">
-                A compact view of the wave, repo, PR, review, and evidence trail.
+                Start with the 6529 hook. Each row connects a builder wave to its repo, PR evidence, review state, and latest activity.
               </p>
             </div>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
+              {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
+            </Badge>
           </div>
           <div className="grid gap-3">
             {activeHookProjects.map((project) => (

@@ -38,7 +38,7 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "- The hook is immutable by default.",
     "- No proxy, delegatecall, deployment, spending, payouts, or governance changes in phase 1.",
     "- Capped parameters need explicit bounds and tests.",
-    "- Contribution scores are transparent reports, not REP, TDH, payments, permissions, or merge rights.",
+    "- Contribution report scores are not REP, TDH, payments, permissions, or merge rights.",
     `- ${participationLine(wave.gates)}`,
     "",
     "Next step: propose one scoped command, then record the builder wave decision URL before using a Codex packet.",
