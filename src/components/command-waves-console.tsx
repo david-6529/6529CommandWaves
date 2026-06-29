@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
+import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import {
   classifyRisk,
   evaluatePoll,
@@ -88,9 +89,8 @@ function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
 }
 
-type WaveApiResponse = {
+type WaveApiResponse = ApiErrorPayload & {
   wave?: CommandWave;
-  error?: string;
 };
 
 type WaveContextPreview = {
@@ -118,9 +118,8 @@ type WaveContextPreview = {
   }>;
 };
 
-type ContextPreviewResponse = {
+type ContextPreviewResponse = ApiErrorPayload & {
   preview?: WaveContextPreview;
-  error?: string;
 };
 
 type WaveSearchResult = {
@@ -130,9 +129,8 @@ type WaveSearchResult = {
   source: "6529";
 };
 
-type WaveSearchResponse = {
+type WaveSearchResponse = ApiErrorPayload & {
   results?: WaveSearchResult[];
-  error?: string;
 };
 
 type SetupValidation = {
@@ -157,9 +155,8 @@ type SetupValidation = {
   canRunCode: boolean;
 };
 
-type SetupValidationResponse = {
+type SetupValidationResponse = ApiErrorPayload & {
   validation?: SetupValidation;
-  error?: string;
 };
 
 type ReadinessCheck = {
@@ -169,24 +166,22 @@ type ReadinessCheck = {
   message: string;
 };
 
-type ReadinessResponse = {
+type ReadinessResponse = ApiErrorPayload & {
   summary: {
     pass: number;
     warn: number;
     fail: number;
   };
   checks: ReadinessCheck[];
-  error?: string;
 };
 
-type CodexWorkPacketResponse = {
+type CodexWorkPacketResponse = ApiErrorPayload & {
   packet?: {
     proposalId: string;
     targetBranch: string;
     packetHash: string;
     text: string;
   };
-  error?: string;
 };
 
 const accessKeyStorageKey = "command-waves-access-key";
@@ -204,7 +199,7 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
   const payload = (await response.json()) as WaveApiResponse;
 
   if (!response.ok || !payload.wave) {
-    throw new Error(payload.error ?? "Command wave request failed.");
+    throw new Error(formatApiError(payload, "Command wave request failed."));
   }
 
   return payload.wave;
@@ -224,7 +219,7 @@ async function requestContextPreview(waveId: string) {
   const payload = (await response.json()) as ContextPreviewResponse;
 
   if (!response.ok || !payload.preview) {
-    throw new Error(payload.error ?? "Context preview failed.");
+    throw new Error(formatApiError(payload, "Context preview failed."));
   }
 
   return payload.preview;
@@ -235,7 +230,7 @@ async function requestWaveSearch(query: string) {
   const payload = (await response.json()) as WaveSearchResponse;
 
   if (!response.ok || !payload.results) {
-    throw new Error(payload.error ?? "Wave search failed.");
+    throw new Error(formatApiError(payload, "Wave search failed."));
   }
 
   return payload.results;
@@ -252,7 +247,7 @@ async function requestSetupValidation(waveUrl: string, repoUrl: string) {
   const payload = (await response.json()) as SetupValidationResponse;
 
   if (!response.ok || !payload.validation) {
-    throw new Error(payload.error ?? "Setup check failed.");
+    throw new Error(formatApiError(payload, "Setup check failed."));
   }
 
   return payload.validation;
@@ -265,7 +260,7 @@ async function requestReadiness() {
   const payload = (await response.json()) as ReadinessResponse;
 
   if (!response.ok || !payload.checks) {
-    throw new Error(payload.error ?? "Readiness check failed.");
+    throw new Error(formatApiError(payload, "Readiness check failed."));
   }
 
   return payload;
@@ -285,7 +280,7 @@ async function requestCodexWorkPacket(proposalId: string, accessKey?: string) {
   const payload = (await response.json()) as CodexWorkPacketResponse;
 
   if (!response.ok || !payload.packet) {
-    throw new Error(payload.error ?? "Codex work packet failed.");
+    throw new Error(formatApiError(payload, "Codex work packet failed."));
   }
 
   return payload.packet;
