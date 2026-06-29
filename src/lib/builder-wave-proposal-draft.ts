@@ -39,7 +39,7 @@ export function createBuilderWaveProposalDraft({
     "",
     `Proposer: ${cleanLine(proposer, "unknown")}`,
     `Small change: ${cleanLine(title, "Untitled hook work")}`,
-    `Builder wave: ${wave.waveUrl}`,
+    `6529 discussion: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     `Work type: ${commandKindLabel(kind)}`,
     "",
@@ -56,7 +56,7 @@ export function createBuilderWaveProposalDraft({
     "",
     `Budget cap: ${budget} USD`,
     "",
-    "Decision needed: approve, reject, or ask for edits in this builder wave before PR work starts.",
+    "Decision needed: approve, reject, or ask for edits in the 6529 discussion before PR work starts.",
     "Guardrails: no deploy, payout, proxy, delegatecall, governance change, or uncapped parameter change in phase 1.",
   ].join("\n");
 }

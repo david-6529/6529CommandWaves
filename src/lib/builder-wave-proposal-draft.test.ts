@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createBuilderWaveProposalDraft } from "./builder-wave-proposal-draft";
 
-describe("builder wave proposal draft", () => {
+describe("6529 discussion proposal draft", () => {
   it("creates a concise orchestration proposal post", () => {
     const draft = createBuilderWaveProposalDraft({
       wave: demoWave,
@@ -20,7 +20,7 @@ describe("builder wave proposal draft", () => {
     expect(draft).toContain("Swarm proposal");
     expect(draft).toContain("I want to propose one small change for the 6529 hook build.");
     expect(draft).toContain("Small change: Draft hook scaffold");
-    expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Work type: Open PR");
     expect(draft).toContain("What should happen:");

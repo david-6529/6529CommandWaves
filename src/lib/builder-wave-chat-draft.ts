@@ -12,6 +12,6 @@ export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseN
     `Current task: ${nextAction.title}`,
     `- Status: ${nextAction.detail}`,
     `- Repo: ${wave.repoUrl}`,
-    `- Builder wave: ${wave.waveUrl}`,
+    `- 6529 discussion: ${wave.waveUrl}`,
   ].join("\n");
 }
