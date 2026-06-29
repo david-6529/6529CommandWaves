@@ -17,11 +17,14 @@ describe("builder wave proposal draft", () => {
       ruleReason: "Code changes need visible approval before execution.",
     });
 
-    expect(draft).toContain("6529 hook proposal");
+    expect(draft).toContain("Swarm proposal");
+    expect(draft).toContain("I want to propose one small change for the 6529 hook build.");
+    expect(draft).toContain("Small change: Draft hook scaffold");
     expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Work type: Open PR");
-    expect(draft).toContain("Orchestration check:");
+    expect(draft).toContain("What should happen:");
+    expect(draft).toContain("How the app routes it:");
     expect(draft).toContain("Risk: high");
     expect(draft).toContain("Decision route: needs vote");
     expect(draft).toContain("Rule: Code changes need visible approval before execution.");
@@ -45,7 +48,7 @@ describe("builder wave proposal draft", () => {
     });
 
     expect(draft).toContain("Proposer: unknown");
-    expect(draft).toContain("Title: Untitled hook work");
+    expect(draft).toContain("Small change: Untitled hook work");
     expect(draft).toContain("No request written yet.");
     expect(draft).toContain("No limits written yet.");
     expect(draft).toContain("Budget cap: 0 USD");

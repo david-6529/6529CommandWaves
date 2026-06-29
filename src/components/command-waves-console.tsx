@@ -80,6 +80,20 @@ const newcomerPaths = [
   "Suggest one small hook change.",
   "Review the active PR or latest decision.",
 ];
+const plainNextSteps = [
+  {
+    title: "Share it",
+    detail: "Put the idea in the swarm so builders can react in public.",
+  },
+  {
+    title: "Decide it",
+    detail: "Important work needs a visible 6529 decision before code is built.",
+  },
+  {
+    title: "Build and review",
+    detail: "Approved PR work goes through the build agent and reviewer check before humans merge.",
+  },
+];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
   "hook_parameter_explicit_bound",
@@ -714,6 +728,15 @@ export function CommandWavesConsole() {
     hookProposalPreflight.checks,
     hookProposalPreflightBlocked,
   );
+  const firstHookProposalFailure = hookProposalPreflight.checks.find((check) => check.status === "fail") ?? null;
+  const simpleDecisionRoute =
+    selectedRule.mode === "poll" ? "Needs a decision" : selectedRule.mode === "auto" ? "Can be logged" : "Parked";
+  const simplePreflightMessage =
+    hookProposalPreflightRequired && hookProposalPreflightBlocked && firstHookProposalFailure
+      ? firstHookProposalFailure.message
+      : hookProposalPreflightRequired
+        ? hookProposalPreflight.summary
+        : "This support note does not open a PR.";
   const phaseWork = useMemo(() => selectPhaseWork(wave), [wave]);
   const activeProposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
   const activePoll = activeProposal
@@ -1446,6 +1469,7 @@ export function CommandWavesConsole() {
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
+              <JumpLink href="#start-building">Suggest a change</JumpLink>
               <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
               <JumpLink href="#rules-of-game">Read rules</JumpLink>
               <JumpLink href="#swarm-members">See members</JumpLink>
@@ -1480,6 +1504,66 @@ export function CommandWavesConsole() {
                 </li>
               ))}
             </ol>
+          </div>
+        </section>
+
+        <section id="start-building" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">Participate</p>
+            <h2 className="mt-1 text-xl font-semibold text-zinc-50">Suggest one small change</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+              You can help by naming a concrete hook change and the limits it must respect. The app turns that into a
+              proposal the swarm can discuss, approve, build, and review.
+            </p>
+            <div className="mt-4 grid gap-3">
+              <Field label="Your name or 6529 handle">
+                <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
+              </Field>
+              <Field label="Small change">
+                <Textarea rows={2} value={title} onChange={(event) => setTitle(event.target.value)} />
+              </Field>
+              <Field label="What should happen">
+                <Textarea rows={4} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
+              </Field>
+              <Field label="Limits and success criteria">
+                <Textarea rows={4} value={spec} onChange={(event) => setSpec(event.target.value)} />
+              </Field>
+            </div>
+            <div className="mt-4 border-y border-zinc-800 py-3">
+              <div className="flex flex-wrap gap-2">
+                <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
+                <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
+                <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
+                  {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
+                </Badge>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-zinc-500">{simplePreflightMessage}</p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
+                Copy for swarm chat
+              </Button>
+              <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
+                {apiBusy === "proposal" ? "Adding" : "Add to project log"}
+              </Button>
+              <JumpLink href="#wave-room">Talk first</JumpLink>
+            </div>
+            {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
+            {apiError ? <p className="mt-2 text-xs leading-5 text-red-300">{apiError}</p> : null}
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">What happens next</p>
+            <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+              {plainNextSteps.map((step, index) => (
+                <div key={step.title} className="grid grid-cols-[2rem_1fr] gap-3 py-3">
+                  <span className="text-sm font-semibold text-cyan-300">{index + 1}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-100">{step.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{step.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -1781,7 +1865,7 @@ export function CommandWavesConsole() {
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{phaseNextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <JumpLink href="#suggest-hook-work">Orchestrate work</JumpLink>
+                <JumpLink href="#start-building">Suggest a change</JumpLink>
                 <JumpLink href="#recent-activity">View activity</JumpLink>
               </div>
             </div>
@@ -2257,10 +2341,10 @@ export function CommandWavesConsole() {
         </details>
 
         <section id="suggest-hook-work" className="grid scroll-mt-4 gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-          <Panel title="Orchestrate hook work" eyebrow="Builder wave">
+          <Panel title="Advanced proposal check" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Shape one PR-sized change, classify the risk, and send the wave a clean decision brief.
+                Review the risk route and wave brief before adding the work to the project log.
               </p>
               <Field label="Title">
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -2362,7 +2446,7 @@ export function CommandWavesConsole() {
                 {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
               </div>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Proposing" : "Propose work"}
+                {apiBusy === "proposal" ? "Adding" : "Add to project log"}
               </Button>
             </div>
           </Panel>
