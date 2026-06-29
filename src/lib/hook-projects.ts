@@ -86,6 +86,28 @@ function codeStatus(wave: CommandWave) {
   return "No PR-sized hook command yet.";
 }
 
+function reviewStatus(wave: CommandWave) {
+  const phaseWork = selectPhaseWork(wave);
+
+  if (phaseWork.prReview?.status === "pass") {
+    return "review passed";
+  }
+
+  if (phaseWork.prReview?.status === "changes_requested") {
+    return "changes requested";
+  }
+
+  if (phaseWork.prReview?.status === "rule_violation") {
+    return "rule violation";
+  }
+
+  if (phaseWork.prExecution?.status === "complete") {
+    return "ready for review";
+  }
+
+  return "not reviewed";
+}
+
 export function createActiveHookProjects(wave: CommandWave): ActiveHookProject[] {
   const phaseWork = selectPhaseWork(wave);
   const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook command.";
@@ -107,7 +129,7 @@ export function createActiveHookProjects(wave: CommandWave): ActiveHookProject[]
       waveStatus: waveStatus(wave),
       codeStatus: codeStatus(wave),
       latestPrUrl: findPullRequestUrl(wave),
-      reviewStatusLabel: phaseWork.prReview?.status.replaceAll("_", " ") ?? "not reviewed",
+      reviewStatusLabel: reviewStatus(wave),
       evidenceLabel: [
         countLabel(wave.proposals.length, "command"),
         countLabel(wave.executions.length, "run"),

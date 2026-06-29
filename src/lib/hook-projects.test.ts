@@ -20,7 +20,7 @@ describe("active hook projects", () => {
         waveStatus: "Wave decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
-        reviewStatusLabel: "pass",
+        reviewStatusLabel: "review passed",
         evidenceLabel: "1 command, 1 run, 1 review",
       }),
     ]);
@@ -55,6 +55,30 @@ describe("active hook projects", () => {
       codeStatus: "Approved PR command is ready to build.",
       latestPrUrl: null,
       reviewStatusLabel: "not reviewed",
+    });
+  });
+
+  it("shows a readable review state after PR evidence exists", () => {
+    const projects = createActiveHookProjects({
+      ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "reviewing" }],
+      reviews: [],
+    });
+
+    expect(projects[0]).toMatchObject({
+      codeStatus: "PR evidence is ready for review.",
+      reviewStatusLabel: "ready for review",
+    });
+  });
+
+  it("shows a readable review state when changes are requested", () => {
+    const projects = createActiveHookProjects({
+      ...demoWave,
+      reviews: [{ ...demoWave.reviews[0], status: "changes_requested" }],
+    });
+
+    expect(projects[0]).toMatchObject({
+      reviewStatusLabel: "changes requested",
     });
   });
 
