@@ -53,12 +53,11 @@ No auto-merges, autonomous deploys, spending, or live REP/TDH authority in the f
 Launch operating notes are in [docs/first-hook-launch-playbook.md](docs/first-hook-launch-playbook.md).
 Contributor rules for the first hook phase are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Agent Handoff
+## Trust Boundary
 
-This repo is now focused on **Command Waves**, not the earlier summarizer / SwarmOps direction. The product is a governed
-agent workflow controlled by a 6529 wave.
+The first public phase is a governed hook-building workflow controlled by a 6529 builder wave.
 
-Current work is centered on the trust boundary:
+Current trust controls:
 
 - The MVP guardian is a repo-local GitHub Action named `Command Waves Guardian`.
 - PRs must carry a Command Waves manifest that ties code changes back to an approved wave command.
@@ -68,11 +67,11 @@ Current work is centered on the trust boundary:
 - Setup proofs now disclose the current guardian mode as `repo_local_github_action` and mark it as `mvp` strength.
 - Guardian/reviewer/setup-proof code changes are treated as critical-risk diffs.
 
-The most important missing production step is moving from the repo-local GitHub Action to an external GitHub App. The app
+The most important production hardening step is moving from the repo-local GitHub Action to an external GitHub App. The app
 should own the required check, read the 6529 wave state, replay the same deterministic verifier, and publish the same proof
-artifacts. Until then, the MVP is useful and auditable but not the strongest possible trust boundary.
+artifacts. Until then, the MVP is useful and auditable, but not the strongest possible trust boundary.
 
-Best next tasks for another agent:
+Next production tasks:
 
 1. Pick the first real builder wave and hook repo, then publish the launch playbook.
 2. Wire live 6529 proposal and vote state into `COMMAND_WAVE_STATE_URL`.
