@@ -1858,7 +1858,9 @@ export function CommandWavesConsole() {
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
                       {activeProposalIsPr
-                        ? "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
+                        ? activeExecution
+                          ? "Logged PR evidence only. It does not merge, deploy, or spend funds."
+                          : "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
                         : "Use support commands for context, drafts, or wave updates outside the PR build step."}
                     </p>
                     {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
