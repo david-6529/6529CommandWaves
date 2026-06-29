@@ -622,6 +622,7 @@ export function CommandWavesConsole() {
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
+  const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const hookProposalPreflight = useMemo(
@@ -795,6 +796,45 @@ export function CommandWavesConsole() {
       window.clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    const project = activeHookProjects[0];
+
+    if (!project?.waveUrl || projectContextPreviews[project.id]) {
+      return;
+    }
+
+    const autoPreviewKey = `${project.id}:${project.waveUrl}`;
+
+    if (autoPreviewKeysRef.current.has(autoPreviewKey)) {
+      return;
+    }
+
+    autoPreviewKeysRef.current.add(autoPreviewKey);
+
+    let isCurrent = true;
+
+    requestContextPreview(project.waveUrl)
+      .then((preview) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        setProjectContextPreviews((previews) => ({
+          ...previews,
+          [project.id]: preview,
+        }));
+      })
+      .catch(() => {
+        if (isCurrent) {
+          autoPreviewKeysRef.current.delete(autoPreviewKey);
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [activeHookProjects, projectContextPreviews]);
 
   function updateAccessKey(value: string) {
     setAccessKey(value);
