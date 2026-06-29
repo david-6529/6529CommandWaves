@@ -12,15 +12,15 @@ describe("contribution report", () => {
       mode: "informational",
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
-    expect(report.notes.join(" ")).toContain("not a permission system");
+    expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
     expect(report.notes.join(" ")).toContain("review, and ledger evidence");
     expect(report.scoringRubric).toEqual([
-      "Complete proposal: 6 points.",
-      "Reviewing proposal: 4 points.",
-      "Other proposal: 3 points.",
-      "Wave decision receipt: 2 points.",
-      "Vote or attributed activity log event: 1 point.",
+      "Complete proposal: 6 report points.",
+      "Reviewing proposal: 4 report points.",
+      "Other proposal: 3 report points.",
+      "Wave decision receipt: 2 report points.",
+      "Vote or attributed activity log event: 1 report point.",
     ]);
     expect(report.evidence).toContain("1 GitHub PR link");
     expect(report.evidence).toContain("1 Guardian review proof");

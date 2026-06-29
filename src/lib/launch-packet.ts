@@ -185,7 +185,7 @@ function reviewLines(review: GuardianReview | null) {
 function contributionLines(report: ContributionReport) {
   const contributors = report.contributors.map(
     (contributor) =>
-      `${contributor.identity}: score ${contributor.score}, ${contributor.proposals} proposal${contributor.proposals === 1 ? "" : "s"}, ${contributor.votes} vote${contributor.votes === 1 ? "" : "s"}`,
+      `${contributor.identity}: report score ${contributor.score}, ${contributor.proposals} proposal${contributor.proposals === 1 ? "" : "s"}, ${contributor.votes} vote${contributor.votes === 1 ? "" : "s"}`,
   );
 
   return [

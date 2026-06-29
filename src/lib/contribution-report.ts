@@ -82,11 +82,11 @@ function evidenceSummary(wave: CommandWave) {
 }
 
 const scoringRubric = [
-  "Complete proposal: 6 points.",
-  "Reviewing proposal: 4 points.",
-  "Other proposal: 3 points.",
-  "Wave decision receipt: 2 points.",
-  "Vote or attributed activity log event: 1 point.",
+  "Complete proposal: 6 report points.",
+  "Reviewing proposal: 4 report points.",
+  "Other proposal: 3 report points.",
+  "Wave decision receipt: 2 report points.",
+  "Vote or attributed activity log event: 1 report point.",
 ];
 
 export function createContributionReport(
@@ -154,7 +154,7 @@ export function createContributionReport(
     evidence: evidenceSummary(wave),
     contributors: sorted,
     notes: [
-      "Scores are an AI-readable activity report, not a permission system.",
+      "Report scores are an AI-readable activity report, not a permission system.",
       "REP, TDH, payouts, and merge rights must use separate human-approved rules.",
       "The report only uses proposal, vote, decision, PR, review, and ledger evidence currently stored by this app.",
       "Unattributed agent and reviewer events stay in the audit log but do not become human score.",

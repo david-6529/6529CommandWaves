@@ -22,7 +22,7 @@ describe("wave update draft", () => {
       `Review proof: ${demoWave.reviews[0].proof?.verifierVersion} / ${demoWave.reviews[0].proof?.attestationHash}`,
     );
     expect(draft).toContain("humans keep merge, deploy, payment, and governance authority");
-    expect(draft).toContain("Scores are informational only.");
+    expect(draft).toContain("Report scores are informational only.");
     expect(draft).toContain("Developer fee plan:");
     expect(draft).toContain("No automatic payouts.");
     expect(draft).toContain("post it in the builder wave if it matches the work");

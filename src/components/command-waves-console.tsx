@@ -1992,7 +1992,9 @@ export function CommandWavesConsole() {
                     <p className="mt-1 text-xs leading-5 text-zinc-500">{contributor.rationale.join(", ")}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">score {contributor.score}</Badge>
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
+                      report score {contributor.score}
+                    </Badge>
                     <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
                       {countLabel(contributor.proposals, "proposal")}
                     </Badge>

@@ -54,14 +54,14 @@ function contributorLine(wave: CommandWave) {
   const report = createContributionReport(wave, { limit: 3 });
 
   if (!report.contributors.length) {
-    return `Contribution report: ${report.summary} No visible contributors yet. Scores are informational only.`;
+    return `Contribution report: ${report.summary} No visible contributors yet. Report scores are informational only.`;
   }
 
   const contributors = report.contributors
-    .map((contributor) => `${contributor.identity} score ${contributor.score}`)
+    .map((contributor) => `${contributor.identity} report score ${contributor.score}`)
     .join(", ");
 
-  return `Contribution report: ${report.summary} Visible contributors: ${contributors}. Scores are informational only.`;
+  return `Contribution report: ${report.summary} Visible contributors: ${contributors}. Report scores are informational only.`;
 }
 
 function developerFeeLine(wave: CommandWave) {
