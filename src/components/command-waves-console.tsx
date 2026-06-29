@@ -734,6 +734,8 @@ export function CommandWavesConsole() {
       }),
     [activeExecution, activePoll, activeProposal, activeReview, wave],
   );
+  const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
+  const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const recentLedgerEvents = orderedLedgerEvents.slice(0, 6);
   const olderLedgerEvents = orderedLedgerEvents.slice(recentLedgerEvents.length);
@@ -1956,12 +1958,24 @@ export function CommandWavesConsole() {
                     <p className="mt-2 text-sm leading-6 text-zinc-400">
                       {activeReview?.summary ? humanizeLegacyCommandCopy(activeReview.summary) : "Waiting for execution artifacts."}
                     </p>
-                    {activeReview?.checks.length ? (
+                    {visibleReviewChecks.length ? (
                       <ul className="mt-2 space-y-1 text-sm text-zinc-300">
-                        {activeReview.checks.map((check) => (
+                        {visibleReviewChecks.map((check) => (
                           <li key={check}>- {humanizeLegacyCommandCopy(check)}</li>
                         ))}
                       </ul>
+                    ) : null}
+                    {hiddenReviewChecks.length ? (
+                      <details className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                        <summary className="cursor-pointer text-sm font-semibold text-zinc-100">
+                          Show {hiddenReviewChecks.length} more check{hiddenReviewChecks.length === 1 ? "" : "s"}
+                        </summary>
+                        <ul className="mt-2 space-y-1 text-sm text-zinc-300">
+                          {hiddenReviewChecks.map((check) => (
+                            <li key={check}>- {humanizeLegacyCommandCopy(check)}</li>
+                          ))}
+                        </ul>
+                      </details>
                     ) : null}
                     {activeReview?.proof ? (
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
