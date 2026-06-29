@@ -124,6 +124,7 @@ The current app is a local prototype of the hook-building flow:
 - manual developer fee plan draft that uses review evidence without moving funds
 - copyable launch packet for wave, PR, review, contribution, and fee evidence
 - launch packet verification section with setup proof and state endpoints
+- copyable launch status note with next action, open items, and verification links
 - safety rules by command type
 - simple hook work proposal form with advanced command settings collapsed
 - backend command surface limited to context reads, drafts, wave updates, and PR commands

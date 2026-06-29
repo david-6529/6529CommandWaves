@@ -31,6 +31,7 @@ import { createHookProposalPreflight, type HookProposalPreflightCheck } from "@/
 import { createActiveHookProjects } from "@/lib/hook-projects";
 import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
+import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -662,6 +663,7 @@ export function CommandWavesConsole() {
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
+  const [launchStatusNotice, setLaunchStatusNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
   const [proposalDraftNotice, setProposalDraftNotice] = useState("");
@@ -792,6 +794,15 @@ export function CommandWavesConsole() {
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
     }),
     [publicAppOrigin],
+  );
+  const launchStatusDraft = useMemo(
+    () =>
+      createLaunchStatusDraft({
+        wave,
+        audit: launchAudit,
+        verificationTargets: launchVerificationTargets,
+      }),
+    [launchAudit, launchVerificationTargets, wave],
   );
   const waveUpdateDraft = useMemo(
     () =>
@@ -955,6 +966,7 @@ export function CommandWavesConsole() {
     setSetupContextPreview(null);
     setDecisionDraftNotice("");
     setLaunchBriefNotice("");
+    setLaunchStatusNotice("");
     setLaunchLinkNotice("");
     setProposalDraftNotice("");
     setCodexPacketNotice("");
@@ -1131,6 +1143,15 @@ export function CommandWavesConsole() {
       setLaunchBriefNotice("Launch brief copied.");
     } catch {
       setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
+    }
+  }
+
+  async function copyLaunchStatusDraft() {
+    try {
+      await navigator.clipboard.writeText(launchStatusDraft);
+      setLaunchStatusNotice("Launch status copied.");
+    } catch {
+      setLaunchStatusNotice("Copy failed. Select the launch status manually.");
     }
   }
 
@@ -1599,11 +1620,17 @@ export function CommandWavesConsole() {
               </div>
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
-              {launchAudit.status !== "ready" ? (
-                <Button type="button" variant="secondary" className="mt-3" disabled={isBusy} onClick={runLaunchNextAction}>
-                  {launchActionButtonText}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {launchAudit.status !== "ready" ? (
+                  <Button type="button" variant="secondary" disabled={isBusy} onClick={runLaunchNextAction}>
+                    {launchActionButtonText}
+                  </Button>
+                ) : null}
+                <Button type="button" variant="secondary" onClick={() => void copyLaunchStatusDraft()}>
+                  Copy status
                 </Button>
-              ) : null}
+              </div>
+              {launchStatusNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{launchStatusNotice}</p> : null}
             </div>
           </div>
 
