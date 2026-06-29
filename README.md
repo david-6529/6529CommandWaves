@@ -141,6 +141,7 @@ The current app is a local prototype of the hook-building flow:
 - deterministic Codex handoff packet with branch, permission, evidence, and forbidden-action bounds
 - manual wave decision receipt that can anchor approval to a 6529 drop URL
 - PR decision receipt URL validation against the configured builder wave
+- wave-first proposal draft for manual posting before local tracking
 - opt-in GitHub PR adapter that opens draft PRs from prepared branches with the required manifest
 - contributor workflow and PR template for Command Waves manifest evidence
 - PR reviewer-gate foundation for checking command manifests, vote status, rules hashes, risky file paths, and hook contract signals

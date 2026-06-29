@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
+import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
 import { commandKindLabel } from "@/lib/command-kind-copy";
 import {
   classifyRisk,
@@ -656,6 +657,7 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
+  const [proposalDraftNotice, setProposalDraftNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
   const [projectContextPreviews, setProjectContextPreviews] = useState<Record<string, WaveContextPreview>>({});
   const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
@@ -787,6 +789,19 @@ export function CommandWavesConsole() {
     [activeExecution, activePoll, activeProposal, activeReview, launchVerificationTargets, wave],
   );
   const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(wave), [wave]);
+  const builderWaveProposalDraft = useMemo(
+    () =>
+      createBuilderWaveProposalDraft({
+        wave,
+        title,
+        proposer,
+        kind,
+        request: prompt,
+        limits: spec,
+        budgetUsd,
+      }),
+    [budgetUsd, kind, prompt, proposer, spec, title, wave],
+  );
   const launchPacket = useMemo(
     () =>
       createLaunchPacket({
@@ -908,6 +923,7 @@ export function CommandWavesConsole() {
     setSetupContextPreview(null);
     setLaunchBriefNotice("");
     setLaunchLinkNotice("");
+    setProposalDraftNotice("");
     setCodexPacketNotice("");
   }
 
@@ -1082,6 +1098,15 @@ export function CommandWavesConsole() {
       setLaunchBriefNotice("Launch brief copied.");
     } catch {
       setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
+    }
+  }
+
+  async function copyBuilderWaveProposalDraft() {
+    try {
+      await navigator.clipboard.writeText(builderWaveProposalDraft);
+      setProposalDraftNotice("Proposal draft copied.");
+    } catch {
+      setProposalDraftNotice("Copy failed. Select the proposal text and copy it manually.");
     }
   }
 
@@ -1918,6 +1943,19 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               </details>
+              <div className="rounded-md border border-zinc-800 bg-black p-3">
+                <p className="text-sm font-semibold text-zinc-100">Wave-first proposal</p>
+                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                  Copy this into the builder wave. Submit locally only after it matches the wave discussion.
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
+                    Copy for wave
+                  </Button>
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+                </div>
+                {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
+              </div>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Proposing" : "Propose work"}
               </Button>
