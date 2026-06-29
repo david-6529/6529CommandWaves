@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   commandBranchName,
@@ -17,6 +18,17 @@ function response(body: string, init: ResponseInit = {}) {
 }
 
 describe("GitHub repo helpers", () => {
+  it("keeps the local PR template launch-ready", () => {
+    const template = readFileSync(".github/PULL_REQUEST_TEMPLATE.md", "utf8");
+
+    expect(template).toContain("Decision receipt URL:");
+    expect(template).toContain("Command Waves review request copied from the app:");
+    expect(template).toContain("Launch packet or status link:");
+    expect(template).toContain("<!-- command-waves:manifest:start -->");
+    expect(template).toContain("<!-- command-waves:manifest:end -->");
+    expect(template).not.toContain("\u2014");
+  });
+
   it("parses HTTPS, SSH, and owner/repo GitHub references", () => {
     expect(parseGitHubRepoUrl("https://github.com/6529-Collections/6529CommandWaves")).toMatchObject({
       owner: "6529-Collections",
@@ -71,12 +83,62 @@ describe("GitHub repo helpers", () => {
         path: "CONTRIBUTING.md",
         label: "Contributor rules",
         exists: true,
+        valid: true,
       }),
       expect.objectContaining({
         path: ".github/PULL_REQUEST_TEMPLATE.md",
         label: "PR template",
         exists: false,
+        valid: false,
       }),
     ]);
+  });
+
+  it("validates PR template manifest markers", async () => {
+    const files = await getGitHubRepoRequiredFiles("6529-Collections/6529-hook", {
+      apiBaseUrl: "https://api.example.test",
+      fetchImpl: async (input) => {
+        const url = String(input);
+
+        if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
+          return response("## Missing manifest markers");
+        }
+
+        return response("{}");
+      },
+    });
+
+    expect(files.find((file) => file.path === ".github/PULL_REQUEST_TEMPLATE.md")).toMatchObject({
+      exists: true,
+      valid: false,
+      message: ".github/PULL_REQUEST_TEMPLATE.md is missing Command Waves manifest markers.",
+    });
+  });
+
+  it("accepts PR template manifest markers from GitHub content payloads", async () => {
+    const template = [
+      "## Command Waves Manifest",
+      "<!-- command-waves:manifest:start -->",
+      "{}",
+      "<!-- command-waves:manifest:end -->",
+    ].join("\n");
+    const files = await getGitHubRepoRequiredFiles("6529-Collections/6529-hook", {
+      apiBaseUrl: "https://api.example.test",
+      fetchImpl: async (input) => {
+        const url = String(input);
+
+        if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
+          return response(JSON.stringify({ content: btoa(template), encoding: "base64" }));
+        }
+
+        return response("{}");
+      },
+    });
+
+    expect(files.find((file) => file.path === ".github/PULL_REQUEST_TEMPLATE.md")).toMatchObject({
+      exists: true,
+      valid: true,
+      message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
+    });
   });
 });

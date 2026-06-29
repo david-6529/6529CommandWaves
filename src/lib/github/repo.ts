@@ -14,6 +14,7 @@ export type GitHubRepoRequiredFile = {
   path: string;
   label: string;
   exists: boolean;
+  valid: boolean;
   status: number;
   message: string;
 };
@@ -32,6 +33,9 @@ export const requiredHookRepoFiles = [
   { path: "CONTRIBUTING.md", label: "Contributor rules" },
   { path: ".github/PULL_REQUEST_TEMPLATE.md", label: "PR template" },
 ] as const;
+
+const commandPrManifestStart = "<!-- command-waves:manifest:start -->";
+const commandPrManifestEnd = "<!-- command-waves:manifest:end -->";
 
 export function parseGitHubRepoUrl(value: string): GitHubRepoRef | null {
   const trimmed = value.trim();
@@ -127,6 +131,52 @@ function repoContentUrl(repo: GitHubRepoRef, path: string, options: GitHubRepoAp
   return url;
 }
 
+function decodeBase64(value: string) {
+  return atob(value.replace(/\s+/g, ""));
+}
+
+function contentTextFromPayload(rawBody: string) {
+  try {
+    const payload = JSON.parse(rawBody) as unknown;
+
+    if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+      const record = payload as Record<string, unknown>;
+      const content = typeof record.content === "string" ? record.content : null;
+
+      if (content && record.encoding === "base64") {
+        return decodeBase64(content);
+      }
+
+      if (content) {
+        return content;
+      }
+    }
+  } catch {
+    return rawBody;
+  }
+
+  return rawBody;
+}
+
+async function validateRequiredFile(file: (typeof requiredHookRepoFiles)[number], response: Response) {
+  if (file.path !== ".github/PULL_REQUEST_TEMPLATE.md") {
+    return {
+      valid: true,
+      message: `Found ${file.path}.`,
+    };
+  }
+
+  const content = contentTextFromPayload(await response.text());
+  const hasManifestMarkers = content.includes(commandPrManifestStart) && content.includes(commandPrManifestEnd);
+
+  return {
+    valid: hasManifestMarkers,
+    message: hasManifestMarkers
+      ? `Found ${file.path} with Command Waves manifest markers.`
+      : `${file.path} is missing Command Waves manifest markers.`,
+  };
+}
+
 export async function getGitHubRepoMetadata(
   repoUrl: string,
   options: GitHubRepoApiOptions = {},
@@ -181,6 +231,7 @@ export async function getGitHubRepoRequiredFiles(
         return {
           ...file,
           exists: false,
+          valid: false,
           status: response.status,
           message: `Missing ${file.path}.`,
         };
@@ -192,11 +243,14 @@ export async function getGitHubRepoRequiredFiles(
         });
       }
 
+      const validation = await validateRequiredFile(file, response);
+
       return {
         ...file,
         exists: true,
+        valid: validation.valid,
         status: response.status,
-        message: `Found ${file.path}.`,
+        message: validation.message,
       };
     }),
   );

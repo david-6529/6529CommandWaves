@@ -21,6 +21,8 @@
 
 - Tests run:
 - Reviewer notes:
+- Command Waves review request copied from the app:
+- Launch packet or status link:
 
 ## Command Waves Manifest
 

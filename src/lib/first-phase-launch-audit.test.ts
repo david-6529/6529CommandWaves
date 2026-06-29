@@ -37,6 +37,7 @@ const productionSetupValidation: SetupValidation = {
       path: "CONTRIBUTING.md",
       label: "Contributor rules",
       exists: true,
+      valid: true,
       status: 200,
       message: "Found CONTRIBUTING.md.",
     },
@@ -44,8 +45,9 @@ const productionSetupValidation: SetupValidation = {
       path: ".github/PULL_REQUEST_TEMPLATE.md",
       label: "PR template",
       exists: true,
+      valid: true,
       status: 200,
-      message: "Found .github/PULL_REQUEST_TEMPLATE.md.",
+      message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
     },
   ],
   checks: [
@@ -53,12 +55,12 @@ const productionSetupValidation: SetupValidation = {
     { id: "repo_format", label: "GitHub repo", status: "pass", message: "Using 6529-Collections/6529-hook." },
     { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
     { id: "repo_reachable", label: "Repo reachable", status: "pass", message: "GitHub repo exists. Default branch: main." },
-    { id: "repo_file_contributing_md", label: "Contributor rules", status: "pass", message: "CONTRIBUTING.md is present." },
+    { id: "repo_file_contributing_md", label: "Contributor rules", status: "pass", message: "Found CONTRIBUTING.md." },
     {
       id: "repo_file_github_pull_request_template_md",
       label: "PR template",
       status: "pass",
-      message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+      message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
     },
   ],
   canSave: true,
@@ -158,7 +160,7 @@ describe("first phase launch audit", () => {
       ...productionSetupValidation,
       repoRequiredFiles: productionSetupValidation.repoRequiredFiles.map((file) =>
         file.path === ".github/PULL_REQUEST_TEMPLATE.md"
-          ? { ...file, exists: false, status: 404, message: "Missing .github/PULL_REQUEST_TEMPLATE.md." }
+          ? { ...file, exists: false, valid: false, status: 404, message: "Missing .github/PULL_REQUEST_TEMPLATE.md." }
           : file,
       ),
       checks: productionSetupValidation.checks.map((check) =>
@@ -166,7 +168,7 @@ describe("first phase launch audit", () => {
           ? {
               ...check,
               status: "warn",
-              message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before inviting contributors.",
+              message: "Missing .github/PULL_REQUEST_TEMPLATE.md. Fix it before inviting contributors.",
             }
           : check,
       ),
@@ -189,7 +191,7 @@ describe("first phase launch audit", () => {
         id: "setup_repo_file_github_pull_request_template_md",
         label: "PR template",
         status: "needed",
-        detail: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before inviting contributors.",
+        detail: "Missing .github/PULL_REQUEST_TEMPLATE.md. Fix it before inviting contributors.",
       }),
     );
   });

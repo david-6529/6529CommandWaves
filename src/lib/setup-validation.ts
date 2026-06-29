@@ -157,8 +157,8 @@ export async function validateCommandWaveSetup(
             check(
               repoFileCheckId(file.path),
               file.label,
-              file.exists ? "pass" : "warn",
-              file.exists ? `${file.path} is present.` : `${file.path} is missing. Add it before inviting contributors.`,
+              file.valid ? "pass" : "warn",
+              file.valid ? file.message : `${file.message} Fix it before inviting contributors.`,
             ),
           ),
         );

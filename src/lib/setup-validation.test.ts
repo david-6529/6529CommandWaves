@@ -86,9 +86,9 @@ describe("setup validation", () => {
 
     expect(validation.canSave).toBe(true);
     expect(validation.canRunCode).toBe(true);
-    expect(validation.repoRequiredFiles.map((file) => [file.path, file.exists])).toEqual([
-      ["CONTRIBUTING.md", true],
-      [".github/PULL_REQUEST_TEMPLATE.md", false],
+    expect(validation.repoRequiredFiles.map((file) => [file.path, file.exists, file.valid])).toEqual([
+      ["CONTRIBUTING.md", true, true],
+      [".github/PULL_REQUEST_TEMPLATE.md", false, false],
     ]);
     expect(validation.checks).toEqual(
       expect.arrayContaining([
@@ -101,10 +101,54 @@ describe("setup validation", () => {
           id: "repo_file_github_pull_request_template_md",
           label: "PR template",
           status: "warn",
-          message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before inviting contributors.",
+          message: "Missing .github/PULL_REQUEST_TEMPLATE.md. Fix it before inviting contributors.",
         }),
       ]),
     );
     expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");
+  });
+
+  it("warns when the PR template lacks Command Waves manifest markers", async () => {
+    const validation = await validateCommandWaveSetup(
+      {
+        waveUrl: "mock-command-wave",
+        repoUrl: "6529-Collections/6529-hook",
+      },
+      {
+        checkRepoRemote: true,
+        githubApi: {
+          apiBaseUrl: "https://api.example.test",
+          fetchImpl: async (input) => {
+            const url = String(input);
+
+            if (url.endsWith("/repos/6529-Collections/6529-hook")) {
+              return jsonResponse({
+                default_branch: "main",
+                private: false,
+                archived: false,
+              });
+            }
+
+            if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
+              return new Response("## Hook PR", { status: 200 });
+            }
+
+            return jsonResponse({});
+          },
+        },
+      },
+    );
+
+    expect(validation.repoRequiredFiles.find((file) => file.path === ".github/PULL_REQUEST_TEMPLATE.md")).toMatchObject({
+      exists: true,
+      valid: false,
+    });
+    expect(validation.checks).toContainEqual(
+      expect.objectContaining({
+        id: "repo_file_github_pull_request_template_md",
+        status: "warn",
+        message: ".github/PULL_REQUEST_TEMPLATE.md is missing Command Waves manifest markers. Fix it before inviting contributors.",
+      }),
+    );
   });
 });
