@@ -1762,6 +1762,94 @@ export function CommandWavesConsole() {
               </div>
             ))}
           </div>
+          <div className="mt-4 border-t border-zinc-800 pt-4">
+            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
+            {!activeProposal ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <p className="text-sm leading-6 text-zinc-400">Start by suggesting one PR-sized hook change.</p>
+                <JumpLink href="#start-building">Suggest a change</JumpLink>
+              </div>
+            ) : activePollCanVote ? (
+              <div className="mt-2 grid gap-3">
+                <p className="text-sm leading-6 text-zinc-400">
+                  Ask the wave for a decision. Local yes or no logs are manual evidence only and do not replace the 6529 decision.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
+                    Copy decision request
+                  </Button>
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+                  <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
+                    Log local yes
+                  </Button>
+                  <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
+                    Log local no
+                  </Button>
+                </div>
+                {decisionDraftNotice ? <p className="text-xs leading-5 text-zinc-500">{decisionDraftNotice}</p> : null}
+              </div>
+            ) : showDecisionRecorder ? (
+              <div className="mt-2 grid gap-3">
+                <p className="text-sm leading-6 text-zinc-400">
+                  Add the 6529 decision URL so PR work can use the wave as the source of truth.
+                </p>
+                <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+                  <Input
+                    value={decisionReference}
+                    placeholder={decisionReferencePlaceholder}
+                    onChange={(event) => setDecisionReference(event.target.value)}
+                  />
+                  <Button type="button" variant="secondary" disabled={isBusy || !decisionReference.trim()} onClick={recordWaveDecision}>
+                    {apiBusy === "decision" ? "Recording" : "Record decision"}
+                  </Button>
+                </div>
+              </div>
+            ) : showBuildAction ? (
+              <div className="mt-2 grid gap-3">
+                <p className="text-sm leading-6 text-zinc-400">
+                  Build only after the approved wave decision is recorded. This logs PR evidence without merging, deploying, or spending.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" disabled={isBusy || !canBuildApprovedPr} onClick={buildApprovedPr}>
+                    {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
+                  </Button>
+                  {canCopyCodexPacket ? (
+                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void copyCodexWorkPacket()}>
+                      {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
+                    </Button>
+                  ) : null}
+                </div>
+                {codexPacketNotice ? <p className="text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
+              </div>
+            ) : canRunReview ? (
+              <div className="mt-2 grid gap-3">
+                <p className="text-sm leading-6 text-zinc-400">
+                  Reviewer check is next. It checks the PR evidence against the approved proposal and current rules.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
+                    Copy review request
+                  </Button>
+                  {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
+                  <Button type="button" variant="secondary" disabled={isBusy} onClick={runGuardianReview}>
+                    {apiBusy === "review" ? "Reviewing" : "Review result"}
+                  </Button>
+                </div>
+                {reviewRequestNotice ? <p className="text-xs leading-5 text-zinc-500">{reviewRequestNotice}</p> : null}
+              </div>
+            ) : activeReview ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <p className="text-sm leading-6 text-zinc-400">This loop is reviewed. Share the status back to the wave.</p>
+                <JumpLink href="#share-back">Share update</JumpLink>
+                <JumpLink href="#recent-activity">View log</JumpLink>
+              </div>
+            ) : (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <p className="text-sm leading-6 text-zinc-400">The next step is tracked in the detailed work panel.</p>
+                <JumpLink href="#suggest-hook-work">Open detailed controls</JumpLink>
+              </div>
+            )}
+          </div>
         </section>
 
         <section id="wave-room" className="scroll-mt-4">
