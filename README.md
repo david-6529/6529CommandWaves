@@ -102,7 +102,7 @@ Short version:
 
 The current app is a local prototype of the hook-building flow:
 
-- first-screen hook dashboard: wave snapshot, code state, PR, review, and progress
+- first-screen hook dashboard: wave snapshot, repo state, PR, review, and progress
 - hooks-in-development snapshot for the 6529 Hook with wave, repo, PR, review, and evidence state
 - compact current-state area with work, launch, and progress guidance
 - recent activity log placed near the core build flow
@@ -143,7 +143,7 @@ The current app is a local prototype of the hook-building flow:
 - patch-level Solidity checks for upgradeability, delegatecall, deployment, governance, and parameter writes when PR patches are available
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
 - review records store compact guardian proof material for later audit
-- human-reviewed wave update draft for posting results back to the builder wave
+- human-reviewed wave update draft for manual sharing back to the builder wave
 - human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - recent activity view with full audit log export

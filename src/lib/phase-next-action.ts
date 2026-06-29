@@ -39,7 +39,7 @@ const actionCopyByStep: Record<
   },
   log: {
     title: "Share the result",
-    detail: "Post the wave update and keep the launch packet with the PR audit trail.",
+    detail: "Review the wave update draft, share it manually, and keep the launch packet with the PR audit trail.",
   },
 };
 

@@ -75,6 +75,23 @@ describe("phase next action", () => {
     });
   });
 
+  it("keeps result sharing draft-only and human reviewed", () => {
+    const nextAction = createPhaseNextAction(
+      createPhaseChecklist({
+        ...demoWave,
+        ledger: demoWave.ledger.filter((event) => event.type !== "guardian_reviewed"),
+      }),
+    );
+
+    expect(nextAction).toMatchObject({
+      status: "action",
+      stepLabel: "Log",
+      title: "Share the result",
+      detail: "Review the wave update draft, share it manually, and keep the launch packet with the PR audit trail.",
+    });
+    expect(nextAction.detail.toLowerCase()).not.toContain("automatic");
+  });
+
   it("keeps support commands from becoming the PR build next action", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({

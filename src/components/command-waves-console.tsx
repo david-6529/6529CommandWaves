@@ -2116,7 +2116,7 @@ export function CommandWavesConsole() {
           <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="text-sm leading-6 text-zinc-400">
-                Share the short update in the builder wave. Keep the launch packet with the PR audit trail.
+                Review the short update, share it manually in the builder wave, and keep the launch packet with the PR audit trail.
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>

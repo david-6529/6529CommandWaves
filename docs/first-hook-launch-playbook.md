@@ -12,7 +12,7 @@ Make the first public phase a clear community win:
 6. Review every result before humans merge or pay anyone.
 
 This should first feel like a standalone project site for the 6529 hook. If the loop works, the same structure can support more public hook projects later.
-Use the 6529 wave for live discussion and decisions. Use this app for the project snapshot, GitHub code state, PR evidence, review evidence, and launch audit trail.
+Use the 6529 wave for live discussion and decisions. Use this app for the project snapshot, GitHub repo state, PR evidence, review evidence, and launch evidence.
 
 ## Use Now
 
@@ -76,7 +76,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 13. Review the PR manifest, tests, parameter-cap evidence, and changed files.
 14. Humans merge only after review passes.
 15. Use the contribution report and fee plan as evidence for any separate payout vote.
-16. Post the wave update draft back to the builder wave.
+16. Review the wave update draft and share it manually in the builder wave.
 17. Keep the launch packet with the PR so later contributors can audit the loop.
 18. Run the launch check again and fix blockers before broad participation.
 
