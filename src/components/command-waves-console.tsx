@@ -932,11 +932,13 @@ export function CommandWavesConsole() {
 
   function runLaunchNextAction() {
     if (launchActionRunsSetup) {
+      openSetupControls();
       void checkSetup();
       return;
     }
 
     if (launchActionRunsReadiness) {
+      openSetupControls();
       void checkReadiness();
       return;
     }
