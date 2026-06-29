@@ -32,7 +32,7 @@ import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-n
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
-import type { SetupValidation } from "@/lib/setup-validation";
+import { setupValidationNotice, type SetupValidation } from "@/lib/setup-validation";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
@@ -880,7 +880,7 @@ export function CommandWavesConsole() {
       const validation = await requestSetupValidation(waveUrl, repoUrl);
 
       setSetupValidation(validation);
-      setApiNotice(validation.canSave ? "Setup check passed." : "Setup needs fixes before saving.");
+      setApiNotice(setupValidationNotice(validation));
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Setup check failed.");
     } finally {

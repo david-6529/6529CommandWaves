@@ -52,6 +52,21 @@ function hasFailures(checks: SetupCheck[]) {
   return checks.some((item) => item.status === "fail");
 }
 
+export function setupValidationNotice(validation: Pick<SetupValidation, "checks">) {
+  const failCount = validation.checks.filter((item) => item.status === "fail").length;
+  const warnCount = validation.checks.filter((item) => item.status === "warn").length;
+
+  if (failCount) {
+    return "Setup needs fixes before saving.";
+  }
+
+  if (warnCount) {
+    return `Setup check found ${warnCount} launch warning${warnCount === 1 ? "" : "s"}.`;
+  }
+
+  return "Setup check passed.";
+}
+
 function repoFileCheckId(path: string) {
   return `repo_file_${path.replaceAll(/[^a-z0-9]+/gi, "_").replaceAll(/^_+|_+$/g, "").toLowerCase()}`;
 }

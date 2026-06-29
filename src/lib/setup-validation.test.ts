@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateCommandWaveSetup, validateSetupShape } from "./setup-validation";
+import { setupValidationNotice, validateCommandWaveSetup, validateSetupShape } from "./setup-validation";
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -28,6 +28,7 @@ describe("setup validation", () => {
       canSave: true,
       canRunCode: true,
     });
+    expect(setupValidationNotice(validation)).toBe("Setup check passed.");
   });
 
   it("accepts owner/repo shorthand", () => {
@@ -49,6 +50,7 @@ describe("setup validation", () => {
     expect(validation.canSave).toBe(false);
     expect(validation.canRunCode).toBe(false);
     expect(validation.checks.map((check) => check.status)).toEqual(["fail", "fail"]);
+    expect(setupValidationNotice(validation)).toBe("Setup needs fixes before saving.");
   });
 
   it("warns when required launch repo files are missing", async () => {
@@ -103,6 +105,6 @@ describe("setup validation", () => {
         }),
       ]),
     );
+    expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");
   });
-}
-);
+});
