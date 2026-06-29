@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
@@ -545,6 +545,18 @@ function appUrlFromOrigin(path: string, origin: string) {
   return origin ? new URL(path, origin).toString() : path;
 }
 
+function subscribeToStaticOrigin() {
+  return () => {};
+}
+
+function appOriginSnapshot() {
+  return typeof window === "undefined" ? "" : window.location.origin;
+}
+
+function emptyAppOriginSnapshot() {
+  return "";
+}
+
 function modeLabel(mode: string) {
   if (mode === "auto") {
     return "can run";
@@ -647,7 +659,7 @@ export function CommandWavesConsole() {
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
-  const [publicAppOrigin] = useState(() => (typeof window === "undefined" ? "" : window.location.origin));
+  const publicAppOrigin = useSyncExternalStore(subscribeToStaticOrigin, appOriginSnapshot, emptyAppOriginSnapshot);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -1262,9 +1274,7 @@ export function CommandWavesConsole() {
                         >
                           {apiBusy === "context" ? "Loading" : "Read latest posts"}
                         </Button>
-                        <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
-                          Copy update draft
-                        </Button>
+                        <JumpLink href="#share-back">Draft wave post</JumpLink>
                       </div>
                       {contextPreview ? (
                         <div className="mt-3 border-t border-zinc-800 pt-3">
@@ -2248,25 +2258,51 @@ export function CommandWavesConsole() {
           </div>
         </Panel>
 
-        <Panel title="Wave update draft" eyebrow="Share back">
-          <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <p className="text-sm leading-6 text-zinc-400">
-                Review the short update, share it manually in the builder wave, and keep the launch packet with the PR audit trail.
-              </p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
-                  Copy wave update
-                </Button>
-                <Button type="button" variant="secondary" onClick={() => void copyLaunchPacket()}>
-                  Copy launch packet
-                </Button>
+        <section id="share-back" className="scroll-mt-4">
+          <Panel title="Wave update draft" eyebrow="Share back">
+            <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+              <div>
+                <p className="text-sm leading-6 text-zinc-400">
+                  Review the short update, share it manually in the builder wave, and keep the launch packet with the PR audit trail.
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
+                    Copy wave update
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={() => void copyLaunchPacket()}>
+                    Copy launch packet
+                  </Button>
+                </div>
+                {copyNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{copyNotice}</p> : null}
+                <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+                  <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Verification links</p>
+                  <p className="mt-1 text-xs leading-5 text-zinc-500">
+                    Include these links so builders can verify setup and command-wave state.
+                  </p>
+                  <div className="mt-3 grid gap-2">
+                    <a
+                      className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"
+                      href={launchVerificationTargets.setupProofUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {launchVerificationTargets.setupProofUrl}
+                    </a>
+                    <a
+                      className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"
+                      href={launchVerificationTargets.commandWaveStateUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {launchVerificationTargets.commandWaveStateUrl}
+                    </a>
+                  </div>
+                </div>
               </div>
-              {copyNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{copyNotice}</p> : null}
+              <Textarea readOnly rows={12} value={waveUpdateDraft} className="min-h-72 resize-none font-mono text-xs" />
             </div>
-            <Textarea readOnly rows={12} value={waveUpdateDraft} className="min-h-72 resize-none font-mono text-xs" />
-          </div>
-        </Panel>
+          </Panel>
+        </section>
 
       </div>
     </main>

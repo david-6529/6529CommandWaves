@@ -145,7 +145,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       waveLabel: waveLabel(wave.waveUrl),
       repoLabel: repoLabel(wave.repoUrl),
       currentFocus,
-      participation: "Talk in the wave. Track repo work here.",
+      participation: "Read the wave, draft replies here, and track repo work.",
       waveRole: "Live discussion, proposals, decisions, and updates.",
       platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
       waveStatus: waveStatus(wave),
