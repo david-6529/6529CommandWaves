@@ -1618,13 +1618,22 @@ export function CommandWavesConsole() {
                 {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
               </div>
             ) : activeReview ? (
-              <div className="mt-2 flex flex-wrap items-center gap-2">
+              <div className="mt-2 grid gap-3">
                 <p className="text-base leading-7 text-zinc-400">
-                  This change passed review. Share the result or propose the next hook change.
+                  Ready to discuss the next proposal: {title.trim() || "Add one small hook change"}.
                 </p>
-                <JumpLink href="#share-back">Share update</JumpLink>
-                <JumpLink href="#start-building">Propose change</JumpLink>
-                <JumpLink href="#recent-activity">View activity</JumpLink>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
+                    Copy for discussion
+                  </Button>
+                  <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
+                    {apiBusy === "proposal" ? "Adding" : "Add proposal"}
+                  </Button>
+                  <JumpLink href="#start-building">Edit proposal</JumpLink>
+                  <JumpLink href="#recent-activity">View activity</JumpLink>
+                </div>
+                {proposalDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
+                {apiError ? <p className="text-sm leading-6 text-red-300">{apiError}</p> : null}
               </div>
             ) : (
               <div className="mt-2 flex flex-wrap items-center gap-2">
