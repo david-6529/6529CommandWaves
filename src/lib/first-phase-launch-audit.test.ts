@@ -30,6 +30,7 @@ describe("first phase launch audit", () => {
     expect(audit.statusLabel).toBe("ready");
     expect(audit.blockers).toHaveLength(0);
     expect(audit.openItems).toHaveLength(0);
+    expect(audit.readyItems.length).toBeGreaterThan(0);
     expect(audit.items).toContainEqual(
       expect.objectContaining({
         id: "flow_wave_decision_receipt",

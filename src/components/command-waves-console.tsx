@@ -18,6 +18,7 @@ import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import {
   createFirstPhaseLaunchAudit,
+  type FirstPhaseLaunchAuditItem,
   type FirstPhaseLaunchAuditItemStatus,
   type FirstPhaseLaunchAuditStatus,
 } from "@/lib/first-phase-launch-audit";
@@ -401,6 +402,14 @@ function launchAuditItemClass(status: FirstPhaseLaunchAuditItemStatus) {
   return riskClass("medium");
 }
 
+function isLaunchAuditEvidenceItem(item: FirstPhaseLaunchAuditItem) {
+  return (
+    item.id === "flow_wave_decision_receipt" ||
+    item.id === "flow_audit_packet" ||
+    item.source === "readiness"
+  );
+}
+
 function Badge({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${className}`}>
@@ -683,6 +692,7 @@ export function CommandWavesConsole() {
     [phaseChecklist, readiness, wave],
   );
   const launchAuditOpenItems = launchAudit.openItems.slice(0, 5);
+  const launchAuditReadyEvidence = launchAudit.readyItems.filter(isLaunchAuditEvidenceItem).slice(0, 5);
   const waveUpdateDraft = useMemo(
     () =>
       createWaveUpdateDraft({
@@ -1237,7 +1247,23 @@ export function CommandWavesConsole() {
                         ) : null}
                       </div>
                     ) : (
-                      <p className="mt-3 text-xs leading-5 text-zinc-500">No public launch gaps found in these checks.</p>
+                      <div className="mt-3 grid gap-2">
+                        <p className="text-xs leading-5 text-zinc-500">No public launch gaps found in these checks.</p>
+                        {launchAuditReadyEvidence.length ? (
+                          <div className="grid gap-2 border-t border-zinc-900 pt-2">
+                            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Checked evidence</p>
+                            {launchAuditReadyEvidence.map((item) => (
+                              <div key={item.id} className="grid gap-2 sm:grid-cols-[6rem_1fr]">
+                                <Badge className={launchAuditItemClass(item.status)}>{item.status}</Badge>
+                                <div>
+                                  <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
+                                  <p className="mt-1 text-xs leading-5 text-zinc-500">{item.detail}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
                     )}
                   </div>
                   {readiness ? (

@@ -18,6 +18,7 @@ export type FirstPhaseLaunchAudit = {
   statusLabel: string;
   summary: string;
   items: FirstPhaseLaunchAuditItem[];
+  readyItems: FirstPhaseLaunchAuditItem[];
   blockers: FirstPhaseLaunchAuditItem[];
   openItems: FirstPhaseLaunchAuditItem[];
 };
@@ -233,6 +234,7 @@ export function createFirstPhaseLaunchAudit({
       ];
 
   const items = [...flowItems, ...decisionReceiptItem(wave), ...auditPacketItem(wave), ...readinessItems];
+  const readyItems = items.filter((item) => item.status === "ready");
   const blockers = items.filter((item) => item.status === "blocked");
   const openItems = items
     .filter((item) => item.status !== "ready")
@@ -244,6 +246,7 @@ export function createFirstPhaseLaunchAudit({
     statusLabel: statusLabel(status),
     summary: summaryFor(status),
     items,
+    readyItems,
     blockers,
     openItems,
   };
