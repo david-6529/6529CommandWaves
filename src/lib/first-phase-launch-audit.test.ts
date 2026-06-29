@@ -36,6 +36,13 @@ describe("first phase launch audit", () => {
         status: "ready",
       }),
     );
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "flow_audit_packet",
+        label: "Audit packet",
+        status: "ready",
+      }),
+    );
   });
 
   it("keeps launch in setup mode until readiness is checked", () => {
@@ -175,6 +182,58 @@ describe("first phase launch audit", () => {
         id: "flow_wave_decision_receipt",
         status: "blocked",
         detail: "Wave decision URL is required for PR work.",
+      }),
+    );
+  });
+
+  it("blocks public launch when reviewed PR work has no PR link", () => {
+    const wave = {
+      ...demoWave,
+      executions: [
+        {
+          ...demoWave.executions[0],
+          artifacts: demoWave.executions[0].artifacts.filter((artifact) => !artifact.startsWith("https://github.com/")),
+        },
+      ],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_audit_packet",
+        status: "blocked",
+        detail: "Launch packet needs a GitHub PR link before public launch.",
+      }),
+    );
+  });
+
+  it("blocks public launch when reviewed PR work has no review proof", () => {
+    const wave = {
+      ...demoWave,
+      reviews: [
+        {
+          ...demoWave.reviews[0],
+          proof: undefined,
+        },
+      ],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_audit_packet",
+        status: "blocked",
+        detail: "Launch packet needs Guardian review proof before public launch.",
       }),
     );
   });

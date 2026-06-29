@@ -133,6 +133,69 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   ];
 }
 
+function hasGithubPrLink(artifacts: string[]) {
+  return artifacts.some((artifact) =>
+    /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
+  );
+}
+
+function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
+  const proposal = wave?.proposals.find((item) => item.kind === "open_pr") ?? null;
+
+  if (!proposal) {
+    return [];
+  }
+
+  const execution = wave?.executions.find((item) => item.proposalId === proposal.id) ?? null;
+  const review = wave?.reviews.find((item) => item.proposalId === proposal.id) ?? null;
+
+  if (review?.status === "pass" && execution?.status === "complete") {
+    if (!hasGithubPrLink(execution.artifacts)) {
+      return [
+        {
+          id: "flow_audit_packet",
+          label: "Audit packet",
+          status: "blocked",
+          detail: "Launch packet needs a GitHub PR link before public launch.",
+          source: "flow",
+        },
+      ];
+    }
+
+    if (!review.proof) {
+      return [
+        {
+          id: "flow_audit_packet",
+          label: "Audit packet",
+          status: "blocked",
+          detail: "Launch packet needs Guardian review proof before public launch.",
+          source: "flow",
+        },
+      ];
+    }
+
+    return [
+      {
+        id: "flow_audit_packet",
+        label: "Audit packet",
+        status: "ready",
+        detail: "Launch packet can include PR, review proof, contribution, and fee evidence.",
+        source: "flow",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "flow_audit_packet",
+      label: "Audit packet",
+      status: "needed",
+      detail: "Finish PR build and review before preparing the launch packet.",
+      source: "flow",
+    },
+  ];
+}
+
 export function createFirstPhaseLaunchAudit({
   phaseChecklist,
   readinessChecks,
@@ -169,7 +232,7 @@ export function createFirstPhaseLaunchAudit({
         },
       ];
 
-  const items = [...flowItems, ...decisionReceiptItem(wave), ...readinessItems];
+  const items = [...flowItems, ...decisionReceiptItem(wave), ...auditPacketItem(wave), ...readinessItems];
   const blockers = items.filter((item) => item.status === "blocked");
   const openItems = items
     .filter((item) => item.status !== "ready")
