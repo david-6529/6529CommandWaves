@@ -1566,7 +1566,6 @@ export function CommandWavesConsole() {
             </div>
             <div className="flex flex-wrap gap-2 lg:justify-end">
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
-              <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
             </div>
           </div>
 
@@ -1774,7 +1773,7 @@ export function CommandWavesConsole() {
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
-                  Ask a question, respond to the active change, or draft a concise note for the swarm.
+                  Ask a question, respond to the active change, or draft a concise message for the swarm.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button

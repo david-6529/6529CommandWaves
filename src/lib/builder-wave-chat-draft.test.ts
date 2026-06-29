@@ -5,7 +5,7 @@ import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 
 describe("builder wave chat draft", () => {
-  it("creates a concise note for the builder wave", () => {
+  it("creates a concise message for the builder wave", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
     const draft = createBuilderWaveChatDraft(demoWave, nextAction);
 
