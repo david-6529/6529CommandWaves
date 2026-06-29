@@ -2,10 +2,9 @@ import {
   pollApprovalPassedForWave,
   validateWaveDecisionReference,
   type CommandWave,
-  type ExecutionRecord,
-  type GuardianReview,
   type PollState,
 } from "./command-waves";
+import { selectPhaseWork, type PhaseWork } from "./phase-work";
 
 export type PhaseChecklistStatus = "done" | "active" | "waiting" | "blocked";
 
@@ -31,23 +30,10 @@ function setupCanRunCode(wave: CommandWave) {
   return Boolean(waveText && repoLooksValid);
 }
 
-function latestPrProposal(wave: CommandWave) {
-  return wave.proposals.find((item) => item.kind === "open_pr") ?? null;
-}
-
-function latestExecution(wave: CommandWave) {
-  const proposal = latestPrProposal(wave);
-
-  return proposal ? (wave.executions.find((item) => item.proposalId === proposal.id) ?? null) : null;
-}
-
-function latestReview(wave: CommandWave) {
-  const proposal = latestPrProposal(wave);
-
-  return proposal ? (wave.reviews.find((item) => item.proposalId === proposal.id) ?? null) : null;
-}
-
-function buildStatus(execution: ExecutionRecord | null, decisionDone: boolean): Pick<PhaseChecklistItem, "status" | "detail"> {
+function buildStatus(
+  execution: PhaseWork["prExecution"],
+  decisionDone: boolean,
+): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (execution?.status === "complete") {
     return { status: "done", detail: "PR build evidence is recorded." };
   }
@@ -64,8 +50,8 @@ function buildStatus(execution: ExecutionRecord | null, decisionDone: boolean): 
 }
 
 function reviewStatus(
-  execution: ExecutionRecord | null,
-  review: GuardianReview | null,
+  execution: PhaseWork["prExecution"],
+  review: PhaseWork["prReview"],
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (review?.status === "pass") {
     return { status: "done", detail: "Reviewer proof and checks are recorded." };
@@ -84,11 +70,12 @@ function reviewStatus(
 
 export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
   const canRunCode = setupCanRunCode(wave);
-  const proposal = latestPrProposal(wave);
-  const supportProposal = proposal ? null : (wave.proposals[0] ?? null);
-  const poll = proposal ? (wave.polls.find((item) => item.proposalId === proposal.id) ?? null) : null;
-  const execution = latestExecution(wave);
-  const review = latestReview(wave);
+  const phaseWork = selectPhaseWork(wave);
+  const proposal = phaseWork.prProposal;
+  const supportProposal = proposal ? null : (phaseWork.supportProposals[0] ?? null);
+  const poll = phaseWork.prPoll;
+  const execution = phaseWork.prExecution;
+  const review = phaseWork.prReview;
   const decisionDone = proposal ? isDecisionDone(proposal.status, poll, wave.waveUrl) : false;
   const decisionReferenceCheck = poll?.decision
     ? validateWaveDecisionReference({

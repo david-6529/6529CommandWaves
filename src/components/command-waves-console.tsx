@@ -24,6 +24,7 @@ import { createHookProposalPreflight, type HookProposalPreflightCheck } from "@/
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
+import { selectPhaseWork } from "@/lib/phase-work";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
@@ -624,10 +625,25 @@ export function CommandWavesConsole() {
     hookProposalPreflight.checks,
     hookProposalPreflightBlocked,
   );
-  const activeProposal = wave.proposals[0];
-  const activePoll = activeProposal ? wave.polls.find((poll) => poll.proposalId === activeProposal.id) : undefined;
-  const activeExecution = activeProposal ? wave.executions.find((execution) => execution.proposalId === activeProposal.id) : undefined;
-  const activeReview = activeProposal ? wave.reviews.find((review) => review.proposalId === activeProposal.id) : undefined;
+  const phaseWork = useMemo(() => selectPhaseWork(wave), [wave]);
+  const activeProposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
+  const activePoll = activeProposal
+    ? activeProposal.kind === "open_pr"
+      ? phaseWork.prPoll
+      : (wave.polls.find((poll) => poll.proposalId === activeProposal.id) ?? null)
+    : null;
+  const activeExecution = activeProposal
+    ? activeProposal.kind === "open_pr"
+      ? phaseWork.prExecution
+      : (wave.executions.find((execution) => execution.proposalId === activeProposal.id) ?? null)
+    : null;
+  const activeReview = activeProposal
+    ? activeProposal.kind === "open_pr"
+      ? phaseWork.prReview
+      : (wave.reviews.find((review) => review.proposalId === activeProposal.id) ?? null)
+    : null;
+  const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
+  const visibleSupportProposals = supportProposals.slice(0, 3);
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
   const activeDecisionReferenceCheck = activePoll?.decision
     ? validateWaveDecisionReference({
@@ -1447,6 +1463,14 @@ export function CommandWavesConsole() {
           <Panel title="3. Current work" eyebrow="Decide, build, review">
             {activeProposal ? (
               <div className="space-y-4">
+                {!phaseWork.prProposal ? (
+                  <div className="rounded-md border border-amber-800 bg-amber-950/25 p-3">
+                    <p className="text-sm font-semibold text-amber-100">No PR command yet</p>
+                    <p className="mt-1 text-xs leading-5 text-amber-100/80">
+                      This support command can be decided, but the hook phase still needs one PR-sized command before build and review.
+                    </p>
+                  </div>
+                ) : null}
                 <div className="rounded-md border border-zinc-800 bg-black p-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge className={statusClass(activeProposal.status)}>{activeProposal.status.replaceAll("_", " ")}</Badge>
@@ -1459,6 +1483,33 @@ export function CommandWavesConsole() {
                     {humanizeLegacyCommandCopy(activeProposal.spec)}
                   </p>
                 </div>
+
+                {visibleSupportProposals.length ? (
+                  <div className="rounded-md border border-zinc-800 bg-black p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">Support commands</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">
+                          Context, drafts, and wave updates stay separate from the PR build target.
+                        </p>
+                      </div>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                        {countLabel(supportProposals.length, "command")}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      {visibleSupportProposals.map((proposal) => (
+                        <div key={proposal.id} className="grid gap-2 border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge className={statusClass(proposal.status)}>{proposal.status.replaceAll("_", " ")}</Badge>
+                            <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{proposal.kind.replaceAll("_", " ")}</Badge>
+                          </div>
+                          <p className="text-sm font-semibold text-zinc-100">{proposal.title}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
 
                 {activePoll ? (
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
