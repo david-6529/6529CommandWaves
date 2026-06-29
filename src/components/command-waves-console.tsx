@@ -1531,7 +1531,7 @@ export function CommandWavesConsole() {
           <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current focus</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Now building</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
@@ -1667,10 +1667,10 @@ export function CommandWavesConsole() {
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                      Copy proposal
+                      Copy for room
                     </Button>
                     <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                      {apiBusy === "proposal" ? "Adding" : "Add proposal"}
+                      {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                     </Button>
                     <JumpLink href="#start-building">Edit proposal</JumpLink>
                     <JumpLink href="#recent-activity">Activity</JumpLink>
@@ -1691,9 +1691,9 @@ export function CommandWavesConsole() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Room</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk with the builders</h2>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk about the hook</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">
-                  Write a message for the 6529 discussion. Nothing posts automatically.
+                  Ask questions, share context, and shape the next small change.
                 </p>
               </div>
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
@@ -1769,7 +1769,7 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
-              <Field label="Message to the room">
+              <Field label="Message">
                 <Textarea
                   rows={4}
                   value={waveRoomMessage}
@@ -1783,7 +1783,7 @@ export function CommandWavesConsole() {
               </Field>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                  Copy message
+                  Copy for 6529
                 </Button>
                 <Button
                   type="button"
@@ -1806,31 +1806,46 @@ export function CommandWavesConsole() {
 
         <section id="start-building" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Next change</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest a small change</h2>
+            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Propose</p>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Add the next hook change</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Describe one PR-sized change for the hook.
+              Keep it small enough for one PR. The room can discuss it before code starts.
             </p>
             <div className="mt-4 grid gap-3">
               <Field label="Your name or 6529 handle">
                 <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
               </Field>
-              <Field label="Title">
-                <Textarea rows={2} value={title} onChange={(event) => setTitle(event.target.value)} />
+              <Field label="Change title">
+                <Textarea
+                  rows={2}
+                  value={title}
+                  placeholder="Add fee cap tests"
+                  onChange={(event) => setTitle(event.target.value)}
+                />
               </Field>
-              <Field label="Request">
-                <Textarea rows={4} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
+              <Field label="What should change">
+                <Textarea
+                  rows={4}
+                  value={prompt}
+                  placeholder="Describe the exact hook change or question."
+                  onChange={(event) => setPrompt(event.target.value)}
+                />
               </Field>
-              <Field label="Limits and success criteria">
-                <Textarea rows={4} value={spec} onChange={(event) => setSpec(event.target.value)} />
+              <Field label="Limits and tests">
+                <Textarea
+                  rows={4}
+                  value={spec}
+                  placeholder="Name caps, tests, and anything out of scope."
+                  onChange={(event) => setSpec(event.target.value)}
+                />
               </Field>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                Copy proposal
+                Copy for room
               </Button>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Adding" : "Add proposal"}
+                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
               <JumpLink href="#wave-room">Back to room</JumpLink>
             </div>
@@ -1838,7 +1853,7 @@ export function CommandWavesConsole() {
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
             <details className="mt-4 border-y border-zinc-800 py-3" open={hookProposalPreflightBlocked ? true : undefined}>
               <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3 text-base font-semibold text-zinc-100">
-                <span>Proposal check</span>
+                <span>Safety check</span>
                 <span className="flex flex-wrap gap-2">
                   <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
@@ -1848,7 +1863,7 @@ export function CommandWavesConsole() {
               </summary>
               <div className="mt-3 divide-y divide-zinc-800 border-t border-zinc-800">
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-100">Risk route</p>
+                  <p className="text-base font-semibold text-zinc-100">Risk</p>
                   <Badge className={riskClass(classifiedRisk)}>{classifiedRisk}</Badge>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-3">
@@ -1856,13 +1871,13 @@ export function CommandWavesConsole() {
                   <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-100">Hook check</p>
+                  <p className="text-base font-semibold text-zinc-100">Hook rules</p>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
                     {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
                   </Badge>
                 </div>
                 <div className="py-3">
-                  <p className="text-base font-semibold text-zinc-100">Current check</p>
+                  <p className="text-base font-semibold text-zinc-100">Status</p>
                   <p className="mt-1 text-base leading-7 text-zinc-400">{simplePreflightMessage}</p>
                 </div>
               </div>
@@ -2704,10 +2719,10 @@ export function CommandWavesConsole() {
               <Field label="Title">
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} />
               </Field>
-              <Field label="Request">
+              <Field label="What should change">
                 <Textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} />
               </Field>
-              <Field label="Limits and success criteria">
+              <Field label="Limits and tests">
                 <Textarea value={spec} onChange={(event) => setSpec(event.target.value)} />
               </Field>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
@@ -2801,7 +2816,7 @@ export function CommandWavesConsole() {
                 {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
               </div>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Adding" : "Add proposal"}
+                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
             </div>
           </Panel>
