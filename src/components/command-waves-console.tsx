@@ -602,7 +602,7 @@ function modeLabel(mode: string) {
 
 function eventTypeLabel(type: string) {
   const labels: Record<string, string> = {
-    wave_created: "wave created",
+    wave_created: "project created",
     rules_defined: "setup updated",
     proposal_submitted: "command proposed",
     rule_check: "safety check",
