@@ -5,6 +5,7 @@ import { createDeveloperFeePlan } from "./developer-fee-plan";
 export type WaveUpdateVerificationTargets = {
   setupProofUrl: string;
   commandWaveStateUrl: string;
+  launchAuditUrl?: string;
 };
 
 function decisionReference(poll: PollState) {
@@ -78,7 +79,11 @@ function developerFeeLine(wave: CommandWave) {
 
 function verificationLine(targets: WaveUpdateVerificationTargets | null | undefined) {
   return targets
-    ? `Verification: setup proof ${targets.setupProofUrl}; state ${targets.commandWaveStateUrl}.`
+    ? [
+        `Verification: setup proof ${targets.setupProofUrl}`,
+        `state ${targets.commandWaveStateUrl}`,
+        ...(targets.launchAuditUrl ? [`launch audit ${targets.launchAuditUrl}`] : []),
+      ].join("; ") + "."
     : null;
 }
 

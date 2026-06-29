@@ -3,12 +3,12 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.eyebrow).toBe("Public hook build");
-    expect(commandWaveProductCopy.headline).toBe("Build a hook together");
+    expect(commandWaveProductCopy.headline).toBe("Hook Builder");
+    expect(commandWaveProductCopy.subhead).toBe("Coordinate a community-built hook from idea to reviewed PR.");
     expect(commandWaveProductCopy.positioning).toBe(
-      "You do not need to know Waves or 6529 to start. Read the rules, ask the swarm, or suggest one small change.",
+      "Suggest one small change, discuss it with the swarm, record the wave decision, and review the code before merge.",
     );
-    expect(commandWaveProductCopy.simpleFlow).toBe("Talk - Agree - Build - Review");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Idea - Decision - PR - Review");
   });
 
   it("keeps unsafe authority claims out of the first-screen explanation", () => {
@@ -26,11 +26,10 @@ describe("Command Waves product copy", () => {
   });
 
   it("keeps the first hook ahead of the later reusable protocol", () => {
-    expect(commandWaveProductCopy.headline).toBe("Build a hook together");
-    expect(commandWaveProductCopy.subhead).toContain("shared room");
-    expect(commandWaveProductCopy.subhead).toContain("6529 hook");
-    expect(commandWaveProductCopy.positioning).toContain("do not need to know Waves");
-    expect(commandWaveProductCopy.positioning).toContain("suggest one small change");
+    expect(commandWaveProductCopy.headline).toBe("Hook Builder");
+    expect(commandWaveProductCopy.subhead).toContain("community-built hook");
+    expect(commandWaveProductCopy.positioning).toContain("record the wave decision");
+    expect(commandWaveProductCopy.positioning.toLowerCase()).toContain("suggest one small change");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");
   });

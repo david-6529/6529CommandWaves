@@ -18,6 +18,7 @@ export type FirstPhaseLaunchSnapshot = {
   verificationTargets: {
     setupProofUrl: string;
     commandWaveStateUrl: string;
+    launchAuditUrl: string;
   };
   setupValidation: SetupValidation;
   readiness: {
@@ -82,6 +83,7 @@ export async function createFirstPhaseLaunchSnapshot(
     verificationTargets: {
       setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
       commandWaveStateUrl,
+      launchAuditUrl: appRouteUrl("/api/command-wave/launch/audit", env),
     },
     setupValidation,
     readiness: {

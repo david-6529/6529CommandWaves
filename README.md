@@ -167,13 +167,13 @@ The current app is a local prototype of the hook-building flow:
 - deterministic guardian attestations with input hashes and rerunnable pass/fail results
 - review records store compact guardian proof material for later audit
 - human-reviewed wave update draft for manual sharing back to the builder wave
-- wave update draft verification links for setup proof and command-wave state
+- wave update draft verification links for setup proof, command-wave state, and launch audit status
 - copyable informational contribution report for manual sharing
 - human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - public command-wave state endpoint for `COMMAND_WAVE_STATE_URL`
 - public launch audit endpoint with setup, readiness, checklist, and next-action evidence
-- copyable setup proof and state URLs in launch readiness controls
+- copyable setup proof, state, and launch audit URLs in launch readiness controls
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
 - 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and capped context previews

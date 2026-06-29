@@ -4,6 +4,7 @@ import type { FirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 export type LaunchStatusVerificationTargets = {
   setupProofUrl: string;
   commandWaveStateUrl: string;
+  launchAuditUrl?: string;
 };
 
 function openItemLines(audit: FirstPhaseLaunchAudit) {
@@ -40,6 +41,7 @@ export function createLaunchStatusDraft({
     "Verification:",
     `- Setup proof: ${verificationTargets.setupProofUrl}`,
     `- Command-wave state: ${verificationTargets.commandWaveStateUrl}`,
+    ...(verificationTargets.launchAuditUrl ? [`- Launch audit: ${verificationTargets.launchAuditUrl}`] : []),
     "",
     "Guardrails: humans keep merge, deploy, payment, and governance authority. This status note does not approve work or move funds.",
   ].join("\n");

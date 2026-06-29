@@ -8,6 +8,7 @@ import { getReadinessChecks } from "./system/readiness";
 const verificationTargets = {
   setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
   commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
+  launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
 };
 
 describe("launch status draft", () => {
@@ -27,6 +28,7 @@ describe("launch status draft", () => {
     expect(draft).toContain("- Setup check: Verify the wave, repo, contributor rules, and PR template before inviting contributors.");
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Command-wave state: ${verificationTargets.commandWaveStateUrl}`);
+    expect(draft).toContain(`- Launch audit: ${verificationTargets.launchAuditUrl}`);
     expect(draft).toContain("does not approve work or move funds");
     expect(draft).not.toContain("\u2014");
   });

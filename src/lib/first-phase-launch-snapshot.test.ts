@@ -27,6 +27,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.verificationTargets).toEqual({
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
+      launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
     expect(snapshot.phaseChecklist.every((item) => item.status === "done")).toBe(true);
     expect(snapshot.launchAudit.nextAction).toMatchObject({

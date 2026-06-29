@@ -203,6 +203,7 @@ const accessKeyStorageKey = "command-waves-access-key";
 const wavePreviewMaxMessages = 50;
 const setupProofPath = "/api/command-wave/setup/proof";
 const commandWaveStatePath = "/api/command-wave/state";
+const launchAuditPath = "/api/command-wave/launch/audit";
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
   const headers = new Headers(init?.headers);
@@ -966,6 +967,7 @@ export function CommandWavesConsole() {
     () => ({
       setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
+      launchAuditUrl: appUrlFromOrigin(launchAuditPath, publicAppOrigin),
     }),
     [publicAppOrigin],
   );
@@ -1568,26 +1570,25 @@ export function CommandWavesConsole() {
     <main className="min-h-screen bg-black text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-800 pb-5">
-          <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">{commandWaveProductCopy.eyebrow}</p>
-            <h1 className="mt-2 max-w-4xl text-3xl font-semibold tracking-normal text-zinc-50 sm:text-5xl">
+          <div className="max-w-3xl">
+            <h1 className="text-2xl font-semibold tracking-normal text-zinc-50 sm:text-3xl">
               {commandWaveProductCopy.headline}
             </h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-zinc-300">{commandWaveProductCopy.subhead}</p>
-            <p className="mt-2 text-base leading-7 text-zinc-500">{commandWaveProductCopy.positioning}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</span>
-              {commandWaveProductCopy.simpleFlow.split(" - ").map((step) => (
-                <Badge key={step} className="border-zinc-700 bg-zinc-950 text-zinc-200">
-                  {step}
-                </Badge>
-              ))}
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <JumpLink href="#start-building">Suggest a change</JumpLink>
-              <JumpLink href="#current-build">Current build</JumpLink>
-              <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
-            </div>
+            <p className="mt-2 max-w-2xl text-base leading-7 text-zinc-300">{commandWaveProductCopy.subhead}</p>
+            <p className="mt-1 max-w-3xl text-base leading-7 text-zinc-500">{commandWaveProductCopy.positioning}</p>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Workflow</span>
+            {commandWaveProductCopy.simpleFlow.split(" - ").map((step) => (
+              <Badge key={step} className="border-zinc-700 bg-zinc-950 text-zinc-200">
+                {step}
+              </Badge>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <JumpLink href="#start-building">Suggest a change</JumpLink>
+            <JumpLink href="#current-build">Current build</JumpLink>
+            <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
           </div>
         </header>
 
@@ -2347,7 +2348,7 @@ export function CommandWavesConsole() {
                   </Button>
                   <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
                     <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Guardian URLs</p>
-                    <div className="mt-3 grid gap-3 lg:grid-cols-2">
+                    <div className="mt-3 grid gap-3 lg:grid-cols-3">
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">Wave state</p>
                         <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{commandWaveStatePath}</p>
@@ -2366,6 +2367,16 @@ export function CommandWavesConsole() {
                             Copy proof URL
                           </Button>
                           <LinkButton href={setupProofPath}>Open proof</LinkButton>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">Launch audit</p>
+                        <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{launchAuditPath}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Button type="button" variant="secondary" onClick={() => void copyLaunchUrl(launchAuditPath, "Launch audit URL")}>
+                            Copy audit URL
+                          </Button>
+                          <LinkButton href={launchAuditPath}>Open audit</LinkButton>
                         </div>
                       </div>
                     </div>
@@ -3145,7 +3156,7 @@ export function CommandWavesConsole() {
                 <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
                   <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Verification links</p>
                   <p className="mt-1 text-xs leading-5 text-zinc-500">
-                    Include these links so builders can verify setup and command-wave state.
+                    Include these links so builders can verify setup, command-wave state, and launch audit status.
                   </p>
                   <div className="mt-3 grid gap-2">
                     <a
@@ -3163,6 +3174,14 @@ export function CommandWavesConsole() {
                       rel="noreferrer"
                     >
                       {launchVerificationTargets.commandWaveStateUrl}
+                    </a>
+                    <a
+                      className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"
+                      href={launchVerificationTargets.launchAuditUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {launchVerificationTargets.launchAuditUrl}
                     </a>
                   </div>
                 </div>

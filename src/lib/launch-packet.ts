@@ -16,6 +16,7 @@ export type LaunchPacket = {
 export type LaunchPacketVerificationTargets = {
   setupProofUrl: string;
   commandWaveStateUrl: string;
+  launchAuditUrl?: string;
 };
 
 function list(items: string[]) {
@@ -242,6 +243,7 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
   return [
     `- Setup proof: ${targets.setupProofUrl}`,
     `- Command-wave state: ${targets.commandWaveStateUrl}`,
+    ...(targets.launchAuditUrl ? [`- Launch audit: ${targets.launchAuditUrl}`] : []),
     `- Verify setup: SETUP_PROOF_URL=${targets.setupProofUrl} npm run setup:verify`,
   ];
 }
