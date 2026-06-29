@@ -1893,6 +1893,38 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
+        <Panel title="Recent activity" eyebrow="Log">
+          <div className="divide-y divide-zinc-800">
+            {recentLedgerEvents.map((event) => (
+              <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                <div>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                  <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {olderLedgerEvents.length ? (
+            <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+              <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
+              <div className="mt-3 divide-y divide-zinc-900">
+                {olderLedgerEvents.map((event) => (
+                  <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                    <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                    <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                    <div>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                      <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ) : null}
+        </Panel>
+
         <Panel title="Contribution report" eyebrow="Informational">
           <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
@@ -1986,37 +2018,6 @@ export function CommandWavesConsole() {
           </div>
         </Panel>
 
-        <Panel title="Recent activity" eyebrow="Log">
-          <div className="divide-y divide-zinc-800">
-            {recentLedgerEvents.map((event) => (
-              <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                <div>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          {olderLedgerEvents.length ? (
-            <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
-              <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
-              <div className="mt-3 divide-y divide-zinc-900">
-                {olderLedgerEvents.map((event) => (
-                  <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                    <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                    <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                    <div>
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                      <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </details>
-          ) : null}
-        </Panel>
       </div>
     </main>
   );
