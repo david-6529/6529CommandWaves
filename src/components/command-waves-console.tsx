@@ -40,6 +40,7 @@ import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-che
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
+import { createRoomFeed } from "@/lib/room-feed";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { setupValidationNotice, type SetupValidation } from "@/lib/setup-validation";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
@@ -854,6 +855,16 @@ export function CommandWavesConsole() {
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
+  const hasRecentDiscussionPosts = Boolean(primaryProjectContextPreview?.sampleDrops.length);
+  const roomFeed = useMemo(
+    () =>
+      createRoomFeed(wave, {
+        title,
+        prompt,
+        proposer,
+      }),
+    [prompt, proposer, title, wave],
+  );
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -1497,7 +1508,7 @@ export function CommandWavesConsole() {
           </nav>
         </header>
 
-        <section id="workspace" className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
+        <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[0.95fr_1.05fr]">
           <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -1641,44 +1652,12 @@ export function CommandWavesConsole() {
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
             </div>
 
-            <div className="mt-4">
-              <Field label="Message to the room">
-                <Textarea
-                  rows={7}
-                  value={waveRoomMessage}
-                  placeholder="Ask a question, share context, or suggest the next small change."
-                  onChange={(event) => {
-                    setWaveRoomMessage(event.target.value);
-                    setWaveRoomNotice("");
-                  }}
-                  className="min-h-44 resize-none"
-                />
-              </Field>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                  Copy message
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isBusy || !primaryHookProject?.waveUrl}
-                  onClick={() =>
-                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
-                  }
-                >
-                  {apiBusy === "context" ? "Loading" : "Refresh posts"}
-                </Button>
-                <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                  Clear
-                </Button>
-              </div>
-              {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
-            </div>
-
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Recent posts</p>
-                {primaryProjectContextPreview ? (
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">
+                  {hasRecentDiscussionPosts ? "Recent posts" : "Project thread"}
+                </p>
+                {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
                   <span className="flex flex-wrap gap-2">
                     <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
                       {contextModeLabel(primaryProjectContextPreview)}
@@ -1687,9 +1666,11 @@ export function CommandWavesConsole() {
                       {primaryProjectContextPreview.dropCount} drops
                     </Badge>
                   </span>
-                ) : null}
+                ) : (
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">app activity</Badge>
+                )}
               </div>
-              {primaryProjectContextPreview ? (
+              {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
                 <div className="mt-3 grid gap-3">
                   {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
                     <div key={drop.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
@@ -1713,10 +1694,65 @@ export function CommandWavesConsole() {
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-sm leading-6 text-zinc-500">
-                  Load posts to see recent 6529 discussion context here.
-                </p>
+                <div className="mt-3 grid gap-3">
+                  {roomFeed.map((item) => (
+                    <div key={item.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
+                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{item.status}</Badge>
+                      </div>
+                      <p className="mt-1 text-sm font-semibold leading-6 text-zinc-100">
+                        {humanizeLegacyCommandCopy(item.title)}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
+                      {item.href ? (
+                        <a
+                          className="mt-2 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                          href={item.href}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item.hrefLabel ?? "Open"}
+                        </a>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
               )}
+            </div>
+
+            <div className="mt-4 border-t border-zinc-800 pt-4">
+              <Field label="Message to the room">
+                <Textarea
+                  rows={4}
+                  value={waveRoomMessage}
+                  placeholder="Ask a question, share context, or suggest the next small change."
+                  onChange={(event) => {
+                    setWaveRoomMessage(event.target.value);
+                    setWaveRoomNotice("");
+                  }}
+                  className="min-h-32 resize-none"
+                />
+              </Field>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
+                  Copy message
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isBusy || !primaryHookProject?.waveUrl}
+                  onClick={() =>
+                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                  }
+                >
+                  {apiBusy === "context" ? "Loading" : "Refresh posts"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                  Clear
+                </Button>
+              </div>
+              {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
             </div>
           </section>
         </section>
