@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
-import { createContributionReport } from "./contribution-report";
+import { createContributionReport, createContributionReportDraft } from "./contribution-report";
 
 describe("contribution report", () => {
   it("summarizes visible activity without granting authority", () => {
@@ -51,5 +51,22 @@ describe("contribution report", () => {
 
     expect(report.summary).toBe("No contributor activity has been recorded yet.");
     expect(report.evidence).toEqual(["No app evidence recorded yet."]);
+  });
+
+  it("creates a copyable report draft without granting authority", () => {
+    const draft = createContributionReportDraft(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      limit: 2,
+    });
+
+    expect(draft).toContain("6529 hook contribution report");
+    expect(draft).toContain("Generated: 2026-06-21T12:00:00.000Z");
+    expect(draft).toContain("Evidence:");
+    expect(draft).toContain("- 1 GitHub PR link");
+    expect(draft).toContain("Contributors:");
+    expect(draft).toContain("- david: report score");
+    expect(draft).toContain("Report scores are an AI-readable activity report, not a permission system.");
+    expect(draft).toContain("REP, TDH, payouts, and merge rights must use separate human-approved rules.");
+    expect(draft).not.toContain("\u2014");
   });
 });

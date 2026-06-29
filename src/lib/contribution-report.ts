@@ -161,3 +161,44 @@ export function createContributionReport(
     ],
   };
 }
+
+export function createContributionReportDraft(
+  wave: CommandWave,
+  options: {
+    generatedAt?: string;
+    limit?: number;
+  } = {},
+) {
+  const report = createContributionReport(wave, options);
+  const contributors = report.contributors.length
+    ? report.contributors.map((contributor) => {
+        const counts = [
+          countLabel(contributor.proposals, "proposal"),
+          countLabel(contributor.votes, "vote"),
+          countLabel(contributor.decisions, "decision"),
+          countLabel(contributor.ledgerEvents, "activity log event"),
+        ].join(", ");
+
+        return `- ${contributor.identity}: report score ${contributor.score}; ${counts}; ${contributor.rationale.join(", ")}`;
+      })
+    : ["- No visible contributors yet."];
+
+  return [
+    "6529 hook contribution report",
+    "",
+    `Generated: ${report.generatedAt}`,
+    report.summary,
+    "",
+    "Evidence:",
+    ...report.evidence.map((item) => `- ${item}`),
+    "",
+    "Contributors:",
+    ...contributors,
+    "",
+    "Scoring rubric:",
+    ...report.scoringRubric.map((item) => `- ${item}`),
+    "",
+    "Notes:",
+    ...report.notes.map((item) => `- ${item}`),
+  ].join("\n");
+}

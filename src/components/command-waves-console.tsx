@@ -15,7 +15,7 @@ import {
   type CommandKind,
   type CommandWave,
 } from "@/lib/command-waves";
-import { createContributionReport } from "@/lib/contribution-report";
+import { createContributionReport, createContributionReportDraft } from "@/lib/contribution-report";
 import { createDeveloperFeePlan } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
@@ -657,6 +657,7 @@ export function CommandWavesConsole() {
   const [apiNotice, setApiNotice] = useState("Project state is loading.");
   const [apiError, setApiError] = useState("");
   const [copyNotice, setCopyNotice] = useState("");
+  const [contributionReportNotice, setContributionReportNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
@@ -755,6 +756,7 @@ export function CommandWavesConsole() {
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
+  const contributionReportDraft = useMemo(() => createContributionReportDraft(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
@@ -933,6 +935,7 @@ export function CommandWavesConsole() {
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
     setGateNotes(nextWave.gates.join("\n"));
+    setContributionReportNotice("");
     setProjectContextPreviews({});
     setSetupContextPreview(null);
     setDecisionDraftNotice("");
@@ -1135,6 +1138,15 @@ export function CommandWavesConsole() {
       setDecisionDraftNotice("Decision request copied.");
     } catch {
       setDecisionDraftNotice("Copy failed. Select the decision request and copy it manually.");
+    }
+  }
+
+  async function copyContributionReportDraft() {
+    try {
+      await navigator.clipboard.writeText(contributionReportDraft);
+      setContributionReportNotice("Report copied.");
+    } catch {
+      setContributionReportNotice("Copy failed. Select the report text and copy it manually.");
     }
   }
 
@@ -2307,6 +2319,13 @@ export function CommandWavesConsole() {
               <p className="mt-2 text-xs leading-5 text-zinc-500">
                 This report summarizes visible app activity. It does not grant REP, TDH, payouts, permissions, or merge rights.
               </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <Button type="button" variant="secondary" onClick={() => void copyContributionReportDraft()}>
+                  Copy report
+                </Button>
+                <JumpLink href="#share-back">Share update</JumpLink>
+              </div>
+              {contributionReportNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{contributionReportNotice}</p> : null}
               <div className="mt-3 flex flex-wrap gap-2">
                 {contributionReport.notes.map((note) => (
                   <Badge key={note} className="border-zinc-700 bg-zinc-900 text-zinc-300">

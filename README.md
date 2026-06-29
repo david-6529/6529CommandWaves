@@ -151,6 +151,7 @@ The current app is a local prototype of the hook-building flow:
 - review records store compact guardian proof material for later audit
 - human-reviewed wave update draft for manual sharing back to the builder wave
 - wave update draft verification links for setup proof and command-wave state
+- copyable informational contribution report for manual sharing
 - human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - public command-wave state endpoint for `COMMAND_WAVE_STATE_URL`
