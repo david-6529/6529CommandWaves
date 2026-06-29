@@ -1255,7 +1255,7 @@ export function CommandWavesConsole() {
                 </summary>
                 <div className="mt-3 grid gap-3">
                   <p className="text-xs leading-5 text-zinc-500">
-                    Shows local mode, storage, 6529 mode, GitHub PR adapter, and guardian wave-state readiness.
+                    Shows local mode, storage, 6529 mode, GitHub PR adapter, guardian wave state, and guardian mode.
                   </p>
                   <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkReadiness()}>
                     {apiBusy === "readiness" ? "Checking" : "Check readiness"}

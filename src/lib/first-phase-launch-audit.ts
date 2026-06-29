@@ -34,6 +34,7 @@ const launchReadinessCheckIds = new Set([
   "6529_mode",
   "github_pr_adapter",
   "guardian_wave_state",
+  "guardian_mode",
 ]);
 
 function phaseItemStatus(status: PhaseChecklistStatus): FirstPhaseLaunchAuditItemStatus {

@@ -6,7 +6,7 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 0, warn: 7, fail: 3 });
+    expect(summary).toEqual({ pass: 0, warn: 8, fail: 3 });
     expect(checks.find((check) => check.id === "database")).toMatchObject({
       status: "warn",
     });
@@ -31,12 +31,15 @@ describe("readiness checks", () => {
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 7, warn: 2, fail: 1 });
+    expect(summary).toEqual({ pass: 7, warn: 3, fail: 1 });
     expect(checks.find((check) => check.id === "6529_posting")).toMatchObject({
       status: "warn",
     });
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",
+    });
+    expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
+      status: "warn",
     });
   });
 
@@ -59,6 +62,17 @@ describe("readiness checks", () => {
 
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "pass",
+    });
+  });
+
+  it("passes guardian mode readiness for the external GitHub App mode", () => {
+    const checks = getReadinessChecks({
+      COMMAND_WAVE_GUARDIAN_MODE: "external_github_app",
+    });
+
+    expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
+      status: "pass",
+      message: "External GitHub App guardian mode is configured.",
     });
   });
 });

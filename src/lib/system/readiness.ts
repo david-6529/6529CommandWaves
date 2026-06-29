@@ -38,6 +38,10 @@ function githubPrAdapterEnabled(env: Record<string, string | undefined>) {
   return env.COMMAND_WAVE_REPO_ADAPTER === "github";
 }
 
+function externalGuardianEnabled(env: Record<string, string | undefined>) {
+  return env.COMMAND_WAVE_GUARDIAN_MODE === "external_github_app";
+}
+
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const mockMode = env["6529_MOCK_MODE"] !== "false";
@@ -48,6 +52,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
   const hasPostgresStore = postgresStoreEnabled(env);
   const hasGuardianWaveState = guardianWaveStateConfigured(env);
   const hasGithubPrAdapter = githubPrAdapterEnabled(env);
+  const hasExternalGuardian = externalGuardianEnabled(env);
 
   return [
     hasValue(appUrl)
@@ -124,6 +129,14 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
         : productionMode(env)
           ? "Missing COMMAND_WAVE_STATE_PATH or COMMAND_WAVE_STATE_URL. PR guardian checks cannot verify real wave state."
           : "Not configured. Fine for local development, required before using the guardian as a required PR check.",
+    },
+    {
+      id: "guardian_mode",
+      label: "Guardian mode",
+      status: hasExternalGuardian ? "pass" : "warn",
+      message: hasExternalGuardian
+        ? "External GitHub App guardian mode is configured."
+        : "Repo-local guardian mode is MVP strength. Use COMMAND_WAVE_GUARDIAN_MODE=external_github_app for the strongest launch boundary.",
     },
   ];
 }
