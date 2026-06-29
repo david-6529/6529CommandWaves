@@ -71,7 +71,7 @@ const hookGuardrails = [
 ];
 const swarmGameRules = [
   "Start with one small hook change.",
-  "Talk in the swarm before code work starts.",
+  "Talk in the builder room before code work starts.",
   "The orchestration agent labels risk and keeps work inside the rules.",
   "Important changes need a visible decision before a PR is built.",
   "The reviewer agent checks the PR before humans merge.",
@@ -1489,8 +1489,8 @@ export function CommandWavesConsole() {
           <nav className="mt-4 flex flex-wrap gap-2" aria-label="Workspace sections">
             <JumpLink href="#wave-room">Builder room</JumpLink>
             <JumpLink href="#start-building">New proposal</JumpLink>
+            <JumpLink href="#active-hooks">Hooks</JumpLink>
             <JumpLink href="#recent-activity">Activity</JumpLink>
-            <JumpLink href="#swarm-members">Members</JumpLink>
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
           </nav>
         </header>
@@ -1499,7 +1499,9 @@ export function CommandWavesConsole() {
           <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current hook task</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">
+                  {activeReview?.status === "pass" ? "Latest hook task" : "Current hook task"}
+                </p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">
                   {activeProposal ? activeProposal.title : "Choose the next hook change"}
                 </h2>
@@ -1799,6 +1801,52 @@ export function CommandWavesConsole() {
                 </div>
               </div>
             </details>
+          </div>
+        </section>
+
+        <section id="active-hooks" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">In development</h2>
+              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
+                See what is happening with each public hook build.
+              </p>
+            </div>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
+              {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
+            </Badge>
+          </div>
+          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+            {activeHookProjects.map((project) => (
+              <div key={project.id} className="grid gap-3 py-4 lg:grid-cols-[1fr_auto]">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-xl font-semibold text-zinc-50">{project.name}</h3>
+                    <Badge className={nextActionStatusClass(project.nextActionStatus)}>{project.nextActionLabel}</Badge>
+                  </div>
+                  <p className="mt-2 text-base leading-7 text-zinc-400">{project.currentFocus}</p>
+                  <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                    {[
+                      ["Discussion", project.waveLabel],
+                      ["Repo", project.repoLabel],
+                      ["Access", project.gateSnapshotLabel === "manual gate" ? "manual review" : project.gateSnapshotLabel],
+                      ["Review", project.reviewStatusLabel],
+                    ].map(([label, value]) => (
+                      <div key={label} className="border-t border-zinc-800 pt-2">
+                        <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
+                        <dd className="mt-1 text-base font-semibold text-zinc-100">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+                <div className="flex flex-wrap gap-2 lg:justify-end">
+                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Open discussion</LinkButton> : null}
+                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
+                  <JumpLink href="#wave-room">Message</JumpLink>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
