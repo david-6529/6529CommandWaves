@@ -803,6 +803,30 @@ export function CommandWavesConsole() {
       : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
+  const currentBuildStatusLabel = activeReview?.status === "pass"
+    ? "review passed"
+    : activeExecution
+      ? "PR logged"
+      : activePollDecisionRecorded
+        ? "decision recorded"
+        : activePollNeedsWaveDecision
+          ? "decision receipt needed"
+          : activePoll?.status === "open"
+            ? "decision open"
+            : activeProposal
+              ? "proposal ready"
+              : "waiting";
+  const currentBuildStatusClass = activeReview?.status === "pass"
+    ? statusClass("pass")
+    : activeExecution
+      ? statusClass("complete")
+      : activePollDecisionRecorded
+        ? statusClass("complete")
+        : activePollNeedsWaveDecision || activePoll?.status === "open"
+          ? riskClass("medium")
+          : activeProposal
+            ? statusClass(activeProposal.status)
+            : "border-zinc-700 bg-zinc-900 text-zinc-400";
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -810,6 +834,100 @@ export function CommandWavesConsole() {
       activePrHasWaveDecision &&
       !activeExecution,
   );
+  const currentBuildRows = [
+    {
+      label: "Proposal",
+      status: activeProposal ? activeProposal.status.replaceAll("_", " ") : "waiting",
+      className: activeProposal ? statusClass(activeProposal.status) : "border-zinc-700 bg-zinc-900 text-zinc-400",
+      detail: activeProposal ? activeProposal.title : "No active hook change has been proposed yet.",
+    },
+    {
+      label: "Decision",
+      status: activePollDecisionRecorded
+        ? "recorded"
+        : activePollNeedsWaveDecision
+          ? "needs receipt"
+          : activePoll?.status === "open"
+            ? "open"
+            : activePoll?.status === "failed"
+              ? "failed"
+              : activeProposal
+                ? "not required"
+                : "waiting",
+      className: activePollDecisionRecorded
+        ? statusClass("complete")
+        : activePollNeedsWaveDecision
+          ? riskClass("medium")
+          : activePoll?.status === "open"
+            ? statusClass("open")
+            : activePoll?.status === "failed"
+              ? statusClass("failed")
+              : activeProposal
+                ? statusClass("complete")
+                : "border-zinc-700 bg-zinc-900 text-zinc-400",
+      detail: activePollDecisionRecorded
+        ? "6529 decision receipt is recorded."
+        : activePollNeedsWaveDecision
+          ? "Local vote passed. Add the 6529 decision URL before PR work runs."
+          : activePoll?.status === "open"
+            ? "The swarm still needs a visible decision."
+            : activePoll?.status === "failed"
+              ? "The proposal did not pass."
+              : activeProposal
+                ? "This support command can be logged under current rules."
+                : "Waiting for a proposal.",
+    },
+    {
+      label: "PR",
+      status: activeExecution
+        ? "logged"
+        : activeProposalIsPr
+          ? canBuildApprovedPr
+            ? "ready"
+            : "waiting"
+          : activeProposal
+            ? "not a PR"
+            : "waiting",
+      className: activeExecution
+        ? statusClass("complete")
+        : activeProposalIsPr && canBuildApprovedPr
+          ? statusClass("reviewing")
+          : activeProposal && !activeProposalIsPr
+            ? statusClass("complete")
+            : "border-zinc-700 bg-zinc-900 text-zinc-400",
+      detail: activeExecution
+        ? "PR evidence is logged for the approved hook work."
+        : activeProposalIsPr
+          ? activePrHasWaveDecision
+            ? "Approved PR work is ready to build."
+            : "Decision receipt is needed before PR work runs."
+          : activeProposal
+            ? "This support command does not open code."
+            : "Waiting for approved hook work.",
+    },
+    {
+      label: "Review",
+      status: activeReview
+        ? activeReview.status === "pass"
+          ? "passed"
+          : activeReview.status.replaceAll("_", " ")
+        : activeExecution
+          ? "needed"
+          : "waiting",
+      className: activeReview
+        ? statusClass(activeReview.status)
+        : activeExecution
+          ? riskClass("medium")
+          : "border-zinc-700 bg-zinc-900 text-zinc-400",
+      detail: activeReview
+        ? activeReview.status === "pass"
+          ? "Reviewer check passed against the approved proposal and current rules."
+          : humanizeLegacyCommandCopy(activeReview.summary)
+        : activeExecution
+          ? "PR evidence is logged. Reviewer check is next."
+          : "Review starts after PR evidence exists.",
+    },
+  ];
   const showBuildAction = Boolean(activeProposalIsPr && !activeExecution);
   const canRunReview = Boolean(activeExecution && activeProposal?.status === "reviewing" && !activeReview);
   const canCopyCodexPacket = Boolean(
@@ -1470,6 +1588,7 @@ export function CommandWavesConsole() {
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <JumpLink href="#start-building">Suggest a change</JumpLink>
+              <JumpLink href="#current-build">Current build</JumpLink>
               <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
               <JumpLink href="#rules-of-game">Read rules</JumpLink>
               <JumpLink href="#swarm-members">See members</JumpLink>
@@ -1564,6 +1683,40 @@ export function CommandWavesConsole() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="current-build" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">Current build</p>
+              <h2 className="mt-1 text-xl font-semibold text-zinc-50">
+                {activeProposal ? activeProposal.title : "No active hook change yet"}
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">
+                {activeProposal
+                  ? humanizeLegacyCommandCopy(activeProposal.prompt)
+                  : "The next accepted suggestion will appear here with its decision, PR, and review state."}
+              </p>
+            </div>
+            <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+            {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
+            <JumpLink href="#recent-activity">View log</JumpLink>
+            <JumpLink href="#suggest-hook-work">Advanced check</JumpLink>
+          </div>
+          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+            {currentBuildRows.map((row) => (
+              <div key={row.label} className="grid gap-2 py-3 md:grid-cols-[9rem_8rem_1fr]">
+                <p className="text-sm font-semibold text-zinc-100">{row.label}</p>
+                <div>
+                  <Badge className={row.className}>{row.status}</Badge>
+                </div>
+                <p className="text-sm leading-6 text-zinc-400">{row.detail}</p>
+              </div>
+            ))}
           </div>
         </section>
 
