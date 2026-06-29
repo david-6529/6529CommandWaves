@@ -264,12 +264,15 @@ export async function updateCommandWaveSetup(input: unknown) {
     throw Object.assign(new Error("Fix the 6529 wave and GitHub repo before saving setup."), { status: 400 });
   }
 
+  const gates = Object.hasOwn(body, "gates")
+    ? normalizeParticipationGates(body.gates, [])
+    : normalizeParticipationGates(wave.gates);
   const nextWave = appendLedger(
     {
       ...wave,
       waveUrl: `https://6529.io/waves/${validation.waveId}`,
       repoUrl: validation.repo?.htmlUrl ?? wave.repoUrl,
-      gates: normalizeParticipationGates(body.gates, wave.gates),
+      gates,
     },
     {
       actor: "Setup",

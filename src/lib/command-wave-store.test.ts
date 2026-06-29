@@ -80,6 +80,16 @@ describe("Command wave store", () => {
     ]);
   });
 
+  it("allows setup to clear participation notes explicitly", async () => {
+    const wave = await updateCommandWaveSetup({
+      waveUrl: "https://6529.io/waves/new-command-wave",
+      repoUrl: "https://github.com/6529-Collections/new-command-wave",
+      gates: [],
+    });
+
+    expect(wave.gates).toEqual([]);
+  });
+
   it("rejects invalid setup before saving", async () => {
     await expect(updateCommandWaveSetup({
       waveUrl: "",
