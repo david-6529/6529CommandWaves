@@ -15,7 +15,7 @@ Choose project -> Propose work -> Decide -> Build PR -> Review -> Log
 ## Roles
 
 - **Wave participants:** propose commands, vote when the rules require it, and inspect results.
-- **Agent worker:** runs approved commands through an allowed harness such as Codex, Claude Code, scripts, GitHub, or APIs.
+- **Agent worker:** helps with approved PR work through a constrained Codex packet and GitHub draft PR flow.
 - **Reviewer:** checks the agent output against the approved command, vote, rules, architecture, security, and expected artifacts.
 
 Implementation names can evolve later. The user-facing MVP should lead with wave, command, vote, run, and review.
@@ -52,12 +52,13 @@ Proposal
 - Draft response: no poll.
 - Post to wave: poll.
 - Open PR: poll.
-- Run script: poll.
-- Deploy: stricter poll.
-- Spend money: stricter poll.
-- Change rules: strictest poll.
+- Run script: blocked in phase 1.
+- Deploy: blocked in phase 1.
+- Spend money: blocked in phase 1.
+- Change rules: blocked in phase 1.
 
 Polls require a voter identity for every yes/no vote. Duplicate votes from the same identity are rejected server-side.
+Later phases can add stricter approval paths for parked command kinds after the community has a proven hook-building loop.
 
 ## First Real Demo
 
@@ -90,7 +91,8 @@ The first version assumes prompt injection will happen and that reputation alone
 - Permissions are the security boundary.
 - Agents never receive wallet private keys, provider secrets, database credentials, or broad filesystem access through prompts.
 - Dangerous actions go through backend adapters with explicit rule checks.
-- Each command kind maps to explicit tool permission classes such as `wave.read`, `repo.open_pr`, `deploy.run`, or `funds.spend`.
+- Phase-one command kinds map to explicit tool permission classes such as `wave.read`, `wave.post`, and `repo.open_pr`.
+- Deploy, funds, script, and rule-change permissions are reserved for later phases and stay blocked in the app.
 - The agent can only run an approved proposal.
 - The reviewer must check artifacts before a command is marked complete.
 - Hook contract work must flag deployment files, governance changes, explicit parameter caps, and upgradeability patterns.
