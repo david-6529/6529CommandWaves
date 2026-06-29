@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { parseGitHubRepoUrl } from "./github/repo";
 
 function participationLine(gates: string[]) {
   if (!gates.length) {
@@ -8,12 +9,21 @@ function participationLine(gates: string[]) {
   return `Participation notes (advisory): ${gates.join(", ")}`;
 }
 
+function contributorRulesLine(repoUrl: string) {
+  const repo = parseGitHubRepoUrl(repoUrl);
+
+  return repo ? `Contributor rules: ${repo.htmlUrl}/blob/main/CONTRIBUTING.md` : null;
+}
+
 export function createBuilderWaveLaunchDraft(wave: CommandWave) {
+  const rulesLine = contributorRulesLine(wave.repoUrl);
+
   return [
     "6529 Hook Builder launch brief",
     "",
     `Builder wave: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,
+    ...(rulesLine ? [rulesLine] : []),
     "",
     "Goal: build one non-upgradeable 6529 hook in public through this builder wave and one smart contract repo.",
     "",
