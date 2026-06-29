@@ -1127,7 +1127,7 @@ export function CommandWavesConsole() {
                             </Badge>
                           </div>
                           <div className="mt-2 grid gap-2">
-                            {contextPreview.sampleDrops.slice(-2).map((drop) => (
+                            {contextPreview.sampleDrops.slice(-3).map((drop) => (
                               <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
                                 <p className="text-xs font-semibold text-zinc-500">
                                   {drop.author} / {drop.id}
