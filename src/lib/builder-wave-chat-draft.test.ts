@@ -17,6 +17,7 @@ describe("builder wave chat draft", () => {
     expect(draft).toContain("Question or reply:");
     expect(draft).toContain("- Keep this tied to one PR-sized hook change.");
     expect(draft).toContain("Do not treat this note as a vote, payout, deploy, or governance approval.");
+    expect(draft).toContain("post this manually in the builder wave");
     expect(draft).toContain("Record the decision URL only if the wave approves work.");
     expect(draft).not.toContain("\u2014");
   });

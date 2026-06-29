@@ -1590,7 +1590,7 @@ export function CommandWavesConsole() {
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
-                  Read recent drops, draft a short question or reply, then post it in the builder wave.
+                  Read recent drops, draft a short question or reply, then post it manually in the builder wave.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button

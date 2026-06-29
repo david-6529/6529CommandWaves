@@ -17,6 +17,6 @@ export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseN
     "- Keep this tied to one PR-sized hook change.",
     "- Do not treat this note as a vote, payout, deploy, or governance approval.",
     "",
-    "Next step: post this in the builder wave. Record the decision URL only if the wave approves work.",
+    "Next step: post this manually in the builder wave. Record the decision URL only if the wave approves work.",
   ].join("\n");
 }

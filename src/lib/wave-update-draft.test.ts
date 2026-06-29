@@ -31,7 +31,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Report scores are informational only.");
     expect(draft).toContain("Developer fee plan:");
     expect(draft).toContain("No automatic payouts.");
-    expect(draft).toContain("post it in the builder wave if it matches the work");
+    expect(draft).toContain("post it manually in the builder wave if it matches the work");
     expect(draft).not.toContain("automatically posted");
   });
 

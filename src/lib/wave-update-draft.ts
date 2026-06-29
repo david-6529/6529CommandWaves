@@ -117,6 +117,6 @@ export function createWaveUpdateDraft({
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
     developerFeeLine(wave),
-    "Next step: review this draft, then post it in the builder wave if it matches the work.",
+    "Next step: review this draft, then post it manually in the builder wave if it matches the work.",
   ].join("\n");
 }

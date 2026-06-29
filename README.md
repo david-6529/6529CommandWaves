@@ -115,7 +115,7 @@ The current app is a local prototype of the hook-building flow:
 - active work orchestration trace with decision route, rule reason, and reviewer route
 - per-hook next step in the active projects list
 - automatic latest-wave preview for the active hook project
-- copyable builder wave conversation note for questions and replies
+- copyable builder wave conversation note for manual questions and replies
 - first-screen wave update draft copy action for human sharing in the builder wave
 - first-screen jump actions for suggesting work and reading activity
 - compact current-state area with work, launch, and progress guidance
