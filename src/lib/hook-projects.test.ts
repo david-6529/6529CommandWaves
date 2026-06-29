@@ -13,6 +13,8 @@ describe("active hook projects", () => {
         status: "active",
         waveUrl: demoWave.waveUrl,
         repoUrl: demoWave.repoUrl,
+        waveLabel: "6529-hook-builder",
+        repoLabel: "6529-Collections/6529-hook",
         currentFocus: demoWave.proposals[0].title,
         participation: "Talk in the wave. Inspect the GitHub work here.",
         waveRole: "Discussion, proposals, and decisions.",
@@ -36,6 +38,8 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       status: "setup",
+      waveLabel: "No builder wave",
+      repoLabel: "No GitHub repo",
       currentFocus: "Choose the first PR-sized hook command.",
       waveStatus: "Wave has not selected a PR-sized hook command yet.",
       codeStatus: "No PR-sized hook command yet.",

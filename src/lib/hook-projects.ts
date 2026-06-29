@@ -8,6 +8,8 @@ export type ActiveHookProject = {
   statusLabel: string;
   waveUrl: string;
   repoUrl: string;
+  waveLabel: string;
+  repoLabel: string;
   currentFocus: string;
   participation: string;
   waveRole: string;
@@ -30,6 +32,21 @@ function hookName(wave: CommandWave) {
 
 function countLabel(count: number, singular: string) {
   return `${count} ${count === 1 ? singular : `${singular}s`}`;
+}
+
+function waveLabel(waveUrl: string) {
+  const trimmed = waveUrl.trim();
+  const match = trimmed.match(/\/waves\/([^/?#\s]+)/);
+
+  return match?.[1] ?? (trimmed || "No builder wave");
+}
+
+function repoLabel(repoUrl: string) {
+  const trimmed = repoUrl.trim();
+  const httpsMatch = trimmed.match(/^https?:\/\/github\.com\/([^/\s]+\/[^/\s?#]+)(?:[?#].*)?$/);
+  const sshMatch = trimmed.match(/^git@github\.com:([^/\s]+\/[^/\s]+?)(?:\.git)?$/);
+
+  return (httpsMatch?.[1] ?? sshMatch?.[1] ?? trimmed) || "No GitHub repo";
 }
 
 function findPullRequestUrl(wave: CommandWave) {
@@ -122,6 +139,8 @@ export function createActiveHookProjects(wave: CommandWave): ActiveHookProject[]
       statusLabel: hasProject ? "active" : "setup",
       waveUrl: wave.waveUrl,
       repoUrl: wave.repoUrl,
+      waveLabel: waveLabel(wave.waveUrl),
+      repoLabel: repoLabel(wave.repoUrl),
       currentFocus,
       participation: "Talk in the wave. Inspect the GitHub work here.",
       waveRole: "Discussion, proposals, and decisions.",

@@ -1103,6 +1103,10 @@ export function CommandWavesConsole() {
                     <div>
                       <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
                       <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">wave {project.waveLabel}</Badge>
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">repo {project.repoLabel}</Badge>
+                      </div>
                     </div>
                     <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
                       {project.statusLabel}
