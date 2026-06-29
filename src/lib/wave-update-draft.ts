@@ -46,6 +46,10 @@ function reviewLine(review: GuardianReview | null) {
   return `Review: ${review.status}. ${review.summary}`;
 }
 
+function reviewProofLine(review: GuardianReview | null) {
+  return review?.proof ? `Review proof: ${review.proof.verifierVersion} / ${review.proof.attestationHash}` : null;
+}
+
 function contributorLine(wave: CommandWave) {
   const report = createContributionReport(wave, { limit: 3 });
 
@@ -81,6 +85,7 @@ export function createWaveUpdateDraft({
   review: GuardianReview | null;
 }) {
   const pr = prLine(execution);
+  const reviewProof = reviewProofLine(review);
 
   return [
     "6529 Hook Builder update",
@@ -93,6 +98,7 @@ export function createWaveUpdateDraft({
     buildLine(poll, execution),
     ...(pr ? [pr] : []),
     reviewLine(review),
+    ...(reviewProof ? [reviewProof] : []),
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
     developerFeeLine(wave),
