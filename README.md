@@ -118,7 +118,7 @@ The current app is a local prototype of the hook-building flow:
 - project details drawer with the active hook, builder wave, repo evidence, gate notes, and repo action
 - launch checklist drawer with work state, launch state, and phase progress
 - advanced controls drawer for preflight, orchestration, voting, PR build, and review details
-- reports and fees drawer for contribution evidence and manual developer fee planning
+- activity report drawer for contribution evidence and manual developer fee planning
 - share update drawer for the human-reviewed wave update draft and launch packet
 - collapsed maintainer setup and guardrail controls at the bottom of the page
 - project wave setup with simpler user-facing language

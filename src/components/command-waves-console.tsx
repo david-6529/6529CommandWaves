@@ -1417,7 +1417,7 @@ export function CommandWavesConsole() {
       await navigator.clipboard.writeText(developerFeePlanDraft);
       setDeveloperFeePlanNotice("Fee plan copied.");
     } catch {
-      setDeveloperFeePlanNotice("Copy failed. Select the fee plan text and copy it manually.");
+      setDeveloperFeePlanNotice("Copy failed. Select the planning draft and copy it manually.");
     }
   }
 
@@ -3012,11 +3012,11 @@ export function CommandWavesConsole() {
 
         <details id="reports" className="order-10 scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Reports and fees</span>
+            <span>Activity report</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">informational</Badge>
           </summary>
           <div className="mt-4 grid gap-5">
-            <Panel title="Contribution report" eyebrow="Informational">
+            <Panel title="Activity report" eyebrow="Informational">
               <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                 <div>
               <p className="text-sm leading-6 text-zinc-400">{contributionReport.summary}</p>
@@ -3098,7 +3098,7 @@ export function CommandWavesConsole() {
               </div>
             </Panel>
 
-            <Panel title="Developer fee plan" eyebrow="Manual payout">
+            <Panel title="Manual fee planning" eyebrow="Separate decision">
               <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
                 <div>
               <p className="text-sm leading-6 text-zinc-400">{developerFeePlan.summary}</p>
@@ -3107,7 +3107,7 @@ export function CommandWavesConsole() {
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" onClick={() => void copyDeveloperFeePlanDraft()}>
-                  Copy fee plan
+                  Copy planning draft
                 </Button>
                 {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
               </div>
