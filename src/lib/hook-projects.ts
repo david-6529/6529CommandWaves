@@ -1,5 +1,7 @@
 import type { CommandWave } from "./command-waves";
 import { ledgerEventsByRecency } from "./ledger";
+import { createPhaseChecklist } from "./phase-checklist";
+import { createPhaseNextAction, type PhaseNextActionStatus } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
 
 export type ActiveHookProject = {
@@ -15,6 +17,10 @@ export type ActiveHookProject = {
   participation: string;
   waveRole: string;
   platformRole: string;
+  nextActionStatus: PhaseNextActionStatus;
+  nextActionLabel: string;
+  nextActionTitle: string;
+  nextActionDetail: string;
   waveStatus: string;
   codeStatus: string;
   latestPrUrl: string | null;
@@ -131,6 +137,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
 
   return waves.map((wave) => {
     const phaseWork = selectPhaseWork(wave);
+    const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook command.";
     const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim());
     const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
@@ -148,6 +155,10 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       participation: "Read the wave, draft replies here, and track repo work.",
       waveRole: "Live discussion, proposals, decisions, and updates.",
       platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+      nextActionStatus: nextAction.status,
+      nextActionLabel: nextAction.statusLabel,
+      nextActionTitle: nextAction.title,
+      nextActionDetail: nextAction.detail,
       waveStatus: waveStatus(wave),
       codeStatus: codeStatus(wave),
       latestPrUrl: findPullRequestUrl(wave),

@@ -19,6 +19,10 @@ describe("active hook projects", () => {
         participation: "Read the wave, draft replies here, and track repo work.",
         waveRole: "Live discussion, proposals, decisions, and updates.",
         platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+        nextActionStatus: "ready",
+        nextActionLabel: "ready",
+        nextActionTitle: "Loop complete",
+        nextActionDetail: "The approved hook work has PR, review, wave update, and launch packet evidence.",
         waveStatus: "Wave decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
@@ -41,6 +45,10 @@ describe("active hook projects", () => {
       waveLabel: "No builder wave",
       repoLabel: "No GitHub repo",
       currentFocus: "Choose the first PR-sized hook command.",
+      nextActionStatus: "action",
+      nextActionLabel: "next",
+      nextActionTitle: "Set the project",
+      nextActionDetail: "Confirm one builder wave and one GitHub repo before proposals start.",
       waveStatus: "Wave has not selected a PR-sized hook command yet.",
       codeStatus: "No PR-sized hook command yet.",
     });
@@ -57,6 +65,8 @@ describe("active hook projects", () => {
     expect(projects[0]).toMatchObject({
       waveStatus: "Wave decision recorded with 5 yes and 1 no.",
       codeStatus: "Approved PR command is ready to build.",
+      nextActionTitle: "Build the approved PR",
+      nextActionDetail: "Use the approved packet or prepared branch, then record the PR evidence.",
       latestPrUrl: null,
       reviewStatusLabel: "not reviewed",
     });

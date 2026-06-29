@@ -1432,9 +1432,17 @@ export function CommandWavesConsole() {
                     </div>
 
                     <div className="border-t border-zinc-800 pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">GitHub evidence</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">GitHub evidence</p>
+                        <Badge className={nextActionStatusClass(project.nextActionStatus)}>{project.nextActionLabel}</Badge>
+                      </div>
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.platformRole}</p>
                       <dl className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
+                        <div>
+                          <dt className="font-semibold text-zinc-300">Next step</dt>
+                          <dd>{project.nextActionTitle}</dd>
+                          <dd className="mt-1 text-zinc-500">{project.nextActionDetail}</dd>
+                        </div>
                         <div>
                           <dt className="font-semibold text-zinc-300">Focus</dt>
                           <dd>{project.currentFocus}</dd>
