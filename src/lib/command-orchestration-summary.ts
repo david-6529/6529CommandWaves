@@ -1,0 +1,83 @@
+import { commandKindLabel } from "./command-kind-copy";
+import type { CommandProposal, CommandWave, PollState, RiskLevel } from "./command-waves";
+
+export type CommandOrchestrationSummary = {
+  workType: string;
+  risk: RiskLevel | "waiting";
+  decisionRoute: string;
+  ruleReason: string;
+  reviewerRoute: string;
+};
+
+function routeForRule(wave: CommandWave, proposal: CommandProposal) {
+  const rule = wave.rules.rulesByKind[proposal.kind];
+
+  if (!rule) {
+    return "needs rule review";
+  }
+
+  if (rule.mode === "blocked") {
+    return "blocked by current rules";
+  }
+
+  if (rule.mode === "auto") {
+    return "allowed by current rules";
+  }
+
+  return `vote required, quorum ${rule.quorum}, yes threshold ${rule.yesPercent}%`;
+}
+
+function routeForPoll(poll: PollState) {
+  const route = `vote required, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%`;
+
+  if (poll.decision) {
+    return `${route}, decision receipt recorded`;
+  }
+
+  if (poll.status === "passed") {
+    return `${route}, record the 6529 decision URL`;
+  }
+
+  if (poll.status === "failed") {
+    return `${route}, vote failed`;
+  }
+
+  if (poll.status === "open") {
+    return `${route}, vote open`;
+  }
+
+  return `${route}, ${poll.status.replaceAll("_", " ")}`;
+}
+
+export function createCommandOrchestrationSummary({
+  wave,
+  proposal,
+  poll,
+}: {
+  wave: CommandWave;
+  proposal: CommandProposal | null;
+  poll: PollState | null;
+}): CommandOrchestrationSummary {
+  if (!proposal) {
+    return {
+      workType: "No command selected",
+      risk: "waiting",
+      decisionRoute: "waiting for one scoped hook command",
+      ruleReason: "No rule applies until work is proposed.",
+      reviewerRoute: "PR work needs reviewer CI before human merge.",
+    };
+  }
+
+  const rule = wave.rules.rulesByKind[proposal.kind];
+
+  return {
+    workType: commandKindLabel(proposal.kind),
+    risk: proposal.risk,
+    decisionRoute: poll ? routeForPoll(poll) : routeForRule(wave, proposal),
+    ruleReason: rule?.reason ?? "No rule reason recorded.",
+    reviewerRoute:
+      proposal.kind === "open_pr"
+        ? "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence before human merge."
+        : "Support commands stay outside the PR build step.",
+  };
+}

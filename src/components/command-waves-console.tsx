@@ -9,6 +9,7 @@ import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
 import { createBuilderWaveReviewRequestDraft } from "@/lib/builder-wave-review-request-draft";
 import { commandKindLabel } from "@/lib/command-kind-copy";
+import { createCommandOrchestrationSummary } from "@/lib/command-orchestration-summary";
 import {
   classifyRisk,
   evaluatePoll,
@@ -702,6 +703,15 @@ export function CommandWavesConsole() {
       ? phaseWork.prPoll
       : (wave.polls.find((poll) => poll.proposalId === activeProposal.id) ?? null)
     : null;
+  const activeOrchestrationSummary = useMemo(
+    () =>
+      createCommandOrchestrationSummary({
+        wave,
+        proposal: activeProposal,
+        poll: activePoll,
+      }),
+    [activePoll, activeProposal, wave],
+  );
   const activeExecution = activeProposal
     ? activeProposal.kind === "open_pr"
       ? phaseWork.prExecution
@@ -2291,6 +2301,23 @@ export function CommandWavesConsole() {
                   <p className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 text-sm leading-6 text-zinc-300">
                     {humanizeLegacyCommandCopy(activeProposal.spec)}
                   </p>
+                  <div className="mt-3 border-t border-zinc-800 pt-3">
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Orchestration trace</p>
+                    <dl className="mt-2 grid gap-2 text-xs leading-5 text-zinc-400 sm:grid-cols-3">
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Decision route</dt>
+                        <dd>{activeOrchestrationSummary.decisionRoute}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Rule</dt>
+                        <dd>{activeOrchestrationSummary.ruleReason}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Reviewer</dt>
+                        <dd>{activeOrchestrationSummary.reviewerRoute}</dd>
+                      </div>
+                    </dl>
+                  </div>
                 </div>
 
                 {visibleSupportProposals.length ? (

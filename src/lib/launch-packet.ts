@@ -1,5 +1,6 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
 import { commandKindLabel } from "./command-kind-copy";
+import { createCommandOrchestrationSummary } from "./command-orchestration-summary";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
@@ -155,34 +156,14 @@ function decisionLines(poll: PollState | null) {
 }
 
 function orchestrationLines(wave: CommandWave, proposal: CommandProposal | null, poll: PollState | null) {
-  if (!proposal) {
-    return [
-      "- Risk route: waiting for one scoped hook command.",
-      "- Reviewer route: PR work needs reviewer CI before human merge.",
-    ];
-  }
-
-  const rule = wave.rules.rulesByKind[proposal.kind];
-  const decisionRoute = poll
-    ? `vote required, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%, then record the 6529 decision URL`
-    : rule?.mode === "blocked"
-      ? "blocked by current rules"
-      : rule?.mode === "auto"
-        ? "allowed by current rules"
-        : rule?.mode === "poll"
-          ? "vote required by current rules"
-          : "needs rule review";
-  const reviewerRoute =
-    proposal.kind === "open_pr"
-      ? "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence before human merge."
-      : "Support commands stay outside the PR build step.";
+  const summary = createCommandOrchestrationSummary({ wave, proposal, poll });
 
   return [
-    `- Work type: ${commandKindLabel(proposal.kind)}`,
-    `- Risk: ${proposal.risk}`,
-    `- Decision route: ${decisionRoute}.`,
-    `- Rule reason: ${rule?.reason ?? "No rule reason recorded."}`,
-    `- Reviewer route: ${reviewerRoute}`,
+    `- Work type: ${summary.workType}`,
+    `- Risk: ${summary.risk}`,
+    `- Decision route: ${summary.decisionRoute}.`,
+    `- Rule reason: ${summary.ruleReason}`,
+    `- Reviewer route: ${summary.reviewerRoute}`,
   ];
 }
 
