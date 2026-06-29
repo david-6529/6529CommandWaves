@@ -1590,75 +1590,7 @@ export function CommandWavesConsole() {
           </div>
         </header>
 
-        <section id="start-building" className="order-3 grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.15fr_0.85fr]">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">New proposal</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest a hook change</h2>
-            <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Name the change, add the limits, and share it with the swarm before it becomes PR work.
-            </p>
-            <div className="mt-4 grid gap-3">
-              <Field label="Your name or 6529 handle">
-                <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
-              </Field>
-              <Field label="Small change">
-                <Textarea rows={2} value={title} onChange={(event) => setTitle(event.target.value)} />
-              </Field>
-              <Field label="What should happen">
-                <Textarea rows={4} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
-              </Field>
-              <Field label="Limits and success criteria">
-                <Textarea rows={4} value={spec} onChange={(event) => setSpec(event.target.value)} />
-              </Field>
-            </div>
-            <div className="mt-4 border-y border-zinc-800 py-3">
-              <div className="flex flex-wrap gap-2">
-                <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
-                <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
-                <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
-                  {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
-                </Badge>
-              </div>
-              <p className="mt-2 text-sm leading-6 text-zinc-500">{simplePreflightMessage}</p>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                Copy for swarm chat
-              </Button>
-              <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Adding" : "Add to project log"}
-              </Button>
-              <JumpLink href="#wave-room">Talk first</JumpLink>
-            </div>
-            {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
-            {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
-          </div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Proposal status</p>
-            <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
-              <div className="flex items-center justify-between gap-3 py-3">
-                <p className="text-base font-semibold text-zinc-100">Risk route</p>
-                <Badge className={riskClass(classifiedRisk)}>{classifiedRisk}</Badge>
-              </div>
-              <div className="flex items-center justify-between gap-3 py-3">
-                <p className="text-base font-semibold text-zinc-100">Decision</p>
-                <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
-              </div>
-              <div className="flex items-center justify-between gap-3 py-3">
-                <p className="text-base font-semibold text-zinc-100">Hook check</p>
-                <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
-                  {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
-                </Badge>
-              </div>
-              <div className="py-3">
-                <p className="text-base font-semibold text-zinc-100">Current note</p>
-                <p className="mt-1 text-base leading-7 text-zinc-400">{simplePreflightMessage}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="current-build" className="order-1 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <section id="current-build" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Active change</p>
@@ -1768,7 +1700,7 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <section id="wave-room" className="order-2 scroll-mt-4">
+        <section id="wave-room" className="scroll-mt-4">
           <Panel title="Talk to the swarm" eyebrow="Chat">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
@@ -1847,7 +1779,75 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <section id="swarm-members" className="order-4 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <section id="start-building" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">New proposal</p>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest a hook change</h2>
+            <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
+              Name the change, add the limits, and share it with the swarm before it becomes PR work.
+            </p>
+            <div className="mt-4 grid gap-3">
+              <Field label="Your name or 6529 handle">
+                <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
+              </Field>
+              <Field label="Small change">
+                <Textarea rows={2} value={title} onChange={(event) => setTitle(event.target.value)} />
+              </Field>
+              <Field label="What should happen">
+                <Textarea rows={4} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
+              </Field>
+              <Field label="Limits and success criteria">
+                <Textarea rows={4} value={spec} onChange={(event) => setSpec(event.target.value)} />
+              </Field>
+            </div>
+            <div className="mt-4 border-y border-zinc-800 py-3">
+              <div className="flex flex-wrap gap-2">
+                <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
+                <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
+                <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
+                  {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
+                </Badge>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-zinc-500">{simplePreflightMessage}</p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
+                Copy for swarm chat
+              </Button>
+              <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
+                {apiBusy === "proposal" ? "Adding" : "Add to project log"}
+              </Button>
+              <JumpLink href="#wave-room">Talk first</JumpLink>
+            </div>
+            {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
+            {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
+          </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Proposal status</p>
+            <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+              <div className="flex items-center justify-between gap-3 py-3">
+                <p className="text-base font-semibold text-zinc-100">Risk route</p>
+                <Badge className={riskClass(classifiedRisk)}>{classifiedRisk}</Badge>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-3">
+                <p className="text-base font-semibold text-zinc-100">Decision</p>
+                <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-3">
+                <p className="text-base font-semibold text-zinc-100">Hook check</p>
+                <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
+                  {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
+                </Badge>
+              </div>
+              <div className="py-3">
+                <p className="text-base font-semibold text-zinc-100">Current note</p>
+                <p className="mt-1 text-base leading-7 text-zinc-400">{simplePreflightMessage}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">People</p>
@@ -1876,7 +1876,7 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <details id="rules-of-game" className="order-5 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="rules-of-game" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Rules and access</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">reference</Badge>
@@ -1913,7 +1913,7 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details id="project-details" className="order-6 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="project-details" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Project details</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2065,7 +2065,7 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details className="order-7 border-b border-zinc-800 pb-5">
+        <details className="border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Launch checklist</span>
             <span className="flex flex-wrap justify-end gap-2">
@@ -2581,7 +2581,7 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <details id="suggest-hook-work" className="order-8 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="suggest-hook-work" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Proposal tools</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
@@ -2976,7 +2976,7 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <section id="recent-activity" className="order-9 scroll-mt-4">
+        <section id="recent-activity" className="scroll-mt-4">
           <Panel title="Recent activity" eyebrow="Log">
             <div className="divide-y divide-zinc-800">
               {recentLedgerEvents.map((event) => (
@@ -3010,7 +3010,7 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <details id="reports" className="order-10 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Activity report</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">informational</Badge>
@@ -3126,7 +3126,7 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details id="share-back" className="order-11 scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="share-back" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Share update</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>
