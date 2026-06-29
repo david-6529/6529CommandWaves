@@ -108,7 +108,7 @@ function createDemoExecution(wave: CommandWave): ExecutionRecord {
     proposalId: reviewingProposal.id,
     harness: "codex",
     status: "complete",
-    summary: "Local agent mock opened a deterministic PR artifact for the approved hook scaffold command.",
+    summary: "Agent adapter opened a deterministic PR record for the approved hook scaffold command.",
     artifacts: [
       formatRunManifestArtifact(runManifest),
       formatAgentHandoffArtifact(handoff),
@@ -168,7 +168,7 @@ function createDemoReview(): GuardianReview {
       "REP, TDH, and holder threshold language is not treated as live authority unless explicitly wired.",
       `Guardian attestation hash: ${attestation.attestationHash}.`,
     ],
-    summary: "Reviewer mock passed the execution against the approved hook proposal and current rules.",
+    summary: "Reviewer adapter passed the execution against the approved hook proposal and current rules.",
     proof: {
       version: attestation.version,
       verifier: attestation.verifier.name,

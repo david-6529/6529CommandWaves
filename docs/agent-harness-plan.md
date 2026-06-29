@@ -32,7 +32,7 @@ Current local adapter status:
 - The work packet gives a human operator the approved prompt, target branch, required evidence, forbidden actions, and PR manifest text to use in a prepared branch.
 - Includes the Command Waves PR manifest in the PR body for `open_pr` commands.
 - Can opt into a real GitHub draft PR adapter with `COMMAND_WAVE_REPO_ADAPTER=github` once a controlled harness has prepared the branch.
-- Reviewer mock requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
+- Reviewer adapter requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
 
 Current GitHub PR adapter status:
 

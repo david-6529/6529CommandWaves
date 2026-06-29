@@ -116,8 +116,8 @@ export function createLocalOrchestratorAdapter(
         status: "complete",
         summary:
           input.proposal.kind === "open_pr"
-            ? "Local agent mock opened a deterministic PR artifact for the approved command."
-            : "Local agent mock recorded the approved command without external side effects.",
+            ? "Agent adapter opened a deterministic PR record for the approved command."
+            : "Agent adapter recorded the approved command without external side effects.",
         artifacts: [
           formatRunManifestArtifact(manifest),
           ...(handoff ? [formatAgentHandoffArtifact(handoff), "Codex handoff packet recorded"] : []),
@@ -239,8 +239,8 @@ export const localGuardianAdapter: GuardianAdapter = {
         ...(attestation ? [`Guardian attestation hash: ${attestation.attestationHash}.`] : []),
       ],
       summary: needsChanges
-        ? "Reviewer mock requested changes because the run evidence did not fully match the approved command."
-        : "Reviewer mock passed the execution against the approved proposal and current rules.",
+        ? "Reviewer adapter requested changes because the run evidence did not fully match the approved command."
+        : "Reviewer adapter passed the execution against the approved proposal and current rules.",
       proof: attestation
         ? {
             version: attestation.version,

@@ -8,5 +8,7 @@ describe("legacy command copy", () => {
       "Agent executed through agent run.",
     );
     expect(humanizeLegacyCommandCopy("Guardian review passed by Guardian Agent.")).toBe("Review passed by Reviewer.");
+    expect(humanizeLegacyCommandCopy("Local agent mock opened a PR.")).toBe("Agent adapter opened a PR.");
+    expect(humanizeLegacyCommandCopy("Reviewer mock passed.")).toBe("Reviewer adapter passed.");
   });
 });

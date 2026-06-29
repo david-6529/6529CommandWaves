@@ -8,6 +8,10 @@ const copyReplacements: Array<[RegExp, string]> = [
   [/\bguardian review\b/g, "review"],
   [/\bGuardian\b/g, "Reviewer"],
   [/\bguardian\b/g, "reviewer"],
+  [/\bLocal agent mock\b/g, "Agent adapter"],
+  [/\blocal agent mock\b/g, "agent adapter"],
+  [/\bReviewer mock\b/g, "Reviewer adapter"],
+  [/\breviewer mock\b/g, "reviewer adapter"],
 ];
 
 export function humanizeLegacyCommandCopy(value: string) {
