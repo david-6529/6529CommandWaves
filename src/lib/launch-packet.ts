@@ -12,6 +12,11 @@ export type LaunchPacket = {
   text: string;
 };
 
+export type LaunchPacketVerificationTargets = {
+  setupProofUrl: string;
+  commandWaveStateUrl: string;
+};
+
 function list(items: string[]) {
   return items.map((item) => `- ${item}`);
 }
@@ -212,6 +217,18 @@ function feeLines(plan: DeveloperFeePlan) {
   ];
 }
 
+function verificationLines(targets: LaunchPacketVerificationTargets | null | undefined) {
+  if (!targets) {
+    return ["- Setup proof: not attached.", "- Command-wave state: not attached."];
+  }
+
+  return [
+    `- Setup proof: ${targets.setupProofUrl}`,
+    `- Command-wave state: ${targets.commandWaveStateUrl}`,
+    `- Verify setup: SETUP_PROOF_URL=${targets.setupProofUrl} npm run setup:verify`,
+  ];
+}
+
 function nextStep(proposal: CommandProposal | null, execution: ExecutionRecord | null, review: GuardianReview | null) {
   if (!proposal) {
     return "Choose one PR-sized hook command.";
@@ -238,6 +255,7 @@ export function createLaunchPacket({
   poll,
   execution,
   review,
+  verificationTargets,
   generatedAt = latestLedgerTimestamp(wave.ledger),
 }: {
   wave: CommandWave;
@@ -245,6 +263,7 @@ export function createLaunchPacket({
   poll: PollState | null;
   execution: ExecutionRecord | null;
   review: GuardianReview | null;
+  verificationTargets?: LaunchPacketVerificationTargets | null;
   generatedAt?: string;
 }): LaunchPacket {
   const contributionReport = createContributionReport(wave, { generatedAt, limit: 6 });
@@ -278,6 +297,9 @@ export function createLaunchPacket({
     "",
     "## Developer Fee Evidence",
     ...feeLines(developerFeePlan),
+    "",
+    "## Verification",
+    ...verificationLines(verificationTargets),
     "",
     "## Authority Limits",
     "- Humans keep merge, deploy, payment, and governance authority.",

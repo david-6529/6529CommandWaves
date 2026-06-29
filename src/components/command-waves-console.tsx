@@ -765,6 +765,10 @@ export function CommandWavesConsole() {
         poll: activePoll ?? null,
         execution: activeExecution ?? null,
         review: activeReview ?? null,
+        verificationTargets: {
+          setupProofUrl: setupProofPath,
+          commandWaveStateUrl: commandWaveStatePath,
+        },
       }),
     [activeExecution, activePoll, activeProposal, activeReview, wave],
   );

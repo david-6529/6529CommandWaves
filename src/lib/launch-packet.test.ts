@@ -11,6 +11,10 @@ describe("launch packet", () => {
       poll: demoWave.polls[0],
       execution: demoWave.executions[0],
       review: demoWave.reviews[0],
+      verificationTargets: {
+        setupProofUrl: "/api/command-wave/setup/proof",
+        commandWaveStateUrl: "/api/command-wave/state",
+      },
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
@@ -31,6 +35,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("david: report score 10");
     expect(packet.text).toContain("1 Guardian review proof");
     expect(packet.text).toContain("## Developer Fee Evidence");
+    expect(packet.text).toContain("## Verification");
+    expect(packet.text).toContain("Setup proof: /api/command-wave/setup/proof");
+    expect(packet.text).toContain("Command-wave state: /api/command-wave/state");
+    expect(packet.text).toContain("SETUP_PROOF_URL=/api/command-wave/setup/proof npm run setup:verify");
     expect(packet.text).toContain("Run manifest recorded.");
     expect(packet.text).toContain("PR manifest in body.");
     expect(packet.text).toContain("PR link: https://github.com/6529-Collections/6529-hook/pull/12");
@@ -65,6 +73,8 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Build: waiting for an approved PR command.");
     expect(packet.text).toContain("Review: waiting for execution evidence.");
     expect(packet.text).toContain("Choose one PR-sized hook command.");
+    expect(packet.text).toContain("Setup proof: not attached.");
+    expect(packet.text).toContain("Command-wave state: not attached.");
   });
 
   it("labels wave update support commands without implying automatic posting", () => {
