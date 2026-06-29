@@ -10,9 +10,12 @@ describe("builder wave launch draft", () => {
     expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Contributor rules: https://github.com/6529-Collections/6529-hook/blob/main/CONTRIBUTING.md");
-    expect(draft).toContain("build one non-upgradeable 6529 hook in public");
+    expect(draft).toContain("run the first builder swarm for a non-upgradeable 6529 hook");
     expect(draft).toContain("Wait for a builder wave decision before PR work starts.");
     expect(draft).toContain("Open draft PRs with the repo template and Command Waves manifest.");
+    expect(draft).toContain("Let reviewer CI check the PR before humans merge.");
+    expect(draft).toContain("Gates decide who can play");
+    expect(draft).toContain("Orchestration rules classify risk");
     expect(draft).toContain("No proxy, delegatecall, deployment, spending, payouts, or governance changes in phase 1.");
     expect(draft).toContain("Participation notes (advisory):");
     expect(draft).toContain("not REP, TDH, payments, permissions, or merge rights");

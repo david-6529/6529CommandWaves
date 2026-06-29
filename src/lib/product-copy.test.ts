@@ -3,13 +3,13 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.eyebrow).toBe("Public hook build");
-    expect(commandWaveProductCopy.headline).toBe("6529 Hook Project");
-    expect(commandWaveProductCopy.positioning).toBe("One hook project today. A repeatable public build loop later.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Wave - Repo - PR - Review");
+    expect(commandWaveProductCopy.eyebrow).toBe("Builder swarm");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Builder Swarm");
+    expect(commandWaveProductCopy.positioning).toBe("Start with the 6529 hook. Keep the loop reusable for public open source builds.");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Gate - Wave - PR - Review");
   });
 
-  it("keeps internal role names out of the first-screen explanation", () => {
+  it("keeps unsafe authority claims out of the first-screen explanation", () => {
     const firstScreenCopy = [
       commandWaveProductCopy.headline,
       commandWaveProductCopy.subhead,
@@ -17,17 +17,19 @@ describe("Command Waves product copy", () => {
       commandWaveProductCopy.simpleFlow,
     ].join(" ");
 
-    expect(firstScreenCopy.toLowerCase()).not.toContain("genesis");
-    expect(firstScreenCopy.toLowerCase()).not.toContain("orchestrator");
     expect(firstScreenCopy.toLowerCase()).not.toContain("guardian");
+    expect(firstScreenCopy.toLowerCase()).not.toContain("auto-merge");
+    expect(firstScreenCopy.toLowerCase()).not.toContain("automatic payout");
+    expect(firstScreenCopy.toLowerCase()).not.toContain("live rep");
   });
 
-  it("keeps the standalone project ahead of the later reusable infrastructure", () => {
-    expect(commandWaveProductCopy.headline).toBe("6529 Hook Project");
-    expect(commandWaveProductCopy.subhead).toContain("builder wave is deciding");
-    expect(commandWaveProductCopy.subhead).toContain("happening in GitHub");
-    expect(commandWaveProductCopy.positioning).toContain("One hook project today");
-    expect(commandWaveProductCopy.positioning).toContain("repeatable public build loop later");
+  it("keeps the first hook ahead of the later reusable protocol", () => {
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Builder Swarm");
+    expect(commandWaveProductCopy.subhead).toContain("gated builder wave");
+    expect(commandWaveProductCopy.subhead).toContain("orchestration rules");
+    expect(commandWaveProductCopy.subhead).toContain("reviewer CI");
+    expect(commandWaveProductCopy.positioning).toContain("Start with the 6529 hook");
+    expect(commandWaveProductCopy.positioning).toContain("public open source builds");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");
   });

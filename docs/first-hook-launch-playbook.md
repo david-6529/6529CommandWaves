@@ -4,21 +4,24 @@
 
 Make the first public phase a clear community win:
 
-1. Use one 6529 builder wave.
-2. Build one non-upgradeable 6529 hook in one GitHub repo.
-3. Let people propose scoped PR work.
-4. Let the wave decide what should run.
-5. Let agents help only inside approved commands.
-6. Review every result before humans merge or pay anyone.
+1. Use one 6529 builder wave as the live swarm room.
+2. Gate who can play, while keeping REP, TDH, allowlist, and QnA notes advisory until live enforcement is wired.
+3. Build one non-upgradeable 6529 hook in one GitHub repo.
+4. Let people propose scoped PR work.
+5. Let orchestration rules classify risk and decide when a vote is needed.
+6. Let agents help only inside approved commands.
+7. Let reviewer CI check every PR before humans merge or pay anyone.
 
-This should first feel like a standalone project site for the 6529 hook. If the loop works, the same structure can support more public hook projects later.
+This should first feel like a focused builder swarm for the 6529 hook. If the loop works, the same structure can support more open source projects later.
 Use the 6529 wave for live discussion and decisions. Use this app for the project snapshot, GitHub repo state, PR evidence, review evidence, and launch evidence.
 
 ## Use Now
 
 - Builder wave and GitHub repo setup.
+- Participation gate notes for who can play.
 - 6529 hook project snapshot with wave context, repo state, PR state, and review evidence.
 - One PR-sized command at a time.
+- Orchestration rules that classify risk and require votes for important changes.
 - Local or imported wave decisions for approvals.
 - Manual decision receipts that link approved work to a 6529 drop URL in the builder wave.
 - Copyable Codex work packets for PR commands with a recorded wave decision receipt.
@@ -36,6 +39,7 @@ Use the 6529 wave for live discussion and decisions. Use this app for the projec
 ## Park For Later
 
 - Live REP or TDH voting authority.
+- Automatic gate enforcement.
 - Automatic payouts.
 - Automatic merges or deploys.
 - Broad multi-agent marketplace behavior.
@@ -69,7 +73,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 5. Post the brief with the builder wave, repo link, participation notes, and hook scope.
 6. Copy the participation guide and share it where new contributors will see it.
 7. Invite ideas in the general chat wave or thread.
-8. Turn one strong idea into a PR-sized command.
+8. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
 9. Vote or approve through the builder wave.
 10. Record the decision drop URL as the manual approval receipt.
 11. Copy the Codex work packet and use it in a prepared branch.
@@ -89,9 +93,12 @@ and required-check wave-state sources can wait until broader participation, but 
 ## Success Criteria
 
 - New contributors understand where to propose work.
+- Gate notes make it clear who can play without claiming live REP or TDH enforcement.
 - Every code change traces back to a visible wave decision.
+- Risky changes require a visible vote before PR work starts.
 - The hook stays non-upgradeable by default.
 - Parameter changes name explicit caps and tests.
+- Reviewer CI signs off before humans merge.
 - Fees and contribution report scores are evidence, not automatic authority.
 - Launch blockers are fixed before broad participation.
 - The first merged PR feels simple, auditable, and worth repeating.

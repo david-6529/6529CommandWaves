@@ -1401,7 +1401,7 @@ export function CommandWavesConsole() {
         <header className="border-b border-zinc-800 pb-5">
           <div className="max-w-4xl">
             <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">{commandWaveProductCopy.eyebrow}</p>
-            <h1 className="mt-2 max-w-4xl text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+            <h1 className="mt-2 max-w-4xl text-2xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
               {commandWaveProductCopy.headline}
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-400">{commandWaveProductCopy.subhead}</p>

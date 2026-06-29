@@ -2,26 +2,31 @@
 
 ## ELI5
 
-Command Waves is currently the project site for building the 6529 Hook in public.
+Command Waves is a builder swarm for creating open source hooks in public. The first proof project is the 6529 Hook.
 
-For the first public phase, the project is simple: use a 6529 wave to coordinate a community-built 6529 hook.
-People propose scoped work, decisions approve PRs, agents can help, reviewers check the output, and humans keep control.
-The workflow can support more public hook projects later, but the first launch should feel like a standalone 6529 Hook site.
-The 6529 wave stays the live conversation and decision surface. This app shows a project snapshot, recent wave context,
-GitHub PR state, code review evidence, launch evidence, and contribution reports.
+For the first public phase, the product is simple: a gated set of builders joins a 6529 wave, shares ideas and code,
+and uses orchestration rules to decide what can become GitHub PR work. Low-risk work can move quickly. Important or risky
+changes need a visible wave decision before they enter the repo. A reviewer gate checks PRs in CI against the approved
+command, rules, risk, and hook guardrails before humans merge.
+
+The same loop can become a reusable public open source protocol later. The first launch stays focused on one hook, one
+builder wave, and one GitHub smart contract repo. The 6529 wave remains the live conversation and decision surface. This
+app shows the project snapshot, recent wave context, GitHub PR state, code review evidence, launch evidence, and
+contribution reports.
 
 The app keeps the loop visible:
 
-1. Choose the builder wave and GitHub repo.
-2. Propose one PR-sized change.
-3. Decide whether it should run.
-4. Build or open the PR.
-5. Review the result.
-6. Log the activity.
+1. Gate who can play.
+2. Share ideas in the builder wave.
+3. Propose one PR-sized change.
+4. Classify risk and decide whether it should run.
+5. Build or open the PR.
+6. Review the result in CI before humans merge.
+7. Log the activity.
 
 The simple project view is:
 
-`Wave snapshot -> Repo state -> PR -> Review`
+`Gate -> Wave -> PR -> Review`
 
 ## Why This Exists
 
@@ -44,12 +49,13 @@ The first public phase:
 
 1. Choose one 6529 builder wave.
 2. Connect one GitHub smart contract repo for the 6529 hook.
-3. Propose hook work in plain English with clear limits.
-4. Decide whether the work is approved.
-5. Let an agent help produce a PR when allowed.
-6. Review the PR against the approved command, rules, and hook guardrails.
-7. Show recent activity and a transparent contribution report.
-8. Keep the full audit log available.
+3. Record participation gates such as REP, TDH, allowlists, or QnA as advisory until live enforcement is wired.
+4. Propose hook work in plain English with clear limits.
+5. Let orchestration rules classify risk and require votes for important changes.
+6. Let an agent help produce a PR when allowed.
+7. Review the PR in CI against the approved command, rules, and hook guardrails.
+8. Show recent activity and a transparent contribution report.
+9. Keep the full audit log available.
 
 No auto-merges, autonomous deploys, spending, or live REP/TDH authority in the first phase.
 
