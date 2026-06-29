@@ -750,6 +750,13 @@ export function CommandWavesConsole() {
   );
   const launchAuditOpenItems = launchAudit.openItems.slice(0, 5);
   const launchAuditReadyEvidence = launchAudit.readyItems.filter(isLaunchAuditEvidenceItem).slice(0, 5);
+  const launchVerificationTargets = useMemo(
+    () => ({
+      setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
+      commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
+    }),
+    [publicAppOrigin],
+  );
   const waveUpdateDraft = useMemo(
     () =>
       createWaveUpdateDraft({
@@ -758,17 +765,11 @@ export function CommandWavesConsole() {
         poll: activePoll ?? null,
         execution: activeExecution ?? null,
         review: activeReview ?? null,
+        verificationTargets: launchVerificationTargets,
       }),
-    [activeExecution, activePoll, activeProposal, activeReview, wave],
+    [activeExecution, activePoll, activeProposal, activeReview, launchVerificationTargets, wave],
   );
   const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(wave), [wave]);
-  const launchVerificationTargets = useMemo(
-    () => ({
-      setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
-      commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
-    }),
-    [publicAppOrigin],
-  );
   const launchPacket = useMemo(
     () =>
       createLaunchPacket({

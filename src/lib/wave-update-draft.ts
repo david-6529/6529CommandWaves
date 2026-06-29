@@ -2,6 +2,11 @@ import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, Pol
 import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan } from "./developer-fee-plan";
 
+export type WaveUpdateVerificationTargets = {
+  setupProofUrl: string;
+  commandWaveStateUrl: string;
+};
+
 function decisionReference(poll: PollState) {
   return poll.decision?.url ?? poll.decision?.dropId ?? "recorded";
 }
@@ -71,21 +76,30 @@ function developerFeeLine(wave: CommandWave) {
   return `Developer fee plan: ${plan.summary} No automatic payouts.`;
 }
 
+function verificationLine(targets: WaveUpdateVerificationTargets | null | undefined) {
+  return targets
+    ? `Verification: setup proof ${targets.setupProofUrl}; state ${targets.commandWaveStateUrl}.`
+    : null;
+}
+
 export function createWaveUpdateDraft({
   wave,
   proposal,
   poll,
   execution,
   review,
+  verificationTargets,
 }: {
   wave: CommandWave;
   proposal: CommandProposal | null;
   poll: PollState | null;
   execution: ExecutionRecord | null;
   review: GuardianReview | null;
+  verificationTargets?: WaveUpdateVerificationTargets | null;
 }) {
   const pr = prLine(execution);
   const reviewProof = reviewProofLine(review);
+  const verification = verificationLine(verificationTargets);
 
   return [
     "6529 hook update",
@@ -99,6 +113,7 @@ export function createWaveUpdateDraft({
     ...(pr ? [pr] : []),
     reviewLine(review),
     ...(reviewProof ? [reviewProof] : []),
+    ...(verification ? [verification] : []),
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
     developerFeeLine(wave),
