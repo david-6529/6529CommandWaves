@@ -664,12 +664,12 @@ export function CommandWavesConsole() {
   );
   const [proposer, setProposer] = useState("david");
   const [kind, setKind] = useState<CommandKind>("open_pr");
-  const [title, setTitle] = useState("Draft the non-upgradeable hook scaffold");
+  const [title, setTitle] = useState("Add fee cap tests");
   const [prompt, setPrompt] = useState(
-    "Use Codex to draft a non-upgradeable 6529 hook scaffold with fee parameters capped at 100 bps and tests.",
+    "Add tests that prove the 6529 hook fee parameter cannot exceed 100 bps and that zero fee still works.",
   );
   const [spec, setSpec] = useState(
-    "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.",
+    "Test-only PR for the current hook contract. Keep the hook immutable. No deploy scripts, payments, owner changes, role changes, proxy, or delegatecall. Include bound-focused tests for the 100 bps max fee.",
   );
   const [budgetUsd, setBudgetUsd] = useState("10");
   const [decisionReference, setDecisionReference] = useState("");
