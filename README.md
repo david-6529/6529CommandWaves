@@ -148,7 +148,7 @@ The current app is a local prototype of the hook-building flow:
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
-- 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and context previews
+- 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and capped context previews
 - local file persistence for command-wave state when `COMMAND_WAVE_STORE=file`
 - Postgres command-wave repository and schema in [db/001_command_waves.sql](db/001_command_waves.sql)
 

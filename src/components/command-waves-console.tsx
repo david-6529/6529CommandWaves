@@ -106,6 +106,7 @@ type WaveContextPreview = {
   toDropId: string | null;
   context: {
     mode: string;
+    maxMessages: number;
     searchedMessages: number;
     hitCap: boolean;
     sources: Array<{
@@ -169,6 +170,7 @@ type CodexWorkPacketResponse = ApiErrorPayload & {
 };
 
 const accessKeyStorageKey = "command-waves-access-key";
+const wavePreviewMaxMessages = 50;
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
   const headers = new Headers(init?.headers);
@@ -198,6 +200,7 @@ async function requestContextPreview(waveId: string) {
     body: JSON.stringify({
       waveId,
       includeAllHistory: true,
+      maxMessages: wavePreviewMaxMessages,
     }),
   });
   const payload = (await response.json()) as ContextPreviewResponse;
@@ -207,6 +210,14 @@ async function requestContextPreview(waveId: string) {
   }
 
   return payload.preview;
+}
+
+function contextModeLabel(preview: WaveContextPreview) {
+  if (preview.context.mode === "all" && preview.context.maxMessages <= wavePreviewMaxMessages) {
+    return "latest";
+  }
+
+  return preview.context.mode === "all" ? "all history" : preview.context.mode;
 }
 
 async function requestWaveSearch(query: string) {
@@ -837,7 +848,7 @@ export function CommandWavesConsole() {
       } else {
         setSetupContextPreview(preview);
       }
-      setApiNotice(`Context preview loaded for ${preview.dropCount} drops.`);
+      setApiNotice(`Wave posts loaded for ${preview.dropCount} drops.`);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Context preview failed.");
     } finally {
@@ -1159,13 +1170,13 @@ export function CommandWavesConsole() {
                           disabled={isBusy || !project.waveUrl}
                           onClick={() => void previewContext(project.waveUrl, "project", project.id)}
                         >
-                          {apiBusy === "context" ? "Loading" : "Read wave posts"}
+                          {apiBusy === "context" ? "Loading" : "Read latest posts"}
                         </Button>
                       </div>
                       {contextPreview ? (
                         <div className="mt-3 border-t border-zinc-800 pt-3">
                           <div className="flex flex-wrap items-center gap-2">
-                            <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextPreview.context.mode}</Badge>
+                            <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextModeLabel(contextPreview)}</Badge>
                             <Badge className={contextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
                               {contextPreview.dropCount} drops
                             </Badge>
@@ -1183,7 +1194,7 @@ export function CommandWavesConsole() {
                         </div>
                       ) : (
                         <p className="mt-3 text-xs leading-5 text-zinc-500">
-                          Preview the wave to read recent 6529 posts on this page.
+                          Preview the wave to read the latest 6529 posts on this page.
                         </p>
                       )}
                     </div>
@@ -1435,7 +1446,7 @@ export function CommandWavesConsole() {
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext(waveUrl, "setup")}>
-                  {apiBusy === "context" ? "Loading" : "Preview wave posts"}
+                  {apiBusy === "context" ? "Loading" : "Preview latest posts"}
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => downloadJson("command-wave-ledger.json", wave)}>
                   Export activity
@@ -1561,7 +1572,7 @@ export function CommandWavesConsole() {
               {setupContextPreview ? (
                 <div className="rounded-md border border-zinc-800 bg-black p-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{setupContextPreview.context.mode}</Badge>
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextModeLabel(setupContextPreview)}</Badge>
                     <Badge className={setupContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
                       {setupContextPreview.context.hitCap ? "hit cap" : "complete fetch"}
                     </Badge>

@@ -53,6 +53,25 @@ describe("6529 wave context", () => {
     });
   });
 
+  it("caps all-history previews to the requested latest drops", async () => {
+    const preview = await previewWaveContext({
+      waveId: "mock-command-wave",
+      includeAllHistory: true,
+      maxMessages: 2,
+    });
+
+    expect(preview).toMatchObject({
+      waveId: "mock-command-wave",
+      dropCount: 2,
+      fromDropId: "drop-002",
+      toDropId: "drop-003",
+    });
+    expect(preview.context).toMatchObject({
+      mode: "all",
+      maxMessages: 2,
+    });
+  });
+
   it("rejects missing primary wave ids clearly", async () => {
     const missingWaveIdInput = {} as Parameters<typeof previewWaveContext>[0];
 
