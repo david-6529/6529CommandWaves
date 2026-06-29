@@ -3,8 +3,6 @@ import type { PhaseNextAction } from "./phase-next-action";
 
 export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseNextAction) {
   return [
-    "Swarm note",
-    "",
     "I want to talk about the 6529 hook build.",
     "",
     "Message:",

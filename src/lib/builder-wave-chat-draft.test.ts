@@ -9,7 +9,6 @@ describe("builder wave chat draft", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
     const draft = createBuilderWaveChatDraft(demoWave, nextAction);
 
-    expect(draft).toContain("Swarm note");
     expect(draft).toContain("I want to talk about the 6529 hook build.");
     expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);

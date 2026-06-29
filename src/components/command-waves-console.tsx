@@ -472,7 +472,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
+      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base font-normal text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -485,7 +485,7 @@ function Textarea({
     <textarea
       {...props}
       ref={inputRef}
-      className={`min-h-28 w-full resize-y rounded-md border border-zinc-800 bg-black px-4 py-3 text-base leading-7 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
+      className={`min-h-28 w-full resize-y rounded-md border border-zinc-800 bg-black px-4 py-3 text-base font-normal leading-7 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -494,7 +494,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base text-zinc-100 outline-none transition focus:border-cyan-500 ${props.className ?? ""}`}
+      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base font-normal text-zinc-100 outline-none transition focus:border-cyan-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -1355,16 +1355,16 @@ export function CommandWavesConsole() {
   async function copyBuilderWaveChatDraft() {
     try {
       await navigator.clipboard.writeText(waveRoomDraftRef.current?.value ?? builderWaveChatDraft);
-      setWaveRoomNotice("Wave note copied.");
+      setWaveRoomNotice("Message copied.");
     } catch {
-      setWaveRoomNotice("Copy failed. Select the wave note and copy it manually.");
+      setWaveRoomNotice("Copy failed. Select the message and copy it manually.");
     }
   }
 
   function resetBuilderWaveChatDraft() {
     if (waveRoomDraftRef.current) {
       waveRoomDraftRef.current.value = builderWaveChatDraft;
-      setWaveRoomNotice("Wave note reset.");
+      setWaveRoomNotice("Message reset.");
     }
   }
 
@@ -1678,7 +1678,6 @@ export function CommandWavesConsole() {
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
             {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
             <JumpLink href="#recent-activity">View log</JumpLink>
-            <JumpLink href="#suggest-hook-work">Advanced check</JumpLink>
           </div>
           <div className="mt-4 border-t border-zinc-800 pt-4">
             <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
@@ -1764,7 +1763,7 @@ export function CommandWavesConsole() {
             ) : (
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <p className="text-base leading-7 text-zinc-400">The next step is tracked in the detailed work panel.</p>
-                <JumpLink href="#suggest-hook-work">Open detailed controls</JumpLink>
+                <JumpLink href="#suggest-hook-work">Open proposal tools</JumpLink>
               </div>
             )}
           </div>
@@ -1790,10 +1789,10 @@ export function CommandWavesConsole() {
                   </Button>
                   {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
-                    Copy note
+                    Copy message
                   </Button>
                   <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                    Reset note
+                    Reset message
                   </Button>
                 </div>
                 {waveRoomNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{waveRoomNotice}</p> : null}
@@ -1836,13 +1835,15 @@ export function CommandWavesConsole() {
                   </p>
                 )}
               </div>
-              <Textarea
-                key={builderWaveChatDraft}
-                inputRef={waveRoomDraftRef}
-                rows={12}
-                defaultValue={builderWaveChatDraft}
-                className="min-h-72 resize-none font-mono text-sm"
-              />
+              <Field label="Draft message">
+                <Textarea
+                  key={builderWaveChatDraft}
+                  inputRef={waveRoomDraftRef}
+                  rows={10}
+                  defaultValue={builderWaveChatDraft}
+                  className="min-h-64 resize-none"
+                />
+              </Field>
             </div>
           </Panel>
         </section>
@@ -2583,7 +2584,7 @@ export function CommandWavesConsole() {
 
         <details id="suggest-hook-work" className="order-8 scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Advanced controls</span>
+            <span>Proposal tools</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
           </summary>
           <section className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
