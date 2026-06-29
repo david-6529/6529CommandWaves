@@ -608,6 +608,7 @@ export function CommandWavesConsole() {
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
+  const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
@@ -888,6 +889,7 @@ export function CommandWavesConsole() {
   }
 
   async function checkReadiness() {
+    setReadinessControlsOpen(true);
     setApiBusy("readiness");
     setApiError("");
 
@@ -1452,7 +1454,11 @@ export function CommandWavesConsole() {
                   <Textarea readOnly rows={10} value={builderWaveLaunchDraft} className="min-h-60 resize-none font-mono text-xs" />
                 </div>
               </details>
-              <details className="rounded-md border border-zinc-800 bg-black p-3">
+              <details
+                className="rounded-md border border-zinc-800 bg-black p-3"
+                open={readinessControlsOpen}
+                onToggle={(event) => setReadinessControlsOpen(event.currentTarget.open)}
+              >
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
                   <span>Launch readiness</span>
                   {readiness ? (
