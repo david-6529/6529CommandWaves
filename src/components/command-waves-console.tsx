@@ -652,6 +652,23 @@ export function CommandWavesConsole() {
   const activePollNeedsWaveDecision = Boolean(
     activePoll?.status === "passed" && (!activePoll.decision || activeDecisionReferenceCheck?.ok === false),
   );
+  const activePollDecisionRecorded = Boolean(activePoll?.decision && activeDecisionReferenceCheck?.ok !== false);
+  const activePollTitle = activePollNeedsWaveDecision
+    ? "Wave decision needed"
+    : activePollDecisionRecorded
+      ? "Wave decision recorded"
+      : activePoll?.status === "failed"
+        ? "Vote failed"
+        : activePoll?.status === "passed"
+          ? "Vote passed"
+          : "Vote open";
+  const activePollDetail = activePollNeedsWaveDecision
+    ? "Local vote passed. Record the builder wave decision receipt before work runs."
+    : activePollDecisionRecorded
+      ? `Builder wave decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
+      : `Current vote: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
+          activePoll?.quorumRequired ?? 0
+        } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -1713,14 +1730,8 @@ export function CommandWavesConsole() {
                   <div className="rounded-md border border-zinc-800 bg-black p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-zinc-100">
-                          {activePollNeedsWaveDecision ? "Wave decision needed" : "Vote needed"}
-                        </p>
-                        <p className="mt-1 text-xs text-zinc-500">
-                          {activePollNeedsWaveDecision
-                            ? "Local vote passed. Record the builder wave decision receipt before work runs."
-                            : `Current vote: ${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Needs ${activePoll.quorumRequired} total votes and ${activePoll.yesPercentRequired}% yes.`}
-                        </p>
+                        <p className="text-sm font-semibold text-zinc-100">{activePollTitle}</p>
+                        <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
                           <p className="mt-1 text-xs text-zinc-500">Voting as {proposer || "unnamed voter"}.</p>
                         ) : null}
