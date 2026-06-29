@@ -678,6 +678,8 @@ export function CommandWavesConsole() {
       activePrHasWaveDecision &&
       !activeExecution,
   );
+  const showBuildAction = Boolean(activeProposalIsPr && !activeExecution);
+  const canRunReview = Boolean(activeExecution && activeProposal?.status === "reviewing" && !activeReview);
   const canCopyCodexPacket = Boolean(
     activeProposal &&
       activeProposalIsPr &&
@@ -1832,20 +1834,16 @@ export function CommandWavesConsole() {
                         ))}
                       </ul>
                     ) : null}
-                    <Button
-                      type="button"
-                      className="mt-3"
-                      disabled={isBusy || !canBuildApprovedPr}
-                      onClick={buildApprovedPr}
-                    >
-                      {apiBusy === "execute"
-                        ? "Building"
-                        : activeProposalIsPr
-                          ? activePrHasWaveDecision
-                            ? "Build approved PR"
-                            : "Decision receipt needed"
-                          : "PR build not needed"}
-                    </Button>
+                    {showBuildAction ? (
+                      <Button
+                        type="button"
+                        className="mt-3"
+                        disabled={isBusy || !canBuildApprovedPr}
+                        onClick={buildApprovedPr}
+                      >
+                        {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
+                      </Button>
+                    ) : null}
                     <Button
                       type="button"
                       className="mt-2"
@@ -1882,15 +1880,17 @@ export function CommandWavesConsole() {
                         </p>
                       </div>
                     ) : null}
-                    <Button
-                      type="button"
-                      className="mt-3"
-                      variant="secondary"
-                      disabled={isBusy || !activeExecution || activeProposal.status !== "reviewing" || Boolean(activeReview)}
-                      onClick={runGuardianReview}
-                    >
-                      {apiBusy === "review" ? "Reviewing" : "Review result"}
-                    </Button>
+                    {canRunReview ? (
+                      <Button
+                        type="button"
+                        className="mt-3"
+                        variant="secondary"
+                        disabled={isBusy}
+                        onClick={runGuardianReview}
+                      >
+                        {apiBusy === "review" ? "Reviewing" : "Review result"}
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
               </div>
