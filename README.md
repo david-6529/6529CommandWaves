@@ -110,6 +110,7 @@ The current app is a local prototype of the hook-building flow:
 
 - first-screen hook dashboard: wave snapshot, repo state, PR, review, and progress
 - hooks-in-development snapshot for the 6529 Hook with wave, repo, PR, review, and evidence state
+- visible participation gate notes in the hook project snapshot
 - at-a-glance hook status row for gate, orchestration, PR, and review
 - per-hook next step in the active projects list
 - automatic latest-wave preview for the active hook project

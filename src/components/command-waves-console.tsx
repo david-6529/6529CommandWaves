@@ -1472,6 +1472,14 @@ export function CommandWavesConsole() {
                       <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Wave activity</p>
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
+                      <div className="mt-3 border-t border-zinc-800 pt-3">
+                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Who can play</p>
+                        <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-400">
+                          {project.gateDetails.map((gate) => (
+                            <li key={gate}>- {gate}</li>
+                          ))}
+                        </ul>
+                      </div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave</LinkButton> : null}
                         <Button

@@ -19,6 +19,11 @@ describe("active hook projects", () => {
         participation: "Read the wave, draft replies here, and track repo work.",
         waveRole: "Live discussion, proposals, decisions, and updates.",
         platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+        gateDetails: [
+          "Builder wave allowlist for phase 1, manual note only",
+          "REP or TDH gates are planned, not enforced here",
+          "AI contribution report scores are not permissions",
+        ],
         gateSnapshotLabel: "manual gate",
         orchestrationSnapshotLabel: "high approved",
         codeSnapshotLabel: "PR reviewed",
@@ -54,6 +59,11 @@ describe("active hook projects", () => {
       nextActionDetail: "Confirm one builder wave and one GitHub repo before proposals start.",
       waveStatus: "Wave has not selected a PR-sized hook command yet.",
       gateSnapshotLabel: "manual gate",
+      gateDetails: [
+        "Builder wave allowlist for phase 1, manual note only",
+        "REP or TDH gates are planned, not enforced here",
+        "AI contribution report scores are not permissions",
+      ],
       orchestrationSnapshotLabel: "needs idea",
       codeStatus: "No PR-sized hook command yet.",
       codeSnapshotLabel: "no PR yet",
@@ -107,6 +117,7 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       gateSnapshotLabel: "gate unset",
+      gateDetails: ["Participation gate is not set yet."],
       orchestrationSnapshotLabel: "needs idea",
     });
   });

@@ -17,6 +17,7 @@ export type ActiveHookProject = {
   participation: string;
   waveRole: string;
   platformRole: string;
+  gateDetails: string[];
   gateSnapshotLabel: string;
   orchestrationSnapshotLabel: string;
   codeSnapshotLabel: string;
@@ -103,6 +104,16 @@ function gateSnapshotLabel(wave: CommandWave) {
   }
 
   return "open gate";
+}
+
+function gateDetails(wave: CommandWave) {
+  const gates = wave.gates.map((gate) => gate.trim()).filter(Boolean);
+
+  if (!gates.length) {
+    return ["Participation gate is not set yet."];
+  }
+
+  return gates.slice(0, 4);
 }
 
 function orchestrationSnapshotLabel(wave: CommandWave) {
@@ -222,6 +233,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       participation: "Read the wave, draft replies here, and track repo work.",
       waveRole: "Live discussion, proposals, decisions, and updates.",
       platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+      gateDetails: gateDetails(wave),
       gateSnapshotLabel: gateSnapshotLabel(wave),
       orchestrationSnapshotLabel: orchestrationSnapshotLabel(wave),
       codeSnapshotLabel: codeSnapshotLabel(wave),
