@@ -1043,19 +1043,37 @@ export function CommandWavesConsole() {
           )}
         </div>
 
-        <section className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 md:grid-cols-[10rem_1fr] md:items-center">
-          <div className="flex flex-wrap items-center gap-2 md:block">
-            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
-            <Badge className={`${nextActionStatusClass(phaseNextAction.status)} mt-0 md:mt-2`}>
-              {phaseNextAction.statusLabel}
-            </Badge>
-          </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-base font-semibold text-zinc-50">{phaseNextAction.title}</h2>
-              <Badge className="border-zinc-700 bg-black text-zinc-300">{phaseNextAction.stepLabel}</Badge>
+        <section className="grid gap-3 lg:grid-cols-2">
+          <div className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 md:grid-cols-[8rem_1fr] md:items-center">
+            <div className="flex flex-wrap items-center gap-2 md:block">
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Work action</p>
+              <Badge className={`${nextActionStatusClass(phaseNextAction.status)} mt-0 md:mt-2`}>
+                {phaseNextAction.statusLabel}
+              </Badge>
             </div>
-            <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-base font-semibold text-zinc-50">{phaseNextAction.title}</h2>
+                <Badge className="border-zinc-700 bg-black text-zinc-300">{phaseNextAction.stepLabel}</Badge>
+              </div>
+              <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 md:grid-cols-[8rem_1fr] md:items-center">
+            <div className="flex flex-wrap items-center gap-2 md:block">
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Launch action</p>
+              <Badge className={`${launchAuditStatusClass(launchAudit.nextAction.status)} mt-0 md:mt-2`}>
+                {launchAudit.nextAction.statusLabel}
+              </Badge>
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h2>
+                <Badge className="border-zinc-700 bg-black text-zinc-300">Public launch</Badge>
+              </div>
+              <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
+            </div>
           </div>
         </section>
 

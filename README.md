@@ -98,7 +98,7 @@ The current app is a local prototype of the hook-building flow:
 
 - first-screen flow: choose project, propose work, decide, build PR, review, log
 - phase checklist derived from the current wave state
-- next-action guidance derived from the same six-step flow
+- separate work-loop and public-launch next-action guidance
 - project wave setup with simpler user-facing language
 - 6529 wave search by name or pasted wave URL/ID
 - GitHub repo link
