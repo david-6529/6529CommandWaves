@@ -108,18 +108,18 @@ Short version:
 
 The current app is a local prototype of the hook-building flow:
 
-- first-screen hook dashboard: wave snapshot, repo state, PR, review, and progress
-- hooks-in-development snapshot for the 6529 Hook with wave, repo, PR, review, and evidence state
-- visible participation gate notes in the hook project snapshot
-- at-a-glance hook status row for gate, orchestration, PR, and review
-- active work orchestration trace with decision route, rule reason, and reviewer route
-- per-hook next step in the active projects list
-- automatic latest-wave preview for the active hook project
-- copyable builder wave conversation note for manual questions and replies
-- first-screen wave update draft copy action for human sharing in the builder wave
-- first-screen jump actions for suggesting work and reading activity
-- compact current-state area with work, launch, and progress guidance
-- recent activity log placed near the core build flow
+- simple public project room with the vision, rules drawer, proposal form, current build, swarm chat, members, and activity
+- large readable default UI that keeps secondary details collapsed until needed
+- first-screen jump actions for suggesting work, checking the current build, and talking to the swarm
+- beginner-friendly hook work proposal form with visible next steps
+- current build view with proposal, decision, PR, review, and one next action
+- builder wave chat area with latest-post preview and a copyable conversation note
+- swarm member list with 6529 profile links and informational contribution scores
+- project details drawer with the active hook, builder wave, repo evidence, gate notes, and repo action
+- launch checklist drawer with work state, launch state, and phase progress
+- advanced controls drawer for preflight, orchestration, voting, PR build, and review details
+- reports and fees drawer for contribution evidence and manual developer fee planning
+- share update drawer for the human-reviewed wave update draft and launch packet
 - collapsed maintainer setup and guardrail controls at the bottom of the page
 - project wave setup with simpler user-facing language
 - 6529 wave search by name or pasted wave URL/ID
