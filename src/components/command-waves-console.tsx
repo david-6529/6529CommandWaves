@@ -123,6 +123,11 @@ type WaveContextPreview = {
   }>;
 };
 
+type ProjectContextPreviewState = {
+  projectId: string;
+  preview: WaveContextPreview;
+};
+
 type ContextPreviewResponse = ApiErrorPayload & {
   preview?: WaveContextPreview;
 };
@@ -603,7 +608,7 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
-  const [projectContextPreview, setProjectContextPreview] = useState<WaveContextPreview | null>(null);
+  const [projectContextPreview, setProjectContextPreview] = useState<ProjectContextPreviewState | null>(null);
   const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
@@ -804,7 +809,7 @@ export function CommandWavesConsole() {
     }
   }
 
-  async function previewContext(targetWaveUrl = waveUrl, target: "project" | "setup" = "setup") {
+  async function previewContext(targetWaveUrl = waveUrl, target: "project" | "setup" = "setup", projectId?: string) {
     setApiBusy("context");
     setApiError("");
 
@@ -812,7 +817,7 @@ export function CommandWavesConsole() {
       const preview = await requestContextPreview(targetWaveUrl);
 
       if (target === "project") {
-        setProjectContextPreview(preview);
+        setProjectContextPreview({ projectId: projectId ?? targetWaveUrl, preview });
       } else {
         setSetupContextPreview(preview);
       }
@@ -1082,93 +1087,97 @@ export function CommandWavesConsole() {
             </Badge>
           </div>
           <div className="grid gap-3">
-            {activeHookProjects.map((project) => (
-              <div key={project.id} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
-                    <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
-                  </div>
-                  <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
-                    {project.statusLabel}
-                  </Badge>
-                </div>
+            {activeHookProjects.map((project) => {
+              const contextPreview = projectContextPreview?.projectId === project.id ? projectContextPreview.preview : null;
 
-                <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-                  <div className="border-t border-zinc-800 pt-3">
-                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Wave activity</p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave to talk</LinkButton> : null}
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={isBusy || !project.waveUrl}
-                        onClick={() => void previewContext(project.waveUrl, "project")}
-                      >
-                        {apiBusy === "context" ? "Loading" : "Read wave posts"}
-                      </Button>
+              return (
+                <div key={project.id} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
+                      <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                     </div>
-                    {projectContextPreview ? (
-                      <div className="mt-3 border-t border-zinc-800 pt-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{projectContextPreview.context.mode}</Badge>
-                          <Badge className={projectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                            {projectContextPreview.dropCount} drops
-                          </Badge>
-                        </div>
-                        <div className="mt-2 grid gap-2">
-                          {projectContextPreview.sampleDrops.slice(-2).map((drop) => (
-                            <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
-                              <p className="text-xs font-semibold text-zinc-500">
-                                {drop.author} / {drop.id}
-                              </p>
-                              <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="mt-3 text-xs leading-5 text-zinc-500">
-                        Preview the wave to read recent 6529 posts on this page.
-                      </p>
-                    )}
+                    <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
+                      {project.statusLabel}
+                    </Badge>
                   </div>
 
-                  <div className="border-t border-zinc-800 pt-3">
-                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">GitHub evidence</p>
-                    <p className="mt-2 text-sm leading-6 text-zinc-300">{project.platformRole}</p>
-                    <dl className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
-                      <div>
-                        <dt className="font-semibold text-zinc-300">Focus</dt>
-                        <dd>{project.currentFocus}</dd>
+                  <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+                    <div className="border-t border-zinc-800 pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Wave activity</p>
+                      <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave to talk</LinkButton> : null}
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          disabled={isBusy || !project.waveUrl}
+                          onClick={() => void previewContext(project.waveUrl, "project", project.id)}
+                        >
+                          {apiBusy === "context" ? "Loading" : "Read wave posts"}
+                        </Button>
                       </div>
-                      <div>
-                        <dt className="font-semibold text-zinc-300">PR state</dt>
-                        <dd>{project.codeStatus}</dd>
+                      {contextPreview ? (
+                        <div className="mt-3 border-t border-zinc-800 pt-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextPreview.context.mode}</Badge>
+                            <Badge className={contextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                              {contextPreview.dropCount} drops
+                            </Badge>
+                          </div>
+                          <div className="mt-2 grid gap-2">
+                            {contextPreview.sampleDrops.slice(-2).map((drop) => (
+                              <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
+                                <p className="text-xs font-semibold text-zinc-500">
+                                  {drop.author} / {drop.id}
+                                </p>
+                                <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="mt-3 text-xs leading-5 text-zinc-500">
+                          Preview the wave to read recent 6529 posts on this page.
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="border-t border-zinc-800 pt-3">
+                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">GitHub evidence</p>
+                      <p className="mt-2 text-sm leading-6 text-zinc-300">{project.platformRole}</p>
+                      <dl className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
+                        <div>
+                          <dt className="font-semibold text-zinc-300">Focus</dt>
+                          <dd>{project.currentFocus}</dd>
+                        </div>
+                        <div>
+                          <dt className="font-semibold text-zinc-300">PR state</dt>
+                          <dd>{project.codeStatus}</dd>
+                        </div>
+                        <div>
+                          <dt className="font-semibold text-zinc-300">Review</dt>
+                          <dd>{project.reviewStatusLabel}</dd>
+                        </div>
+                        <div>
+                          <dt className="font-semibold text-zinc-300">Evidence</dt>
+                          <dd>{project.evidenceLabel}</dd>
+                        </div>
+                        <div>
+                          <dt className="font-semibold text-zinc-300">Latest activity</dt>
+                          <dd>{project.latestActivity}</dd>
+                        </div>
+                      </dl>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
+                        {project.latestPrUrl ? <LinkButton href={project.latestPrUrl}>Open PR</LinkButton> : null}
                       </div>
-                      <div>
-                        <dt className="font-semibold text-zinc-300">Review</dt>
-                        <dd>{project.reviewStatusLabel}</dd>
-                      </div>
-                      <div>
-                        <dt className="font-semibold text-zinc-300">Evidence</dt>
-                        <dd>{project.evidenceLabel}</dd>
-                      </div>
-                      <div>
-                        <dt className="font-semibold text-zinc-300">Latest activity</dt>
-                        <dd>{project.latestActivity}</dd>
-                      </div>
-                    </dl>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
-                      {project.latestPrUrl ? <LinkButton href={project.latestPrUrl}>Open PR</LinkButton> : null}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
