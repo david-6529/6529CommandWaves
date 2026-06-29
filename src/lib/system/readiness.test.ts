@@ -6,7 +6,8 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 0, warn: 8, fail: 3 });
+    expect(summary).toEqual({ pass: 0, warn: 7, fail: 3 });
+    expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "database")).toMatchObject({
       status: "warn",
     });
@@ -19,7 +20,7 @@ describe("readiness checks", () => {
     });
   });
 
-  it("passes configured production basics while warning when posting is disabled", () => {
+  it("passes configured production basics without requiring posting credentials", () => {
     const checks = getReadinessChecks({
       NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
       DATABASE_URL: "postgresql://example",
@@ -31,10 +32,8 @@ describe("readiness checks", () => {
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 7, warn: 3, fail: 1 });
-    expect(checks.find((check) => check.id === "6529_posting")).toMatchObject({
-      status: "warn",
-    });
+    expect(summary).toEqual({ pass: 7, warn: 2, fail: 1 });
+    expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",
     });
