@@ -19,7 +19,7 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
   const rulesLine = contributorRulesLine(wave.repoUrl);
 
   return [
-    "6529 Hook Builder launch brief",
+    "6529 hook launch brief",
     "",
     `Builder wave: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,

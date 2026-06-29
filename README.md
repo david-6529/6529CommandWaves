@@ -6,6 +6,7 @@ Command Waves let a 6529 builder wave govern scoped work in a GitHub repo.
 
 For the first public phase, the project is simple: use a 6529 wave to coordinate a community-built 6529 hook.
 People propose scoped work, decisions approve PRs, agents can help, reviewers check the output, and humans keep control.
+The workflow is reusable for future public hook projects, but the first launch UI stays focused on the 6529 hook.
 
 The app keeps the loop visible:
 
@@ -16,9 +17,9 @@ The app keeps the loop visible:
 5. Review the result.
 6. Log the activity.
 
-The simple flow is:
+The simplest flow is:
 
-`Choose project -> Propose work -> Decide -> Build PR -> Review -> Log`
+`Wave -> PR -> Review -> Log`
 
 ## Why This Exists
 
@@ -97,6 +98,7 @@ Short version:
 The current app is a local prototype of the hook-building flow:
 
 - first-screen flow: choose project, propose work, decide, build PR, review, log
+- active hooks in development list with each hook's builder wave and repo
 - phase checklist derived from the current wave state
 - separate work-loop and public-launch next-action guidance
 - project wave setup with simpler user-facing language

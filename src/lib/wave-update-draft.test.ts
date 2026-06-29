@@ -13,7 +13,7 @@ describe("wave update draft", () => {
       review: demoWave.reviews[0],
     });
 
-    expect(draft).toContain("6529 Hook Builder update");
+    expect(draft).toContain("6529 hook update");
     expect(draft).toContain(`Command: ${proposal.id} - ${proposal.title}`);
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
     expect(draft).toContain("receipt https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval.");

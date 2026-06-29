@@ -19,7 +19,7 @@ describe("launch packet", () => {
       proposalId: proposal.id,
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
-    expect(packet.text).toContain("# 6529 Hook Builder launch packet");
+    expect(packet.text).toContain("# 6529 hook launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("manual note only");

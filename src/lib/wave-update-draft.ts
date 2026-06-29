@@ -88,7 +88,7 @@ export function createWaveUpdateDraft({
   const reviewProof = reviewProofLine(review);
 
   return [
-    "6529 Hook Builder update",
+    "6529 hook update",
     "",
     `Wave: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,

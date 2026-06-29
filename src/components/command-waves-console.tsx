@@ -24,6 +24,7 @@ import {
   type FirstPhaseLaunchAuditStatus,
 } from "@/lib/first-phase-launch-audit";
 import { createHookProposalPreflight, type HookProposalPreflightCheck } from "@/lib/hook-proposal-preflight";
+import { createActiveHookProjects } from "@/lib/hook-projects";
 import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
@@ -427,16 +428,6 @@ function CompactList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-function StepCard({ step, title, body }: { step: string; title: string; body: string }) {
-  return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
-      <p className="text-xs font-semibold uppercase tracking-normal text-cyan-300">{step}</p>
-      <h2 className="mt-2 text-base font-semibold text-zinc-50">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-400">{body}</p>
-    </div>
-  );
-}
-
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block text-sm font-semibold text-zinc-200">
@@ -666,6 +657,7 @@ export function CommandWavesConsole() {
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
+  const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const launchAudit = useMemo(
     () =>
       createFirstPhaseLaunchAudit({
@@ -1013,24 +1005,73 @@ export function CommandWavesConsole() {
   return (
     <main className="min-h-screen bg-black text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="grid gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1fr_0.8fr] lg:items-end">
-          <div>
+        <header className="border-b border-zinc-800 pb-5">
+          <div className="max-w-4xl">
             <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">{commandWaveProductCopy.eyebrow}</p>
             <h1 className="mt-2 max-w-4xl text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
               {commandWaveProductCopy.headline}
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-400">{commandWaveProductCopy.subhead}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
-            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Simple flow</p>
-            <p className="mt-1 text-sm font-semibold text-zinc-100">{commandWaveProductCopy.simpleFlow}</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-500">{commandWaveProductCopy.positioning}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Flow</span>
+              {commandWaveProductCopy.simpleFlow.split(" - ").map((step) => (
+                <Badge key={step} className="border-zinc-700 bg-zinc-950 text-zinc-200">
+                  {step}
+                </Badge>
+              ))}
+            </div>
           </div>
         </header>
 
-        <section className="grid gap-3 md:grid-cols-3">
-          {commandWaveProductCopy.steps.map((step) => (
-            <StepCard key={step.step} step={step.step} title={step.title} body={step.body} />
-          ))}
+        <section className="grid gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in progress</p>
+              <h2 className="mt-1 text-base font-semibold text-zinc-50">Active hooks</h2>
+            </div>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{countLabel(activeHookProjects.length, "hook")}</Badge>
+          </div>
+          <div className="grid gap-3">
+            {activeHookProjects.map((project) => (
+              <div key={project.id} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
+                    <p className="mt-1 text-xs leading-5 text-zinc-500">{project.participation}</p>
+                  </div>
+                  <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
+                    {project.statusLabel}
+                  </Badge>
+                </div>
+                <div className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
+                  <p>
+                    <span className="font-semibold text-zinc-300">Focus:</span> {project.currentFocus}
+                  </p>
+                  <p className="break-all">
+                    <span className="font-semibold text-zinc-300">Wave:</span>{" "}
+                    {project.waveUrl ? (
+                      <a className="text-cyan-300 hover:text-cyan-200" href={project.waveUrl} target="_blank" rel="noreferrer">
+                        {project.waveUrl}
+                      </a>
+                    ) : (
+                      <span className="text-zinc-500">not set</span>
+                    )}
+                  </p>
+                  <p className="break-all">
+                    <span className="font-semibold text-zinc-300">Repo:</span>{" "}
+                    {project.repoUrl ? (
+                      <a className="text-cyan-300 hover:text-cyan-200" href={project.repoUrl} target="_blank" rel="noreferrer">
+                        {project.repoUrl}
+                      </a>
+                    ) : (
+                      <span className="text-zinc-500">not set</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         <div className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">

@@ -6,7 +6,7 @@ describe("builder wave launch draft", () => {
   it("creates a concise first post for the hook builder wave", () => {
     const draft = createBuilderWaveLaunchDraft(demoWave);
 
-    expect(draft).toContain("6529 Hook Builder launch brief");
+    expect(draft).toContain("6529 hook launch brief");
     expect(draft).toContain(`Builder wave: ${demoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Contributor rules: https://github.com/6529-Collections/6529-hook/blob/main/CONTRIBUTING.md");

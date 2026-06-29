@@ -51,7 +51,7 @@ const poll: PollState = {
 
 const preExecutionWave: CommandWave = {
   id: "cw-6529-hook-builder",
-  name: "6529 Hook Builder",
+  name: "6529 Hook",
   waveUrl: "https://6529.io/waves/6529-hook-builder",
   repoUrl: "https://github.com/6529-Collections/6529-hook",
   gates: [...defaultParticipationGates],
@@ -66,7 +66,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:00:00.000Z",
       actor: "Setup",
       type: "wave_created",
-      message: "Created 6529 Hook Builder and attached the builder wave plus GitHub repo.",
+      message: "Created the 6529 hook project and attached the builder wave plus GitHub repo.",
     },
     {
       id: "evt-002",

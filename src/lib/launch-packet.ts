@@ -249,7 +249,7 @@ export function createLaunchPacket({
   const contributionReport = createContributionReport(wave, { generatedAt, limit: 6 });
   const developerFeePlan = createDeveloperFeePlan(wave, contributionReport);
   const text = [
-    "# 6529 Hook Builder launch packet",
+    "# 6529 hook launch packet",
     "",
     "Status: human-reviewed draft",
     `Generated: ${generatedAt}`,
