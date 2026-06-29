@@ -960,7 +960,7 @@ export function CommandWavesConsole() {
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
-  const recentLedgerEvents = orderedLedgerEvents.slice(0, 6);
+  const recentLedgerEvents = orderedLedgerEvents.slice(0, 4);
   const olderLedgerEvents = orderedLedgerEvents.slice(recentLedgerEvents.length);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
@@ -1515,6 +1515,7 @@ export function CommandWavesConsole() {
           <div className="mt-4 flex flex-wrap gap-2">
             <JumpLink href="#wave-room">Message swarm</JumpLink>
             <JumpLink href="#start-building">Propose change</JumpLink>
+            <JumpLink href="#recent-activity">View activity</JumpLink>
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
             {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
           </div>
@@ -1539,7 +1540,7 @@ export function CommandWavesConsole() {
           <div className="mt-4 flex flex-wrap gap-2">
             {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
             {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
-            <JumpLink href="#recent-activity">View log</JumpLink>
+            <JumpLink href="#recent-activity">View activity</JumpLink>
           </div>
           <div className="mt-4 border-t border-zinc-800 pt-4">
             <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
@@ -1623,7 +1624,7 @@ export function CommandWavesConsole() {
                 </p>
                 <JumpLink href="#share-back">Share update</JumpLink>
                 <JumpLink href="#start-building">Propose change</JumpLink>
-                <JumpLink href="#recent-activity">View log</JumpLink>
+                <JumpLink href="#recent-activity">View activity</JumpLink>
               </div>
             ) : (
               <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -1780,6 +1781,40 @@ export function CommandWavesConsole() {
               </div>
             </details>
           </div>
+        </section>
+
+        <section id="recent-activity" className="scroll-mt-4">
+          <Panel title="Project activity" eyebrow="Log">
+            <div className="divide-y divide-zinc-800">
+              {recentLedgerEvents.map((event) => (
+                <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                  <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                  <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                  <div>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {olderLedgerEvents.length ? (
+              <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+                <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
+                <div className="mt-3 divide-y divide-zinc-900">
+                  {olderLedgerEvents.map((event) => (
+                    <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
+                      <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
+                      <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                      <div>
+                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
+                        <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+          </Panel>
         </section>
 
         <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
@@ -2918,40 +2953,6 @@ export function CommandWavesConsole() {
             </details>
           </div>
         </details>
-
-        <section id="recent-activity" className="scroll-mt-4">
-          <Panel title="Recent activity" eyebrow="Log">
-            <div className="divide-y divide-zinc-800">
-              {recentLedgerEvents.map((event) => (
-                <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                  <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                  <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                  <div>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {olderLedgerEvents.length ? (
-              <details className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
-                <summary className="text-sm font-semibold text-zinc-100">Show older activity</summary>
-                <div className="mt-3 divide-y divide-zinc-900">
-                  {olderLedgerEvents.map((event) => (
-                    <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
-                      <p className="text-xs font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                      <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
-                      <div>
-                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                        <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            ) : null}
-          </Panel>
-        </section>
 
         <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
