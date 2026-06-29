@@ -76,20 +76,6 @@ const swarmGameRules = [
   "Important changes need a visible decision before a PR is built.",
   "The reviewer agent checks the PR before humans merge.",
 ];
-const plainNextSteps = [
-  {
-    title: "Share it",
-    detail: "Put the idea in the swarm so builders can react in public.",
-  },
-  {
-    title: "Decide it",
-    detail: "Important work needs a visible 6529 decision before code is built.",
-  },
-  {
-    title: "Build and review",
-    detail: "Approved PR work goes through the build agent and reviewer check before humans merge.",
-  },
-];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
   "hook_parameter_explicit_bound",
@@ -1570,72 +1556,47 @@ export function CommandWavesConsole() {
     <main className="min-h-screen bg-black text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-800 pb-5">
-          <div className="max-w-3xl">
-            <h1 className="text-2xl font-semibold tracking-normal text-zinc-50 sm:text-3xl">
-              {commandWaveProductCopy.headline}
-            </h1>
-            <p className="mt-2 max-w-2xl text-base leading-7 text-zinc-300">{commandWaveProductCopy.subhead}</p>
-            <p className="mt-1 max-w-3xl text-base leading-7 text-zinc-500">{commandWaveProductCopy.positioning}</p>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+                {commandWaveProductCopy.headline}
+              </h1>
+              <p className="mt-3 max-w-2xl text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
+              <p className="mt-1 max-w-3xl text-base leading-7 text-zinc-500">{commandWaveProductCopy.positioning}</p>
+            </div>
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+              <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
+            </div>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Workflow</span>
-            {commandWaveProductCopy.simpleFlow.split(" - ").map((step) => (
-              <Badge key={step} className="border-zinc-700 bg-zinc-950 text-zinc-200">
-                {step}
-              </Badge>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {currentBuildRows.map((row) => (
+              <div key={row.label} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-zinc-400">{row.label}</p>
+                  <Badge className={row.className}>{row.status}</Badge>
+                </div>
+                <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-300">{row.detail}</p>
+              </div>
             ))}
           </div>
+
           <div className="mt-4 flex flex-wrap gap-2">
-            <JumpLink href="#start-building">Suggest a change</JumpLink>
-            <JumpLink href="#current-build">Current build</JumpLink>
-            <JumpLink href="#wave-room">Talk to the swarm</JumpLink>
+            <JumpLink href="#current-build">Current work</JumpLink>
+            <JumpLink href="#wave-room">Talk to swarm</JumpLink>
+            <JumpLink href="#start-building">Suggest change</JumpLink>
+            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+            {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
           </div>
         </header>
 
-        <details id="rules-of-game" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>How it works</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">details</Badge>
-          </summary>
-          <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1fr]">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Rules</p>
-              <ol className="mt-3 grid gap-2">
-                {swarmGameRules.map((rule, index) => (
-                  <li key={rule} className="grid grid-cols-[2rem_1fr] gap-3 border-t border-zinc-800 pt-2">
-                    <span className="text-base font-semibold text-cyan-300">{index + 1}</span>
-                    <span className="text-base leading-7 text-zinc-300">{rule}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-            <div id="who-can-play">
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Who can play</p>
-              <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
-                {participationGateNotes.map((gate) => (
-                  <div key={gate} className="py-3">
-                    <p className="text-base leading-7 text-zinc-300">{gate}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
-                  Copy guide
-                </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
-              </div>
-              {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
-            </div>
-          </div>
-        </details>
-
-        <section id="start-building" className="grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.15fr_0.85fr]">
+        <section id="start-building" className="order-3 grid scroll-mt-4 gap-4 border-b border-zinc-800 pb-5 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Participate</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest one small change</h2>
+            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">New proposal</p>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest a hook change</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              You can help by naming a concrete hook change and the limits it must respect. The app turns that into a
-              proposal the swarm can discuss, approve, build, and review.
+              Name the change, add the limits, and share it with the swarm before it becomes PR work.
             </p>
             <div className="mt-4 grid gap-3">
               <Field label="Your name or 6529 handle">
@@ -1674,25 +1635,34 @@ export function CommandWavesConsole() {
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
           </div>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">What happens next</p>
+            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Proposal status</p>
             <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
-              {plainNextSteps.map((step, index) => (
-                <div key={step.title} className="grid grid-cols-[2rem_1fr] gap-3 py-3">
-                  <span className="text-base font-semibold text-cyan-300">{index + 1}</span>
-                  <div>
-                    <p className="text-base font-semibold text-zinc-100">{step.title}</p>
-                    <p className="mt-1 text-base leading-7 text-zinc-400">{step.detail}</p>
-                  </div>
-                </div>
-              ))}
+              <div className="flex items-center justify-between gap-3 py-3">
+                <p className="text-base font-semibold text-zinc-100">Risk route</p>
+                <Badge className={riskClass(classifiedRisk)}>{classifiedRisk}</Badge>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-3">
+                <p className="text-base font-semibold text-zinc-100">Decision</p>
+                <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
+              </div>
+              <div className="flex items-center justify-between gap-3 py-3">
+                <p className="text-base font-semibold text-zinc-100">Hook check</p>
+                <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
+                  {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
+                </Badge>
+              </div>
+              <div className="py-3">
+                <p className="text-base font-semibold text-zinc-100">Current note</p>
+                <p className="mt-1 text-base leading-7 text-zinc-400">{simplePreflightMessage}</p>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="current-build" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <section id="current-build" className="order-1 scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current build</p>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Active change</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">
                 {activeProposal ? activeProposal.title : "No active hook change yet"}
               </h2>
@@ -1709,17 +1679,6 @@ export function CommandWavesConsole() {
             {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
             <JumpLink href="#recent-activity">View log</JumpLink>
             <JumpLink href="#suggest-hook-work">Advanced check</JumpLink>
-          </div>
-          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-            {currentBuildRows.map((row) => (
-              <div key={row.label} className="grid gap-2 py-3 md:grid-cols-[9rem_8rem_1fr]">
-                <p className="text-base font-semibold text-zinc-100">{row.label}</p>
-                <div>
-                  <Badge className={row.className}>{row.status}</Badge>
-                </div>
-                <p className="text-base leading-7 text-zinc-400">{row.detail}</p>
-              </div>
-            ))}
           </div>
           <div className="mt-4 border-t border-zinc-800 pt-4">
             <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
@@ -1811,13 +1770,12 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <section id="wave-room" className="scroll-mt-4">
+        <section id="wave-room" className="order-2 scroll-mt-4">
           <Panel title="Talk to the swarm" eyebrow="Chat">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
-                  Ask what matters, suggest a change, or reply to a decision. The app can read recent 6529 posts, but this
-                  room should still make sense if you have never used a Wave.
+                  Ask a question, respond to the active change, or draft a concise note for the swarm.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button
@@ -1889,7 +1847,7 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <section id="swarm-members" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <section id="swarm-members" className="order-4 scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">People</p>
@@ -1918,7 +1876,44 @@ export function CommandWavesConsole() {
           </div>
         </section>
 
-        <details id="project-details" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="rules-of-game" className="order-5 scroll-mt-4 border-b border-zinc-800 pb-5">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>Rules and access</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">reference</Badge>
+          </summary>
+          <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1fr]">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Build rules</p>
+              <ol className="mt-3 grid gap-2">
+                {swarmGameRules.map((rule, index) => (
+                  <li key={rule} className="grid grid-cols-[2rem_1fr] gap-3 border-t border-zinc-800 pt-2">
+                    <span className="text-base font-semibold text-cyan-300">{index + 1}</span>
+                    <span className="text-base leading-7 text-zinc-300">{rule}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div id="who-can-play">
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Who can join</p>
+              <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+                {participationGateNotes.map((gate) => (
+                  <div key={gate} className="py-3">
+                    <p className="text-base leading-7 text-zinc-300">{gate}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
+                  Copy guide
+                </Button>
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+              </div>
+              {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
+            </div>
+          </div>
+        </details>
+
+        <details id="project-details" className="order-6 scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Project details</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2070,12 +2065,15 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details className="border-b border-zinc-800 pb-5">
+        <details className="order-7 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Launch checklist</span>
-            <Badge className="border-zinc-700 bg-black text-zinc-300">
-              {completedPhaseCount}/{phaseChecklist.length} done
-            </Badge>
+            <span className="flex flex-wrap justify-end gap-2">
+              <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
+              <Badge className="border-zinc-700 bg-black text-zinc-300">
+                {completedPhaseCount}/{phaseChecklist.length} flow
+              </Badge>
+            </span>
           </summary>
 
           {showApiNotice ? (
@@ -2583,7 +2581,7 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <details id="suggest-hook-work" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="suggest-hook-work" className="order-8 scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Advanced controls</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
@@ -2978,7 +2976,7 @@ export function CommandWavesConsole() {
           </section>
         </details>
 
-        <section id="recent-activity" className="scroll-mt-4">
+        <section id="recent-activity" className="order-9 scroll-mt-4">
           <Panel title="Recent activity" eyebrow="Log">
             <div className="divide-y divide-zinc-800">
               {recentLedgerEvents.map((event) => (
@@ -3012,7 +3010,7 @@ export function CommandWavesConsole() {
           </Panel>
         </section>
 
-        <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="reports" className="order-10 scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Reports and fees</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">informational</Badge>
@@ -3128,7 +3126,7 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details id="share-back" className="scroll-mt-4 border-b border-zinc-800 pb-5">
+        <details id="share-back" className="order-11 scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
             <span>Share update</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>

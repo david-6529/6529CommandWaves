@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Build Hooks Together",
-  description: "Coordinate public hook work through a 6529 wave, GitHub PRs, reviews, and audit logs.",
+  title: "6529 Hook",
+  description: "Coordinate the active hook change with swarm chat, decisions, PR evidence, and review status.",
 };
 
 export default function RootLayout({
