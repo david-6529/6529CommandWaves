@@ -154,6 +154,38 @@ function decisionLines(poll: PollState | null) {
   ];
 }
 
+function orchestrationLines(wave: CommandWave, proposal: CommandProposal | null, poll: PollState | null) {
+  if (!proposal) {
+    return [
+      "- Risk route: waiting for one scoped hook command.",
+      "- Reviewer route: PR work needs reviewer CI before human merge.",
+    ];
+  }
+
+  const rule = wave.rules.rulesByKind[proposal.kind];
+  const decisionRoute = poll
+    ? `vote required, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%, then record the 6529 decision URL`
+    : rule?.mode === "blocked"
+      ? "blocked by current rules"
+      : rule?.mode === "auto"
+        ? "allowed by current rules"
+        : rule?.mode === "poll"
+          ? "vote required by current rules"
+          : "needs rule review";
+  const reviewerRoute =
+    proposal.kind === "open_pr"
+      ? "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence before human merge."
+      : "Support commands stay outside the PR build step.";
+
+  return [
+    `- Work type: ${commandKindLabel(proposal.kind)}`,
+    `- Risk: ${proposal.risk}`,
+    `- Decision route: ${decisionRoute}.`,
+    `- Rule reason: ${rule?.reason ?? "No rule reason recorded."}`,
+    `- Reviewer route: ${reviewerRoute}`,
+  ];
+}
+
 function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
     if (poll?.status === "passed" && !poll.decision) {
@@ -282,6 +314,9 @@ export function createLaunchPacket({
     "",
     "## Command",
     ...proposalLines(proposal),
+    "",
+    "## Orchestration",
+    ...orchestrationLines(wave, proposal, poll),
     "",
     "## Decision",
     ...decisionLines(poll),

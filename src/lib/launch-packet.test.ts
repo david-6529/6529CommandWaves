@@ -27,6 +27,14 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("manual note only");
+    expect(packet.text).toContain("## Orchestration");
+    expect(packet.text).toContain("- Work type: Open PR");
+    expect(packet.text).toContain("- Risk: high");
+    expect(packet.text).toContain(
+      "- Decision route: vote required, quorum 3, yes threshold 60%, then record the 6529 decision URL.",
+    );
+    expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
+    expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence");
     expect(packet.text).toContain("Wave decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("## Contribution Report");
@@ -70,6 +78,8 @@ describe("launch packet", () => {
 
     expect(packet.proposalId).toBeNull();
     expect(packet.text).toContain("Command: none selected yet.");
+    expect(packet.text).toContain("Risk route: waiting for one scoped hook command.");
+    expect(packet.text).toContain("Reviewer route: PR work needs reviewer CI before human merge.");
     expect(packet.text).toContain("Build: waiting for an approved PR command.");
     expect(packet.text).toContain("Review: waiting for execution evidence.");
     expect(packet.text).toContain("Choose one PR-sized hook command.");
