@@ -39,8 +39,6 @@ const launchReadinessCheckIds = new Set([
   "database",
   "command_wave_store",
   "admin_api_key",
-  "cron_secret",
-  "rate_limit_salt",
   "6529_mode",
   "github_pr_adapter",
   "guardian_wave_state",

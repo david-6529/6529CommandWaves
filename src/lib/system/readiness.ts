@@ -9,12 +9,6 @@ function hasValue(value: string | undefined) {
   return Boolean(value?.trim());
 }
 
-function checkSecret(id: string, label: string, value: string | undefined): ReadinessCheck {
-  return hasValue(value)
-    ? { id, label, status: "pass", message: "Configured." }
-    : { id, label, status: "fail", message: "Missing." };
-}
-
 function localFileStoreEnabled(env: Record<string, string | undefined>) {
   return Boolean(
     env.COMMAND_WAVE_STORE === "file" ||
@@ -94,9 +88,19 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           ? "Local file persistence is active. Good for development, not production."
           : "In-memory only. State resets when the server restarts.",
     },
-    checkSecret("admin_api_key", "Admin API key", env.ADMIN_API_KEY),
-    checkSecret("cron_secret", "Cron secret", env.CRON_SECRET),
-    checkSecret("rate_limit_salt", "Rate-limit salt", env.RATE_LIMIT_SALT),
+    hasValue(env.ADMIN_API_KEY)
+      ? {
+          id: "admin_api_key",
+          label: "Admin API key",
+          status: "pass",
+          message: "Configured.",
+        }
+      : {
+          id: "admin_api_key",
+          label: "Admin API key",
+          status: "fail",
+          message: "Missing.",
+        },
     {
       id: "6529_mode",
       label: "6529 mode",

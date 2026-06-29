@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 import { getReadinessChecks, getReadinessSummary } from "./readiness";
 
 describe("readiness checks", () => {
-  it("warns about local-only infrastructure and fails missing required secrets", () => {
+  it("warns about local-only infrastructure and fails missing admin protection", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 1, warn: 6, fail: 3 });
+    expect(summary).toEqual({ pass: 1, warn: 6, fail: 1 });
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
+    expect(checks.some((check) => check.id === "cron_secret")).toBe(false);
+    expect(checks.some((check) => check.id === "rate_limit_salt")).toBe(false);
     expect(checks.find((check) => check.id === "database")).toMatchObject({
       status: "warn",
     });
@@ -25,14 +27,12 @@ describe("readiness checks", () => {
       NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
       DATABASE_URL: "postgresql://example",
       ADMIN_API_KEY: "admin",
-      CRON_SECRET: "cron",
-      RATE_LIMIT_SALT: "salt",
       "6529_MOCK_MODE": "false",
       NODE_ENV: "production",
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 8, warn: 1, fail: 1 });
+    expect(summary).toEqual({ pass: 6, warn: 1, fail: 1 });
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",

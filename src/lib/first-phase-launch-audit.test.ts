@@ -9,8 +9,6 @@ const productionReadyChecks = getReadinessChecks({
   NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
   DATABASE_URL: "postgresql://example",
   ADMIN_API_KEY: "admin",
-  CRON_SECRET: "cron",
-  RATE_LIMIT_SALT: "salt",
   "6529_MOCK_MODE": "false",
   NODE_ENV: "production",
   COMMAND_WAVE_STORE: "postgres",
@@ -210,8 +208,11 @@ describe("first phase launch audit", () => {
       itemId: "readiness_admin_api_key",
       title: "Fix Admin API key",
     });
-    expect(audit.blockers.map((item) => item.label)).toEqual(["Admin API key", "Cron secret", "Rate-limit salt"]);
-    expect(audit.openItems.slice(0, 3).map((item) => item.status)).toEqual(["blocked", "blocked", "blocked"]);
+    expect(audit.blockers.map((item) => item.label)).toEqual(["Admin API key"]);
+    expect(audit.openItems[0]).toMatchObject({
+      id: "readiness_admin_api_key",
+      status: "blocked",
+    });
   });
 
   it("reports unfinished flow steps without blocking local work", () => {
