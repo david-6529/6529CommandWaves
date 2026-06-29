@@ -79,3 +79,17 @@ export function normalizeParticipationGates(
 
   return [...fallback].map((item) => normalizeGateLine(item)).filter((item): item is string => Boolean(item));
 }
+
+export function summarizeParticipationAccess(input: unknown) {
+  const gates = normalizeParticipationGates(input);
+
+  if (!gates.length) {
+    return "Participation access is not set yet.";
+  }
+
+  if (gates.some((gate) => advisoryPattern.test(gate))) {
+    return "Phase 1 access is reviewed manually. REP, TDH, QnA, and report scores are not live permissions here.";
+  }
+
+  return gates[0];
+}

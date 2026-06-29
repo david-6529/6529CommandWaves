@@ -3,6 +3,7 @@ import {
   defaultParticipationGates,
   normalizeParticipationGates,
   participationGateNeedsAdvisoryNote,
+  summarizeParticipationAccess,
 } from "./participation-gates";
 
 describe("participation gates", () => {
@@ -34,5 +35,12 @@ describe("participation gates", () => {
     expect(participationGateNeedsAdvisoryNote("30% of TDH holders can contribute")).toBe(true);
     expect(participationGateNeedsAdvisoryNote("REP or TDH planned, not enforced here")).toBe(false);
     expect(participationGateNeedsAdvisoryNote("Community builders welcome")).toBe(false);
+  });
+
+  it("summarizes manual phase 1 access without claiming live gates", () => {
+    expect(summarizeParticipationAccess(defaultParticipationGates)).toBe(
+      "Phase 1 access is reviewed manually. REP, TDH, QnA, and report scores are not live permissions here.",
+    );
+    expect(summarizeParticipationAccess(["Community builders welcome"])).toBe("Community builders welcome");
   });
 });

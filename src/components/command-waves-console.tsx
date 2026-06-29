@@ -35,7 +35,7 @@ import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
-import { normalizeParticipationGates } from "@/lib/participation-gates";
+import { normalizeParticipationGates, summarizeParticipationAccess } from "@/lib/participation-gates";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -838,18 +838,22 @@ export function CommandWavesConsole() {
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
+  const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
+  const participationAccessSummary = useMemo(() => summarizeParticipationAccess(wave.gates), [wave.gates]);
   const currentProjectFacts = primaryHookProject
     ? [
         { label: "Hook", value: primaryHookProject.name },
         { label: "6529 discussion", value: primaryHookProject.waveLabel, href: primaryHookProject.waveUrl },
         { label: "GitHub repo", value: primaryHookProject.repoLabel, href: primaryHookProject.repoUrl },
-        { label: "Access", value: primaryHookProject.gateSnapshotLabel },
+        {
+          label: "Access",
+          value: primaryHookProject.gateSnapshotLabel === "manual gate" ? "manual review" : primaryHookProject.gateSnapshotLabel,
+        },
       ]
     : [];
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
-  const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -1511,6 +1515,7 @@ export function CommandWavesConsole() {
               ))}
             </div>
           ) : null}
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500">{participationAccessSummary}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             <JumpLink href="#wave-room">Message swarm</JumpLink>
