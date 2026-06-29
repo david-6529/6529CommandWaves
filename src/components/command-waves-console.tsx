@@ -603,7 +603,8 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [codexPacketNotice, setCodexPacketNotice] = useState("");
-  const [contextPreview, setContextPreview] = useState<WaveContextPreview | null>(null);
+  const [projectContextPreview, setProjectContextPreview] = useState<WaveContextPreview | null>(null);
+  const [setupContextPreview, setSetupContextPreview] = useState<WaveContextPreview | null>(null);
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -781,6 +782,8 @@ export function CommandWavesConsole() {
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
     setGateNotes(nextWave.gates.join("\n"));
+    setProjectContextPreview(null);
+    setSetupContextPreview(null);
     setLaunchBriefNotice("");
     setCodexPacketNotice("");
   }
@@ -801,14 +804,18 @@ export function CommandWavesConsole() {
     }
   }
 
-  async function previewContext(targetWaveUrl = waveUrl) {
+  async function previewContext(targetWaveUrl = waveUrl, target: "project" | "setup" = "setup") {
     setApiBusy("context");
     setApiError("");
 
     try {
       const preview = await requestContextPreview(targetWaveUrl);
 
-      setContextPreview(preview);
+      if (target === "project") {
+        setProjectContextPreview(preview);
+      } else {
+        setSetupContextPreview(preview);
+      }
       setApiNotice(`Context preview loaded for ${preview.dropCount} drops.`);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Context preview failed.");
@@ -842,7 +849,7 @@ export function CommandWavesConsole() {
 
   function selectWaveResult(result: WaveSearchResult) {
     setWaveUrl(`https://6529.io/waves/${result.id}`);
-    setContextPreview(null);
+    setSetupContextPreview(null);
     setSetupValidation(null);
     setApiNotice(`Selected ${result.name}.`);
   }
@@ -1095,21 +1102,21 @@ export function CommandWavesConsole() {
                         type="button"
                         variant="secondary"
                         disabled={isBusy || !project.waveUrl}
-                        onClick={() => void previewContext(project.waveUrl)}
+                        onClick={() => void previewContext(project.waveUrl, "project")}
                       >
                         {apiBusy === "context" ? "Loading" : "Read wave posts"}
                       </Button>
                     </div>
-                    {contextPreview ? (
+                    {projectContextPreview ? (
                       <div className="mt-3 border-t border-zinc-800 pt-3">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextPreview.context.mode}</Badge>
-                          <Badge className={contextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                            {contextPreview.dropCount} drops
+                          <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{projectContextPreview.context.mode}</Badge>
+                          <Badge className={projectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                            {projectContextPreview.dropCount} drops
                           </Badge>
                         </div>
                         <div className="mt-2 grid gap-2">
-                          {contextPreview.sampleDrops.slice(-2).map((drop) => (
+                          {projectContextPreview.sampleDrops.slice(-2).map((drop) => (
                             <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
                               <p className="text-xs font-semibold text-zinc-500">
                                 {drop.author} / {drop.id}
@@ -1234,7 +1241,13 @@ export function CommandWavesConsole() {
                 Start with one project wave. You can paste a wave link directly or search by name.
               </p>
               <Field label="6529 wave">
-                <Input value={waveUrl} onChange={(event) => setWaveUrl(event.target.value)} />
+                <Input
+                  value={waveUrl}
+                  onChange={(event) => {
+                    setWaveUrl(event.target.value);
+                    setSetupContextPreview(null);
+                  }}
+                />
               </Field>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
                 <Field label="Find a wave">
@@ -1355,7 +1368,7 @@ export function CommandWavesConsole() {
                 </Button>
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
-                <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext()}>
+                <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext(waveUrl, "setup")}>
                   {apiBusy === "context" ? "Loading" : "Preview wave posts"}
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => downloadJson("command-wave-ledger.json", wave)}>
@@ -1475,22 +1488,22 @@ export function CommandWavesConsole() {
                   ) : null}
                 </div>
               </details>
-              {contextPreview ? (
+              {setupContextPreview ? (
                 <div className="rounded-md border border-zinc-800 bg-black p-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextPreview.context.mode}</Badge>
-                    <Badge className={contextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                      {contextPreview.context.hitCap ? "hit cap" : "complete fetch"}
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{setupContextPreview.context.mode}</Badge>
+                    <Badge className={setupContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                      {setupContextPreview.context.hitCap ? "hit cap" : "complete fetch"}
                     </Badge>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-zinc-300">
-                    Found {contextPreview.dropCount} drops after checking {contextPreview.context.searchedMessages} messages.
+                    Found {setupContextPreview.dropCount} drops after checking {setupContextPreview.context.searchedMessages} messages.
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
-                    {contextPreview.fromDropId ?? "no first drop"} to {contextPreview.toDropId ?? "no latest drop"}
+                    {setupContextPreview.fromDropId ?? "no first drop"} to {setupContextPreview.toDropId ?? "no latest drop"}
                   </p>
                   <div className="mt-3 space-y-2">
-                    {contextPreview.sampleDrops.slice(-3).map((drop) => (
+                    {setupContextPreview.sampleDrops.slice(-3).map((drop) => (
                       <div key={drop.id} className="border-t border-zinc-900 pt-2">
                         <p className="text-xs font-semibold text-zinc-500">
                           {drop.author} / {drop.id}
