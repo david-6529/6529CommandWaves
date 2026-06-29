@@ -31,6 +31,7 @@ import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-n
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
+import type { SetupValidation } from "@/lib/setup-validation";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
@@ -134,35 +135,6 @@ type WaveSearchResult = {
 
 type WaveSearchResponse = ApiErrorPayload & {
   results?: WaveSearchResult[];
-};
-
-type SetupValidation = {
-  waveId: string | null;
-  repo: {
-    owner: string;
-    repo: string;
-    htmlUrl: string;
-  } | null;
-  repoMetadata: {
-    defaultBranch: string | null;
-    private: boolean | null;
-    archived: boolean | null;
-  } | null;
-  repoRequiredFiles: Array<{
-    path: string;
-    label: string;
-    exists: boolean;
-    status: number;
-    message: string;
-  }>;
-  checks: Array<{
-    id: string;
-    label: string;
-    status: "pass" | "warn" | "fail";
-    message: string;
-  }>;
-  canSave: boolean;
-  canRunCode: boolean;
 };
 
 type SetupValidationResponse = ApiErrorPayload & {
@@ -415,6 +387,7 @@ function isLaunchAuditEvidenceItem(item: FirstPhaseLaunchAuditItem) {
   return (
     item.id === "flow_wave_decision_receipt" ||
     item.id === "flow_audit_packet" ||
+    item.source === "setup" ||
     item.source === "readiness"
   );
 }
@@ -698,9 +671,10 @@ export function CommandWavesConsole() {
       createFirstPhaseLaunchAudit({
         phaseChecklist,
         readinessChecks: readiness?.checks ?? null,
+        setupValidation,
         wave,
       }),
-    [phaseChecklist, readiness, wave],
+    [phaseChecklist, readiness, setupValidation, wave],
   );
   const launchAuditOpenItems = launchAudit.openItems.slice(0, 5);
   const launchAuditReadyEvidence = launchAudit.readyItems.filter(isLaunchAuditEvidenceItem).slice(0, 5);

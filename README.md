@@ -121,7 +121,7 @@ The current app is a local prototype of the hook-building flow:
 - poll voting with one vote per voter identity
 - backend setup validation for 6529 wave links, GitHub repo links, contributor rules, and PR template
 - launch readiness checks for local mode, storage, 6529 mode, GitHub PRs, guardian wave state, and guardian mode
-- first-phase public launch audit with a single next launch action
+- first-phase public launch audit with setup evidence and a single next launch action
 - automated U+2014 guard for project text
 - controlled local run record
 - copyable manual Codex work packet for PR commands with a recorded wave decision receipt

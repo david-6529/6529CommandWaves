@@ -1,6 +1,7 @@
 import { validateWaveDecisionReference, type CommandWave } from "./command-waves";
 import { participationGateNeedsAdvisoryNote } from "./participation-gates";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
+import type { SetupCheckStatus, SetupValidation } from "./setup-validation";
 import type { ReadinessCheck } from "./system/readiness";
 
 export type FirstPhaseLaunchAuditStatus = "ready" | "needs_setup" | "blocked";
@@ -11,7 +12,7 @@ export type FirstPhaseLaunchAuditItem = {
   label: string;
   status: FirstPhaseLaunchAuditItemStatus;
   detail: string;
-  source: "flow" | "readiness";
+  source: "flow" | "readiness" | "setup";
 };
 
 export type FirstPhaseLaunchNextAction = {
@@ -100,6 +101,10 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_wave_decision_receipt: "Record the 6529 decision URL",
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Prepare the launch packet",
+  setup_not_checked: "Check setup",
+  setup_repo_required_files: "Check launch repo files",
+  setup_repo_file_contributing_md: "Add contributor rules",
+  setup_repo_file_github_pull_request_template_md: "Add PR template",
   readiness_not_checked: "Run readiness",
 };
 
@@ -159,6 +164,70 @@ function createNextAction({
 
 function openItemWeight(item: FirstPhaseLaunchAuditItem) {
   return item.status === "blocked" ? 0 : 1;
+}
+
+function setupItemStatus(status: SetupCheckStatus): FirstPhaseLaunchAuditItemStatus {
+  if (status === "pass") {
+    return "ready";
+  }
+
+  if (status === "fail") {
+    return "blocked";
+  }
+
+  return "needed";
+}
+
+function setupValidationItems(setupValidation: SetupValidation | null | undefined): FirstPhaseLaunchAuditItem[] {
+  if (!setupValidation) {
+    return [
+      {
+        id: "setup_not_checked",
+        label: "Setup check",
+        status: "needed",
+        detail: "Run setup check before public launch.",
+        source: "setup",
+      },
+    ];
+  }
+
+  if (!setupValidation.canSave) {
+    const firstFailure = setupValidation.checks.find((item) => item.status === "fail");
+
+    return [
+      {
+        id: "setup_project_check",
+        label: "Setup check",
+        status: "blocked",
+        detail: firstFailure?.message ?? "Fix the 6529 wave and GitHub repo before public launch.",
+        source: "setup",
+      },
+    ];
+  }
+
+  const launchChecks = setupValidation.checks.filter(
+    (item) => item.id === "wave_reachable" || item.id === "repo_reachable" || item.id === "repo_required_files" || item.id.startsWith("repo_file_"),
+  );
+
+  if (!launchChecks.length) {
+    return [
+      {
+        id: "setup_remote_check",
+        label: "Setup check",
+        status: "needed",
+        detail: "Run setup check to verify the wave, repo, contributor rules, and PR template.",
+        source: "setup",
+      },
+    ];
+  }
+
+  return launchChecks.map((item) => ({
+    id: `setup_${item.id}`,
+    label: item.label,
+    status: setupItemStatus(item.status),
+    detail: item.message,
+    source: "setup",
+  }));
 }
 
 function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
@@ -309,10 +378,12 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
 export function createFirstPhaseLaunchAudit({
   phaseChecklist,
   readinessChecks,
+  setupValidation,
   wave,
 }: {
   phaseChecklist: PhaseChecklistItem[];
   readinessChecks?: ReadinessCheck[] | null;
+  setupValidation?: SetupValidation | null;
   wave?: CommandWave | null;
 }): FirstPhaseLaunchAudit {
   const flowItems: FirstPhaseLaunchAuditItem[] = phaseChecklist.map((item) => ({
@@ -344,6 +415,7 @@ export function createFirstPhaseLaunchAudit({
 
   const items = [
     ...flowItems,
+    ...setupValidationItems(setupValidation),
     ...decisionReceiptItem(wave),
     ...participationNotesItem(wave),
     ...auditPacketItem(wave),

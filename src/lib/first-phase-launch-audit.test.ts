@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createPhaseChecklist } from "./phase-checklist";
+import type { SetupValidation } from "./setup-validation";
 import { getReadinessChecks } from "./system/readiness";
 
 const productionReadyChecks = getReadinessChecks({
@@ -19,11 +20,60 @@ const productionReadyChecks = getReadinessChecks({
   COMMAND_WAVE_GUARDIAN_MODE: "external_github_app",
 });
 
+const productionSetupValidation: SetupValidation = {
+  waveId: "6529-hook-builder",
+  repo: {
+    owner: "6529-Collections",
+    repo: "6529-hook",
+    htmlUrl: "https://github.com/6529-Collections/6529-hook",
+  },
+  repoMetadata: {
+    owner: "6529-Collections",
+    repo: "6529-hook",
+    htmlUrl: "https://github.com/6529-Collections/6529-hook",
+    defaultBranch: "main",
+    private: false,
+    archived: false,
+  },
+  repoRequiredFiles: [
+    {
+      path: "CONTRIBUTING.md",
+      label: "Contributor rules",
+      exists: true,
+      status: 200,
+      message: "Found CONTRIBUTING.md.",
+    },
+    {
+      path: ".github/PULL_REQUEST_TEMPLATE.md",
+      label: "PR template",
+      exists: true,
+      status: 200,
+      message: "Found .github/PULL_REQUEST_TEMPLATE.md.",
+    },
+  ],
+  checks: [
+    { id: "wave_format", label: "6529 wave", status: "pass", message: "Using wave 6529-hook-builder." },
+    { id: "repo_format", label: "GitHub repo", status: "pass", message: "Using 6529-Collections/6529-hook." },
+    { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
+    { id: "repo_reachable", label: "Repo reachable", status: "pass", message: "GitHub repo exists. Default branch: main." },
+    { id: "repo_file_contributing_md", label: "Contributor rules", status: "pass", message: "CONTRIBUTING.md is present." },
+    {
+      id: "repo_file_github_pull_request_template_md",
+      label: "PR template",
+      status: "pass",
+      message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+    },
+  ],
+  canSave: true,
+  canRunCode: true,
+};
+
 describe("first phase launch audit", () => {
   it("marks the completed demo flow and production checks ready", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave: demoWave,
     });
 
@@ -57,12 +107,34 @@ describe("first phase launch audit", () => {
         status: "ready",
       }),
     );
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "setup_repo_file_contributing_md",
+        status: "ready",
+      }),
+    );
+  });
+
+  it("keeps launch in setup mode until setup is checked", () => {
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: productionReadyChecks,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.nextAction).toMatchObject({
+      status: "needs_setup",
+      itemId: "setup_not_checked",
+      title: "Check setup",
+    });
   });
 
   it("keeps launch in setup mode until readiness is checked", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: null,
+      setupValidation: productionSetupValidation,
       wave: demoWave,
     });
 
@@ -81,10 +153,52 @@ describe("first phase launch audit", () => {
     ]);
   });
 
+  it("keeps launch in setup mode when the PR template is missing", () => {
+    const setupValidation: SetupValidation = {
+      ...productionSetupValidation,
+      repoRequiredFiles: productionSetupValidation.repoRequiredFiles.map((file) =>
+        file.path === ".github/PULL_REQUEST_TEMPLATE.md"
+          ? { ...file, exists: false, status: 404, message: "Missing .github/PULL_REQUEST_TEMPLATE.md." }
+          : file,
+      ),
+      checks: productionSetupValidation.checks.map((check) =>
+        check.id === "repo_file_github_pull_request_template_md"
+          ? {
+              ...check,
+              status: "warn",
+              message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before broad launch.",
+            }
+          : check,
+      ),
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: productionReadyChecks,
+      setupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.nextAction).toMatchObject({
+      status: "needs_setup",
+      itemId: "setup_repo_file_github_pull_request_template_md",
+      title: "Add PR template",
+    });
+    expect(audit.openItems).toContainEqual(
+      expect.objectContaining({
+        id: "setup_repo_file_github_pull_request_template_md",
+        label: "PR template",
+        status: "needed",
+        detail: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before broad launch.",
+      }),
+    );
+  });
+
   it("blocks public launch when required launch checks fail", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({}),
+      setupValidation: productionSetupValidation,
       wave: demoWave,
     });
 
@@ -112,6 +226,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -127,6 +242,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -167,6 +283,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -202,6 +319,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -228,6 +346,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -254,6 +373,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -275,6 +395,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -298,6 +419,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -318,6 +440,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
       wave,
     });
 
@@ -334,6 +457,7 @@ describe("first phase launch audit", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({}),
+      setupValidation: productionSetupValidation,
       wave: demoWave,
     });
 
