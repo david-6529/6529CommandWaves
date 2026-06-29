@@ -1263,7 +1263,7 @@ export function CommandWavesConsole() {
                 <Badge className={launchAuditStatusClass(launchAudit.nextAction.status)}>
                   {launchAudit.nextAction.statusLabel}
                 </Badge>
-                <Badge className="border-zinc-700 bg-black text-zinc-300">Public launch</Badge>
+                <Badge className="border-zinc-700 bg-black text-zinc-300">First loop</Badge>
               </div>
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
@@ -1484,7 +1484,7 @@ export function CommandWavesConsole() {
                   <div className="border-t border-zinc-900 pt-3">
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-zinc-100">Public launch audit</p>
+                        <p className="text-sm font-semibold text-zinc-100">Launch check</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">{launchAudit.summary}</p>
                       </div>
                       <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
@@ -1522,7 +1522,7 @@ export function CommandWavesConsole() {
                       </div>
                     ) : (
                       <div className="mt-3 grid gap-2">
-                        <p className="text-xs leading-5 text-zinc-500">No public launch gaps found in these checks.</p>
+                        <p className="text-xs leading-5 text-zinc-500">No launch gaps found in these checks.</p>
                         {launchAuditReadyEvidence.length ? (
                           <div className="grid gap-2 border-t border-zinc-900 pt-2">
                             <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Checked evidence</p>

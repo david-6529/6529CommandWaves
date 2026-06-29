@@ -79,7 +79,7 @@ describe("first phase launch audit", () => {
     expect(audit.nextAction).toMatchObject({
       status: "ready",
       itemId: null,
-      title: "Start the public hook loop",
+      title: "Start the first public loop",
     });
     expect(audit.blockers).toHaveLength(0);
     expect(audit.openItems).toHaveLength(0);
@@ -125,7 +125,7 @@ describe("first phase launch audit", () => {
       status: "needs_setup",
       itemId: "setup_not_checked",
       title: "Run launch setup check",
-      detail: "Verify the wave, repo, contributor rules, and PR template before public launch.",
+      detail: "Verify the wave, repo, contributor rules, and PR template before inviting contributors.",
     });
   });
 
@@ -166,7 +166,7 @@ describe("first phase launch audit", () => {
           ? {
               ...check,
               status: "warn",
-              message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before public launch.",
+              message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before inviting contributors.",
             }
           : check,
       ),
@@ -189,12 +189,12 @@ describe("first phase launch audit", () => {
         id: "setup_repo_file_github_pull_request_template_md",
         label: "PR template",
         status: "needed",
-        detail: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before public launch.",
+        detail: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before inviting contributors.",
       }),
     );
   });
 
-  it("blocks public launch when required launch checks fail", () => {
+  it("blocks the first loop when required launch checks fail", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({}),
@@ -237,7 +237,7 @@ describe("first phase launch audit", () => {
     expect(audit.openItems.map((item) => item.label)).toContain("Choose project");
   });
 
-  it("requires a builder wave decision receipt before public launch", () => {
+  it("requires a builder wave decision receipt before the first loop", () => {
     const wave = {
       ...demoWave,
       polls: [{ ...demoWave.polls[0], decision: null }],
@@ -264,7 +264,7 @@ describe("first phase launch audit", () => {
     );
   });
 
-  it("blocks public launch when a stored receipt points to another wave", () => {
+  it("blocks the first loop when a stored receipt points to another wave", () => {
     const decision = demoWave.polls[0].decision;
 
     if (!decision) {
@@ -300,7 +300,7 @@ describe("first phase launch audit", () => {
     );
   });
 
-  it("blocks public launch when a PR receipt has only a drop id", () => {
+  it("blocks the first loop when a PR receipt has only a drop id", () => {
     const decision = demoWave.polls[0].decision;
 
     if (!decision) {
@@ -336,7 +336,7 @@ describe("first phase launch audit", () => {
     );
   });
 
-  it("blocks public launch when reviewed PR work has no PR link", () => {
+  it("blocks the first loop when reviewed PR work has no PR link", () => {
     const wave = {
       ...demoWave,
       executions: [
@@ -358,12 +358,12 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_audit_packet",
         status: "blocked",
-        detail: "Launch packet needs a GitHub PR link before public launch.",
+        detail: "Launch packet needs a GitHub PR link before contributors audit it.",
       }),
     );
   });
 
-  it("blocks public launch when reviewed PR work has no review proof", () => {
+  it("blocks the first loop when reviewed PR work has no review proof", () => {
     const wave = {
       ...demoWave,
       reviews: [
@@ -385,12 +385,12 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_audit_packet",
         status: "blocked",
-        detail: "Launch packet needs Guardian review proof before public launch.",
+        detail: "Launch packet needs Guardian review proof before contributors audit it.",
       }),
     );
   });
 
-  it("blocks public launch when participation notes imply live authority", () => {
+  it("blocks the first loop when participation notes imply live authority", () => {
     const wave = {
       ...demoWave,
       gates: ["30% of TDH holders can contribute"],
@@ -414,7 +414,7 @@ describe("first phase launch audit", () => {
     );
   });
 
-  it("does not require participation notes before public launch", () => {
+  it("does not require participation notes before the first loop", () => {
     const wave = {
       ...demoWave,
       gates: [],

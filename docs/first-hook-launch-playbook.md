@@ -26,7 +26,7 @@ Use the 6529 wave for live discussion and decisions. Use this app for the projec
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Copyable builder wave launch brief for the first public post.
 - Reviewer gate checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
-- Public launch audit during setup and again before inviting broad participation.
+- Launch check during setup and again before inviting broad participation.
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
 - Human-reviewed wave update draft.
@@ -62,7 +62,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 ## Launch Sequence
 
 1. Pick the builder wave and GitHub repo.
-2. Run the public launch audit once to expose setup blockers.
+2. Run the launch check once to expose setup blockers.
 3. Confirm the hook repo has `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
 4. Copy the builder wave launch brief from setup.
 5. Post the brief with the builder wave, repo link, participation notes, and hook scope.
@@ -78,7 +78,7 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 15. Use the contribution report and fee plan as evidence for any separate payout vote.
 16. Post the wave update draft back to the builder wave.
 17. Keep the launch packet with the PR so later contributors can audit the loop.
-18. Run the public launch audit again and fix blockers before broad participation.
+18. Run the launch check again and fix blockers before broad participation.
 
 ## Success Criteria
 
@@ -87,5 +87,5 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 - The hook stays non-upgradeable by default.
 - Parameter changes name explicit caps and tests.
 - Fees and contribution report scores are evidence, not automatic authority.
-- Public launch blockers are fixed before broad participation.
+- Launch blockers are fixed before broad participation.
 - The first merged PR feels simple, auditable, and worth repeating.

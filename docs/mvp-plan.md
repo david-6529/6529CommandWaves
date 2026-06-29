@@ -123,7 +123,7 @@ The GitHub PR adapter is intentionally narrow. It opens a draft PR only after a 
 and it includes the Command Waves manifest in the PR body. It does not create merges, deploys, payments, or governance
 changes.
 
-The first public launch sequence is in [first-hook-launch-playbook.md](first-hook-launch-playbook.md).
+The first public loop sequence is in [first-hook-launch-playbook.md](first-hook-launch-playbook.md).
 
 The production table plan is in [data-model.md](data-model.md).
 The GitHub merge gate plan is in [github-reviewer-gate.md](github-reviewer-gate.md).

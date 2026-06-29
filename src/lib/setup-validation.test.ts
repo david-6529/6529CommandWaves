@@ -101,7 +101,7 @@ describe("setup validation", () => {
           id: "repo_file_github_pull_request_template_md",
           label: "PR template",
           status: "warn",
-          message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before public launch.",
+          message: ".github/PULL_REQUEST_TEMPLATE.md is missing. Add it before inviting contributors.",
         }),
       ]),
     );

@@ -79,14 +79,14 @@ function statusLabel(status: FirstPhaseLaunchAuditStatus) {
 
 function summaryFor(status: FirstPhaseLaunchAuditStatus) {
   if (status === "ready") {
-    return "The hook project flow and public launch checks are ready.";
+    return "The hook project flow and launch checks are ready.";
   }
 
   if (status === "blocked") {
-    return "Public launch is blocked until failed checks are fixed.";
+    return "The first public loop is blocked until failed checks are fixed.";
   }
 
-  return "The local flow is usable. Public launch still needs setup.";
+  return "The local flow is usable. Invite contributors after setup checks pass.";
 }
 
 const launchActionCopyByItemId: Record<string, string> = {
@@ -134,7 +134,7 @@ function createNextAction({
       status,
       statusLabel,
       itemId: null,
-      title: "Start the public hook loop",
+      title: "Start the first public loop",
       detail: "Post the launch brief, invite contributors, and keep each PR tied to a builder wave decision.",
     };
   }
@@ -147,7 +147,7 @@ function createNextAction({
       statusLabel,
       itemId: null,
       title: "Check launch state",
-      detail: "Run the public launch audit again before inviting contributors.",
+      detail: "Run launch checks again before inviting contributors.",
     };
   }
 
@@ -183,7 +183,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_not_checked",
         label: "Setup check",
         status: "needed",
-        detail: "Verify the wave, repo, contributor rules, and PR template before public launch.",
+        detail: "Verify the wave, repo, contributor rules, and PR template before inviting contributors.",
         source: "setup",
       },
     ];
@@ -197,7 +197,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_project_check",
         label: "Setup check",
         status: "blocked",
-        detail: firstFailure?.message ?? "Fix the 6529 wave and GitHub repo before public launch.",
+        detail: firstFailure?.message ?? "Fix the 6529 wave and GitHub repo before inviting contributors.",
         source: "setup",
       },
     ];
@@ -273,7 +273,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
       id: "flow_wave_decision_receipt",
       label: "Wave decision receipt",
       status: "needed",
-      detail: "Record the 6529 decision URL before public launch.",
+      detail: "Record the 6529 decision URL before the PR work is launch-ready.",
       source: "flow",
     },
   ];
@@ -333,7 +333,7 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
           id: "flow_audit_packet",
           label: "Audit packet",
           status: "blocked",
-          detail: "Launch packet needs a GitHub PR link before public launch.",
+          detail: "Launch packet needs a GitHub PR link before contributors audit it.",
           source: "flow",
         },
       ];
@@ -345,7 +345,7 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
           id: "flow_audit_packet",
           label: "Audit packet",
           status: "blocked",
-          detail: "Launch packet needs Guardian review proof before public launch.",
+          detail: "Launch packet needs Guardian review proof before contributors audit it.",
           source: "flow",
         },
       ];
@@ -406,7 +406,7 @@ export function createFirstPhaseLaunchAudit({
           id: "readiness_not_checked",
           label: "Readiness check",
           status: "needed",
-          detail: "Run readiness before public launch.",
+          detail: "Run readiness before inviting contributors.",
           source: "readiness",
         },
       ];
