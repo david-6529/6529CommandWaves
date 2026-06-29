@@ -80,6 +80,9 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 17. Keep the launch packet with the PR so later contributors can audit the loop.
 18. Run the launch check again and fix blockers before broad participation.
 
+The launch check focuses on the first public loop. Warning-only hardening items such as Postgres storage, the GitHub PR adapter,
+and required-check wave-state sources can wait until broader participation, but failed or misconfigured items still block.
+
 ## Success Criteria
 
 - New contributors understand where to propose work.

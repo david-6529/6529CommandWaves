@@ -215,6 +215,49 @@ describe("first phase launch audit", () => {
     });
   });
 
+  it("does not treat later hardening warnings as first-loop launch gaps", () => {
+    const firstLoopChecks = getReadinessChecks({
+      NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
+      ADMIN_API_KEY: "admin",
+      "6529_MOCK_MODE": "false",
+    });
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: firstLoopChecks,
+      setupValidation: productionSetupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("ready");
+    expect(audit.openItems).toEqual([]);
+    expect(audit.items.map((item) => item.id)).not.toContain("readiness_database");
+    expect(audit.items.map((item) => item.id)).not.toContain("readiness_command_wave_store");
+    expect(audit.items.map((item) => item.id)).not.toContain("readiness_github_pr_adapter");
+    expect(audit.items.map((item) => item.id)).not.toContain("readiness_guardian_wave_state");
+  });
+
+  it("keeps live 6529 mode as a first-loop launch gap", () => {
+    const mockModeChecks = getReadinessChecks({
+      NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
+      ADMIN_API_KEY: "admin",
+    });
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: mockModeChecks,
+      setupValidation: productionSetupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.openItems).toContainEqual(
+      expect.objectContaining({
+        id: "readiness_6529_mode",
+        label: "6529 mode",
+        status: "needed",
+      }),
+    );
+  });
+
   it("reports unfinished flow steps without blocking local work", () => {
     const wave = {
       ...demoWave,
