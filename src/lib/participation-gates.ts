@@ -93,3 +93,30 @@ export function summarizeParticipationAccess(input: unknown) {
 
   return gates[0];
 }
+
+export function createParticipationAccessSnapshot(input: unknown) {
+  const gates = normalizeParticipationGates(input);
+  const manual = gates.some((gate) => advisoryPattern.test(gate));
+
+  if (!gates.length) {
+    return {
+      label: "not set",
+      summary: "Participation access is not set yet.",
+      notes: ["Set who can join before inviting builders."],
+    };
+  }
+
+  if (manual) {
+    return {
+      label: "manual review",
+      summary: "REP, TDH, QnA, and report scores are not live permissions here.",
+      notes: gates.slice(0, 2),
+    };
+  }
+
+  return {
+    label: "open",
+    summary: gates[0],
+    notes: gates.slice(0, 2),
+  };
+}

@@ -36,7 +36,7 @@ import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
-import { normalizeParticipationGates } from "@/lib/participation-gates";
+import { createParticipationAccessSnapshot, normalizeParticipationGates } from "@/lib/participation-gates";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -870,6 +870,7 @@ export function CommandWavesConsole() {
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
   const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
+  const participationAccess = useMemo(() => createParticipationAccessSnapshot(wave.gates), [wave.gates]);
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
@@ -1558,6 +1559,22 @@ export function CommandWavesConsole() {
                   {primaryHookProject.waveUrl ? <LinkButton href={primaryHookProject.waveUrl}>Open discussion</LinkButton> : null}
                   {primaryHookProject.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Open repo</LinkButton> : null}
                   {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>{activePrLinkLabel}</LinkButton> : null}
+                </div>
+                <div className="mt-3 border-t border-zinc-800 pt-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Access</p>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
+                  </div>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
+                      Copy guide
+                    </Button>
+                    <JumpLink href="#active-builders">Builders</JumpLink>
+                  </div>
+                  {participationGuideNotice ? (
+                    <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p>
+                  ) : null}
                 </div>
               </div>
             ) : null}
