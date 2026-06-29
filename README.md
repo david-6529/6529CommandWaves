@@ -139,7 +139,7 @@ The current app is a local prototype of the hook-building flow:
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
 - 6529 adapter foundation for wave ID normalization, mock-mode wave reads, drop normalization, context pagination, and context previews
 - local file persistence for command-wave state when `COMMAND_WAVE_STORE=file`
-- Postgres schema foundation in [db/001_command_waves.sql](db/001_command_waves.sql)
+- Postgres command-wave repository and schema in [db/001_command_waves.sql](db/001_command_waves.sql)
 
 ## Run Locally
 
@@ -159,6 +159,33 @@ Before opening a PR, run the local app gate:
 
 ```bash
 npm run verify
+```
+
+## Production Storage
+
+For public launch, use Postgres so the wave setup, proposals, votes, decisions, PR evidence, reviews, and ledger survive
+server restarts.
+
+1. Create a Postgres database.
+2. Apply the schema:
+
+```bash
+psql "$DATABASE_URL" -f db/001_command_waves.sql
+```
+
+3. Configure the app:
+
+```bash
+COMMAND_WAVE_STORE=postgres
+DATABASE_URL=postgresql://...
+```
+
+4. Verify storage appears as production durable:
+
+```bash
+SETUP_REQUIRE_PRODUCTION_STORAGE=true \
+SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof \
+npm run setup:verify
 ```
 
 ## Guardian Check
@@ -277,7 +304,7 @@ API errors include an `errorId` so a user-visible error can be matched to server
 
 ## Next Production Steps
 
-1. Finish durable Postgres persistence using [docs/data-model.md](docs/data-model.md).
+1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify production storage.
 2. Wire live 6529 setup, proposal, vote, and result-posting flows.
 3. Finish controlled GitHub branch, commit, PR comment, and CI-state operations.
 4. Add controlled Codex execution using [docs/agent-harness-plan.md](docs/agent-harness-plan.md).
