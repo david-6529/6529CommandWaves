@@ -932,6 +932,14 @@ export function CommandWavesConsole() {
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
+  const currentProjectFacts = primaryHookProject
+    ? [
+        { label: "Hook", value: primaryHookProject.name },
+        { label: "Builder wave", value: primaryHookProject.waveLabel, href: primaryHookProject.waveUrl },
+        { label: "GitHub repo", value: primaryHookProject.repoLabel, href: primaryHookProject.repoUrl },
+        { label: "Access", value: primaryHookProject.gateSnapshotLabel },
+      ]
+    : [];
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
@@ -1617,6 +1625,27 @@ export function CommandWavesConsole() {
             {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
             <JumpLink href="#recent-activity">View log</JumpLink>
           </div>
+          {currentProjectFacts.length ? (
+            <div className="mt-4 grid divide-y divide-zinc-800 border-y border-zinc-800 sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4">
+              {currentProjectFacts.map((fact) => (
+                <div key={fact.label} className="py-3 sm:px-3 sm:first:pl-0 lg:last:pr-0">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{fact.label}</p>
+                  {fact.href ? (
+                    <a
+                      className="mt-1 block break-words text-base font-semibold leading-7 text-zinc-100 hover:text-cyan-200"
+                      href={fact.href}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {fact.value}
+                    </a>
+                  ) : (
+                    <p className="mt-1 break-words text-base font-semibold leading-7 text-zinc-100">{fact.value}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : null}
           <div className="mt-4 border-t border-zinc-800 pt-4">
             <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
             {!activeProposal ? (
