@@ -32,7 +32,7 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "2. Bring one PR-sized hook change to the builder wave.",
     "3. Include clear limits, tests, and any parameter cap.",
     "4. Wait for a builder wave decision before PR work starts.",
-    "5. Use GitHub PRs for code and reviews.",
+    "5. Open draft PRs with the repo template and Command Waves manifest.",
     "",
     "Guardrails:",
     "- The hook is immutable by default.",

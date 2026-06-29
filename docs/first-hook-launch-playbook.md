@@ -59,21 +59,22 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 
 1. Pick the builder wave and GitHub repo.
 2. Run the public launch audit once to expose setup blockers.
-3. Copy the builder wave launch brief from setup.
-4. Post the brief with the builder wave, repo link, participation notes, and hook scope.
-5. Invite ideas in the general chat wave or thread.
-6. Turn one strong idea into a PR-sized command.
-7. Vote or approve through the builder wave.
-8. Record the decision drop URL as the manual approval receipt.
-9. Copy the Codex work packet and use it in a prepared branch.
-10. Run the agent only inside that approved packet.
-11. Open a draft PR using the repo template and Command Waves manifest.
-12. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-13. Humans merge only after review passes.
-14. Use the contribution report and fee plan as evidence for any separate payout vote.
-15. Post the wave update draft back to the builder wave.
-16. Keep the launch packet with the PR so later contributors can audit the loop.
-17. Run the public launch audit again and fix blockers before broad launch.
+3. Confirm the hook repo has `CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
+4. Copy the builder wave launch brief from setup.
+5. Post the brief with the builder wave, repo link, participation notes, and hook scope.
+6. Invite ideas in the general chat wave or thread.
+7. Turn one strong idea into a PR-sized command.
+8. Vote or approve through the builder wave.
+9. Record the decision drop URL as the manual approval receipt.
+10. Copy the Codex work packet and use it in a prepared branch.
+11. Run the agent only inside that approved packet.
+12. Open a draft PR using the repo template and Command Waves manifest.
+13. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+14. Humans merge only after review passes.
+15. Use the contribution report and fee plan as evidence for any separate payout vote.
+16. Post the wave update draft back to the builder wave.
+17. Keep the launch packet with the PR so later contributors can audit the loop.
+18. Run the public launch audit again and fix blockers before broad launch.
 
 ## Success Criteria
 
