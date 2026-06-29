@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "6529 Command Waves",
-  description: "Governed agent work for 6529 waves.",
+  title: "6529 Hook Builder",
+  description: "Coordinate one builder wave and one smart contract repo through scoped PR work, reviews, and audit logs.",
 };
 
 export default function RootLayout({
