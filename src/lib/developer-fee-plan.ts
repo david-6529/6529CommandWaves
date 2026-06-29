@@ -38,3 +38,36 @@ export function createDeveloperFeePlan(wave: CommandWave, contributionReport: Co
     ],
   };
 }
+
+function contributorLine(contributor: ContributionReport["contributors"][number]) {
+  return `- ${contributor.identity}: report score ${contributor.score}; ${contributor.rationale.join(", ")}`;
+}
+
+export function createDeveloperFeePlanDraft(wave: CommandWave, contributionReport: ContributionReport) {
+  const plan = createDeveloperFeePlan(wave, contributionReport);
+  const contributors = contributionReport.contributors.length
+    ? contributionReport.contributors.map(contributorLine)
+    : ["- No visible contributors yet."];
+
+  return [
+    "6529 hook developer fee plan",
+    "",
+    `Builder wave: ${wave.waveUrl}`,
+    `GitHub repo: ${wave.repoUrl}`,
+    plan.summary,
+    "",
+    "Evidence for human review:",
+    ...plan.evidenceInputs.map((item) => `- ${item}`),
+    "",
+    "Visible contributors for review:",
+    ...contributors,
+    "",
+    "Decisions needed:",
+    ...plan.requiredDecisions.map((item) => `- ${item}`),
+    "",
+    "Blocked in this app:",
+    ...plan.blockedActions.map((item) => `- ${item}`),
+    "",
+    "Note: this draft does not move funds, choose recipients, set amounts, grant REP or TDH, or create payment authority.",
+  ].join("\n");
+}

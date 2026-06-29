@@ -16,7 +16,7 @@ import {
   type CommandWave,
 } from "@/lib/command-waves";
 import { createContributionReport, createContributionReportDraft } from "@/lib/contribution-report";
-import { createDeveloperFeePlan } from "@/lib/developer-fee-plan";
+import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
@@ -658,6 +658,7 @@ export function CommandWavesConsole() {
   const [apiError, setApiError] = useState("");
   const [copyNotice, setCopyNotice] = useState("");
   const [contributionReportNotice, setContributionReportNotice] = useState("");
+  const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
@@ -758,6 +759,10 @@ export function CommandWavesConsole() {
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
   const contributionReportDraft = useMemo(() => createContributionReportDraft(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
+  const developerFeePlanDraft = useMemo(
+    () => createDeveloperFeePlanDraft(wave, contributionReport),
+    [contributionReport, wave],
+  );
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
@@ -936,6 +941,7 @@ export function CommandWavesConsole() {
     setRepoUrl(nextWave.repoUrl);
     setGateNotes(nextWave.gates.join("\n"));
     setContributionReportNotice("");
+    setDeveloperFeePlanNotice("");
     setProjectContextPreviews({});
     setSetupContextPreview(null);
     setDecisionDraftNotice("");
@@ -1147,6 +1153,15 @@ export function CommandWavesConsole() {
       setContributionReportNotice("Report copied.");
     } catch {
       setContributionReportNotice("Copy failed. Select the report text and copy it manually.");
+    }
+  }
+
+  async function copyDeveloperFeePlanDraft() {
+    try {
+      await navigator.clipboard.writeText(developerFeePlanDraft);
+      setDeveloperFeePlanNotice("Fee plan copied.");
+    } catch {
+      setDeveloperFeePlanNotice("Copy failed. Select the fee plan text and copy it manually.");
     }
   }
 
@@ -2382,6 +2397,13 @@ export function CommandWavesConsole() {
               <p className="mt-2 text-xs leading-5 text-zinc-500">
                 Planning evidence only. Humans approve the budget and move funds outside this app.
               </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <Button type="button" variant="secondary" onClick={() => void copyDeveloperFeePlanDraft()}>
+                  Copy fee plan
+                </Button>
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open wave</LinkButton> : null}
+              </div>
+              {developerFeePlanNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{developerFeePlanNotice}</p> : null}
               <Badge className="mt-3 border-amber-700 bg-amber-950/45 text-amber-100">
                 {developerFeePlan.mode.replaceAll("_", " ")}
               </Badge>
