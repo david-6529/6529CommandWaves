@@ -737,6 +737,18 @@ export function CommandWavesConsole() {
   const olderLedgerEvents = orderedLedgerEvents.slice(recentLedgerEvents.length);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
+  const launchNextActionItemId = launchAudit.nextAction.itemId;
+  const launchActionRunsSetup = launchNextActionItemId === "setup_not_checked" || launchNextActionItemId === "setup_remote_check";
+  const launchActionRunsReadiness = launchNextActionItemId === "readiness_not_checked";
+  const launchActionButtonText = launchActionRunsSetup
+    ? apiBusy === "setup"
+      ? "Checking"
+      : "Run setup check"
+    : launchActionRunsReadiness
+      ? apiBusy === "readiness"
+        ? "Checking"
+        : "Check readiness"
+      : "Open launch controls";
 
   useEffect(() => {
     const controller = new AbortController();
@@ -916,6 +928,20 @@ export function CommandWavesConsole() {
     window.requestAnimationFrame(() => {
       setupControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  }
+
+  function runLaunchNextAction() {
+    if (launchActionRunsSetup) {
+      void checkSetup();
+      return;
+    }
+
+    if (launchActionRunsReadiness) {
+      void checkReadiness();
+      return;
+    }
+
+    openSetupControls();
   }
 
   async function copyWaveUpdateDraft() {
@@ -1235,8 +1261,8 @@ export function CommandWavesConsole() {
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
               {launchAudit.status !== "ready" ? (
-                <Button type="button" variant="secondary" className="mt-3" onClick={openSetupControls}>
-                  Open launch controls
+                <Button type="button" variant="secondary" className="mt-3" disabled={isBusy} onClick={runLaunchNextAction}>
+                  {launchActionButtonText}
                 </Button>
               ) : null}
             </div>
