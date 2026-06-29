@@ -22,6 +22,7 @@ import { createContributionReport, createContributionReportDraft } from "@/lib/c
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
+import { createHookProgress, type HookProgressStatus } from "@/lib/hook-progress";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import {
   createFirstPhaseLaunchAudit,
@@ -371,6 +372,22 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
 
   if (status === "active") {
     return statusClass("reviewing");
+  }
+
+  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+}
+
+function hookProgressStatusClass(status: HookProgressStatus) {
+  if (status === "done") {
+    return statusClass("complete");
+  }
+
+  if (status === "current") {
+    return statusClass("reviewing");
+  }
+
+  if (status === "blocked") {
+    return statusClass("blocked");
   }
 
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
@@ -823,6 +840,7 @@ export function CommandWavesConsole() {
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
   const activePrLinkLabel = activeReview?.status === "pass" ? "Open last PR" : "Open PR";
+  const hookProgress = useMemo(() => createHookProgress(wave, title), [title, wave]);
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -1519,8 +1537,20 @@ export function CommandWavesConsole() {
             </div>
             <p className="mt-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
 
+            <ol className="mt-4 grid gap-2 border-y border-zinc-800 py-3 sm:grid-cols-4">
+              {hookProgress.map((step) => (
+                <li key={step.id} className="border-t border-zinc-800 pt-2 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{step.label}</p>
+                    <Badge className={hookProgressStatusClass(step.status)}>{step.status}</Badge>
+                  </div>
+                  <p className="mt-1 text-sm leading-6 text-zinc-400">{step.detail}</p>
+                </li>
+              ))}
+            </ol>
+
             {primaryHookProject ? (
-              <div className="mt-4 border-y border-zinc-800 py-3">
+              <div className="mt-4 border-b border-zinc-800 pb-3">
                 <p className="text-sm leading-6 text-zinc-500">
                   {primaryHookProject.name} is connected to the 6529 discussion and GitHub repo.
                 </p>
