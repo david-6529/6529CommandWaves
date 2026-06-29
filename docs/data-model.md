@@ -1,8 +1,10 @@
-# Production Data Model
+# Command Wave Data Model
 
-The current app uses local JSON persistence for development speed. Production should move the same state machine into Postgres without changing the product flow.
+The app can use local JSON persistence for development and Postgres for public launch storage. The Postgres repository
+keeps the same command-wave state machine while making the setup, proposals, decisions, PR evidence, reviews, and ledger
+durable.
 
-The first SQL foundation is in [../db/001_command_waves.sql](../db/001_command_waves.sql).
+The SQL schema is in [../db/001_command_waves.sql](../db/001_command_waves.sql).
 
 ## Core Tables
 
@@ -51,7 +53,7 @@ The proposed prompt/command before execution.
 
 - `id`
 - `command_wave_id`
-- `6529_drop_id`
+- `drop_id_6529`
 - `title`
 - `proposer`
 - `kind`
@@ -68,7 +70,7 @@ Indexes:
 
 - `command_wave_id, created_at`
 - `command_wave_id, status`
-- `6529_drop_id`
+- `drop_id_6529`
 
 ### command_polls
 
@@ -76,7 +78,7 @@ The vote state tied to a proposal.
 
 - `id`
 - `proposal_id`
-- `6529_poll_drop_id`
+- `poll_drop_id_6529`
 - `decision_receipt_json`
 - `yes_votes`
 - `no_votes`
@@ -90,7 +92,7 @@ The vote state tied to a proposal.
 Indexes:
 
 - unique `proposal_id`
-- `6529_poll_drop_id`
+- `poll_drop_id_6529`
 - `status, closes_at`
 
 ### command_votes
@@ -140,6 +142,7 @@ The independent review of execution.
 - `execution_id`
 - `status`
 - `checks_json`
+- `proof_json`
 - `summary`
 - `reviewer`
 - `created_at`
