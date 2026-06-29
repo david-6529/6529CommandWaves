@@ -1192,8 +1192,13 @@ export function CommandWavesConsole() {
           </ol>
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-          <Panel title="1. Choose the project" eyebrow="Setup">
+        <details className="border-t border-zinc-800 pt-3">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+            <span>Maintainer setup and guardrails</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-400">controls</Badge>
+          </summary>
+          <section className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+            <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
                 Start with one project wave. You can paste a wave link directly or search by name.
@@ -1483,7 +1488,7 @@ export function CommandWavesConsole() {
             </div>
           </Panel>
 
-          <Panel title="Safety rules" eyebrow={wave.rules.version}>
+            <Panel title="Safety rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
                 Phase 1 accepts reads, drafts, wave updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
@@ -1548,11 +1553,12 @@ export function CommandWavesConsole() {
                 </div>
               </details>
             </div>
-          </Panel>
-        </section>
+            </Panel>
+          </section>
+        </details>
 
         <section className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-          <Panel title="2. Propose hook work" eyebrow="Builder wave">
+          <Panel title="Propose hook work" eyebrow="Builder wave">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
                 Describe one PR-sized change. Keep the limits clear so the wave knows what it is approving.
@@ -1644,7 +1650,7 @@ export function CommandWavesConsole() {
             </div>
           </Panel>
 
-          <Panel title="3. Current work" eyebrow="Decide, build, review">
+          <Panel title="Current work" eyebrow="Decide, build, review">
             {activeProposal ? (
               <div className="space-y-4">
                 {!phaseWork.prProposal ? (

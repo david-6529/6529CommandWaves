@@ -9,6 +9,7 @@ For the first public phase, the product helps the community build a 6529 hook to
 The underlying workflow should be reusable for future public hook projects. The first shipped UI should feel like one standalone 6529 Hook project site so anyone can see the hook, its builder wave, its GitHub repo, and the current code review state.
 
 6529 remains the live conversation and decision layer. The app should act as a snapshot and project dashboard: recent wave context, approved commands, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
+Maintainer setup, guardrails, and readiness checks should stay available without leading the public project experience.
 
 The simplest product view is:
 
