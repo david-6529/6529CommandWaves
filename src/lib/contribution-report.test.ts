@@ -15,6 +15,13 @@ describe("contribution report", () => {
     expect(report.notes.join(" ")).toContain("not a permission system");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
     expect(report.notes.join(" ")).toContain("review, and ledger evidence");
+    expect(report.scoringRubric).toEqual([
+      "Complete proposal: 6 points.",
+      "Reviewing proposal: 4 points.",
+      "Other proposal: 3 points.",
+      "Wave decision receipt: 2 points.",
+      "Vote or attributed activity log event: 1 point.",
+    ]);
     expect(report.evidence).toContain("1 GitHub PR link");
     expect(report.evidence).toContain("1 Guardian review proof");
     expect(report.contributors[0]).toMatchObject({

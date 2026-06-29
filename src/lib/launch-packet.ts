@@ -190,6 +190,8 @@ function contributionLines(report: ContributionReport) {
 
   return [
     `- Summary: ${report.summary}`,
+    "- Scoring rubric:",
+    ...limitedList(report.scoringRubric, 6, "No scoring rubric recorded."),
     "- Evidence used:",
     ...limitedList(report.evidence, 6, "No app evidence recorded yet."),
     "- Visible contributors:",

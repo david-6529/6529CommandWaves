@@ -15,6 +15,7 @@ export type ContributionReport = {
   mode: "informational";
   generatedAt: string;
   summary: string;
+  scoringRubric: string[];
   evidence: string[];
   contributors: ContributionContributor[];
   notes: string[];
@@ -80,6 +81,14 @@ function evidenceSummary(wave: CommandWave) {
   return evidence.length ? evidence : ["No app evidence recorded yet."];
 }
 
+const scoringRubric = [
+  "Complete proposal: 6 points.",
+  "Reviewing proposal: 4 points.",
+  "Other proposal: 3 points.",
+  "Wave decision receipt: 2 points.",
+  "Vote or attributed activity log event: 1 point.",
+];
+
 export function createContributionReport(
   wave: CommandWave,
   options: {
@@ -141,6 +150,7 @@ export function createContributionReport(
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
       : "No contributor activity has been recorded yet.",
+    scoringRubric,
     evidence: evidenceSummary(wave),
     contributors: sorted,
     notes: [

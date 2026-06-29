@@ -1741,6 +1741,12 @@ export function CommandWavesConsole() {
                   </Badge>
                 ))}
               </div>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Scoring rubric</p>
+              <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-500">
+                {contributionReport.scoringRubric.map((item) => (
+                  <li key={item}>- {item}</li>
+                ))}
+              </ul>
             </div>
             <div className="divide-y divide-zinc-800 rounded-md border border-zinc-800 bg-black">
               {contributionReport.contributors.map((contributor) => (
