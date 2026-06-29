@@ -1,8 +1,8 @@
 export const commandWaveProductCopy = {
-  eyebrow: "Public Hook Projects",
-  headline: "Build hooks together.",
+  eyebrow: "Project site",
+  headline: "6529 Hook",
   subhead:
-    "Start with the 6529 hook. Anyone can propose scoped work. PRs happen on GitHub. Humans approve every merge.",
-  positioning: "Reusable for future public hooks. Focused first on 6529.",
-  simpleFlow: "Wave - PR - Review - Log",
+    "A simple home for building the hook with the community. The 6529 wave holds discussion and decisions. This site makes the GitHub work easy to inspect.",
+  positioning: "One wave. One repo. One public build.",
+  simpleFlow: "Wave - Code - PR - Review",
 } as const;

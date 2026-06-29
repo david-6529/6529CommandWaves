@@ -4,7 +4,7 @@ import { firstPhaseScopeInventory } from "./phase-scope";
 describe("first phase scope inventory", () => {
   it("keeps the launch focused on one builder wave and one hook repo", () => {
     expect(firstPhaseScopeInventory.useNow).toContain("One 6529 builder wave and one GitHub hook repo.");
-    expect(firstPhaseScopeInventory.useNow).toContain("Active hook list with each hook's builder wave and repo.");
+    expect(firstPhaseScopeInventory.useNow).toContain("6529 hook project snapshot with wave, repo, PR, and review state.");
     expect(firstPhaseScopeInventory.useNow).toContain("Manual 6529 decision receipts before PR work runs.");
     expect(firstPhaseScopeInventory.parkLater).toContain("Broad swarm marketplace flows or external agent endpoints.");
     expect(firstPhaseScopeInventory.parkLater).toContain("Upgradeable hook contracts by default.");

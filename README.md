@@ -2,11 +2,13 @@
 
 ## ELI5
 
-Command Waves let a 6529 builder wave govern scoped work in a GitHub repo.
+Command Waves is currently the project site for building the 6529 Hook in public.
 
 For the first public phase, the project is simple: use a 6529 wave to coordinate a community-built 6529 hook.
 People propose scoped work, decisions approve PRs, agents can help, reviewers check the output, and humans keep control.
-The workflow is reusable for future public hook projects, but the first launch UI stays focused on the 6529 hook.
+The workflow can support more public hook projects later, but the first launch should feel like a standalone 6529 Hook site.
+The 6529 wave stays the live conversation and decision surface. This app shows a project snapshot, recent wave context,
+GitHub PR state, code review evidence, launch evidence, and contribution reports.
 
 The app keeps the loop visible:
 
@@ -17,9 +19,9 @@ The app keeps the loop visible:
 5. Review the result.
 6. Log the activity.
 
-The simplest flow is:
+The simplest view is:
 
-`Wave -> PR -> Review -> Log`
+`Wave snapshot -> Code state -> PR -> Review`
 
 ## Why This Exists
 
@@ -97,10 +99,9 @@ Short version:
 
 The current app is a local prototype of the hook-building flow:
 
-- first-screen flow: choose project, propose work, decide, build PR, review, log
-- active hooks in development list with each hook's builder wave and repo
-- phase checklist derived from the current wave state
-- separate work-loop and public-launch next-action guidance
+- first-screen hook dashboard: wave snapshot, code state, PR, review, and progress
+- 6529 Hook project snapshot with wave, repo, PR, review, and evidence state
+- compact current-state area with work, launch, and progress guidance
 - project wave setup with simpler user-facing language
 - 6529 wave search by name or pasted wave URL/ID
 - GitHub repo link

@@ -484,6 +484,19 @@ function Button({
   );
 }
 
+function LinkButton({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm font-semibold text-zinc-100 transition hover:bg-zinc-800"
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+    >
+      {children}
+    </a>
+  );
+}
+
 function downloadJson(filename: string, payload: unknown) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -658,6 +671,7 @@ export function CommandWavesConsole() {
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
+  const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
       createFirstPhaseLaunchAudit({
@@ -697,6 +711,7 @@ export function CommandWavesConsole() {
   const recentLedgerEvents = orderedLedgerEvents.slice(0, 6);
   const olderLedgerEvents = orderedLedgerEvents.slice(recentLedgerEvents.length);
   const isBusy = apiBusy !== null;
+  const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1027,10 +1042,9 @@ export function CommandWavesConsole() {
         <section className="grid gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Hooks in progress</p>
-              <h2 className="mt-1 text-base font-semibold text-zinc-50">Active hooks</h2>
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Project snapshot</p>
+              <h2 className="mt-1 text-base font-semibold text-zinc-50">What is happening now</h2>
             </div>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{countLabel(activeHookProjects.length, "hook")}</Badge>
           </div>
           <div className="grid gap-3">
             {activeHookProjects.map((project) => (
@@ -1038,96 +1052,144 @@ export function CommandWavesConsole() {
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
-                    <p className="mt-1 text-xs leading-5 text-zinc-500">{project.participation}</p>
+                    <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                   </div>
                   <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
                     {project.statusLabel}
                   </Badge>
                 </div>
-                <div className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
-                  <p>
-                    <span className="font-semibold text-zinc-300">Focus:</span> {project.currentFocus}
-                  </p>
-                  <p className="break-all">
-                    <span className="font-semibold text-zinc-300">Wave:</span>{" "}
-                    {project.waveUrl ? (
-                      <a className="text-cyan-300 hover:text-cyan-200" href={project.waveUrl} target="_blank" rel="noreferrer">
-                        {project.waveUrl}
-                      </a>
+
+                <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+                  <div className="border-t border-zinc-800 pt-3">
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">6529 wave snapshot</p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave to talk</LinkButton> : null}
+                      <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void previewContext()}>
+                        {apiBusy === "context" ? "Loading" : "Preview wave here"}
+                      </Button>
+                    </div>
+                    {contextPreview ? (
+                      <div className="mt-3 border-t border-zinc-800 pt-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextPreview.context.mode}</Badge>
+                          <Badge className={contextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
+                            {contextPreview.dropCount} drops
+                          </Badge>
+                        </div>
+                        <div className="mt-2 grid gap-2">
+                          {contextPreview.sampleDrops.slice(-2).map((drop) => (
+                            <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
+                              <p className="text-xs font-semibold text-zinc-500">
+                                {drop.author} / {drop.id}
+                              </p>
+                              <p className="mt-1 text-sm leading-5 text-zinc-400">{drop.preview}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     ) : (
-                      <span className="text-zinc-500">not set</span>
+                      <p className="mt-3 text-xs leading-5 text-zinc-500">
+                        Preview the wave to read recent 6529 posts on this page.
+                      </p>
                     )}
-                  </p>
-                  <p className="break-all">
-                    <span className="font-semibold text-zinc-300">Repo:</span>{" "}
-                    {project.repoUrl ? (
-                      <a className="text-cyan-300 hover:text-cyan-200" href={project.repoUrl} target="_blank" rel="noreferrer">
-                        {project.repoUrl}
-                      </a>
-                    ) : (
-                      <span className="text-zinc-500">not set</span>
-                    )}
-                  </p>
+                  </div>
+
+                  <div className="border-t border-zinc-800 pt-3">
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Codebase visibility</p>
+                    <p className="mt-2 text-sm leading-6 text-zinc-300">{project.platformRole}</p>
+                    <dl className="mt-3 grid gap-2 text-xs leading-5 text-zinc-400">
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Focus</dt>
+                        <dd>{project.currentFocus}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Code</dt>
+                        <dd>{project.codeStatus}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Review</dt>
+                        <dd>{project.reviewStatusLabel}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Evidence</dt>
+                        <dd>{project.evidenceLabel}</dd>
+                      </div>
+                      <div>
+                        <dt className="font-semibold text-zinc-300">Latest activity</dt>
+                        <dd>{project.latestActivity}</dd>
+                      </div>
+                    </dl>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
+                      {project.latestPrUrl ? <LinkButton href={project.latestPrUrl}>Open PR</LinkButton> : null}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        <div className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300">
-          {apiError ? (
-            <span className="font-semibold text-red-300">{apiError}</span>
-          ) : (
-            <span>
-              <span className="font-semibold text-zinc-100">Status:</span> {isBusy ? `Working on ${apiBusy}.` : apiNotice}
-            </span>
-          )}
-        </div>
-
-        <section className="grid gap-3 lg:grid-cols-2">
-          <div className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 md:grid-cols-[8rem_1fr] md:items-center">
-            <div className="flex flex-wrap items-center gap-2 md:block">
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Work action</p>
-              <Badge className={`${nextActionStatusClass(phaseNextAction.status)} mt-0 md:mt-2`}>
-                {phaseNextAction.statusLabel}
-              </Badge>
-            </div>
+        <section className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base font-semibold text-zinc-50">{phaseNextAction.title}</h2>
-                <Badge className="border-zinc-700 bg-black text-zinc-300">{phaseNextAction.stepLabel}</Badge>
-              </div>
-              <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
+              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Current state</p>
+              <h2 className="mt-1 text-base font-semibold text-zinc-50">Next actions</h2>
             </div>
+            <Badge className="border-zinc-700 bg-black text-zinc-300">
+              {completedPhaseCount}/{phaseChecklist.length} done
+            </Badge>
           </div>
 
-          <div className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950 p-3 md:grid-cols-[8rem_1fr] md:items-center">
-            <div className="flex flex-wrap items-center gap-2 md:block">
-              <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Launch action</p>
-              <Badge className={`${launchAuditStatusClass(launchAudit.nextAction.status)} mt-0 md:mt-2`}>
-                {launchAudit.nextAction.statusLabel}
-              </Badge>
+          {showApiNotice ? (
+            <div className="mt-3 rounded-md border border-zinc-800 bg-black px-3 py-2 text-sm text-zinc-300">
+              {apiError ? (
+                <span className="font-semibold text-red-300">{apiError}</span>
+              ) : (
+                <span>{isBusy ? `Working on ${apiBusy}.` : apiNotice}</span>
+              )}
             </div>
-            <div>
+          ) : null}
+
+          <div className="mt-3 grid gap-3 lg:grid-cols-2">
+            <div className="border-t border-zinc-800 pt-3 lg:border-r lg:border-t-0 lg:pr-3">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h2>
+                <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Work</p>
+                <Badge className={nextActionStatusClass(phaseNextAction.status)}>{phaseNextAction.statusLabel}</Badge>
+                <Badge className="border-zinc-700 bg-black text-zinc-300">{phaseNextAction.stepLabel}</Badge>
+              </div>
+              <h3 className="mt-2 text-base font-semibold text-zinc-50">{phaseNextAction.title}</h3>
+              <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
+            </div>
+
+            <div className="border-t border-zinc-800 pt-3 lg:border-t-0 lg:pl-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Launch</p>
+                <Badge className={launchAuditStatusClass(launchAudit.nextAction.status)}>
+                  {launchAudit.nextAction.statusLabel}
+                </Badge>
                 <Badge className="border-zinc-700 bg-black text-zinc-300">Public launch</Badge>
               </div>
+              <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
             </div>
           </div>
-        </section>
 
-        <section className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">
-          {phaseChecklist.map((item) => (
-            <div key={item.id} className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
-                <Badge className={phaseStatusClass(item.status)}>{item.status}</Badge>
-              </div>
-              <p className="mt-2 text-xs leading-5 text-zinc-500">{item.detail}</p>
-            </div>
-          ))}
+          <ol className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
+            {phaseChecklist.map((item) => (
+              <li key={item.id} className="border-t border-zinc-800 pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-zinc-100">{item.label}</p>
+                  <Badge className={phaseStatusClass(item.status)}>{item.status}</Badge>
+                </div>
+                {item.status === "active" || item.status === "blocked" ? (
+                  <p className="mt-1 text-xs leading-5 text-zinc-500">{item.detail}</p>
+                ) : null}
+              </li>
+            ))}
+          </ol>
         </section>
 
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">

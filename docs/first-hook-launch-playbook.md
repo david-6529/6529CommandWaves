@@ -11,12 +11,13 @@ Make the first public phase a clear community win:
 5. Let agents help only inside approved commands.
 6. Review every result before humans merge or pay anyone.
 
-This should prove a reusable way for anyone to build a hook in public, while keeping the first launch centered on the 6529 hook.
+This should first feel like a standalone project site for the 6529 hook. If the loop works, the same structure can support more public hook projects later.
+Use the 6529 wave for live discussion and decisions. Use this app for the project snapshot, GitHub code state, PR evidence, review evidence, and launch audit trail.
 
 ## Use Now
 
 - Builder wave and GitHub repo setup.
-- Active hook list with the builder wave and repo for each hook in development.
+- 6529 hook project snapshot with wave context, repo state, PR state, and review evidence.
 - One PR-sized command at a time.
 - Local or imported wave decisions for approvals.
 - Manual decision receipts that link approved work to a 6529 drop URL in the builder wave.

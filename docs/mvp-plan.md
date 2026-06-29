@@ -6,12 +6,14 @@ A Command Wave is a 6529 project wave that governs scoped work in a GitHub repo.
 
 For the first public phase, the product helps the community build a 6529 hook together. People and agents propose commands in plain English. Rules decide whether a command can run now or needs a visible decision. Approved commands can run through a controlled agent adapter. The result is reviewed and logged so the wave can see what happened.
 
-The underlying workflow should be reusable for future public hook projects. The first shipped UI should stay focused on one concrete 6529 hook launch so anyone can see the active hook, its builder wave, and its GitHub repo.
+The underlying workflow should be reusable for future public hook projects. The first shipped UI should feel like one standalone 6529 Hook project site so anyone can see the hook, its builder wave, its GitHub repo, and the current code review state.
 
-The simplest product flow is:
+6529 remains the live conversation and decision layer. The app should act as a snapshot and project dashboard: recent wave context, approved commands, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
+
+The simplest product view is:
 
 ```text
-Wave -> PR -> Review -> Log
+Wave snapshot -> Code state -> PR -> Review
 ```
 
 ## Roles

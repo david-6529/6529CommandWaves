@@ -14,7 +14,14 @@ describe("active hook projects", () => {
         waveUrl: demoWave.waveUrl,
         repoUrl: demoWave.repoUrl,
         currentFocus: demoWave.proposals[0].title,
-        participation: "Anyone can propose PR-sized hook work through the builder wave.",
+        participation: "Discuss in the 6529 wave. Track the code work here.",
+        waveRole: "6529 wave: live discussion, proposals, and decisions.",
+        platformRole: "This site: GitHub repo, PRs, reviews, launch evidence, and contribution reports.",
+        waveStatus: "Wave decision recorded with 5 yes and 1 no.",
+        codeStatus: "PR reviewed and logged.",
+        latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
+        reviewStatusLabel: "pass",
+        evidenceLabel: "1 command, 1 run, 1 review",
       }),
     ]);
   });
@@ -30,6 +37,24 @@ describe("active hook projects", () => {
     expect(projects[0]).toMatchObject({
       status: "setup",
       currentFocus: "Choose the first PR-sized hook command.",
+      waveStatus: "Wave has not selected a PR-sized hook command yet.",
+      codeStatus: "No PR-sized hook command yet.",
+    });
+  });
+
+  it("summarizes local wave approval before code evidence exists", () => {
+    const projects = createActiveHookProjects({
+      ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+      executions: [],
+      reviews: [],
+    });
+
+    expect(projects[0]).toMatchObject({
+      waveStatus: "Wave decision recorded with 5 yes and 1 no.",
+      codeStatus: "Approved PR command is ready to build.",
+      latestPrUrl: null,
+      reviewStatusLabel: "not reviewed",
     });
   });
 
