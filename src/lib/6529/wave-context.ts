@@ -60,10 +60,18 @@ function normalizeSourceLabel(value: string | undefined, fallback: string) {
   return normalized || fallback;
 }
 
+function primaryWaveId(value: unknown) {
+  if (typeof value !== "string" || !value.trim()) {
+    throw Object.assign(new Error("Paste a 6529 wave link or wave id."), { status: 400 });
+  }
+
+  return normalizeWaveId(value);
+}
+
 function buildContextSources(params: WaveContextParams): WaveContextSource[] {
   const sources: WaveContextSource[] = [
     {
-      waveId: normalizeWaveId(params.waveId),
+      waveId: primaryWaveId(params.waveId),
       label: "Primary wave",
       primary: true,
     },
@@ -71,7 +79,7 @@ function buildContextSources(params: WaveContextParams): WaveContextSource[] {
   const seen = new Set(sources.map((source) => source.waveId));
 
   for (const related of params.relatedWaves?.slice(0, MAX_RELATED_WAVES) ?? []) {
-    const waveId = normalizeWaveId(related.waveId);
+    const waveId = typeof related.waveId === "string" ? normalizeWaveId(related.waveId) : "";
 
     if (!waveId || seen.has(waveId)) {
       continue;

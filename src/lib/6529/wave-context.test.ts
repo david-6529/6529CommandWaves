@@ -53,6 +53,20 @@ describe("6529 wave context", () => {
     });
   });
 
+  it("rejects missing primary wave ids clearly", async () => {
+    const missingWaveIdInput = {} as Parameters<typeof previewWaveContext>[0];
+
+    await expect(previewWaveContext({ waveId: "" })).rejects.toMatchObject({
+      message: "Paste a 6529 wave link or wave id.",
+      status: 400,
+    });
+
+    await expect(previewWaveContext(missingWaveIdInput)).rejects.toMatchObject({
+      message: "Paste a 6529 wave link or wave id.",
+      status: 400,
+    });
+  });
+
   it("rejects conflicting all-history and explicit date windows", async () => {
     await expect(
       fetchWaveContext({
