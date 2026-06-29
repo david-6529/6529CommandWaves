@@ -28,6 +28,7 @@ import { ledgerEventsByRecency } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
+import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
@@ -1385,6 +1386,10 @@ export function CommandWavesConsole() {
               <p className="text-sm leading-6 text-zinc-400">
                 Phase 1 accepts reads, drafts, wave updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
               </p>
+              <div className="grid gap-3 lg:grid-cols-2">
+                <CompactList title="Use now" items={firstPhaseScopeInventory.useNow} />
+                <CompactList title="Park later" items={firstPhaseScopeInventory.parkLater} />
+              </div>
               <div className="grid gap-2 sm:grid-cols-3">
                 <div className="rounded-md border border-zinc-800 bg-black p-3">
                   <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Voters</p>
