@@ -16,7 +16,7 @@ describe("active hook projects", () => {
         waveLabel: "6529-hook-builder",
         repoLabel: "6529-Collections/6529-hook",
         currentFocus: demoWave.proposals[0].title,
-        participation: "Talk in the wave. Inspect the GitHub work here.",
+        participation: "Discuss in the wave. Inspect GitHub work here.",
         waveRole: "Discussion, proposals, and decisions.",
         platformRole: "Repo, PRs, review proof, launch evidence, and contribution reports.",
         waveStatus: "Wave decision recorded with 5 yes and 1 no.",

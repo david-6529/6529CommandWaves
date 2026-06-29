@@ -1149,7 +1149,7 @@ export function CommandWavesConsole() {
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave to talk</LinkButton> : null}
+                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open wave</LinkButton> : null}
                         <Button
                           type="button"
                           variant="secondary"
