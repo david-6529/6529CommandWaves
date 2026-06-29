@@ -44,6 +44,13 @@ describe("first phase launch audit", () => {
         status: "ready",
       }),
     );
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "flow_participation_notes",
+        label: "Participation notes",
+        status: "ready",
+      }),
+    );
   });
 
   it("keeps launch in setup mode until readiness is checked", () => {
@@ -235,6 +242,69 @@ describe("first phase launch audit", () => {
         id: "flow_audit_packet",
         status: "blocked",
         detail: "Launch packet needs Guardian review proof before public launch.",
+      }),
+    );
+  });
+
+  it("blocks public launch when participation notes imply live authority", () => {
+    const wave = {
+      ...demoWave,
+      gates: ["30% of TDH holders can contribute"],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_participation_notes",
+        label: "Participation notes",
+        status: "blocked",
+        detail:
+          "Participation notes must be advisory until live REP, TDH, holder, allowlist, or QnA enforcement is wired.",
+      }),
+    );
+  });
+
+  it("does not require participation notes before public launch", () => {
+    const wave = {
+      ...demoWave,
+      gates: [],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "flow_participation_notes",
+        status: "ready",
+        detail: "No participation notes recorded.",
+      }),
+    );
+  });
+
+  it("allows harmless participation note formatting differences", () => {
+    const wave = {
+      ...demoWave,
+      gates: ["  Community builders welcome  "],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      wave,
+    });
+
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "flow_participation_notes",
+        status: "ready",
+        detail: "Participation notes are advisory and do not grant permissions.",
       }),
     );
   });

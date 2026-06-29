@@ -19,20 +19,38 @@ function asGateLines(value: unknown): string[] {
   return value.split("\n");
 }
 
-function normalizeGateLine(value: string) {
+function cleanGateLine(value: string) {
   const trimmed = value.trim().replace(/\s+/g, " ");
 
   if (!trimmed) {
     return null;
   }
 
-  const capped = trimmed.length > 140 ? `${trimmed.slice(0, 137)}...` : trimmed;
+  return trimmed.length > 140 ? `${trimmed.slice(0, 137)}...` : trimmed;
+}
 
-  if (authorityPattern.test(capped) && !advisoryPattern.test(capped)) {
-    return `${capped} (manual note only, not enforced by this app)`;
+export function participationGateNeedsAdvisoryNote(value: string) {
+  const cleaned = cleanGateLine(value);
+
+  if (!cleaned) {
+    return false;
   }
 
-  return capped;
+  return authorityPattern.test(cleaned) && !advisoryPattern.test(cleaned);
+}
+
+function normalizeGateLine(value: string) {
+  const cleaned = cleanGateLine(value);
+
+  if (!cleaned) {
+    return null;
+  }
+
+  if (participationGateNeedsAdvisoryNote(cleaned)) {
+    return `${cleaned} (manual note only, not enforced by this app)`;
+  }
+
+  return cleaned;
 }
 
 export function normalizeParticipationGates(

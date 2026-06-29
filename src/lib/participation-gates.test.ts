@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { defaultParticipationGates, normalizeParticipationGates } from "./participation-gates";
+import {
+  defaultParticipationGates,
+  normalizeParticipationGates,
+  participationGateNeedsAdvisoryNote,
+} from "./participation-gates";
 
 describe("participation gates", () => {
   it("keeps default gate notes advisory", () => {
@@ -24,5 +28,11 @@ describe("participation gates", () => {
     expect(normalizeParticipationGates("REP or TDH planned, not enforced here")).toEqual([
       "REP or TDH planned, not enforced here",
     ]);
+  });
+
+  it("detects only authority notes that need advisory wording", () => {
+    expect(participationGateNeedsAdvisoryNote("30% of TDH holders can contribute")).toBe(true);
+    expect(participationGateNeedsAdvisoryNote("REP or TDH planned, not enforced here")).toBe(false);
+    expect(participationGateNeedsAdvisoryNote("Community builders welcome")).toBe(false);
   });
 });

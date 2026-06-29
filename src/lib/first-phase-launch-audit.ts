@@ -1,4 +1,5 @@
 import { validateWaveDecisionReference, type CommandWave } from "./command-waves";
+import { participationGateNeedsAdvisoryNote } from "./participation-gates";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
 import type { ReadinessCheck } from "./system/readiness";
 
@@ -140,6 +141,37 @@ function hasGithubPrLink(artifacts: string[]) {
   );
 }
 
+function participationNotesItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
+  if (!wave) {
+    return [];
+  }
+
+  if (wave.gates.some(participationGateNeedsAdvisoryNote)) {
+    return [
+      {
+        id: "flow_participation_notes",
+        label: "Participation notes",
+        status: "blocked",
+        detail:
+          "Participation notes must be advisory until live REP, TDH, holder, allowlist, or QnA enforcement is wired.",
+        source: "flow",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "flow_participation_notes",
+      label: "Participation notes",
+      status: "ready",
+      detail: wave.gates.length
+        ? "Participation notes are advisory and do not grant permissions."
+        : "No participation notes recorded.",
+      source: "flow",
+    },
+  ];
+}
+
 function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
   const proposal = wave?.proposals.find((item) => item.kind === "open_pr") ?? null;
 
@@ -233,7 +265,13 @@ export function createFirstPhaseLaunchAudit({
         },
       ];
 
-  const items = [...flowItems, ...decisionReceiptItem(wave), ...auditPacketItem(wave), ...readinessItems];
+  const items = [
+    ...flowItems,
+    ...decisionReceiptItem(wave),
+    ...participationNotesItem(wave),
+    ...auditPacketItem(wave),
+    ...readinessItems,
+  ];
   const readyItems = items.filter((item) => item.status === "ready");
   const blockers = items.filter((item) => item.status === "blocked");
   const openItems = items
