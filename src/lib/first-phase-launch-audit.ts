@@ -115,6 +115,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Prepare the launch packet",
   setup_not_checked: "Run launch setup check",
+  setup_remote_check: "Run launch setup check",
   setup_repo_required_files: "Check launch repo files",
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",

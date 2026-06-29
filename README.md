@@ -172,6 +172,7 @@ The current app is a local prototype of the hook-building flow:
 - human-reviewed launch packet for PR audit trails
 - public setup proof endpoint for third-party verification of wave/repo/storage/rules/check expectations
 - public command-wave state endpoint for `COMMAND_WAVE_STATE_URL`
+- public launch audit endpoint with setup, readiness, checklist, and next-action evidence
 - copyable setup proof and state URLs in launch readiness controls
 - recent activity view with full audit log export
 - local API routes for fetching/resetting state, proposals, votes, runs, and reviews
@@ -331,6 +332,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
+- `GET /api/command-wave/launch/audit`: public first-loop launch audit. Add `?remote=1` to run remote wave and repo setup checks.
 - `GET /api/command-wave`: return the current local command wave.
 - `PUT /api/command-wave`: disabled in phase 1. Use scoped setup, proposal, vote, decision, run, and review routes.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.
