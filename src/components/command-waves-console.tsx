@@ -1742,8 +1742,8 @@ export function CommandWavesConsole() {
               </div>
             </div>
             <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
-              {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Repo</LinkButton> : null}
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Room</LinkButton> : null}
+              {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Code</LinkButton> : null}
             </div>
           </div>
 
@@ -1751,8 +1751,8 @@ export function CommandWavesConsole() {
             <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
               Ask to join
             </Button>
-            <JumpLink href="#wave-room">Message room</JumpLink>
-            <JumpLink href="#start-building">Propose change</JumpLink>
+            <JumpLink href="#wave-room">Message</JumpLink>
+            <JumpLink href="#start-building">Suggest work</JumpLink>
             <JumpLink href="#active-builders">Members</JumpLink>
             <JumpLink href="#recent-activity">Activity</JumpLink>
           </nav>
@@ -1803,7 +1803,7 @@ export function CommandWavesConsole() {
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
                       Copy decision request
                     </Button>
-                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
+                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
                     <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
                       Log local yes
                     </Button>
@@ -1902,8 +1902,8 @@ export function CommandWavesConsole() {
                 </div>
               ) : (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <p className="text-base leading-7 text-zinc-400">Propose the next scoped change.</p>
-                  <JumpLink href="#start-building">Propose change</JumpLink>
+                  <p className="text-base leading-7 text-zinc-400">Suggest the next scoped change.</p>
+                  <JumpLink href="#start-building">Suggest work</JumpLink>
                 </div>
               )}
             </div>
@@ -1916,7 +1916,7 @@ export function CommandWavesConsole() {
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Chat</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">Draft a message for the room.</p>
               </div>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
@@ -2189,7 +2189,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Active hook rooms</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Each hook has a public discussion, a repo, and one next move.
+                Each hook has a public room, a code repo, and one next move.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2207,8 +2207,8 @@ export function CommandWavesConsole() {
                   <p className="mt-2 text-base leading-7 text-zinc-400">{project.currentFocus}</p>
                   <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     {[
-                      ["Discussion", project.waveLabel],
-                      ["Repo", project.repoLabel],
+                      ["Room", project.waveLabel],
+                      ["Code", project.repoLabel],
                       ["Access", project.gateSnapshotLabel === "manual gate" ? "manual review" : project.gateSnapshotLabel],
                       ["Review", project.reviewStatusLabel],
                     ].map(([label, value]) => (
@@ -2220,8 +2220,8 @@ export function CommandWavesConsole() {
                   </dl>
                 </div>
                 <div className="flex flex-wrap gap-2 lg:justify-end">
-                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Discussion</LinkButton> : null}
-                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Repo</LinkButton> : null}
+                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Room</LinkButton> : null}
+                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Code</LinkButton> : null}
                   <JumpLink href="#wave-room">Message</JumpLink>
                 </div>
               </div>
