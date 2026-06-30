@@ -51,6 +51,7 @@ describe("6529 wave context", () => {
       id: "drop-003",
       url: "https://6529.io/waves/mock-command-wave/drops/drop-003",
       author: "reviewer-agent",
+      preview: "Review passed cmd-001. The hook scaffold matched the approved proposal and rules.",
     });
   });
 

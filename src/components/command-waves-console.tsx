@@ -1242,6 +1242,7 @@ export function CommandWavesConsole() {
   }
 
   function applyWave(nextWave: CommandWave) {
+    autoPreviewKeysRef.current.clear();
     setWave(nextWave);
     setWaveUrl(nextWave.waveUrl);
     setRepoUrl(nextWave.repoUrl);
