@@ -10,6 +10,7 @@ import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draf
 import { createBuilderWaveJoinDraft } from "@/lib/builder-wave-join-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
+import { createBuilderWaveQuickPosts, type BuilderWaveQuickPost } from "@/lib/builder-wave-quick-posts";
 import { createBuilderWaveReviewRequestDraft } from "@/lib/builder-wave-review-request-draft";
 import { commandKindLabel } from "@/lib/command-kind-copy";
 import { createCommandOrchestrationSummary } from "@/lib/command-orchestration-summary";
@@ -962,6 +963,10 @@ export function CommandWavesConsole() {
     () => createBuilderWaveChatDraft(wave, phaseNextAction, waveRoomMessage),
     [phaseNextAction, wave, waveRoomMessage],
   );
+  const builderWaveQuickPosts = useMemo(
+    () => createBuilderWaveQuickPosts({ handle: proposer, title: currentFocusTitle }),
+    [currentFocusTitle, proposer],
+  );
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -1346,6 +1351,11 @@ export function CommandWavesConsole() {
   function resetBuilderWaveChatDraft() {
     setWaveRoomMessage("");
     setWaveRoomNotice("Message cleared.");
+  }
+
+  function prepareQuickPost(post: BuilderWaveQuickPost) {
+    setWaveRoomMessage(post.message);
+    setWaveRoomNotice(`${post.label} draft ready.`);
   }
 
   function prepareJoinRequest() {
@@ -1755,6 +1765,14 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Start with</p>
+                {builderWaveQuickPosts.map((post) => (
+                  <Button key={post.id} type="button" variant="secondary" onClick={() => prepareQuickPost(post)}>
+                    {post.label}
+                  </Button>
+                ))}
+              </div>
               <Field label="Draft post">
                 <Textarea
                   rows={4}
