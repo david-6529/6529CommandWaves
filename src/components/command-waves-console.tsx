@@ -7,6 +7,7 @@ import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timel
 import { createBuilderRoster } from "@/lib/builder-roster";
 import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
+import { createBuilderWaveJoinDraft } from "@/lib/builder-wave-join-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
 import { createBuilderWaveReviewRequestDraft } from "@/lib/builder-wave-review-request-draft";
@@ -1341,6 +1342,14 @@ export function CommandWavesConsole() {
     setWaveRoomNotice("Message cleared.");
   }
 
+  function prepareJoinRequest() {
+    setWaveRoomMessage(createBuilderWaveJoinDraft(proposer));
+    setWaveRoomNotice("Join message ready.");
+    window.requestAnimationFrame(() => {
+      document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   async function copyBuilderWaveProposalDraft() {
     try {
       await navigator.clipboard.writeText(builderWaveProposalDraft);
@@ -1586,7 +1595,9 @@ export function CommandWavesConsole() {
                   </div>
                   <p className="mt-1 text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <JumpLink href="#wave-room">Ask to join</JumpLink>
+                    <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
+                      Ask to join
+                    </Button>
                     <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
                       Copy guide
                     </Button>
