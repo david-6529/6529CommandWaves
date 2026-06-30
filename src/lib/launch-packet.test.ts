@@ -27,13 +27,13 @@ describe("launch packet", () => {
     expect(packet.text).toContain("# 6529 hook launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain("Participation notes (advisory):");
-    expect(packet.text).toContain("manual note only");
+    expect(packet.text).toContain("Manual builder review for phase 1");
     expect(packet.text).toContain("## Orchestration");
     expect(packet.text).toContain("- Work type: Open PR");
     expect(packet.text).toContain("- Risk: high");
     expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision receipt recorded.");
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
-    expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence");
+    expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
     expect(packet.text).toContain("6529 decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("## Contribution Report");
@@ -57,7 +57,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("run-manifest:{");
     expect(packet.text).toContain("No automatic payouts.");
     expect(packet.text).toContain("This packet does not grant REP, TDH, payouts, permissions, or merge rights.");
-    expect(packet.text).toContain("Post this packet to the builder wave after human review");
+    expect(packet.text).toContain("Post this packet to the room after human review");
     expect(packet.text).not.toContain("automatically posted");
     expect(packet.text).not.toContain("\u2014");
   });
@@ -79,19 +79,19 @@ describe("launch packet", () => {
     });
 
     expect(packet.proposalId).toBeNull();
-    expect(packet.text).toContain("Command: none selected yet.");
-    expect(packet.text).toContain("Work type: No command selected");
+    expect(packet.text).toContain("Work: none selected yet.");
+    expect(packet.text).toContain("Work type: No work selected");
     expect(packet.text).toContain("Risk: waiting");
-    expect(packet.text).toContain("Decision route: waiting for one scoped hook command.");
+    expect(packet.text).toContain("Decision route: waiting for one scoped hook change.");
     expect(packet.text).toContain("Reviewer route: PR work needs reviewer CI before human merge.");
-    expect(packet.text).toContain("Build: waiting for an approved PR command.");
-    expect(packet.text).toContain("Review: waiting for execution evidence.");
-    expect(packet.text).toContain("Choose one PR-sized hook command.");
+    expect(packet.text).toContain("Build: waiting for an approved PR change.");
+    expect(packet.text).toContain("Review: waiting for a PR record.");
+    expect(packet.text).toContain("Choose one PR-sized hook change.");
     expect(packet.text).toContain("Setup proof: not attached.");
     expect(packet.text).toContain("Command-wave state: not attached.");
   });
 
-  it("labels discussion update support commands without implying automatic posting", () => {
+  it("labels discussion update support items without implying automatic posting", () => {
     const proposal = {
       ...demoWave.proposals[0],
       id: "cmd-wave-update",
@@ -156,7 +156,7 @@ describe("launch packet", () => {
     });
 
     expect(packet.text).toContain("6529 decision receipt: not recorded yet.");
-    expect(packet.text).toContain("Build: waiting for a recorded wave decision.");
+    expect(packet.text).toContain("Build: waiting for a recorded room decision.");
   });
 
   it("defaults generatedAt to the newest ledger event", () => {

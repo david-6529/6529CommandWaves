@@ -385,7 +385,7 @@ describe("Command wave store", () => {
     await recordVote({ proposalId: "cmd-002", voterIdentity: "carol", vote: "yes" });
 
     await expect(executeProposal({ proposalId: "cmd-002" })).rejects.toThrow(
-      "Record the 6529 decision receipt before running a PR command.",
+      "Record the 6529 decision receipt before building PR work.",
     );
 
     await recordDecisionReceipt({
@@ -422,7 +422,7 @@ describe("Command wave store", () => {
     });
   });
 
-  it("does not execute non-PR support commands in the phase 1 build step", async () => {
+  it("does not execute support items in the phase 1 build step", async () => {
     const submitted = await submitCommandProposal({
       title: "Draft launch scope note",
       proposer: "tester",
@@ -437,7 +437,7 @@ describe("Command wave store", () => {
       status: "approved",
     });
     await expect(executeProposal({ proposalId: "cmd-002" })).rejects.toThrow(
-      "Only approved PR commands can use the agent build step in phase 1.",
+      "Only approved PR work can use the build step in phase 1.",
     );
   });
 

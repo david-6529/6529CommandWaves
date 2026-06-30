@@ -74,7 +74,7 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
       detail: buildBlocked
         ? "PR work is blocked."
         : buildDone
-          ? "PR evidence recorded."
+          ? "PR recorded."
           : decisionDone
             ? "Build or attach the approved PR."
             : "Waits for the decision.",

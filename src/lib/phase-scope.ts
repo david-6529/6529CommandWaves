@@ -5,9 +5,9 @@ export type PhaseScopeInventory = {
 
 export const firstPhaseScopeInventory: PhaseScopeInventory = {
   useNow: [
-    "One 6529 builder wave and one GitHub hook repo.",
-    "6529 hook project snapshot with wave, repo, PR, and review state.",
-    "PR-sized hook commands with clear limits and tests.",
+    "One 6529 hook room and one GitHub hook repo.",
+    "6529 hook project snapshot with room, code, PR, and review state.",
+    "PR-sized hook changes with clear limits and tests.",
     "Manual 6529 decision receipts before PR work runs.",
     "Codex work packets for prepared branches and draft PRs.",
     "Reviewer checks for manifests, risky files, caps, and hook guardrails.",

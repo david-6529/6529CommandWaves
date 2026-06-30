@@ -12,7 +12,7 @@ describe("phase next action", () => {
       statusLabel: "ready",
       stepLabel: "Log",
       title: "Loop complete",
-      detail: "The approved hook work has PR, review, discussion update, and launch packet evidence.",
+      detail: "The approved hook work has a PR, review, room update, and launch packet.",
     });
   });
 
@@ -70,7 +70,7 @@ describe("phase next action", () => {
     expect(nextAction).toMatchObject({
       status: "action",
       stepLabel: "Decide",
-      title: "Get the wave decision",
+      title: "Get the room decision",
       detail: "Vote or record the 6529 decision URL before work runs.",
     });
   });
@@ -92,7 +92,7 @@ describe("phase next action", () => {
     expect(nextAction.detail.toLowerCase()).not.toContain("automatic");
   });
 
-  it("keeps support commands from becoming the PR build next action", () => {
+  it("keeps support items from becoming the PR build next action", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
         ...demoWave,

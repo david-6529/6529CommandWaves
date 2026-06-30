@@ -19,7 +19,7 @@ describe("wave update draft", () => {
     });
 
     expect(draft).toContain("6529 hook update");
-    expect(draft).toContain(`Command: ${proposal.id} - ${proposal.title}`);
+    expect(draft).toContain(`Work: ${proposal.id} - ${proposal.title}`);
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
     expect(draft).toContain("receipt https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval.");
     expect(draft).toContain("PR: https://github.com/6529-Collections/6529-hook/pull/12");
@@ -33,7 +33,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Report scores are informational only.");
     expect(draft).toContain("Developer fee plan:");
     expect(draft).toContain("No automatic payouts.");
-    expect(draft).toContain("post it manually in the builder wave if it matches the work");
+    expect(draft).toContain("post it manually in the room if it matches the work");
     expect(draft).not.toContain("automatically posted");
   });
 
@@ -52,9 +52,9 @@ describe("wave update draft", () => {
       review: null,
     });
 
-    expect(draft).toContain("Command: none selected yet.");
-    expect(draft).toContain("Build: waiting for an approved PR command.");
-    expect(draft).toContain("Review: waiting for execution evidence.");
+    expect(draft).toContain("Work: none selected yet.");
+    expect(draft).toContain("Build: waiting for an approved PR change.");
+    expect(draft).toContain("Review: waiting for a PR record.");
   });
 
   it("keeps local vote approval waiting for a 6529 decision receipt", () => {
@@ -73,6 +73,6 @@ describe("wave update draft", () => {
     });
 
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
-    expect(draft).toContain("Build: waiting for a recorded wave decision.");
+    expect(draft).toContain("Build: waiting for a recorded room decision.");
   });
 });

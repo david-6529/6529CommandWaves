@@ -73,7 +73,7 @@ describe("hook progress", () => {
     ]);
   });
 
-  it("shows review as current after PR evidence is recorded", () => {
+  it("shows review as current after a PR is recorded", () => {
     const progress = createHookProgress({
       ...demoWave,
       proposals: [{ ...demoWave.proposals[0], status: "reviewing" }],

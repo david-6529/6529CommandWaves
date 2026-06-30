@@ -101,7 +101,7 @@ function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): Roo
   return {
     id: "pr",
     label,
-    title: "PR evidence recorded",
+    title: "PR recorded",
     body: "The approved hook change has a PR record ready for builders to inspect.",
     status: execution.status,
     href: prUrl(execution),

@@ -91,7 +91,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
       detail: "Add the decision URL before PR work starts.",
       status: "current",
       href: wave.waveUrl,
-      hrefLabel: "Open 6529",
+      hrefLabel: "Open room",
     };
   }
 
@@ -102,7 +102,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     detail: "Code work waits for a visible 6529 decision.",
     status: "current",
     href: wave.waveUrl,
-    hrefLabel: "Open 6529",
+    hrefLabel: "Open room",
   };
 }
 
@@ -120,7 +120,7 @@ function prItem(
       id: "pr",
       label: "PR",
       title: "Waiting for decision",
-      detail: "The PR starts after approval is recorded.",
+      detail: "The PR starts after approval is recorded in the room.",
       status: "waiting",
       href: null,
       hrefLabel: null,
@@ -143,8 +143,8 @@ function prItem(
     return {
       id: "pr",
       label: "PR",
-      title: "PR evidence recorded",
-      detail: "Approved PR evidence is recorded.",
+      title: "PR recorded",
+      detail: "Approved PR record is ready for review.",
       status: "done",
       href,
       hrefLabel: href ? "Open PR" : null,
@@ -155,7 +155,7 @@ function prItem(
     id: "pr",
     label: "PR",
     title: "Build the approved PR",
-    detail: "Use the approved packet and record the PR evidence.",
+    detail: "Use the approved packet and record the PR.",
     status: "current",
     href: wave.repoUrl,
     hrefLabel: "Open repo",
@@ -168,7 +168,7 @@ function reviewItem(execution: ExecutionRecord | null, review: GuardianReview | 
       id: "review",
       label: "Review",
       title: "Waiting for PR",
-      detail: "Review starts after PR evidence is attached.",
+      detail: "Review starts after a PR is attached.",
       status: "waiting",
       href: null,
       hrefLabel: null,

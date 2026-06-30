@@ -11,7 +11,7 @@ function prUrl(execution: ExecutionRecord | null) {
 
 function buildEvidenceLines(execution: ExecutionRecord | null) {
   if (!execution) {
-    return ["- PR evidence is not recorded yet."];
+    return ["- PR record is not attached yet."];
   }
 
   return [
@@ -36,7 +36,7 @@ export function createBuilderWaveReviewRequestDraft({
     "",
     `6529 discussion: ${wave.waveUrl}`,
     `GitHub repo: ${wave.repoUrl}`,
-    `Command: ${proposal.id} - ${proposal.title}`,
+    `Work: ${proposal.id} - ${proposal.title}`,
     `PR: ${prUrl(execution) ?? "not recorded yet"}`,
     "",
     "Approved work:",
@@ -45,11 +45,11 @@ export function createBuilderWaveReviewRequestDraft({
     "Limits and success criteria:",
     humanizeLegacyCommandCopy(proposal.spec),
     "",
-    "Build evidence:",
+    "Build record:",
     ...buildEvidenceLines(execution),
     "",
     "Review checklist:",
-    "- PR matches the approved command and limits.",
+    "- PR matches the approved work and limits.",
     "- Command Waves manifest and 6529 decision receipt are present.",
     "- Tests cover capped hook parameters and guardrails.",
     "- No proxy, delegatecall, deploy, payment, or governance change is introduced.",

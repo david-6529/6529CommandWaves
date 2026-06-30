@@ -20,7 +20,10 @@ describe("build timeline", () => {
       hrefLabel: "Open decision",
     });
     expect(timeline[2].href).toBe("https://github.com/6529-Collections/6529-hook/pull/12");
-    expect(timeline[2].detail).toBe("Approved PR evidence is recorded.");
+    expect(timeline[2]).toMatchObject({
+      title: "PR recorded",
+      detail: "Approved PR record is ready for review.",
+    });
     expect(timeline[3].detail).toBe("Reviewer checked the PR against the approved hook proposal and rules.");
     expect(timeline[4]).toMatchObject({
       title: "Add fee cap tests",

@@ -22,6 +22,7 @@ describe("room feed", () => {
       status: "needs decision",
     });
     expect(feed[2]).toMatchObject({
+      title: "PR recorded",
       body: "The approved hook change has a PR record ready for builders to inspect.",
       hrefLabel: "Open PR",
       status: "complete",

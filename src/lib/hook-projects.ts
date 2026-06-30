@@ -49,7 +49,7 @@ function waveLabel(waveUrl: string) {
   const trimmed = waveUrl.trim();
   const match = trimmed.match(/\/waves\/([^/?#\s]+)/);
 
-  return match?.[1] ?? (trimmed || "No builder wave");
+  return match?.[1] ?? (trimmed || "No room");
 }
 
 function repoLabel(repoUrl: string) {
@@ -57,7 +57,7 @@ function repoLabel(repoUrl: string) {
   const httpsMatch = trimmed.match(/^https?:\/\/github\.com\/([^/\s]+\/[^/\s?#]+)(?:[?#].*)?$/);
   const sshMatch = trimmed.match(/^git@github\.com:([^/\s]+\/[^/\s]+?)(?:\.git)?$/);
 
-  return (httpsMatch?.[1] ?? sshMatch?.[1] ?? trimmed) || "No GitHub repo";
+  return (httpsMatch?.[1] ?? sshMatch?.[1] ?? trimmed) || "No code repo";
 }
 
 function findPullRequestUrl(wave: CommandWave) {
@@ -100,7 +100,7 @@ function gateSnapshotLabel(wave: CommandWave) {
   }
 
   if (gates.some((gate) => /\b(rep|tdh|holder|allowlist|qna|quiz|manual|advisory|not enforced)\b/i.test(gate))) {
-    return "manual gate";
+    return "manual review";
   }
 
   return "open gate";
@@ -152,7 +152,7 @@ function codeStatus(wave: CommandWave) {
   }
 
   if (phaseWork.prExecution?.status === "complete") {
-    return "PR evidence is ready for review.";
+    return "PR record is ready for review.";
   }
 
   if (phaseWork.prProposal?.status === "approved") {
@@ -232,7 +232,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       currentFocus,
       participation: "Follow the room, draft replies for manual posting, and track code work.",
       waveRole: "Where builders talk, propose, decide, and share updates.",
-      platformRole: "Code state, PR record, review proof, launch packet, and contribution report.",
+      platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
       gateDetails: gateDetails(wave),
       gateSnapshotLabel: gateSnapshotLabel(wave),
       orchestrationSnapshotLabel: orchestrationSnapshotLabel(wave),

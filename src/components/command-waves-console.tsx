@@ -148,12 +148,8 @@ const buildRoomRules = [
   "Important changes need a visible decision before a PR is built.",
   "The reviewer agent checks the PR before humans merge.",
 ];
-const roomRuleSnapshots = [
-  ["Talk", "Ideas and questions start in the room."],
-  ["Decide", "Important code work waits for visible approval."],
-  ["Review", "PRs need reviewer proof before humans merge."],
-  ["Control", "No auto-merge, deploys, payments, or rule changes."],
-];
+const roomRuleSummary =
+  "Talk first. Important code waits for approval. PRs are reviewed before merge. No auto-merge, deploys, payments, or rule changes.";
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
@@ -1148,7 +1144,7 @@ export function CommandWavesConsole() {
         ? "Record the 6529 decision URL so the PR has a source of truth."
         : showBuildAction
           ? activePrHasWaveDecision
-            ? "Use the approved packet and attach the PR evidence."
+            ? "Use the approved packet and attach the PR record."
             : "Record the 6529 decision URL before PR work starts."
           : canRunReview
             ? "Check the PR against the approved proposal and room rules."
@@ -1747,11 +1743,7 @@ export function CommandWavesConsole() {
                 {commandWaveProductCopy.headline}
               </h1>
               <p className="mt-2 max-w-3xl text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm leading-6 text-zinc-400">
-                <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
-                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{commandWaveProductCopy.simpleFlow}</Badge>
-                <span>{builderRoster.length} visible builders</span>
-              </div>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">{builderRoster.length} visible builders</p>
             </div>
             <div className="flex flex-wrap items-start gap-2 lg:justify-end">
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Room</LinkButton> : null}
@@ -1763,10 +1755,9 @@ export function CommandWavesConsole() {
             <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
               Ask to join
             </Button>
-            <JumpLink href="#wave-room">Message</JumpLink>
-            <JumpLink href="#start-building">Suggest work</JumpLink>
+            <JumpLink href="#wave-room">Chat</JumpLink>
+            <JumpLink href="#start-building">Suggest</JumpLink>
             <JumpLink href="#active-builders">Members</JumpLink>
-            <JumpLink href="#recent-activity">Activity</JumpLink>
           </nav>
         </header>
 
@@ -1799,14 +1790,10 @@ export function CommandWavesConsole() {
               </div>
             ) : null}
 
-            <dl className="mt-4 grid gap-3 border-t border-zinc-800 pt-3 sm:grid-cols-2">
-              {roomRuleSnapshots.map(([label, detail]) => (
-                <div key={label} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:first:border-t sm:first:pt-2">
-                  <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
-                  <dd className="mt-1 text-sm leading-6 text-zinc-400">{detail}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="mt-4 border-t border-zinc-800 pt-3">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
+              <p className="mt-1 text-sm leading-6 text-zinc-400">{roomRuleSummary}</p>
+            </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Actions</p>
@@ -1864,7 +1851,7 @@ export function CommandWavesConsole() {
               ) : canRunReview ? (
                 <div className="mt-2 grid gap-3">
                   <p className="text-base leading-7 text-zinc-400">
-                    Review the PR evidence against the approved proposal.
+                    Review the PR record against the approved proposal.
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
@@ -2224,7 +2211,7 @@ export function CommandWavesConsole() {
                     {[
                       ["Room", project.waveLabel],
                       ["Code", project.repoLabel],
-                      ["Access", project.gateSnapshotLabel === "manual gate" ? "manual review" : project.gateSnapshotLabel],
+                      ["Access", project.gateSnapshotLabel],
                       ["Review", project.reviewStatusLabel],
                     ].map(([label, value]) => (
                       <div key={label} className="border-t border-zinc-800 pt-2">
@@ -3419,7 +3406,7 @@ export function CommandWavesConsole() {
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
                       {activeProposalIsPr
                         ? activeExecution
-                          ? "Logged PR evidence only. It does not merge, deploy, or spend funds."
+                          ? "Logged the PR record only. It does not merge, deploy, or spend funds."
                           : "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
                         : "Use support items for context, drafts, or room updates outside the PR build step."}
                     </p>

@@ -76,9 +76,9 @@ export function createCommandOrchestrationSummary({
 }): CommandOrchestrationSummary {
   if (!proposal) {
     return {
-      workType: "No command selected",
+      workType: "No work selected",
       risk: "waiting",
-      decisionRoute: "waiting for one scoped hook command",
+      decisionRoute: "waiting for one scoped hook change",
       ruleReason: "No rule applies until work is proposed.",
       reviewerRoute: "PR work needs reviewer CI before human merge.",
     };
@@ -93,7 +93,7 @@ export function createCommandOrchestrationSummary({
     ruleReason: rule?.reason ?? "No rule reason recorded.",
     reviewerRoute:
       proposal.kind === "open_pr"
-        ? "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence before human merge."
-        : "Support commands stay outside the PR build step.",
+        ? "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records before human merge."
+        : "Support items stay outside the PR build step.",
   };
 }

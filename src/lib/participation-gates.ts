@@ -1,5 +1,5 @@
 export const defaultParticipationGates = [
-  "Builder wave allowlist for phase 1, manual note only",
+  "Manual builder review for phase 1",
   "REP or TDH gates are planned, not enforced here",
   "AI contribution report scores are not permissions",
 ] as const;

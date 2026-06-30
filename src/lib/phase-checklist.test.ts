@@ -65,7 +65,7 @@ describe("phase checklist", () => {
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",
-      detail: "Build waits for a recorded wave decision.",
+      detail: "Build waits for a recorded room decision.",
     });
   });
 
@@ -93,11 +93,11 @@ describe("phase checklist", () => {
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",
-      detail: "Build waits for a recorded wave decision.",
+      detail: "Build waits for a recorded room decision.",
     });
   });
 
-  it("keeps support commands outside the PR build checklist", () => {
+  it("keeps support items outside the PR build checklist", () => {
     const checklist = createPhaseChecklist({
       ...demoWave,
       proposals: [
@@ -124,7 +124,7 @@ describe("phase checklist", () => {
       ["log", "waiting"],
     ]);
     expect(checklist.find((item) => item.id === "proposal")?.detail).toBe(
-      "Support command recorded. Write one PR-sized hook command.",
+      "Support item recorded. Write one PR-sized hook change.",
     );
   });
 

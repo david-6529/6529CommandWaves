@@ -18,19 +18,19 @@ describe("active hook projects", () => {
         currentFocus: demoWave.proposals[0].title,
         participation: "Follow the room, draft replies for manual posting, and track code work.",
         waveRole: "Where builders talk, propose, decide, and share updates.",
-        platformRole: "Code state, PR record, review proof, launch packet, and contribution report.",
+        platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
         gateDetails: [
-          "Builder wave allowlist for phase 1, manual note only",
+          "Manual builder review for phase 1",
           "REP or TDH gates are planned, not enforced here",
           "AI contribution report scores are not permissions",
         ],
-        gateSnapshotLabel: "manual gate",
+        gateSnapshotLabel: "manual review",
         orchestrationSnapshotLabel: "high approved",
         codeSnapshotLabel: "PR reviewed",
         nextActionStatus: "ready",
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
-        nextActionDetail: "The approved hook work has PR, review, discussion update, and launch packet evidence.",
+        nextActionDetail: "The approved hook work has a PR, review, room update, and launch packet.",
         waveStatus: "Room decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
@@ -50,17 +50,17 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       status: "setup",
-      waveLabel: "No builder wave",
-      repoLabel: "No GitHub repo",
+      waveLabel: "No room",
+      repoLabel: "No code repo",
       currentFocus: "Choose the first PR-sized hook change.",
       nextActionStatus: "action",
       nextActionLabel: "next",
       nextActionTitle: "Set the project",
-      nextActionDetail: "Confirm one builder wave and one GitHub repo before proposals start.",
+      nextActionDetail: "Confirm one hook room and one code repo before proposals start.",
       waveStatus: "No PR-sized hook change selected yet.",
-      gateSnapshotLabel: "manual gate",
+      gateSnapshotLabel: "manual review",
       gateDetails: [
-        "Builder wave allowlist for phase 1, manual note only",
+        "Manual builder review for phase 1",
         "REP or TDH gates are planned, not enforced here",
         "AI contribution report scores are not permissions",
       ],
@@ -80,18 +80,18 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       waveStatus: "Room decision recorded with 5 yes and 1 no.",
-      gateSnapshotLabel: "manual gate",
+      gateSnapshotLabel: "manual review",
       orchestrationSnapshotLabel: "high approved",
       codeStatus: "Approved PR change is ready to build.",
       codeSnapshotLabel: "ready to build",
       nextActionTitle: "Build the approved PR",
-      nextActionDetail: "Use the approved packet or prepared branch, then record the PR evidence.",
+      nextActionDetail: "Use the approved packet or prepared branch, then record the PR.",
       latestPrUrl: null,
       reviewStatusLabel: "not reviewed",
     });
   });
 
-  it("shows a readable review state after PR evidence exists", () => {
+  it("shows a readable review state after a PR record exists", () => {
     const projects = createActiveHookProjects({
       ...demoWave,
       proposals: [{ ...demoWave.proposals[0], status: "reviewing" }],
@@ -99,7 +99,7 @@ describe("active hook projects", () => {
     });
 
     expect(projects[0]).toMatchObject({
-      codeStatus: "PR evidence is ready for review.",
+      codeStatus: "PR record is ready for review.",
       codeSnapshotLabel: "PR ready",
       reviewStatusLabel: "ready for review",
     });

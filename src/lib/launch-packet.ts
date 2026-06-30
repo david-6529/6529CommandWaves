@@ -122,17 +122,17 @@ function buildEvidenceItems(artifacts: string[]) {
 
 function proposalLines(proposal: CommandProposal | null) {
   if (!proposal) {
-    return ["- Command: none selected yet.", "- Status: setup"];
+    return ["- Work: none selected yet.", "- Status: setup"];
   }
 
   return [
-    `- Command: ${proposal.id} - ${proposal.title}`,
+    `- Work: ${proposal.id} - ${proposal.title}`,
     `- Status: ${proposal.status}`,
     `- Kind: ${commandKindLabel(proposal.kind)}`,
     `- Risk: ${proposal.risk}`,
     `- Proposer: ${proposal.proposer}`,
     `- Budget cap: $${proposal.budgetUsd}`,
-    `- Approved command: ${humanizeLegacyCommandCopy(proposal.prompt)}`,
+    `- Approved work: ${humanizeLegacyCommandCopy(proposal.prompt)}`,
     `- Limits: ${humanizeLegacyCommandCopy(proposal.spec)}`,
   ];
 }
@@ -171,10 +171,10 @@ function orchestrationLines(wave: CommandWave, proposal: CommandProposal | null,
 function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
     if (poll?.status === "passed" && !poll.decision) {
-      return ["- Build: waiting for a recorded wave decision."];
+      return ["- Build: waiting for a recorded room decision."];
     }
 
-    return ["- Build: waiting for an approved PR command."];
+    return ["- Build: waiting for an approved PR change."];
   }
 
   return [
@@ -188,7 +188,7 @@ function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
 
 function reviewLines(review: GuardianReview | null) {
   if (!review) {
-    return ["- Review: waiting for execution evidence."];
+    return ["- Review: waiting for a PR record."];
   }
 
   return [
@@ -250,7 +250,7 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
 
 function nextStep(proposal: CommandProposal | null, execution: ExecutionRecord | null, review: GuardianReview | null) {
   if (!proposal) {
-    return "Choose one PR-sized hook command.";
+    return "Choose one PR-sized hook change.";
   }
 
   if (!execution) {
@@ -265,7 +265,7 @@ function nextStep(proposal: CommandProposal | null, execution: ExecutionRecord |
     return "Resolve review findings before merge, deploy, payment, or governance decisions.";
   }
 
-  return "Post this packet to the builder wave after human review, then decide any payout separately.";
+  return "Post this packet to the room after human review, then decide any payout separately.";
 }
 
 export function createLaunchPacket({

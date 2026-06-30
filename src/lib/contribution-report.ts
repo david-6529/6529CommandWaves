@@ -115,14 +115,14 @@ const scoringRubric = [
 
 const coverage = {
   included: [
-    "Command proposals stored by this app.",
+    "Work proposals stored by this app.",
     "Votes and recorded 6529 decision receipts stored by this app.",
     "Recorded GitHub PR links and Guardian review proof.",
     "Attributed activity log events stored by this app.",
   ],
   notIncluded: [
     "Live wave posts that have not been pulled into app state.",
-    "GitHub commits, comments, reviews, and merges that are not attached to recorded PR evidence.",
+    "GitHub commits, comments, reviews, and merges that are not attached to a recorded PR.",
     "Manual payments, REP, TDH, off-app agreements, or private coordination.",
   ],
 };

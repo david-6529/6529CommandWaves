@@ -15,7 +15,7 @@ describe("command orchestration summary", () => {
       risk: "high",
       decisionRoute: "vote required, quorum 3, yes threshold 60%, decision receipt recorded",
       ruleReason: "Code changes need visible approval before execution.",
-      reviewerRoute: "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and evidence before human merge.",
+      reviewerRoute: "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records before human merge.",
     });
   });
 
@@ -56,7 +56,7 @@ describe("command orchestration summary", () => {
     );
   });
 
-  it("keeps support commands outside the PR review route", () => {
+  it("keeps support items outside the PR review route", () => {
     const summary = createCommandOrchestrationSummary({
       wave: demoWave,
       proposal: {
@@ -72,7 +72,7 @@ describe("command orchestration summary", () => {
       risk: "low",
       decisionRoute: "allowed by current rules",
       ruleReason: "Drafting text does not publish or change external systems.",
-      reviewerRoute: "Support commands stay outside the PR build step.",
+      reviewerRoute: "Support items stay outside the PR build step.",
     });
   });
 
@@ -84,9 +84,9 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary).toMatchObject({
-      workType: "No command selected",
+      workType: "No work selected",
       risk: "waiting",
-      decisionRoute: "waiting for one scoped hook command",
+      decisionRoute: "waiting for one scoped hook change",
       ruleReason: "No rule applies until work is proposed.",
       reviewerRoute: "PR work needs reviewer CI before human merge.",
     });

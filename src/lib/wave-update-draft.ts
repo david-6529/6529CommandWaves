@@ -27,10 +27,10 @@ function pollLine(poll: PollState | null) {
 function buildLine(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
     if (poll?.status === "passed" && !poll.decision) {
-      return "Build: waiting for a recorded wave decision.";
+      return "Build: waiting for a recorded room decision.";
     }
 
-    return "Build: waiting for an approved PR command.";
+    return "Build: waiting for an approved PR change.";
   }
 
   return `Build: ${execution.status}. ${execution.summary}`;
@@ -46,7 +46,7 @@ function prLine(execution: ExecutionRecord | null) {
 
 function reviewLine(review: GuardianReview | null) {
   if (!review) {
-    return "Review: waiting for execution evidence.";
+    return "Review: waiting for a PR record.";
   }
 
   return `Review: ${review.status}. ${review.summary}`;
@@ -111,7 +111,7 @@ export function createWaveUpdateDraft({
     "",
     `Wave: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
-    proposal ? `Command: ${proposal.id} - ${proposal.title}` : "Command: none selected yet.",
+    proposal ? `Work: ${proposal.id} - ${proposal.title}` : "Work: none selected yet.",
     proposal ? `Status: ${proposal.status}` : "Status: setup",
     pollLine(poll),
     buildLine(poll, execution),
@@ -122,6 +122,6 @@ export function createWaveUpdateDraft({
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
     developerFeeLine(wave),
-    "Next step: review this draft, then post it manually in the builder wave if it matches the work.",
+    "Next step: review this draft, then post it manually in the room if it matches the work.",
   ].join("\n");
 }

@@ -12,19 +12,19 @@ export type DeveloperFeePlan = {
 export function createDeveloperFeePlan(wave: CommandWave, contributionReport: ContributionReport): DeveloperFeePlan {
   const reviewedWorkCount = wave.reviews.filter((review) => review.status === "pass").length;
   const visibleContributorCount = contributionReport.contributors.length;
-  const reviewedWorkLabel = reviewedWorkCount === 1 ? "reviewed command" : "reviewed commands";
+  const reviewedWorkLabel = reviewedWorkCount === 1 ? "reviewed change" : "reviewed changes";
   const contributorLabel = visibleContributorCount === 1 ? "visible contributor" : "visible contributors";
 
   return {
     mode: "manual_review",
     summary: reviewedWorkCount
       ? `Manual fee planning can use ${reviewedWorkCount} ${reviewedWorkLabel} and ${visibleContributorCount} ${contributorLabel} as evidence.`
-      : "Manual fee planning starts after a reviewed command exists.",
+      : "Manual fee planning starts after a reviewed change exists.",
     evidenceInputs: [
-      "Approved command and vote record.",
-      "Merged or reviewed PR evidence.",
+      "Approved work and vote record.",
+      "Merged or reviewed PR record.",
       "Contribution report rationale.",
-      "Human review notes from the builder wave.",
+      "Human review notes from the room.",
     ],
     requiredDecisions: [
       "Wave approves the fee budget before any payment.",

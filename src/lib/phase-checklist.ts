@@ -35,7 +35,7 @@ function buildStatus(
   decisionDone: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (execution?.status === "complete") {
-    return { status: "done", detail: "PR build evidence is recorded." };
+    return { status: "done", detail: "PR record is ready." };
   }
 
   if (execution?.status === "blocked") {
@@ -46,7 +46,7 @@ function buildStatus(
     return { status: "active", detail: "Approved work is ready for the PR build step." };
   }
 
-  return { status: "waiting", detail: "Build waits for a recorded wave decision." };
+  return { status: "waiting", detail: "Build waits for a recorded room decision." };
 }
 
 function reviewStatus(
@@ -62,10 +62,10 @@ function reviewStatus(
   }
 
   if (execution?.status === "complete") {
-    return { status: "active", detail: "Execution evidence is ready for review." };
+    return { status: "active", detail: "PR record is ready for review." };
   }
 
-  return { status: "waiting", detail: "Review waits for execution evidence." };
+  return { status: "waiting", detail: "Review waits for a PR record." };
 }
 
 export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
@@ -100,7 +100,7 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       id: "project",
       label: "Choose project",
       status: canRunCode ? "done" : "active",
-      detail: canRunCode ? "Builder wave and GitHub repo are set." : "Set a valid builder wave and GitHub repo.",
+      detail: canRunCode ? "Hook room and code repo are set." : "Set a valid hook room and code repo.",
     },
     {
       id: "proposal",
@@ -109,8 +109,8 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       detail: proposal
         ? `${proposal.id}: ${proposal.title}`
         : supportProposal
-          ? "Support command recorded. Write one PR-sized hook command."
-          : "Write one PR-sized hook command.",
+          ? "Support item recorded. Write one PR-sized hook change."
+          : "Write one PR-sized hook change.",
     },
     {
       id: "decision",

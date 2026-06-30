@@ -487,14 +487,14 @@ export async function executeProposal(input: unknown) {
   }
 
   if (proposal.kind !== "open_pr") {
-    throw Object.assign(new Error("Only approved PR commands can use the agent build step in phase 1."), { status: 409 });
+    throw Object.assign(new Error("Only approved PR work can use the build step in phase 1."), { status: 409 });
   }
 
   const poll = wave.polls.find((item) => item.proposalId === proposalId) ?? null;
 
   if (!pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     if (proposal.status === "approved" || poll?.status === "passed") {
-      throw Object.assign(new Error("Record the 6529 decision receipt before running a PR command."), { status: 409 });
+      throw Object.assign(new Error("Record the 6529 decision receipt before building PR work."), { status: 409 });
     }
 
     throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });

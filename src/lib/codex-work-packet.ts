@@ -68,7 +68,7 @@ export function createCodexWorkPacket({
     `Handoff packet hash: ${handoff.packetHash}`,
     `PR manifest hash: ${prManifestHash ?? "none"}`,
     "",
-    "Approved command:",
+    "Approved work:",
     proposal.prompt,
     "",
     "Limits and success criteria:",
@@ -78,7 +78,7 @@ export function createCodexWorkPacket({
     ...numbered([
       "Work in an isolated clone or worktree for the repo above.",
       `Create or use branch ${runManifest.targetBranch} from ${baseBranch}.`,
-      "Implement only the approved command and success criteria.",
+      "Implement only the approved work and success criteria.",
       "Run the relevant tests. For contracts, prefer forge test or the project equivalent.",
       "Open a draft PR only after the branch is prepared.",
       "Put the Command Waves manifest below in the PR body.",
