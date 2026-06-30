@@ -2073,9 +2073,9 @@ export function CommandWavesConsole() {
         <section id="start-building" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="max-w-4xl">
             <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Suggest</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Write a room post</h2>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest the next step</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Bring one useful idea to the builders.
+              Choose a small hook change, question, update, or context read.
             </p>
             <div className="mt-4 grid gap-3">
               <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
