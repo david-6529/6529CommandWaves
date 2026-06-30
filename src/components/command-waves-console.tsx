@@ -148,6 +148,12 @@ const buildRoomRules = [
   "Important changes need a visible decision before a PR is built.",
   "The reviewer agent checks the PR before humans merge.",
 ];
+const roomRuleSnapshots = [
+  ["Talk", "Ideas and questions start in the room."],
+  ["Decide", "Important code work waits for visible approval."],
+  ["Review", "PRs need reviewer proof before humans merge."],
+  ["Control", "No auto-merge, deploys, payments, or rule changes."],
+];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
@@ -1786,6 +1792,15 @@ export function CommandWavesConsole() {
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
               </div>
             ) : null}
+
+            <dl className="mt-4 grid gap-3 border-t border-zinc-800 pt-3 sm:grid-cols-2">
+              {roomRuleSnapshots.map(([label, detail]) => (
+                <div key={label} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:first:border-t sm:first:pt-2">
+                  <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
+                  <dd className="mt-1 text-sm leading-6 text-zinc-400">{detail}</dd>
+                </div>
+              ))}
+            </dl>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Actions</p>
