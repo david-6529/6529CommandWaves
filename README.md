@@ -4,19 +4,19 @@
 
 Command Waves is a shared workspace for building open source hooks in public. The first proof project is the 6529 Hook.
 
-For the first public phase, the product is simple: builders use one 6529 discussion and one GitHub repo to propose,
+For the first public phase, the product is simple: builders use one public 6529 room and one GitHub repo to propose,
 approve, build, and review small hook changes. Low-risk work can move quickly. Important or risky changes need a visible
 6529 decision before they enter the repo. A reviewer gate checks PRs in CI against the approved command, rules, risk, and
 hook guardrails before humans merge.
 
 The same loop can become a reusable public open source protocol later. The first launch stays focused on one hook, one
-6529 discussion, and one GitHub smart contract repo. The app shows the current task, recent discussion context, GitHub PR
+6529 room, and one GitHub smart contract repo. The app shows the current task, recent room context, GitHub PR
 state, code review evidence, activity log, and contribution report.
 
 The app keeps the loop visible:
 
 1. Review who can participate.
-2. Share ideas in the 6529 discussion.
+2. Share ideas in the room.
 3. Propose one PR-sized change.
 4. Decide whether it should enter the repo.
 5. Build the PR.
@@ -25,7 +25,7 @@ The app keeps the loop visible:
 
 The simple project view is:
 
-`Access -> Discussion -> PR -> Review`
+`Access -> Room -> PR -> Review`
 
 ## Current Status
 
@@ -35,11 +35,11 @@ is a standalone project site now, with a reusable public hook-building platform 
 What exists now:
 
 - A Next app product surface named `6529 Hook Room`.
-- One active 6529 hook project connected to one 6529 discussion and one GitHub repo.
+- One active 6529 hook project connected to one public 6529 room and one GitHub repo.
 - A room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and a simple
   proposal flow.
 - Work types for Code PR, Question, Update, and Context.
-- Copyable drafts for 6529 discussion posts, join requests, decisions, review requests, project updates, launch packets,
+- Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets,
   Codex work packets, and contribution reports.
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR evidence, reviews, launch audit, setup proof,
   and public command-wave state.
@@ -88,7 +88,7 @@ Command Waves make the answers visible:
 
 The first public phase:
 
-1. Choose one 6529 discussion.
+1. Choose one public 6529 room.
 2. Connect one GitHub smart contract repo for the 6529 hook.
 3. Record participation gates such as REP, TDH, allowlists, or QnA as advisory until live enforcement is wired.
 4. Propose hook work in plain English with clear limits.
@@ -105,7 +105,7 @@ Contributor rules for the first hook phase are in [CONTRIBUTING.md](CONTRIBUTING
 
 ## Trust Boundary
 
-The first public phase is a governed hook-building workflow controlled by one 6529 discussion.
+The first public phase is a governed hook-building workflow controlled by one public 6529 room.
 
 Current trust controls:
 
@@ -123,7 +123,7 @@ artifacts. Until then, the MVP is useful and auditable, but not the strongest po
 
 First launch tasks:
 
-1. Pick the first real 6529 discussion and hook repo, then publish the launch playbook.
+1. Pick the first real 6529 room and hook repo, then publish the launch playbook.
 2. Set `COMMAND_WAVE_STATE_URL` to the deployed `/api/command-wave/state` endpoint before making the guardian a required PR check.
 
 Hardening tasks after the first public loop:
@@ -153,7 +153,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 Default workspace:
 
 - Current hook task, next proposal, and project activity.
-- Links to the 6529 discussion, GitHub repo, current PR, and reviewed work.
+- Links to the room, GitHub repo, current PR, and reviewed work.
 - Builder message composer with latest-post preview and copyable discussion draft.
 - Simple proposal form for one PR-sized hook change with limits and success criteria.
 - Builder list with 6529 profile links and informational activity points.
@@ -362,7 +362,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `DELETE /api/command-wave`: reset the local demo.
 - `POST /api/command-wave/proposals`: submit a command proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
-- `POST /api/command-wave/decision`: record a manual 6529 decision receipt. Body requires `proposalId` and `reference`. PR commands require a 6529 drop URL in the discussion.
+- `POST /api/command-wave/decision`: record a manual 6529 decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from the room.
 - `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded 6529 decision receipt.
 - `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.

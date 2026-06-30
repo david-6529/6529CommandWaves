@@ -2,20 +2,20 @@
 
 ## Product Definition
 
-A Command Wave is a builder swarm workspace where a 6529 wave governs scoped work in a GitHub repo.
+A Command Wave is a hook room where a public 6529 room governs scoped work in a GitHub repo.
 
-For the first public phase, the product helps the community build a 6529 hook together. Participation gates define who can play. People and agents propose commands in plain English. Orchestration rules decide whether a command can run now, needs a visible decision, or must stay blocked. Approved commands can run through a controlled agent adapter. Reviewer CI checks the result before humans merge, and the activity is logged so the wave can see what happened.
+For the first public phase, the product helps the community build a 6529 hook together. Participation gates define who can play. People and agents propose commands in plain English. Orchestration rules decide whether a command can run now, needs a visible decision, or must stay blocked. Approved commands can run through a controlled agent adapter. Reviewer CI checks the result before humans merge, and the activity is logged so the room can see what happened.
 
-The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused 6529 Hook builder swarm so anyone can see the gate notes, builder wave, GitHub repo, current code review state, and next action.
+The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused 6529 Hook room so anyone can see the access notes, room activity, GitHub repo, current code review state, and next action.
 
-6529 remains the live conversation and decision layer. The app should act as a snapshot and project dashboard: recent wave context, approved commands, risk classifications, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
+6529 remains the live conversation and decision layer. The app should act as a snapshot and project dashboard: recent room context, approved commands, risk classifications, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
 Maintainer setup, guardrails, and readiness checks should stay available without leading the public project experience.
 The proposal path should ask for the change, limits, and success criteria first. Command type, proposer identity, and budget settings can stay available as advanced controls.
 
 The simplest product view is:
 
 ```text
-Gate -> Wave -> PR -> Review
+Access -> Room -> PR -> Review
 ```
 
 ## Roles
@@ -25,7 +25,7 @@ Gate -> Wave -> PR -> Review
 - **Agent worker:** helps with approved PR work through a constrained Codex packet and GitHub draft PR flow.
 - **Reviewer agent:** checks the PR against the approved command, vote, rules, architecture, security, and expected artifacts before humans merge.
 
-Implementation names can evolve later. The user-facing MVP should lead with gate, wave, command, vote, PR, and review.
+Implementation names can evolve later. The user-facing MVP should lead with access, room, proposal, decision, PR, and review.
 
 ## Core Objects
 
@@ -70,11 +70,11 @@ Later phases can add stricter approval paths for parked command kinds after the 
 
 ## First Real Demo
 
-1. A builder wave is linked to the 6529 hook smart contract repo.
+1. A public 6529 room is linked to the 6529 hook smart contract repo.
 2. A member proposes: "Draft the non-upgradeable hook scaffold with fee parameters capped at 100 bps and tests."
 3. The orchestration rules classify it as `open_pr`, high risk, vote required.
-4. The wave decision approves the scoped work.
-5. The operator records the decision drop URL as a manual approval receipt.
+4. The room decision approves the scoped work.
+5. The operator records the decision URL as a manual approval receipt.
 6. The agent opens a PR with a Command Waves manifest.
 7. The GitHub reviewer gate checks the PR manifest, vote or receipt status, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
 8. Reviewer CI verifies tests, contract guardrails, and changed files before humans merge.
