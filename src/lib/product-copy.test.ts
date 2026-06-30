@@ -4,11 +4,11 @@ import { commandWaveProductCopy } from "./product-copy";
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
     expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
-    expect(commandWaveProductCopy.subhead).toBe("Coordinate the next 6529 hook change with the builders working on it.");
+    expect(commandWaveProductCopy.subhead).toBe("Work with the swarm on the next 6529 hook change.");
     expect(commandWaveProductCopy.positioning).toBe(
-      "Read the room, suggest one scoped change, record the decision, and move approved work into GitHub review.",
+      "Write in the room, shape one small PR, record the decision, and review the work.",
     );
-    expect(commandWaveProductCopy.simpleFlow).toBe("Discuss - Decide - Build - Review");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Room - Proposal - Decision - PR");
   });
 
   it("keeps unsafe authority claims out of the first-screen explanation", () => {

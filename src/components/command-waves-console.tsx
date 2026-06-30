@@ -1030,6 +1030,12 @@ export function CommandWavesConsole() {
         ? "Checking"
         : "Check readiness"
       : "Open launch controls";
+  const roomSummaryItems = [
+    ["Hook", primaryHookProject?.name ?? "6529 Hook"],
+    ["Current change", currentFocusTitle],
+    ["Decision", activePollTitle],
+    ["Builders", `${builderRoster.length} visible`],
+  ];
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1331,9 +1337,9 @@ export function CommandWavesConsole() {
 
     try {
       await navigator.clipboard.writeText(builderWaveChatDraft);
-      setWaveRoomNotice("Message copied.");
+      setWaveRoomNotice("Discussion post copied.");
     } catch {
-      setWaveRoomNotice("Copy failed. Select the message and copy it manually.");
+      setWaveRoomNotice("Copy failed. Select the discussion post and copy it manually.");
     }
   }
 
@@ -1537,29 +1543,46 @@ export function CommandWavesConsole() {
   return (
     <main className="min-h-screen bg-black text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-800 pb-4">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
-              {commandWaveProductCopy.headline}
-            </h1>
-            <p className="mt-2 text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
+        <header className="rounded-lg border border-zinc-800 bg-zinc-950/75 p-4 shadow-sm shadow-black/20">
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">
+                {primaryHookProject?.name ?? "6529 Hook"}
+              </p>
+              <h1 className="mt-1 text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+                {commandWaveProductCopy.headline}
+              </h1>
+              <p className="mt-2 text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
+            </div>
+            <div className="flex flex-wrap items-start gap-2 lg:justify-end">
+              <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+              <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{commandWaveProductCopy.simpleFlow}</Badge>
+            </div>
           </div>
-          <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-400">{commandWaveProductCopy.positioning}</p>
-          <nav className="mt-4 flex flex-wrap gap-2" aria-label="Workspace sections">
-            <JumpLink href="#wave-room">Room</JumpLink>
-            <JumpLink href="#start-building">Propose</JumpLink>
-            <JumpLink href="#active-hooks">Hooks</JumpLink>
+
+          <dl className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {roomSummaryItems.map(([label, value]) => (
+              <div key={label} className="border-t border-zinc-800 pt-3">
+                <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
+                <dd className="mt-1 text-base font-semibold leading-6 text-zinc-100">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <nav className="mt-4 flex flex-wrap gap-2" aria-label="Room actions">
+            <JumpLink href="#wave-room">Write message</JumpLink>
+            <JumpLink href="#start-building">Suggest change</JumpLink>
             <JumpLink href="#active-builders">Members</JumpLink>
-            <JumpLink href="#recent-activity">Activity</JumpLink>
-            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529 discussion</LinkButton> : null}
+            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
+            {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Open repo</LinkButton> : null}
           </nav>
         </header>
 
         <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-          <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
+          <section id="current-build" className="order-2 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Now building</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current change</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
@@ -1581,7 +1604,7 @@ export function CommandWavesConsole() {
             {primaryHookProject ? (
               <div className="mt-4 border-b border-zinc-800 pb-3">
                 <p className="text-sm leading-6 text-zinc-500">
-                  {primaryHookProject.name} is connected to the 6529 discussion and GitHub repo.
+                  {primaryHookProject.name}: {primaryHookProject.nextActionDetail}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {primaryHookProject.waveUrl ? <LinkButton href={primaryHookProject.waveUrl}>Open discussion</LinkButton> : null}
@@ -1617,7 +1640,7 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Do next</p>
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
               {!activeProposal ? (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-base leading-7 text-zinc-400">Start with one small, testable hook change.</p>
@@ -1719,16 +1742,50 @@ export function CommandWavesConsole() {
             </div>
           </section>
 
-          <section id="wave-room" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4">
+          <section id="wave-room" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-2">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Room</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk about the hook</h2>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Swarm chat</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">
-                  Ask questions, share context, and shape the next small change.
+                  Draft a post for the hook builders. Copy it into the 6529 discussion when ready.
                 </p>
               </div>
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
+            </div>
+
+            <div className="mt-4 border-t border-zinc-800 pt-4">
+              <Field label="Draft post">
+                <Textarea
+                  rows={4}
+                  value={waveRoomMessage}
+                  placeholder="Ask a question, share context, or suggest the next small hook change."
+                  onChange={(event) => {
+                    setWaveRoomMessage(event.target.value);
+                    setWaveRoomNotice("");
+                  }}
+                  className="min-h-32 resize-none"
+                />
+              </Field>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
+                  Copy discussion post
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isBusy || !primaryHookProject?.waveUrl}
+                  onClick={() =>
+                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                  }
+                >
+                  {apiBusy === "context" ? "Loading" : "Refresh posts"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                  Clear
+                </Button>
+              </div>
+              {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
@@ -1799,49 +1856,15 @@ export function CommandWavesConsole() {
                 </div>
               )}
             </div>
-
-            <div className="mt-4 border-t border-zinc-800 pt-4">
-              <Field label="Message">
-                <Textarea
-                  rows={4}
-                  value={waveRoomMessage}
-                  placeholder="Ask a question, share context, or suggest the next small change."
-                  onChange={(event) => {
-                    setWaveRoomMessage(event.target.value);
-                    setWaveRoomNotice("");
-                  }}
-                  className="min-h-32 resize-none"
-                />
-              </Field>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                  Copy message
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isBusy || !primaryHookProject?.waveUrl}
-                  onClick={() =>
-                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
-                  }
-                >
-                  {apiBusy === "context" ? "Loading" : "Refresh posts"}
-                </Button>
-                <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                  Clear
-                </Button>
-              </div>
-              {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
-            </div>
           </section>
         </section>
 
         <section id="start-building" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Propose</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Add the next hook change</h2>
+            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Next PR</p>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest a hook change</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Keep it small enough for one PR. The room can discuss it before code starts.
+              Turn one idea into a small, reviewable PR for the room.
             </p>
             <div className="mt-4 grid gap-3">
               <Field label="Your name or 6529 handle">
@@ -1920,10 +1943,10 @@ export function CommandWavesConsole() {
         <section id="active-hooks" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Hooks in progress</h2>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Active hook</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Hook status</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Track each hook build, its discussion, repo, and next action.
+                Discussion, repo, access, and review state for each hook in development.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -1966,10 +1989,10 @@ export function CommandWavesConsole() {
         <section id="recent-activity" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Activity</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Build timeline</h2>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Timeline</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">What happened</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                The hook build in order, from proposal to review and the next change.
+                Proposal, decision, PR, review, and the next hook change.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2017,10 +2040,10 @@ export function CommandWavesConsole() {
         <section id="active-builders" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Members</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Swarm members</h2>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">People in the room</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                People with visible activity in this hook room. Activity is a report, not permission.
+                Visible contributors and their recent activity. Scores are informational only.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">

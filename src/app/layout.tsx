@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "6529 Hook Room",
-  description: "Coordinate the next 6529 hook change with the builder room, decisions, PR evidence, and review status.",
+  description: "Work with the swarm on the next 6529 hook change.",
 };
 
 export default function RootLayout({
