@@ -1750,7 +1750,6 @@ export function CommandWavesConsole() {
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm leading-6 text-zinc-400">
                 <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{commandWaveProductCopy.simpleFlow}</Badge>
-                <span>{roomNeedLabel}</span>
                 <span>{builderRoster.length} visible builders</span>
               </div>
             </div>
