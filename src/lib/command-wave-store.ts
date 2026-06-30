@@ -2,7 +2,8 @@ import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
 import { demoWave } from "./demo-wave";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
-import { normalizeParticipationGates } from "./participation-gates";
+import { humanizeLegacyCommandCopy } from "./legacy-copy";
+import { defaultParticipationGates, normalizeParticipationGates } from "./participation-gates";
 import { validateSetupShape } from "./setup-validation";
 import {
   classifyRisk,
@@ -101,6 +102,63 @@ function migrateLegacyDemoWave(wave: CommandWave | null) {
   return wave;
 }
 
+function isBuiltInHookProject(wave: CommandWave) {
+  return (
+    wave.id === demoWave.id &&
+    wave.waveUrl.includes("/waves/6529-hook-builder") &&
+    wave.repoUrl.includes("/6529-hook")
+  );
+}
+
+function normalizeBuiltInHookGate(gate: string) {
+  if (/^Builder wave allowlist for phase 1/i.test(gate)) {
+    return defaultParticipationGates[0];
+  }
+
+  if (/^AI contribution scores are reports/i.test(gate)) {
+    return defaultParticipationGates[2];
+  }
+
+  return humanizeLegacyCommandCopy(gate);
+}
+
+function withCurrentHookRoomCopy(wave: CommandWave) {
+  if (!isBuiltInHookProject(wave)) {
+    return wave;
+  }
+
+  const nextWave: CommandWave = {
+    ...wave,
+    name: wave.name === "6529 Hook Builder" || wave.name === "6529 Hook Project" ? demoWave.name : wave.name,
+    gates: wave.gates.map(normalizeBuiltInHookGate),
+    polls: wave.polls.map((poll) => ({
+      ...poll,
+      decision: poll.decision
+        ? {
+            ...poll.decision,
+            summary: humanizeLegacyCommandCopy(poll.decision.summary),
+          }
+        : poll.decision,
+    })),
+    executions: wave.executions.map((execution) => ({
+      ...execution,
+      summary: humanizeLegacyCommandCopy(execution.summary),
+    })),
+    reviews: wave.reviews.map((review) => ({
+      ...review,
+      summary: humanizeLegacyCommandCopy(review.summary),
+      checks: review.checks.map(humanizeLegacyCommandCopy),
+    })),
+    ledger: wave.ledger.map((event) => ({
+      ...event,
+      actor: humanizeLegacyCommandCopy(event.actor),
+      message: humanizeLegacyCommandCopy(event.message),
+    })),
+  };
+
+  return JSON.stringify(nextWave) === JSON.stringify(wave) ? wave : nextWave;
+}
+
 function sameRule(left: CommandWave["rules"]["rulesByKind"][CommandKind], right: CommandWave["rules"]["rulesByKind"][CommandKind]) {
   return (
     left.mode === right.mode &&
@@ -153,7 +211,7 @@ async function store() {
     const persisted = await loadPersistedCommandWave();
     const migrated = migrateLegacyDemoWave(persisted);
     const baseWave = migrated ?? cloneDemoWave();
-    const wave = withFirstPhaseRules(baseWave);
+    const wave = withCurrentHookRoomCopy(withFirstPhaseRules(baseWave));
 
     if (persisted && wave !== persisted) {
       await savePersistedCommandWave(wave);
@@ -223,7 +281,7 @@ function initialProposalStatus(ruleMode: CommandWave["rules"]["rulesByKind"][Com
 
 export async function getCommandWave() {
   const currentStore = await store();
-  const wave = withFirstPhaseRules(currentStore.wave);
+  const wave = withCurrentHookRoomCopy(withFirstPhaseRules(currentStore.wave));
 
   if (wave !== currentStore.wave) {
     await savePersistedCommandWave(wave);
@@ -238,7 +296,7 @@ export function clearCommandWaveStoreForTests() {
 }
 
 export async function replaceCommandWave(wave: CommandWave) {
-  const nextWave = withFirstPhaseRules(wave);
+  const nextWave = withCurrentHookRoomCopy(withFirstPhaseRules(wave));
 
   await savePersistedCommandWave(nextWave);
   (await store()).wave = nextWave;

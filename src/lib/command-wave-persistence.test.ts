@@ -114,10 +114,27 @@ describe("command wave persistence", () => {
     expect(wave.ledger[0]?.message).toBe("Created the 6529 hook project and attached the 6529 room and code repo.");
   });
 
-  it("keeps custom local hook demo activity during stale status migration", async () => {
+  it("normalizes old hook-room copy without replacing custom activity", async () => {
     await replaceCommandWave({
       ...demoWave,
+      name: "6529 Hook Builder",
+      gates: [
+        "Builder wave allowlist for phase 1 (manual note only, not enforced by this app)",
+        "REP or TDH gates are planned, not enforced here",
+        "AI contribution scores are reports, not permissions",
+      ],
       proposals: [{ ...demoWave.proposals[0], status: "approved" }],
+      polls: [
+        {
+          ...demoWave.polls[0],
+          decision: demoWave.polls[0].decision
+            ? {
+                ...demoWave.polls[0].decision,
+                summary: "Builder wave approved cmd-001 with 5 yes and 1 no.",
+              }
+            : demoWave.polls[0].decision,
+        },
+      ],
       executions: [
         {
           proposalId: "cmd-001",
@@ -127,16 +144,42 @@ describe("command wave persistence", () => {
           artifacts: ["PR #99"],
         },
       ],
-      reviews: [],
+      reviews: [
+        {
+          proposalId: "cmd-001",
+          status: "pass",
+          checks: ["Run manifest matches approved command, rules hash, permissions, and budget."],
+          summary: "Reviewer mock passed the execution against the approved command.",
+        },
+      ],
+      ledger: [
+        {
+          id: "evt-custom",
+          at: "2026-06-20T12:55:00.000Z",
+          actor: "Wave Poll",
+          type: "poll_passed",
+          message: "Builder wave approved custom PR #99.",
+        },
+      ],
     });
 
     clearCommandWaveStoreForTests();
 
     const wave = await getCommandWave();
 
+    expect(wave.name).toBe("6529 Hook");
+    expect(wave.gates).toContain("Manual builder review for phase 1");
+    expect(wave.gates).toContain("AI contribution report scores are not permissions");
+    expect(wave.polls[0]?.decision?.summary).toBe("Room approved cmd-001 with 5 yes and 1 no.");
     expect(wave.proposals[0]?.status).toBe("approved");
-    expect(wave.executions[0]?.summary).toBe("Local agent mock opened a deterministic PR artifact for the approved command.");
+    expect(wave.executions[0]?.summary).toBe("Agent adapter opened a deterministic PR artifact for the approved work.");
     expect(wave.executions[0]?.artifacts).toEqual(["PR #99"]);
+    expect(wave.reviews[0]?.summary).toBe("Reviewer adapter passed the execution against the approved work.");
+    expect(wave.reviews[0]?.checks).toEqual(["Run manifest matches approved work, rules hash, permissions, and budget."]);
+    expect(wave.ledger[0]).toMatchObject({
+      actor: "Decision",
+      message: "Room approved custom PR #99.",
+    });
   });
 
   it("refreshes old complete hook demo records that lack deterministic evidence", async () => {

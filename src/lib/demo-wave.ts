@@ -37,7 +37,7 @@ const poll: PollState = {
     waveUrl: "https://6529.io/waves/6529-hook-builder",
     recordedBy: "david",
     recordedAt: "2026-06-20T12:40:30.000Z",
-    summary: "Builder wave approved cmd-001 with 5 yes and 1 no.",
+    summary: "Room approved cmd-001 with 5 yes and 1 no.",
   }),
   votes: [
     { voterIdentity: "david", vote: "yes", weight: 1, source: "local", at: "2026-06-20T12:10:00.000Z" },
@@ -85,7 +85,7 @@ const preExecutionWave: CommandWave = {
     {
       id: "evt-004",
       at: "2026-06-20T12:40:00.000Z",
-      actor: "Wave Poll",
+      actor: "Decision",
       type: "poll_passed",
       message: "cmd-001 passed with 5 yes, 1 no, and a 6529 decision receipt.",
     },
@@ -155,7 +155,7 @@ function createDemoReview(): GuardianReview {
     status: "pass",
     checks: [
       "Execution is linked to an approved proposal.",
-      "Run manifest matches approved command, rules hash, permissions, and budget.",
+      "Run manifest matches approved work, rules hash, permissions, and budget.",
       "Codex handoff packet matches the run manifest, target branch, permissions, and budget.",
       "Hook contract signals checked: contract code, parameter change.",
       "Hook contract signals fit the approved risk level.",
