@@ -1973,10 +1973,17 @@ export function CommandWavesConsole() {
               </Field>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                disabled={!wave.waveUrl}
+                onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
+              >
+                Copy and open
+              </Button>
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                 Copy proposal post
               </Button>
-              <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
+              <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
               <JumpLink href="#wave-room">Back to room</JumpLink>
