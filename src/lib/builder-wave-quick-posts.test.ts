@@ -8,11 +8,11 @@ describe("builder wave quick posts", () => {
       title: " Add fee cap tests ",
     });
 
-    expect(posts.map((post) => post.label)).toEqual(["Join", "Ask", "Review", "Tests"]);
+    expect(posts.map((post) => post.label)).toEqual(["Join", "Ask", "Idea", "Review"]);
     expect(posts[0].message).toContain("Handle: david.");
-    expect(posts[1].message).toContain("smallest useful next step for Add fee cap tests");
-    expect(posts[2].message).toContain("review the next PR for Add fee cap tests");
-    expect(posts[3].message).toContain("bounded hook parameter");
+    expect(posts[1].message).toContain("What needs a decision before anyone opens a PR for Add fee cap tests");
+    expect(posts[2].message).toContain("Idea for the room");
+    expect(posts[3].message).toContain("review the next PR for Add fee cap tests");
     expect(posts.map((post) => post.message).join("\n")).not.toContain("\u2014");
   });
 

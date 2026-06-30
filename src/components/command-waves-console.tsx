@@ -1922,15 +1922,15 @@ export function CommandWavesConsole() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builder room</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Chat</h2>
-                <p className="mt-2 text-base leading-7 text-zinc-400">Draft a message for the room.</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Room chat</h2>
+                <p className="mt-2 text-base leading-7 text-zinc-400">Ask a question, offer help, or suggest the next small change.</p>
               </div>
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Starters</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Start with</p>
                 {builderWaveQuickPosts.map((post) => (
                   <Button key={post.id} type="button" variant="secondary" onClick={() => prepareQuickPost(post)}>
                     {post.label}
