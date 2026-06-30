@@ -914,7 +914,7 @@ export function CommandWavesConsole() {
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentBuildStatusLabel = readyForNextHookChange
-    ? "needs discussion"
+    ? "needs room input"
     : activeExecution
       ? "PR logged"
       : activePollDecisionRecorded
@@ -1415,10 +1415,10 @@ export function CommandWavesConsole() {
     try {
       await navigator.clipboard.writeText(waveUpdateDraftRef.current?.value ?? waveUpdateDraft);
       setCopyNotice("Draft copied.");
-      setApiNotice("Discussion update draft copied.");
+      setApiNotice("Room update copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
-      setApiNotice("Copy failed. Select the discussion update draft and copy it manually.");
+      setApiNotice("Copy failed. Select the room update draft and copy it manually.");
     }
   }
 
@@ -1504,7 +1504,7 @@ export function CommandWavesConsole() {
 
   function discussSupportProposal(proposal: NonNullable<typeof activeSupportProposal>) {
     setWaveRoomMessage([`${activeSupportProposalLabel}: ${proposal.title}`, "", proposal.prompt].join("\n"));
-    setWaveRoomNotice("Discussion draft ready.");
+    setWaveRoomNotice("Room draft ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -2462,7 +2462,7 @@ export function CommandWavesConsole() {
 
                   <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                     <div className="border-t border-zinc-800 pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Discussion activity</p>
+                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Room activity</p>
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
                       <div className="mt-3 border-t border-zinc-800 pt-3">
@@ -2483,7 +2483,7 @@ export function CommandWavesConsole() {
                         >
                           {apiBusy === "context" ? "Loading" : "Read latest posts"}
                         </Button>
-                        <JumpLink href="#wave-room">Draft discussion post</JumpLink>
+                        <JumpLink href="#wave-room">Message room</JumpLink>
                       </div>
                       {contextPreview ? (
                         <div className="mt-3 border-t border-zinc-800 pt-3">
@@ -2518,7 +2518,7 @@ export function CommandWavesConsole() {
                         </div>
                       ) : (
                         <p className="mt-3 text-xs leading-5 text-zinc-500">
-                          Preview the discussion to read the latest 6529 posts on this page.
+                          Preview the room to read the latest posts here.
                         </p>
                       )}
                     </div>
@@ -3029,7 +3029,7 @@ export function CommandWavesConsole() {
             <Panel title="Safety rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
-                Phase 1 accepts reads, drafts, discussion updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
+                Phase 1 accepts reads, drafts, room updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
               </p>
               <div className="grid gap-3 lg:grid-cols-2">
                 <CompactList title="Use now" items={firstPhaseScopeInventory.useNow} />
@@ -3104,7 +3104,7 @@ export function CommandWavesConsole() {
             <Panel title="Proposal review" eyebrow="Optional">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Check the risk path and discussion draft before adding the proposal.
+                Check the risk path and room draft before adding the proposal.
               </p>
               <Field label="Title">
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -3149,7 +3149,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">No PR opened</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Use this command for context, drafts, or discussion updates. PR commands still need hook preflight.
+                          Use this command for context, drafts, or room updates. PR commands still need hook preflight.
                         </p>
                       </div>
                     </div>
@@ -3193,9 +3193,9 @@ export function CommandWavesConsole() {
                 </div>
               </details>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <p className="text-sm font-semibold text-zinc-100">Discussion brief</p>
+                <p className="text-sm font-semibold text-zinc-100">Room brief</p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Copy this into the room. Save locally only after it matches the discussion and risk path.
+                  Copy this into the room. Save locally only after it matches the room and risk path.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
@@ -3258,7 +3258,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">Support commands</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Context, drafts, and discussion updates stay separate from the PR build target.
+                          Context, drafts, and room updates stay separate from the PR build target.
                         </p>
                       </div>
                       <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
@@ -3424,7 +3424,7 @@ export function CommandWavesConsole() {
                         ? activeExecution
                           ? "Logged PR evidence only. It does not merge, deploy, or spend funds."
                           : "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
-                        : "Use support commands for context, drafts, or discussion updates outside the PR build step."}
+                        : "Use support commands for context, drafts, or room updates outside the PR build step."}
                     </p>
                     {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
                   </div>
@@ -3614,7 +3614,7 @@ export function CommandWavesConsole() {
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>
           </summary>
           <div className="mt-4">
-            <Panel title="Discussion update draft" eyebrow="Share back">
+            <Panel title="Room update draft" eyebrow="Share back">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
