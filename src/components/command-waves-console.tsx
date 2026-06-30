@@ -1375,9 +1375,15 @@ export function CommandWavesConsole() {
     });
   }
 
-  async function copyBuilderWaveProposalDraft() {
+  async function copyBuilderWaveProposalDraft({ openDiscussion = false } = {}) {
     try {
       await navigator.clipboard.writeText(builderWaveProposalDraft);
+      if (openDiscussion && wave.waveUrl) {
+        window.open(wave.waveUrl, "_blank", "noopener,noreferrer");
+        setProposalDraftNotice("Proposal post copied. Opened 6529 discussion.");
+        return;
+      }
+
       setProposalDraftNotice("Proposal post copied.");
     } catch {
       setProposalDraftNotice("Copy failed. Select the proposal text and copy it manually.");
@@ -1739,11 +1745,17 @@ export function CommandWavesConsole() {
                     Discuss this draft in the room. Save it as a proposal when the scope is clear.
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      disabled={!wave.waveUrl}
+                      onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
+                    >
+                      Copy and open
+                    </Button>
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                       Copy proposal post
                     </Button>
-                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open discussion</LinkButton> : null}
-                    <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
+                    <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                       {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                     </Button>
                     <JumpLink href="#start-building">Edit proposal</JumpLink>
