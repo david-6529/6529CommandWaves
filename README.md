@@ -154,7 +154,7 @@ Default workspace:
 - Links to the room, code repo, current PR, and reviewed work.
 - Builder message composer with direct room posting when configured, latest-post preview, and copyable discussion draft.
 - Simple proposal form for one PR-sized hook change with limits and success criteria.
-- Builder list with 6529 profile links and informational activity points.
+- Builder list with 6529 profile links, visible room activity, and informational activity points.
 
 Safety and review:
 

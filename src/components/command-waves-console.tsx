@@ -999,7 +999,6 @@ export function CommandWavesConsole() {
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
-  const builderRoster = useMemo(() => createBuilderRoster(contributionReport), [contributionReport]);
   const contributionReportDraft = useMemo(() => createContributionReportDraft(wave), [wave]);
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const developerFeePlanDraft = useMemo(
@@ -1016,6 +1015,18 @@ export function CommandWavesConsole() {
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
   const hasRecentDiscussionPosts = Boolean(primaryProjectContextPreview?.sampleDrops.length);
+  const roomRosterPosts = useMemo(
+    () =>
+      (primaryProjectContextPreview?.sampleDrops ?? []).map((drop) => ({
+        author: drop.author,
+        preview: drop.preview,
+      })),
+    [primaryProjectContextPreview],
+  );
+  const builderRoster = useMemo(
+    () => createBuilderRoster(contributionReport, { roomPosts: roomRosterPosts }),
+    [contributionReport, roomRosterPosts],
+  );
   const roomFeed = useMemo(
     () =>
       createRoomFeed(wave, {
@@ -2411,7 +2422,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Members</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Profiles from visible room activity.
+                Profiles from visible app and room activity.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
