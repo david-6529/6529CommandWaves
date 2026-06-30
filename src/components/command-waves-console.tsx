@@ -850,7 +850,7 @@ export function CommandWavesConsole() {
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentBuildStatusLabel = readyForNextHookChange
-    ? "draft in room"
+    ? "needs discussion"
     : activeExecution
       ? "PR logged"
       : activePollDecisionRecorded
@@ -1670,6 +1670,9 @@ export function CommandWavesConsole() {
           </div>
 
           <nav className="mt-4 flex flex-wrap gap-2" aria-label="Room actions">
+            <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
+              Ask to join
+            </Button>
             <JumpLink href="#wave-room">Talk to builders</JumpLink>
             <JumpLink href="#start-building">Draft change</JumpLink>
             <JumpLink href="#active-builders">Members</JumpLink>
@@ -1819,7 +1822,7 @@ export function CommandWavesConsole() {
                       disabled={!wave.waveUrl}
                       onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
                     >
-                      Copy to 6529
+                      Copy for 6529
                     </Button>
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                       Copy text
@@ -1848,7 +1851,7 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Room</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk to builders</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">
-                  Write a message for the hook builders. Copy it to 6529 when ready.
+                  Write a message for the hook builders. Copy it for 6529 when ready.
                 </p>
               </div>
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529</LinkButton> : null}
@@ -1881,7 +1884,7 @@ export function CommandWavesConsole() {
                   disabled={!waveRoomMessage.trim() || !wave.waveUrl}
                   onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
                 >
-                  Copy to 6529
+                  Copy for 6529
                 </Button>
                 <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
                   Copy text
@@ -2033,7 +2036,7 @@ export function CommandWavesConsole() {
                 disabled={!wave.waveUrl}
                 onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
               >
-                Copy to 6529
+                Copy for 6529
               </Button>
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                 Copy text
