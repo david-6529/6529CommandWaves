@@ -150,7 +150,7 @@ const buildRoomRules = [
   "The reviewer agent checks the PR before humans merge.",
 ];
 const roomRuleSummary =
-  "Talk first. Important code waits for approval. PRs are reviewed before merge. No auto-merge, deploys, payments, or rule changes.";
+  "Talk first. Important code waits for approval. Humans review and merge.";
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
@@ -1875,7 +1875,9 @@ export function CommandWavesConsole() {
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
-            <p className="mt-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
+            {!readyForNextHookChange ? (
+              <p className="mt-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
+            ) : null}
 
             <div className="mt-4 rounded-md border border-cyan-800/70 bg-cyan-950/20 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1894,7 +1896,6 @@ export function CommandWavesConsole() {
                       <dt className="text-sm font-semibold text-zinc-300">{item.label}</dt>
                       <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
                     </div>
-                    <dd className="mt-1 text-sm leading-5 text-zinc-500">{humanizeLegacyCommandCopy(item.detail)}</dd>
                   </div>
                 ))}
               </dl>
@@ -1906,13 +1907,12 @@ export function CommandWavesConsole() {
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
                 </div>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
               </div>
             ) : null}
 
             <div className="mt-4 border-t border-zinc-800 pt-3">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
-              <p className="mt-1 text-sm leading-6 text-zinc-400">{roomRuleSummary}</p>
+              <p className="mt-1 text-base leading-7 text-zinc-300">{roomRuleSummary}</p>
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
@@ -1999,9 +1999,6 @@ export function CommandWavesConsole() {
                 </div>
               ) : readyForNextHookChange ? (
                 <div className="mt-2 grid gap-3">
-                  <p className="text-base leading-7 text-zinc-400">
-                    Share the draft in the room. Save it here after the scope is clear.
-                  </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button
                       type="button"
@@ -2115,17 +2112,30 @@ export function CommandWavesConsole() {
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">People</p>
                   <JumpLink href="#active-builders">View all</JumpLink>
                 </div>
-                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="mt-3 divide-y divide-zinc-900 border-y border-zinc-900">
                   {visibleRoomMembers.map((member) => (
-                    <button
-                      key={member.identity}
-                      type="button"
-                      className="cursor-pointer rounded-md border border-zinc-800 bg-black p-3 text-left transition hover:border-cyan-700 hover:bg-zinc-950"
-                      onClick={() => showMemberProfile(member.identity)}
-                    >
-                      <span className="block truncate text-base font-semibold text-zinc-100">{member.identity}</span>
-                      <span className="mt-1 block text-sm leading-5 text-zinc-500">{member.role}</span>
-                    </button>
+                    <div key={member.identity} className="grid gap-2 py-3 sm:grid-cols-[1fr_auto]">
+                      <button
+                        type="button"
+                        className="group cursor-pointer text-left"
+                        onClick={() => showMemberProfile(member.identity)}
+                      >
+                        <span className="block truncate text-base font-semibold text-zinc-100 transition group-hover:text-cyan-200">
+                          {member.identity}
+                        </span>
+                        <span className="mt-1 block text-sm leading-5 text-zinc-500">
+                          {member.role}, {member.activity}
+                        </span>
+                      </button>
+                      <a
+                        className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-800 bg-black px-3 text-sm font-semibold text-zinc-200 transition hover:border-cyan-700 hover:bg-zinc-950 hover:text-cyan-200"
+                        href={memberProfileUrl(member.identity)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        6529 profile
+                      </a>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -2424,10 +2434,10 @@ export function CommandWavesConsole() {
         <section id="active-builders" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Members</h2>
+              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">People</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Builders in the room</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Profiles from visible app and room activity.
+                Open a profile, message someone, or check visible activity.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2438,7 +2448,7 @@ export function CommandWavesConsole() {
             <div className="mt-4 grid gap-3 border-y border-zinc-800 py-4 lg:grid-cols-[1fr_auto]">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Selected member</p>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Member</p>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{selectedMember.role}</Badge>
                   <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{selectedMember.scoreLabel}</Badge>
                 </div>
@@ -2446,7 +2456,7 @@ export function CommandWavesConsole() {
                 <p className="mt-2 text-base leading-7 text-zinc-400">{selectedMember.activity}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{selectedMember.detail}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">
-                  Visible activity only. Scores do not grant permissions, payouts, or merge rights.
+                  Activity is informational. It does not grant permissions, payouts, or merge rights.
                 </p>
               </div>
               <div className="flex flex-wrap items-start gap-2 lg:justify-end">
