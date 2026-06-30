@@ -947,7 +947,7 @@ export function CommandWavesConsole() {
       : activeProposal?.title ?? "Pick the next hook change";
   const currentFocusDescription =
     readyForNextHookChange
-      ? "Discuss this draft in the room, then save it as a proposal."
+      ? "Discuss this draft in the room, then record it as a proposal."
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
@@ -1661,7 +1661,7 @@ export function CommandWavesConsole() {
             budgetUsd,
           }),
         }, accessKey),
-      "Proposal submitted and checked against the rules.",
+      "Proposal recorded and checked against the rules.",
     );
   }
 
@@ -1901,7 +1901,7 @@ export function CommandWavesConsole() {
               ) : readyForNextHookChange ? (
                 <div className="mt-2 grid gap-3">
                   <p className="text-base leading-7 text-zinc-400">
-                    Discuss this draft in the room. Save it as a proposal when the scope is clear.
+                    Discuss this draft in the room. Record it after the scope is clear.
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button
@@ -1915,7 +1915,7 @@ export function CommandWavesConsole() {
                       Copy text
                     </Button>
                     <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                      {apiBusy === "proposal" ? "Saving" : "Save in app"}
+                      {apiBusy === "proposal" ? "Recording" : "Record in app"}
                     </Button>
                     <JumpLink href="#start-building">Edit details</JumpLink>
                     {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open last PR</LinkButton> : null}
@@ -2161,10 +2161,13 @@ export function CommandWavesConsole() {
                 Copy text
               </Button>
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Saving" : "Save in app"}
+                {apiBusy === "proposal" ? "Recording" : "Record in app"}
               </Button>
               <JumpLink href="#wave-room">Chat</JumpLink>
             </div>
+            <p className="mt-2 text-sm leading-6 text-zinc-500">
+              Copy the post to the public discussion first. Record it here once the room can see it.
+            </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
             <details className="mt-4 border-y border-zinc-800 py-3" open={hookProposalPreflightBlocked ? true : undefined}>
