@@ -856,7 +856,7 @@ export function CommandWavesConsole() {
       : activeProposal?.title ?? "Pick the next hook change";
   const currentFocusDescription =
     readyForNextHookChange
-      ? "Ready to discuss this as the next PR-sized hook change."
+      ? "Discuss this draft in the room, then save it as a proposal."
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
@@ -891,6 +891,9 @@ export function CommandWavesConsole() {
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
+  const currentProjectDetail = readyForNextHookChange
+    ? "Discuss the draft, save the proposal, then ask the room to decide."
+    : primaryHookProject?.nextActionDetail;
   const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
   const participationAccess = useMemo(() => createParticipationAccessSnapshot(wave.gates), [wave.gates]);
   const primaryProjectContextPreview = primaryHookProject
@@ -1614,7 +1617,7 @@ export function CommandWavesConsole() {
             {primaryHookProject ? (
               <div className="mt-4 border-b border-zinc-800 pb-3">
                 <p className="text-sm leading-6 text-zinc-500">
-                  {primaryHookProject.name}: {primaryHookProject.nextActionDetail}
+                  {primaryHookProject.name}: {currentProjectDetail}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {primaryHookProject.waveUrl ? <LinkButton href={primaryHookProject.waveUrl}>Open discussion</LinkButton> : null}
@@ -1727,7 +1730,7 @@ export function CommandWavesConsole() {
               ) : readyForNextHookChange ? (
                 <div className="mt-2 grid gap-3">
                   <p className="text-base leading-7 text-zinc-400">
-                    The last PR review passed. Bring the next small hook change to the room.
+                    Discuss this draft in the room. Save it as a proposal when the scope is clear.
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
