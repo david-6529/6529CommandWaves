@@ -8,8 +8,15 @@ export type ContributionContributor = {
   proposals: number;
   votes: number;
   decisions: number;
+  roomPosts: number;
   ledgerEvents: number;
   rationale: string[];
+};
+
+export type ContributionRoomPost = {
+  author: string;
+  preview: string;
+  createdAt?: string | null;
 };
 
 export type ContributionReport = {
@@ -41,6 +48,7 @@ function addContributor(map: Map<string, ContributionContributor>, identity: str
     proposals: 0,
     votes: 0,
     decisions: 0,
+    roomPosts: 0,
     ledgerEvents: 0,
     rationale: [],
   };
@@ -88,7 +96,40 @@ function githubPrLinkCount(wave: CommandWave) {
   );
 }
 
-function evidenceSummary(wave: CommandWave) {
+function roomPostPreview(value: string) {
+  return value.trim().replace(/\s+/g, " ").slice(0, 110);
+}
+
+function isSystemRoomAuthor(identity: string) {
+  const normalized = identity.trim().toLowerCase();
+
+  return (
+    !normalized ||
+    normalized === "unknown" ||
+    normalized === "wave-poll" ||
+    normalized === "agent" ||
+    normalized === "reviewer" ||
+    normalized.endsWith("-agent")
+  );
+}
+
+function latestReportTimestamp(wave: CommandWave, roomPosts: ContributionRoomPost[]) {
+  const ledgerLatest = latestLedgerTimestamp(wave.ledger);
+  const roomLatest = roomPosts
+    .map((post) => (post.createdAt ? Date.parse(post.createdAt) : 0))
+    .filter((time) => Number.isFinite(time) && time > 0)
+    .sort((left, right) => right - left)[0];
+
+  if (!roomLatest) {
+    return ledgerLatest;
+  }
+
+  const ledgerTime = Date.parse(ledgerLatest);
+
+  return roomLatest > (Number.isFinite(ledgerTime) ? ledgerTime : 0) ? new Date(roomLatest).toISOString() : ledgerLatest;
+}
+
+function evidenceSummary(wave: CommandWave, roomPostCount: number) {
   const voteCount = wave.polls.reduce((count, poll) => count + (poll.votes?.length ?? 0), 0);
   const decisionCount = wave.polls.filter((poll) => poll.decision).length;
   const prLinkCount = githubPrLinkCount(wave);
@@ -97,6 +138,7 @@ function evidenceSummary(wave: CommandWave) {
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
     ...(decisionCount ? [countLabel(decisionCount, "6529 decision receipt")] : []),
+    ...(roomPostCount ? [countLabel(roomPostCount, "room post")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
     ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
@@ -111,12 +153,14 @@ const scoringRubric = [
   "Other proposal: 3 report points.",
   "6529 decision receipt: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
+  "Room post pulled into app: 1 report point.",
 ];
 
 const coverage = {
   included: [
     "Work proposals stored by this app.",
     "Votes and recorded 6529 decision receipts stored by this app.",
+    "Room posts pulled into this app.",
     "Recorded GitHub PR links and Guardian review proof.",
     "Attributed activity log events stored by this app.",
   ],
@@ -132,9 +176,13 @@ export function createContributionReport(
   options: {
     generatedAt?: string;
     limit?: number;
+    roomPosts?: ContributionRoomPost[];
   } = {},
 ): ContributionReport {
   const contributors = new Map<string, ContributionContributor>();
+  const roomPosts = options.roomPosts ?? [];
+  const includedRoomPosts: ContributionRoomPost[] = [];
+  let includedRoomPostCount = 0;
 
   for (const proposal of wave.proposals) {
     const contributor = addContributor(contributors, proposal.proposer);
@@ -184,24 +232,45 @@ export function createContributionReport(
     addRationale(contributor, "Appears in the activity log");
   }
 
+  for (const post of roomPosts) {
+    if (isSystemRoomAuthor(post.author)) {
+      continue;
+    }
+
+    const contributor = addContributor(contributors, post.author);
+
+    contributor.roomPosts += 1;
+    contributor.score += 1;
+    includedRoomPostCount += 1;
+    includedRoomPosts.push(post);
+    addScoreBasis(contributor, "Room posts", 1);
+    addRationale(contributor, "Posted in the room");
+
+    const preview = roomPostPreview(post.preview);
+
+    if (preview) {
+      addRationale(contributor, `Recent room post: ${preview}`);
+    }
+  }
+
   const sorted = [...contributors.values()]
     .sort((left, right) => right.score - left.score || left.identity.localeCompare(right.identity))
-    .slice(0, options.limit ?? 6);
+    .slice(0, options.limit ?? 8);
 
   return {
     mode: "informational",
-    generatedAt: options.generatedAt ?? latestLedgerTimestamp(wave.ledger),
+    generatedAt: options.generatedAt ?? latestReportTimestamp(wave, includedRoomPosts),
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
       : "No contributor activity has been recorded yet.",
     coverage,
     scoringRubric,
-    evidence: evidenceSummary(wave),
+    evidence: evidenceSummary(wave, includedRoomPostCount),
     contributors: sorted,
     notes: [
       "Report scores are an AI-readable activity report, not a permission system.",
       "REP, TDH, payouts, and merge rights must use separate human-approved rules.",
-      "The report only uses proposal, vote, decision, PR, review, and ledger records currently stored by this app.",
+      "The report only uses proposal, vote, decision, room post, PR, review, and ledger records currently stored or previewed by this app.",
       "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
     ],
   };
@@ -212,6 +281,7 @@ export function createContributionReportDraft(
   options: {
     generatedAt?: string;
     limit?: number;
+    roomPosts?: ContributionRoomPost[];
   } = {},
 ) {
   const report = createContributionReport(wave, options);
@@ -221,6 +291,7 @@ export function createContributionReportDraft(
           countLabel(contributor.proposals, "proposal"),
           countLabel(contributor.votes, "vote"),
           countLabel(contributor.decisions, "decision"),
+          countLabel(contributor.roomPosts, "room post"),
           countLabel(contributor.ledgerEvents, "activity log event"),
         ].join(", ");
 

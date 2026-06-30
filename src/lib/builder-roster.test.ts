@@ -27,13 +27,14 @@ describe("builder roster", () => {
   });
 
   it("adds recent room authors without turning them into score authority", () => {
-    const roster = createBuilderRoster(createContributionReport(demoWave), {
+    const report = createContributionReport(demoWave, {
       roomPosts: [
         { author: "room-builder", preview: "I can review the next small hook change." },
         { author: "david", preview: "I posted an update for the room." },
         { author: "wave-poll", preview: "Decision passed." },
       ],
     });
+    const roster = createBuilderRoster(report);
 
     expect(roster.find((member) => member.identity === "david")?.activity).toContain("1 room post");
     expect(roster.find((member) => member.identity === "room-builder")).toMatchObject({

@@ -217,6 +217,7 @@ type WaveContextPreview = {
     id: string;
     url: string | null;
     author: string;
+    createdAt: string | null;
     sourceWaveRole: string | null;
     preview: string;
   }>;
@@ -998,13 +999,6 @@ export function CommandWavesConsole() {
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
-  const contributionReport = useMemo(() => createContributionReport(wave), [wave]);
-  const contributionReportDraft = useMemo(() => createContributionReportDraft(wave), [wave]);
-  const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
-  const developerFeePlanDraft = useMemo(
-    () => createDeveloperFeePlanDraft(wave, contributionReport),
-    [contributionReport, wave],
-  );
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
@@ -1020,13 +1014,24 @@ export function CommandWavesConsole() {
       (primaryProjectContextPreview?.sampleDrops ?? []).map((drop) => ({
         author: drop.author,
         preview: drop.preview,
+        createdAt: drop.createdAt,
       })),
     [primaryProjectContextPreview],
   );
-  const builderRoster = useMemo(
-    () => createBuilderRoster(contributionReport, { roomPosts: roomRosterPosts }),
-    [contributionReport, roomRosterPosts],
+  const contributionReport = useMemo(
+    () => createContributionReport(wave, { roomPosts: roomRosterPosts }),
+    [roomRosterPosts, wave],
   );
+  const contributionReportDraft = useMemo(
+    () => createContributionReportDraft(wave, { roomPosts: roomRosterPosts }),
+    [roomRosterPosts, wave],
+  );
+  const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
+  const developerFeePlanDraft = useMemo(
+    () => createDeveloperFeePlanDraft(wave, contributionReport),
+    [contributionReport, wave],
+  );
+  const builderRoster = useMemo(() => createBuilderRoster(contributionReport), [contributionReport]);
   const roomFeed = useMemo(
     () =>
       createRoomFeed(wave, {

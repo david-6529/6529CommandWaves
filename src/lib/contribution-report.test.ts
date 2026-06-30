@@ -14,8 +14,9 @@ describe("contribution report", () => {
     });
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
-    expect(report.notes.join(" ")).toContain("review, and ledger records");
+    expect(report.notes.join(" ")).toContain("room post, PR, review, and ledger records");
     expect(report.coverage.included).toContain("Work proposals stored by this app.");
+    expect(report.coverage.included).toContain("Room posts pulled into this app.");
     expect(report.coverage.included).toContain("Recorded GitHub PR links and Guardian review proof.");
     expect(report.coverage.notIncluded).toContain("Live wave posts that have not been pulled into app state.");
     expect(report.coverage.notIncluded).toContain("Manual payments, REP, TDH, off-app agreements, or private coordination.");
@@ -25,6 +26,7 @@ describe("contribution report", () => {
       "Other proposal: 3 report points.",
       "6529 decision receipt: 2 report points.",
       "Vote or attributed activity log event: 1 report point.",
+      "Room post pulled into app: 1 report point.",
     ]);
     expect(report.evidence).toContain("1 GitHub PR link");
     expect(report.evidence).toContain("1 Guardian review proof");
@@ -64,6 +66,33 @@ describe("contribution report", () => {
     expect(report.evidence).toEqual(["No app records yet."]);
   });
 
+  it("includes room posts pulled into the app without granting authority", () => {
+    const report = createContributionReport(demoWave, {
+      roomPosts: [
+        {
+          author: "room-builder",
+          preview: "I can review the next hook PR.",
+          createdAt: "2026-06-21T12:00:00.000Z",
+        },
+        {
+          author: "wave-poll",
+          preview: "Decision passed.",
+          createdAt: "2026-06-21T12:01:00.000Z",
+        },
+      ],
+    });
+
+    expect(report.generatedAt).toBe("2026-06-21T12:00:00.000Z");
+    expect(report.evidence).toContain("1 room post");
+    expect(report.contributors.find((contributor) => contributor.identity === "room-builder")).toMatchObject({
+      score: 1,
+      scoreBasis: ["Room posts: 1 report point"],
+      roomPosts: 1,
+    });
+    expect(report.contributors.some((contributor) => contributor.identity === "wave-poll")).toBe(false);
+    expect(report.notes.join(" ")).toContain("not a permission system");
+  });
+
   it("creates a copyable report draft without granting authority", () => {
     const draft = createContributionReportDraft(demoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
@@ -76,6 +105,7 @@ describe("contribution report", () => {
     expect(draft).toContain("- 1 GitHub PR link");
     expect(draft).toContain("Coverage included:");
     expect(draft).toContain("- Work proposals stored by this app.");
+    expect(draft).toContain("- Room posts pulled into this app.");
     expect(draft).toContain("Not included:");
     expect(draft).toContain("- Live wave posts that have not been pulled into app state.");
     expect(draft).toContain("Contributors:");

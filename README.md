@@ -56,8 +56,8 @@ What remains manual or MVP-only:
 - The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
   deploy, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
-- Contribution reporting uses visible app activity today. Full scoring across 6529 posts, PRs, reviews, commits, and
-  ledger events is still future work.
+- Contribution reporting uses visible app activity and room posts pulled into the app. Full scoring across GitHub commits,
+  reviews, merges, and off-app activity is still future work.
 
 What we are working on next:
 
