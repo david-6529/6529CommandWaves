@@ -1,7 +1,22 @@
 import { randomUUID } from "node:crypto";
 
+const noStoreCacheControl = "no-store, max-age=0";
+
+function withDefaultNoStore(init?: ResponseInit): ResponseInit {
+  const headers = new Headers(init?.headers);
+
+  if (!headers.has("Cache-Control")) {
+    headers.set("Cache-Control", noStoreCacheControl);
+  }
+
+  return {
+    ...init,
+    headers,
+  };
+}
+
 export function json(data: unknown, init?: ResponseInit) {
-  return Response.json(data, init);
+  return Response.json(data, withDefaultNoStore(init));
 }
 
 function getErrorStatus(error: unknown) {
