@@ -88,7 +88,7 @@ export function summarizeParticipationAccess(input: unknown) {
   }
 
   if (gates.some((gate) => advisoryPattern.test(gate))) {
-    return "Phase 1 access is reviewed manually. REP, TDH, QnA, and report scores are not live permissions here.";
+    return "Ask in the room to join. Access is reviewed manually for now.";
   }
 
   return gates[0];
@@ -109,7 +109,7 @@ export function createParticipationAccessSnapshot(input: unknown) {
   if (manual) {
     return {
       label: "manual review",
-      summary: "Ask in the room to join. REP, TDH, QnA, and report scores are not live permissions here.",
+      summary: "Ask in the room to join. Access is reviewed manually for now.",
       notes: gates.slice(0, 2),
     };
   }
