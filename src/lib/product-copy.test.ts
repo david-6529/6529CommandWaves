@@ -3,14 +3,12 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.headline).toBe("Coordinate the 6529 hook");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.subhead).toBe(
-      "A shared room for builders to discuss the next change, keep decisions visible, and move one PR at a time.",
+      "One hook change at a time. Talk in the room, record the 6529 decision, ship a reviewed PR.",
     );
-    expect(commandWaveProductCopy.positioning).toBe(
-      "Start in the room. Keep every PR tied to a 6529 decision and reviewer check.",
-    );
-    expect(commandWaveProductCopy.simpleFlow).toBe("Live hook room");
+    expect(commandWaveProductCopy.positioning).toBe("One active change, one 6529 decision, one reviewed GitHub PR.");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Live workspace");
   });
 
   it("keeps unsafe authority claims out of the first-screen explanation", () => {
@@ -28,9 +26,9 @@ describe("Command Waves product copy", () => {
   });
 
   it("keeps the first hook ahead of the later reusable protocol", () => {
-    expect(commandWaveProductCopy.headline).toBe("Coordinate the 6529 hook");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.headline.toLowerCase()).toContain("6529 hook");
-    expect(commandWaveProductCopy.subhead).toContain("next change");
+    expect(commandWaveProductCopy.subhead).toContain("One hook change");
     expect(commandWaveProductCopy.positioning.toLowerCase()).toContain("review");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");

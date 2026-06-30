@@ -9,7 +9,7 @@ export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseN
     "",
     body,
     "",
-    `Current task: ${nextAction.title}`,
+    `Current hook change: ${nextAction.title}`,
     `- Status: ${nextAction.detail}`,
     `- Repo: ${wave.repoUrl}`,
     `- 6529 discussion: ${wave.waveUrl}`,

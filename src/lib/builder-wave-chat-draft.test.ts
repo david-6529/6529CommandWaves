@@ -13,7 +13,7 @@ describe("6529 discussion chat draft", () => {
     expect(draft).toContain("I can review the fee cap tests.");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
-    expect(draft).toContain(`Current task: ${nextAction.title}`);
+    expect(draft).toContain(`Current hook change: ${nextAction.title}`);
     expect(draft).toContain(`Status: ${nextAction.detail}`);
     expect(draft).not.toContain("Rules I am following");
     expect(draft).not.toContain("\u2014");

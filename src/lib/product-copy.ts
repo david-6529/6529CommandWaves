@@ -1,6 +1,6 @@
 export const commandWaveProductCopy = {
-  headline: "Coordinate the 6529 hook",
-  subhead: "A shared room for builders to discuss the next change, keep decisions visible, and move one PR at a time.",
-  positioning: "Start in the room. Keep every PR tied to a 6529 decision and reviewer check.",
-  simpleFlow: "Live hook room",
+  headline: "6529 Hook Room",
+  subhead: "One hook change at a time. Talk in the room, record the 6529 decision, ship a reviewed PR.",
+  positioning: "One active change, one 6529 decision, one reviewed GitHub PR.",
+  simpleFlow: "Live workspace",
 } as const;

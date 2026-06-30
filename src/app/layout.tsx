@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Coordinate the 6529 hook",
-  description: "A shared room for builders to discuss the next hook change and move one PR at a time.",
+  title: "6529 Hook Room",
+  description: "A shared workspace for the current hook change, 6529 decision, GitHub PR, and review.",
 };
 
 export default function RootLayout({
