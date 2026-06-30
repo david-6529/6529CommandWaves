@@ -5,7 +5,7 @@ describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
     expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.subhead).toBe(
-      "Work on the 6529 hook with the room: discuss scope, agree on changes, build PRs, and review before merge.",
+      "Work on the 6529 hook with the room: discuss scope, record decisions, build PRs, and review before merge.",
     );
     expect(commandWaveProductCopy.positioning).toBe("A live room for the current 6529 hook change.");
     expect(commandWaveProductCopy.simpleFlow).toBe("Live room");

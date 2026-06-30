@@ -1104,6 +1104,7 @@ export function CommandWavesConsole() {
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
+  const roomStatusItems = buildTimeline.slice(0, 4);
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
@@ -1778,6 +1779,21 @@ export function CommandWavesConsole() {
                 <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{roomNeedLabel}</Badge>
               </div>
               <p className="mt-1 text-base leading-7 text-zinc-100">{roomNeedDetail}</p>
+            </div>
+
+            <div className="mt-4 border-t border-zinc-800 pt-3">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Status</p>
+              <dl className="mt-2 grid gap-2 sm:grid-cols-4">
+                {roomStatusItems.map((item) => (
+                  <div key={item.id} className="border-t border-zinc-800 pt-2 first:border-t-0 first:pt-0 sm:first:border-t sm:first:pt-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <dt className="text-sm font-semibold text-zinc-300">{item.label}</dt>
+                      <Badge className={buildTimelineStatusClass(item.status)}>{item.status}</Badge>
+                    </div>
+                    <dd className="mt-1 text-sm leading-5 text-zinc-500">{humanizeLegacyCommandCopy(item.title)}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
 
             {primaryHookProject ? (
