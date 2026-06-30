@@ -942,7 +942,7 @@ export function CommandWavesConsole() {
       : activeProposal?.title ?? "Pick the next hook change";
   const currentFocusDescription =
     readyForNextHookChange
-      ? "Discuss this draft in the room, then record it as a proposal."
+      ? "Bring this draft to the room before saving it as a proposal."
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
@@ -1120,7 +1120,7 @@ export function CommandWavesConsole() {
         : "Check readiness"
       : "Open launch controls";
   const roomNeedLabel = readyForNextHookChange
-    ? "Discuss draft"
+    ? "Room input"
     : activePollCanVote
       ? "Decision needed"
       : showDecisionRecorder
@@ -1137,7 +1137,7 @@ export function CommandWavesConsole() {
               ? "Keep moving"
               : "Pick a change";
   const roomNeedDetail = readyForNextHookChange
-    ? "Talk through the draft, then save it as the next PR proposal."
+    ? "Get feedback on scope, then save the proposal."
     : activePollCanVote
       ? "Ask the room for a visible decision before code work starts."
       : showDecisionRecorder
@@ -1887,7 +1887,7 @@ export function CommandWavesConsole() {
               ) : readyForNextHookChange ? (
                 <div className="mt-2 grid gap-3">
                   <p className="text-base leading-7 text-zinc-400">
-                    Discuss this draft in the room. Record it after the scope is clear.
+                    Share the draft in the room. Save it here after the scope is clear.
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button

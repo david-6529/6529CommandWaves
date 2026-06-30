@@ -18,7 +18,7 @@ describe("room feed", () => {
     });
     expect(feed[1]).toMatchObject({
       title: "Not decided yet",
-      body: "Discuss this draft in the room before PR work starts.",
+      body: "Share this draft in the room before PR work starts.",
       status: "needs decision",
     });
     expect(feed[2]).toMatchObject({

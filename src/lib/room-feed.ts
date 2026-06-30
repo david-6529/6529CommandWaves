@@ -62,7 +62,7 @@ function draftDecisionItem(): RoomFeedItem {
     id: "draft-decision",
     label: "Draft status",
     title: "Not decided yet",
-    body: "Discuss this draft in the room before PR work starts.",
+    body: "Share this draft in the room before PR work starts.",
     status: "needs decision",
   };
 }
