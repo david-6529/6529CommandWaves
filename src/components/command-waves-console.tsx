@@ -1156,6 +1156,9 @@ export function CommandWavesConsole() {
   const visibleRoomMembers = builderRoster.slice(0, 3);
   const selectedMember =
     builderRoster.find((member) => member.identity === selectedMemberIdentity) ?? builderRoster[0] ?? null;
+  const otherBuilderRoster = selectedMember
+    ? builderRoster.filter((member) => member.identity !== selectedMember.identity)
+    : builderRoster;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -2295,7 +2298,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builders</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Members</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Visible contributors and their recent activity.
+                Profiles from visible room activity.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2306,7 +2309,7 @@ export function CommandWavesConsole() {
             <div className="mt-4 grid gap-3 border-y border-zinc-800 py-4 lg:grid-cols-[1fr_auto]">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Member profile</p>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Selected member</p>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{selectedMember.role}</Badge>
                   <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{selectedMember.scoreLabel}</Badge>
                 </div>
@@ -2314,7 +2317,7 @@ export function CommandWavesConsole() {
                 <p className="mt-2 text-base leading-7 text-zinc-400">{selectedMember.activity}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{selectedMember.detail}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">
-                  Activity scores are context for builders. They do not grant permissions, payouts, or merge rights.
+                  Visible activity only. Scores do not grant permissions, payouts, or merge rights.
                 </p>
               </div>
               <div className="flex flex-wrap items-start gap-2 lg:justify-end">
@@ -2322,31 +2325,39 @@ export function CommandWavesConsole() {
                   Message
                 </Button>
                 <LinkButton href={memberProfileUrl(selectedMember.identity)}>6529 profile</LinkButton>
-                <JumpLink href="#wave-room">Chat</JumpLink>
               </div>
             </div>
           ) : null}
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {builderRoster.length ? (
-              builderRoster.map((member) => (
-                <div key={member.identity} className="grid gap-3 py-4 md:grid-cols-[1fr_auto]">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-xl font-semibold text-zinc-50">{member.identity}</p>
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
+              otherBuilderRoster.length ? (
+                otherBuilderRoster.map((member) => (
+                  <div key={member.identity} className="grid gap-3 py-4 md:grid-cols-[1fr_auto]">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-xl font-semibold text-zinc-50">{member.identity}</p>
+                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
+                      </div>
+                      <p className="mt-2 text-base leading-7 text-zinc-400">{member.activity}</p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-500">{member.detail}</p>
                     </div>
-                    <p className="mt-2 text-base leading-7 text-zinc-400">{member.activity}</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-500">{member.detail}</p>
+                    <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
+                      <Button type="button" variant="secondary" onClick={() => showMemberProfile(member.identity)}>
+                        Profile
+                      </Button>
+                      <LinkButton href={memberProfileUrl(member.identity)}>6529 profile</LinkButton>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
-                    <Button type="button" variant="secondary" onClick={() => showMemberProfile(member.identity)}>
-                      Profile
-                    </Button>
-                    <LinkButton href={memberProfileUrl(member.identity)}>6529 profile</LinkButton>
-                  </div>
+                ))
+              ) : (
+                <div className="py-4">
+                  <p className="text-base font-semibold text-zinc-100">No other visible members yet</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-500">
+                    More builders will appear after they propose, vote, or record activity.
+                  </p>
                 </div>
-              ))
+              )
             ) : (
               <div className="py-4">
                 <p className="text-base font-semibold text-zinc-100">No visible members yet</p>
