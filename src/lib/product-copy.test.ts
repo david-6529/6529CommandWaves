@@ -5,7 +5,7 @@ describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
     expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.subhead).toBe(
-      "Coordinate the next hook change with the builder swarm. Talk, decide, build, review.",
+      "Build the 6529 hook together. Discuss ideas, approve scoped work, open PRs, and review every change.",
     );
     expect(commandWaveProductCopy.positioning).toBe("A live room for the current 6529 hook change.");
     expect(commandWaveProductCopy.simpleFlow).toBe("Live room");
@@ -28,7 +28,8 @@ describe("Command Waves product copy", () => {
   it("keeps the first hook ahead of the later reusable protocol", () => {
     expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.headline.toLowerCase()).toContain("6529 hook");
-    expect(commandWaveProductCopy.subhead).toContain("next hook change");
+    expect(commandWaveProductCopy.subhead).toContain("Build the 6529 hook together");
+    expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("open prs");
     expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("review");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");
