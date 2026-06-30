@@ -1038,7 +1038,7 @@ export function CommandWavesConsole() {
   const roomSummaryItems = [
     ["Hook", primaryHookProject?.name ?? "6529 Hook"],
     ["Current change", currentFocusTitle],
-    ["Decision", activePollTitle],
+    ["Decision", readyForNextHookChange ? "Not decided yet" : activePollTitle],
     ["Builders", `${builderRoster.length} visible`],
   ];
 

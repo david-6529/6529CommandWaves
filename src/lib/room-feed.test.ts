@@ -11,13 +11,16 @@ describe("room feed", () => {
       proposer: "david",
     });
 
-    expect(feed.map((item) => item.label)).toEqual(["Next proposal", "Decision", "PR", "Review"]);
+    expect(feed.map((item) => item.label)).toEqual(["Next proposal", "Draft status", "Last PR", "Last review"]);
     expect(feed[0]).toMatchObject({
       title: "Add fee cap tests",
       status: "draft",
     });
-    expect(feed[1].href).toContain("https://6529.io/waves/6529-hook-builder");
-    expect(feed[1].body).toBe("The 6529 decision recorded 5 yes and 1 no.");
+    expect(feed[1]).toMatchObject({
+      title: "Not decided yet",
+      body: "Discuss this draft in the room before PR work starts.",
+      status: "needs decision",
+    });
     expect(feed[2]).toMatchObject({
       body: "The approved hook change has a PR record ready for builders to inspect.",
       hrefLabel: "Open PR",

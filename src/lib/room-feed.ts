@@ -56,14 +56,24 @@ function decisionFeedItem(poll: PollState | null): RoomFeedItem | null {
   };
 }
 
-function executionFeedItem(execution: ExecutionRecord | null): RoomFeedItem | null {
+function draftDecisionItem(): RoomFeedItem {
+  return {
+    id: "draft-decision",
+    label: "Draft status",
+    title: "Not decided yet",
+    body: "Discuss this draft in the room before PR work starts.",
+    status: "needs decision",
+  };
+}
+
+function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): RoomFeedItem | null {
   if (!execution) {
     return null;
   }
 
   return {
     id: "pr",
-    label: "PR",
+    label,
     title: "PR evidence recorded",
     body: "The approved hook change has a PR record ready for builders to inspect.",
     status: execution.status,
@@ -72,14 +82,14 @@ function executionFeedItem(execution: ExecutionRecord | null): RoomFeedItem | nu
   };
 }
 
-function reviewFeedItem(review: GuardianReview | null): RoomFeedItem | null {
+function reviewFeedItem(review: GuardianReview | null, label = "Review"): RoomFeedItem | null {
   if (!review) {
     return null;
   }
 
   return {
     id: "review",
-    label: "Review",
+    label,
     title: review.status === "pass" ? "Review passed" : `Review is ${review.status.replaceAll("_", " ")}`,
     body: "The review checked the PR against the approved hook proposal and rules.",
     status: review.status.replaceAll("_", " "),
@@ -100,8 +110,9 @@ export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFe
   const phaseWork = selectPhaseWork(wave);
   const items: RoomFeedItem[] = [];
   const draftTitle = clean(draft?.title ?? "", "");
+  const isNextDraft = phaseWork.prReview?.status === "pass" && Boolean(draftTitle);
 
-  if (phaseWork.prReview?.status === "pass" && draftTitle) {
+  if (isNextDraft) {
     items.push({
       id: "next-proposal",
       label: "Next proposal",
@@ -109,6 +120,7 @@ export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFe
       body: `${clean(draft?.proposer ?? "", "A builder")} is preparing this as the next PR-sized hook change for the room.`,
       status: "draft",
     });
+    items.push(draftDecisionItem());
   } else if (phaseWork.prProposal) {
     items.push({
       id: "current-proposal",
@@ -119,11 +131,11 @@ export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFe
     });
   }
 
-  for (const item of [
-    decisionFeedItem(phaseWork.prPoll),
-    executionFeedItem(phaseWork.prExecution),
-    reviewFeedItem(phaseWork.prReview),
-  ]) {
+  const evidenceItems = isNextDraft
+    ? [executionFeedItem(phaseWork.prExecution, "Last PR"), reviewFeedItem(phaseWork.prReview, "Last review")]
+    : [decisionFeedItem(phaseWork.prPoll), executionFeedItem(phaseWork.prExecution), reviewFeedItem(phaseWork.prReview)];
+
+  for (const item of evidenceItems) {
     if (item) {
       items.push(item);
     }
