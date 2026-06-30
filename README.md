@@ -27,6 +27,48 @@ The simple project view is:
 
 `Access -> Discussion -> PR -> Review`
 
+## Current Status
+
+This repo is an MVP prototype for one public hook-building room. The first target is the 6529 Hook. The product direction
+is a standalone project site now, with a reusable public hook-building platform possible later once the first loop works.
+
+What exists now:
+
+- A Next app product surface named `6529 Hook Room`.
+- One active 6529 hook project connected to one 6529 discussion and one GitHub repo.
+- A room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and a simple
+  proposal flow.
+- Work types for Code PR, Question, Update, and Context.
+- Copyable drafts for 6529 discussion posts, join requests, decisions, review requests, project updates, launch packets,
+  Codex work packets, and contribution reports.
+- Scoped API routes for setup, proposals, local votes, decision receipts, PR evidence, reviews, launch audit, setup proof,
+  and public command-wave state.
+- Hook proposal preflight checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder
+  authority claims.
+- A deterministic reviewer foundation with Command Waves manifests, guardian attestations, proof replay, risky path checks,
+  and hook contract signal checks.
+- Local file storage for the demo flow and optional Postgres storage via `db/001_command_waves.sql`.
+
+What remains manual or MVP-only:
+
+- 6529 posting is still manual. The app drafts text and opens the discussion, but a human posts it.
+- REP, TDH, holder, allowlist, and QnA gates are advisory notes until live wallet/session/score checks are wired.
+- Local votes are app records. PR commands require a manually recorded 6529 decision URL before code work starts.
+- Codex execution is a controlled packet and local/demo adapter today, not autonomous production branch creation.
+- The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
+  deploy, or spend funds.
+- The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
+- Contribution reporting uses visible app activity today. Full scoring across 6529 posts, PRs, reviews, commits, and
+  ledger events is still future work.
+
+What we are working on next:
+
+1. Keep simplifying the first screen so it feels like an active coordination room, not a guide.
+2. Make it obvious what is happening with the hook, who is involved, and how a new builder can help.
+3. Finish the first public loop: discussion, scoped proposal, 6529 decision, PR evidence, reviewer proof, and share-back.
+4. Harden persistence, auth, live 6529 reads, GitHub branch/PR operations, and external guardian trust boundaries.
+5. Expand contribution analysis after the workflow is useful and understandable.
+
 ## Why This Exists
 
 Agents are useful, but broad tool access gets dangerous when a group is moving at prompt speed. In phase 1, agents only
