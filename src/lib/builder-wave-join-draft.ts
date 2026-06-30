@@ -3,9 +3,9 @@ export function createBuilderWaveJoinDraft(handle: string) {
   const handleLine = cleanHandle ? `Handle: ${cleanHandle}.` : "Handle: not set yet.";
 
   return [
-    "I would like to join the 6529 hook build.",
+    "I would like to help with this hook.",
     handleLine,
-    "I can help with tests, review, discussion, or a small PR.",
-    "Please let me know the best next step.",
+    "I can help with discussion, review, tests, or a small PR.",
+    "What should I take next?",
   ].join("\n");
 }

@@ -5,9 +5,10 @@ describe("6529 discussion join draft", () => {
   it("creates a short join request with the builder handle", () => {
     const draft = createBuilderWaveJoinDraft(" david ");
 
-    expect(draft).toContain("I would like to join the 6529 hook build.");
+    expect(draft).toContain("I would like to help with this hook.");
     expect(draft).toContain("Handle: david.");
-    expect(draft).toContain("tests, review, discussion, or a small PR");
+    expect(draft).toContain("discussion, review, tests, or a small PR");
+    expect(draft).toContain("What should I take next?");
     expect(draft).not.toContain("\u2014");
   });
 
