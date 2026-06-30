@@ -598,6 +598,25 @@ function downloadJson(filename: string, payload: unknown) {
   URL.revokeObjectURL(url);
 }
 
+function openBlankDiscussionTab() {
+  const tab = window.open("about:blank", "_blank");
+
+  if (tab) {
+    tab.opener = null;
+  }
+
+  return tab;
+}
+
+function openDiscussionInTab(tab: Window | null, url: string) {
+  if (!tab) {
+    return false;
+  }
+
+  tab.location.href = url;
+  return true;
+}
+
 function appUrl(path: string) {
   if (typeof window === "undefined") {
     return path;
@@ -1343,16 +1362,22 @@ export function CommandWavesConsole() {
       return;
     }
 
+    const discussionTab = openDiscussion && wave.waveUrl ? openBlankDiscussionTab() : null;
+
     try {
       await navigator.clipboard.writeText(builderWaveChatDraft);
       if (openDiscussion && wave.waveUrl) {
-        window.open(wave.waveUrl, "_blank", "noopener,noreferrer");
-        setWaveRoomNotice("Discussion post copied. Opened 6529 discussion.");
+        setWaveRoomNotice(
+          openDiscussionInTab(discussionTab, wave.waveUrl)
+            ? "Discussion post copied. Opened 6529 discussion."
+            : "Discussion post copied. Open the 6529 discussion manually.",
+        );
         return;
       }
 
       setWaveRoomNotice("Discussion post copied.");
     } catch {
+      discussionTab?.close();
       setWaveRoomNotice("Copy failed. Select the discussion post and copy it manually.");
     }
   }
@@ -1376,16 +1401,22 @@ export function CommandWavesConsole() {
   }
 
   async function copyBuilderWaveProposalDraft({ openDiscussion = false } = {}) {
+    const discussionTab = openDiscussion && wave.waveUrl ? openBlankDiscussionTab() : null;
+
     try {
       await navigator.clipboard.writeText(builderWaveProposalDraft);
       if (openDiscussion && wave.waveUrl) {
-        window.open(wave.waveUrl, "_blank", "noopener,noreferrer");
-        setProposalDraftNotice("Proposal post copied. Opened 6529 discussion.");
+        setProposalDraftNotice(
+          openDiscussionInTab(discussionTab, wave.waveUrl)
+            ? "Proposal post copied. Opened 6529 discussion."
+            : "Proposal post copied. Open the 6529 discussion manually.",
+        );
         return;
       }
 
       setProposalDraftNotice("Proposal post copied.");
     } catch {
+      discussionTab?.close();
       setProposalDraftNotice("Copy failed. Select the proposal text and copy it manually.");
     }
   }
