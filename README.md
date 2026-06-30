@@ -40,6 +40,7 @@ What exists now:
 - Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
+- Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
@@ -386,4 +387,4 @@ API errors include an `errorId` so a user-visible error can be matched to server
 4. Add controlled Codex execution using [docs/agent-harness-plan.md](docs/agent-harness-plan.md).
 5. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 6. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.
-7. Add production auth, secrets, rate limits, job queue controls, and required GitHub branch protection.
+7. Add production auth, secrets, distributed rate limits, job queue controls, and required GitHub branch protection.

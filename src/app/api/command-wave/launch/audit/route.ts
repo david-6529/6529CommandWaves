@@ -1,6 +1,7 @@
 import { handleRouteError, json } from "@/lib/api";
 import { getCommandWave } from "@/lib/command-wave-store";
 import { createFirstPhaseLaunchSnapshot } from "@/lib/first-phase-launch-snapshot";
+import { assertRateLimit } from "@/lib/rate-limit";
 
 function shouldCheckSetupRemote(request: Request) {
   const value = new URL(request.url).searchParams.get("remote")?.trim().toLowerCase();
@@ -10,9 +11,15 @@ function shouldCheckSetupRemote(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    const checkSetupRemote = shouldCheckSetupRemote(request);
+
+    if (checkSetupRemote) {
+      assertRateLimit(request, { namespace: "launch_audit_remote", max: 10, windowMs: 60_000 });
+    }
+
     return json({
       audit: await createFirstPhaseLaunchSnapshot(await getCommandWave(), {
-        checkSetupRemote: shouldCheckSetupRemote(request),
+        checkSetupRemote,
       }),
     });
   } catch (error) {
