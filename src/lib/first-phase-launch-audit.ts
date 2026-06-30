@@ -120,6 +120,13 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",
   readiness_not_checked: "Run readiness",
+  readiness_app_url: "Set NEXT_PUBLIC_APP_URL",
+  readiness_database: "Configure DATABASE_URL",
+  readiness_command_wave_store: "Use durable storage",
+  readiness_admin_api_key: "Set ADMIN_API_KEY",
+  readiness_6529_mode: "Use live 6529 mode",
+  readiness_github_pr_adapter: "Configure GitHub PR adapter",
+  readiness_guardian_wave_state: "Connect guardian wave state",
 };
 
 function launchActionTitle(item: FirstPhaseLaunchAuditItem) {

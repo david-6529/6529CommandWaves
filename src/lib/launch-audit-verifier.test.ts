@@ -63,9 +63,11 @@ describe("launch audit verifier", () => {
 
     expect(result.status).toBe("fail");
     expect(result.launchStatus).toBe("blocked");
-    expect(result.blockers.join("\n")).toContain("Admin API key: Missing.");
+    expect(result.blockers.join("\n")).toContain(
+      "Admin API key: Set ADMIN_API_KEY before public launch so protected actions require a key.",
+    );
     expect(result.openItems.length).toBeGreaterThan(0);
-    expect(result.nextAction?.title).toBe("Fix Admin API key");
+    expect(result.nextAction?.title).toBe("Set ADMIN_API_KEY");
   });
 
   it("fails an invalid payload without throwing", () => {

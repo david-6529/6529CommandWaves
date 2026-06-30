@@ -77,7 +77,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           id: "app_url",
           label: "App URL",
           status: "warn",
-          message: "Missing. Fine locally, required before production.",
+          message: "Set NEXT_PUBLIC_APP_URL to the deployed app URL before public launch.",
         },
     hasDatabase
       ? {
@@ -90,7 +90,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           id: "database",
           label: "Database",
           status: "warn",
-          message: "Postgres is not configured. Add DATABASE_URL before production.",
+          message: "Add DATABASE_URL before durable public audit storage.",
         },
     {
       id: "command_wave_store",
@@ -101,7 +101,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           ? "Postgres persistence configured."
           : "Postgres store selected but DATABASE_URL is missing."
         : hasLocalFileStore
-          ? "Local file persistence is active. Good for development, not production."
+          ? "Local file persistence is active. Good for development, not durable public audit storage."
           : "In-memory only. State resets when the server restarts.",
     },
     hasValue(env.ADMIN_API_KEY)
@@ -115,13 +115,13 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           id: "admin_api_key",
           label: "Admin API key",
           status: "fail",
-          message: "Missing.",
+          message: "Set ADMIN_API_KEY before public launch so protected actions require a key.",
         },
     {
       id: "6529_mode",
       label: "6529 mode",
       status: mockMode ? "warn" : "pass",
-      message: mockMode ? "Mock mode is active. Safe for local development." : "Live 6529 API mode.",
+      message: mockMode ? "Set 6529_MOCK_MODE=false before public launch." : "Live 6529 API mode.",
     },
     {
       id: "github_pr_adapter",
@@ -130,8 +130,8 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       message: hasGithubPrAdapter
         ? githubPrConfigured
           ? "GitHub PR creation is enabled and credentialed."
-          : "GitHub PR creation is enabled but no token is configured."
-        : "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before production PR creation.",
+          : "GitHub PR creation is enabled but COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN is missing."
+        : "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.",
     },
     {
       id: "guardian_wave_state",
@@ -141,7 +141,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
         ? guardianWaveStateMessage(env, hasGuardianWaveState)
         : hasGuardianWaveState
           ? guardianWaveStateMessage(env, true)
-          : "Not configured. Fine for local development, required before using the guardian as a required PR check.",
+          : "Set COMMAND_WAVE_STATE_URL before using the guardian as a required PR check.",
     },
     {
       id: "guardian_mode",

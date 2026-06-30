@@ -208,12 +208,14 @@ describe("first phase launch audit", () => {
     expect(audit.nextAction).toMatchObject({
       status: "blocked",
       itemId: "readiness_admin_api_key",
-      title: "Fix Admin API key",
+      title: "Set ADMIN_API_KEY",
+      detail: "Set ADMIN_API_KEY before public launch so protected actions require a key.",
     });
     expect(audit.blockers.map((item) => item.label)).toEqual(["Admin API key"]);
     expect(audit.openItems[0]).toMatchObject({
       id: "readiness_admin_api_key",
       status: "blocked",
+      detail: "Set ADMIN_API_KEY before public launch so protected actions require a key.",
     });
   });
 
@@ -256,6 +258,7 @@ describe("first phase launch audit", () => {
         id: "readiness_6529_mode",
         label: "6529 mode",
         status: "needed",
+        detail: "Set 6529_MOCK_MODE=false before public launch.",
       }),
     );
   });

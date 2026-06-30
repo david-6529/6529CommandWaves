@@ -18,7 +18,13 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "warn",
-      message: "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before production PR creation.",
+      message: "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.",
+    });
+    expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
+      message: "Set ADMIN_API_KEY before public launch so protected actions require a key.",
+    });
+    expect(checks.find((check) => check.id === "6529_mode")).toMatchObject({
+      message: "Set 6529_MOCK_MODE=false before public launch.",
     });
   });
 
