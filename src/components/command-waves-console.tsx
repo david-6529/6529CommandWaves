@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timeline";
+import { createHookProgress, type HookProgressStatus } from "@/lib/hook-progress";
 import { createBuilderRoster } from "@/lib/builder-roster";
 import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
@@ -460,7 +461,7 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
 }
 
-function buildTimelineStatusClass(status: BuildTimelineStatus) {
+function progressStatusClass(status: BuildTimelineStatus | HookProgressStatus) {
   if (status === "done") {
     return statusClass("complete");
   }
@@ -1104,7 +1105,7 @@ export function CommandWavesConsole() {
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
-  const roomStatusItems = buildTimeline.slice(0, 4);
+  const roomStatusItems = useMemo(() => createHookProgress(wave, title), [title, wave]);
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
@@ -1789,9 +1790,9 @@ export function CommandWavesConsole() {
                   <div key={item.id} className="border-t border-zinc-800 pt-2 first:border-t-0 first:pt-0 sm:first:border-t sm:first:pt-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <dt className="text-sm font-semibold text-zinc-300">{item.label}</dt>
-                      <Badge className={buildTimelineStatusClass(item.status)}>{item.status}</Badge>
+                      <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
                     </div>
-                    <dd className="mt-1 text-sm leading-5 text-zinc-500">{humanizeLegacyCommandCopy(item.title)}</dd>
+                    <dd className="mt-1 text-sm leading-5 text-zinc-500">{humanizeLegacyCommandCopy(item.detail)}</dd>
                   </div>
                 ))}
               </dl>
@@ -2266,7 +2267,7 @@ export function CommandWavesConsole() {
               <div key={item.id} className="grid gap-3 py-4 md:grid-cols-[8rem_1fr_auto]">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
-                  <Badge className={buildTimelineStatusClass(item.status)}>{item.status}</Badge>
+                  <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-zinc-50">{humanizeLegacyCommandCopy(item.title)}</p>
