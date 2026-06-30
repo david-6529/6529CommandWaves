@@ -19,11 +19,16 @@ function discussionStep(detail: string, status: HookProgressStatus = "current"):
   };
 }
 
-function waitingSteps(): HookProgressStep[] {
+function waitingSteps(hasDraft: boolean): HookProgressStep[] {
   return [
-    { id: "decide", label: "Decide", status: "waiting", detail: "Waits for a proposal." },
+    {
+      id: "decide",
+      label: "Decide",
+      status: "waiting",
+      detail: hasDraft ? "Save proposal first." : "Waits for a proposal.",
+    },
     { id: "build", label: "PR", status: "waiting", detail: "Waits for a decision." },
-    { id: "review", label: "Review", status: "waiting", detail: "Waits for PR evidence." },
+    { id: "review", label: "Review", status: "waiting", detail: "Waits for a PR." },
   ];
 }
 
@@ -37,8 +42,8 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
 
   if (!proposal || review?.status === "pass") {
     return [
-      discussionStep(nextTitle ? "Shape this proposal in the room." : "Pick one small hook change."),
-      ...waitingSteps(),
+      discussionStep(nextTitle ? "Shape this draft in the room." : "Pick one small hook change."),
+      ...waitingSteps(Boolean(nextTitle)),
     ];
   }
 
@@ -82,7 +87,7 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
         ? "Review needs changes."
         : buildDone
           ? "Check the PR against the rules."
-          : "Waits for PR evidence.",
+          : "Waits for a PR.",
     },
   ];
 }

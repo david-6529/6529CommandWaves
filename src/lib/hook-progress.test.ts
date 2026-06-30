@@ -12,7 +12,32 @@ describe("hook progress", () => {
       ["build", "waiting"],
       ["review", "waiting"],
     ]);
-    expect(progress[0].detail).toBe("Shape this proposal in the room.");
+    expect(progress.map((step) => step.detail)).toEqual([
+      "Shape this draft in the room.",
+      "Save proposal first.",
+      "Waits for a decision.",
+      "Waits for a PR.",
+    ]);
+  });
+
+  it("keeps the empty start state plain", () => {
+    const progress = createHookProgress(
+      {
+        ...demoWave,
+        proposals: [],
+        polls: [],
+        executions: [],
+        reviews: [],
+      },
+      "",
+    );
+
+    expect(progress.map((step) => step.detail)).toEqual([
+      "Pick one small hook change.",
+      "Waits for a proposal.",
+      "Waits for a decision.",
+      "Waits for a PR.",
+    ]);
   });
 
   it("shows decision as current when a proposal needs a 6529 receipt", () => {
