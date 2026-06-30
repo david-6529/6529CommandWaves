@@ -1,4 +1,5 @@
 import type { CommandWave, ExecutionRecord, GuardianReview, LedgerEvent, PollState } from "./command-waves";
+import { commandKindLabel } from "./command-kind-copy";
 import { ledgerEventsByRecency } from "./ledger";
 import { selectPhaseWork } from "./phase-work";
 
@@ -66,6 +67,32 @@ function draftDecisionItem(): RoomFeedItem {
   };
 }
 
+function supportProposalLabel(proposal: CommandWave["proposals"][number]) {
+  if (proposal.kind === "draft_response") {
+    return "Question";
+  }
+
+  if (proposal.kind === "post_to_wave") {
+    return "Update";
+  }
+
+  if (proposal.kind === "read_context") {
+    return "Context";
+  }
+
+  return commandKindLabel(proposal.kind);
+}
+
+function supportProposalFeedItem(proposal: CommandWave["proposals"][number]): RoomFeedItem {
+  return {
+    id: `support-${proposal.id}`,
+    label: supportProposalLabel(proposal),
+    title: proposal.title,
+    body: proposal.prompt,
+    status: proposal.status.replaceAll("_", " "),
+  };
+}
+
 function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): RoomFeedItem | null {
   if (!execution) {
     return null;
@@ -129,6 +156,8 @@ export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFe
       body: phaseWork.prProposal.prompt,
       status: phaseWork.prProposal.status.replaceAll("_", " "),
     });
+  } else {
+    items.push(...phaseWork.supportProposals.slice(0, 2).map(supportProposalFeedItem));
   }
 
   const evidenceItems = isNextDraft

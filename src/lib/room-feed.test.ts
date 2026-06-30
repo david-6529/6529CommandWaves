@@ -58,4 +58,40 @@ describe("room feed", () => {
       },
     ]);
   });
+
+  it("shows support proposals when no PR proposal is active", () => {
+    const wave: CommandWave = {
+      id: "cw-support",
+      name: "6529 Hook",
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      gates: [],
+      rules: defaultRules,
+      proposals: [
+        {
+          id: "cmd-002",
+          title: "Clarify fee cap options",
+          proposer: "david",
+          kind: "draft_response",
+          risk: "low",
+          prompt: "Compare the simplest fee cap options.",
+          spec: "Keep it short.",
+          budgetUsd: 0,
+          status: "approved",
+        },
+      ],
+      polls: [],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    };
+
+    expect(createRoomFeed(wave)[0]).toMatchObject({
+      id: "support-cmd-002",
+      label: "Question",
+      title: "Clarify fee cap options",
+      body: "Compare the simplest fee cap options.",
+      status: "approved",
+    });
+  });
 });
