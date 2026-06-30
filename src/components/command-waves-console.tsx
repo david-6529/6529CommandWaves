@@ -826,7 +826,7 @@ export function CommandWavesConsole() {
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentBuildStatusLabel = readyForNextHookChange
-    ? "ready for next change"
+    ? "draft in room"
     : activeExecution
       ? "PR logged"
       : activePollDecisionRecorded
@@ -840,7 +840,7 @@ export function CommandWavesConsole() {
               : "waiting";
   const currentBuildStatusClass =
     readyForNextHookChange
-      ? statusClass("pass")
+      ? statusClass("reviewing")
       : activeExecution
         ? statusClass("complete")
         : activePollDecisionRecorded
