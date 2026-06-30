@@ -883,6 +883,10 @@ export function CommandWavesConsole() {
   const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
   const visibleSupportProposals = supportProposals.slice(0, 3);
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
+  const activeSupportProposal = activeProposal && !activeProposalIsPr ? activeProposal : null;
+  const activeSupportProposalLabel = activeSupportProposal
+    ? (proposalTypeOptions.find((item) => item.kind === activeSupportProposal.kind)?.label ?? commandKindLabel(activeSupportProposal.kind))
+    : "";
   const activeDecisionReferenceCheck = activePoll?.decision
     ? validateWaveDecisionReference({
         reference: activePoll.decision.url ?? activePoll.decision.dropId ?? "",
@@ -926,6 +930,8 @@ export function CommandWavesConsole() {
           ? "decision receipt needed"
           : activePoll?.status === "open"
             ? "decision open"
+            : activeSupportProposal
+              ? `${activeSupportProposalLabel.toLowerCase()} recorded`
             : activeProposal
               ? "proposal ready"
               : "waiting";
@@ -1138,6 +1144,8 @@ export function CommandWavesConsole() {
             : "Decision URL needed"
           : canRunReview
             ? "Review PR"
+            : activeSupportProposal
+              ? "Discuss support"
             : activeProposal
               ? "Keep moving"
               : "Pick a change";
@@ -1153,6 +1161,8 @@ export function CommandWavesConsole() {
             : "Record the 6529 decision URL before PR work starts."
           : canRunReview
             ? "Check the PR against the approved proposal and room rules."
+            : activeSupportProposal
+              ? `${activeSupportProposalLabel} is recorded. Use the room to discuss it or propose the next code change.`
             : activeProposal
               ? "Follow the next open step for this hook change."
               : "Choose one small hook change the room can discuss.";
@@ -1504,6 +1514,14 @@ export function CommandWavesConsole() {
   function messageMember(identity: string) {
     setWaveRoomMessage(`@${identity} `);
     setWaveRoomNotice("Message draft ready.");
+    window.requestAnimationFrame(() => {
+      document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function discussSupportProposal(proposal: NonNullable<typeof activeSupportProposal>) {
+    setWaveRoomMessage([`${activeSupportProposalLabel}: ${proposal.title}`, "", proposal.prompt].join("\n"));
+    setWaveRoomNotice("Discussion draft ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -1897,6 +1915,19 @@ export function CommandWavesConsole() {
                     </Button>
                   </div>
                   {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
+                </div>
+              ) : activeSupportProposal ? (
+                <div className="mt-2 grid gap-3">
+                  <p className="text-base leading-7 text-zinc-400">
+                    {activeSupportProposalLabel} is recorded for the room. It does not open a PR.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="secondary" onClick={() => discussSupportProposal(activeSupportProposal)}>
+                      Discuss in room
+                    </Button>
+                    <JumpLink href="#start-building">Propose code PR</JumpLink>
+                    <JumpLink href="#recent-activity">Build log</JumpLink>
+                  </div>
                 </div>
               ) : readyForNextHookChange ? (
                 <div className="mt-2 grid gap-3">
