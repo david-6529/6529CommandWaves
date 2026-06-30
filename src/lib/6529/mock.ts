@@ -34,6 +34,9 @@ const mockDropsFixture = {
     },
   ],
 };
+const mockPostBaseMs = Date.parse("2026-06-20T12:10:00.000Z");
+const mockPostedDrops = new Map<string, unknown[]>();
+let mockPostSerial = 4;
 
 export function is6529MockMode() {
   return process.env["6529_MOCK_MODE"] !== "false";
@@ -43,30 +46,44 @@ export function getMockWave(waveId: string) {
   return {
     id: waveId,
     name: "Mock Command Wave",
+    total_drops_count: mockDropsFixture.drops.length + (mockPostedDrops.get(waveId)?.length ?? 0),
     source: "fixture",
   };
 }
 
 export function getMockWaveDrops(waveId: string) {
+  const postedDrops = mockPostedDrops.get(waveId) ?? [];
+
   return normalizeWaveDropsResponse({
     ...mockDropsFixture,
     wave: {
       ...mockDropsFixture.wave,
       id: waveId,
+      total_drops_count: mockDropsFixture.drops.length + postedDrops.length,
     },
+    drops: [...postedDrops].reverse().concat(mockDropsFixture.drops),
   });
 }
 
 export function getMockPostDrop(waveId: string, content: string, options: PostDropOptions = {}) {
-  return {
-    id: `mock-post-${Date.now()}`,
+  const serial = mockPostSerial;
+  const drop = {
+    id: `mock-post-${serial}`,
     wave_id: waveId,
+    serial_no: serial,
+    created_at: new Date(mockPostBaseMs + (serial - 3) * 60_000).toISOString(),
     content,
+    author: { handle: "room-builder" },
     drop_type: options.dropType ?? (options.poll ? "PARTICIPATORY" : "CHAT"),
     reply_to_drop_id: options.replyToDropId ?? null,
     poll: options.poll ?? null,
     source: "fixture",
   };
+
+  mockPostSerial += 1;
+  mockPostedDrops.set(waveId, [...(mockPostedDrops.get(waveId) ?? []), drop]);
+
+  return drop;
 }
 
 export function getMockPollDrop(
@@ -80,4 +97,9 @@ export function getMockPollDrop(
     poll,
     dropType: "PARTICIPATORY",
   });
+}
+
+export function resetMockDropsForTests() {
+  mockPostedDrops.clear();
+  mockPostSerial = 4;
 }

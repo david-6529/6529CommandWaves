@@ -1536,10 +1536,29 @@ export function CommandWavesConsole() {
 
     try {
       const post = await requestRoomPost(roomPostTargetUrl, builderWaveChatDraft, accessKey);
+      let roomPreviewRefreshed = false;
+
+      if (primaryHookProject) {
+        try {
+          const preview = await requestContextPreview(primaryHookProject.waveUrl);
+
+          setProjectContextPreviews((previews) => ({
+            ...previews,
+            [primaryHookProject.id]: preview,
+          }));
+          roomPreviewRefreshed = true;
+        } catch {
+          roomPreviewRefreshed = false;
+        }
+      }
 
       setWaveRoomMessage("");
       setRoomPostUrl(post.url ?? "");
-      setWaveRoomNotice(post.mode === "mock" ? "Posted to the mock room." : "Posted to the room.");
+      setWaveRoomNotice(
+        `${post.mode === "mock" ? "Posted to the mock room." : "Posted to the room."}${
+          roomPreviewRefreshed ? " Room preview refreshed." : ""
+        }`,
+      );
     } catch (error) {
       setWaveRoomNotice(error instanceof Error ? error.message : "Room post failed.");
     } finally {

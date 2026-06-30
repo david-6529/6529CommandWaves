@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { resetMockDropsForTests } from "./mock";
 import { fetchWaveContext, previewWaveContext } from "./wave-context";
 
 describe("6529 wave context", () => {
@@ -6,9 +7,12 @@ describe("6529 wave context", () => {
 
   beforeEach(() => {
     process.env["6529_MOCK_MODE"] = "true";
+    resetMockDropsForTests();
   });
 
   afterEach(() => {
+    resetMockDropsForTests();
+
     if (previousMockMode === undefined) {
       delete process.env["6529_MOCK_MODE"];
     } else {
