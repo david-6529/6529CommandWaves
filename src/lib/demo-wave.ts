@@ -66,7 +66,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:00:00.000Z",
       actor: "Setup",
       type: "wave_created",
-      message: "Created the 6529 hook project and attached the builder wave plus GitHub repo.",
+      message: "Created the 6529 hook project and attached the 6529 room and code repo.",
     },
     {
       id: "evt-002",

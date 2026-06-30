@@ -94,7 +94,7 @@ function evidenceSummary(wave: CommandWave) {
   const prLinkCount = githubPrLinkCount(wave);
   const reviewProofCount = wave.reviews.filter((review) => review.proof).length;
   const evidence = [
-    ...(wave.proposals.length ? [countLabel(wave.proposals.length, "command proposal")] : []),
+    ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
     ...(decisionCount ? [countLabel(decisionCount, "6529 decision receipt")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
@@ -102,7 +102,7 @@ function evidenceSummary(wave: CommandWave) {
     ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
   ];
 
-  return evidence.length ? evidence : ["No app evidence recorded yet."];
+  return evidence.length ? evidence : ["No app records yet."];
 }
 
 const scoringRubric = [
@@ -158,7 +158,7 @@ export function createContributionReport(
       contributor.decisions += 1;
       contributor.score += 2;
       addScoreBasis(contributor, "Decision receipts", 2);
-      addRationale(contributor, "Recorded 6529 decision evidence");
+      addRationale(contributor, "Recorded 6529 decision receipt");
     }
 
     for (const vote of poll.votes ?? []) {
@@ -201,7 +201,7 @@ export function createContributionReport(
     notes: [
       "Report scores are an AI-readable activity report, not a permission system.",
       "REP, TDH, payouts, and merge rights must use separate human-approved rules.",
-      "The report only uses proposal, vote, decision, PR, review, and ledger evidence currently stored by this app.",
+      "The report only uses proposal, vote, decision, PR, review, and ledger records currently stored by this app.",
       "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
     ],
   };
@@ -234,7 +234,7 @@ export function createContributionReportDraft(
     `Generated: ${report.generatedAt}`,
     report.summary,
     "",
-    "Evidence:",
+    "Records:",
     ...report.evidence.map((item) => `- ${item}`),
     "",
     "Coverage included:",

@@ -154,7 +154,7 @@ const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
   ["6529_MOCK_MODE=false", "Uses live 6529 reads instead of local mock data."],
-  ["COMMAND_WAVE_STATE_URL", "Gives guardian PR checks the public wave state."],
+  ["COMMAND_WAVE_STATE_URL", "Gives guardian PR checks the public room state."],
 ];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
@@ -2693,7 +2693,7 @@ export function CommandWavesConsole() {
                   </div>
                 ) : null}
               </div>
-              <Field label="GitHub repo">
+              <Field label="Code repo">
                 <Input
                   value={repoUrl}
                   onChange={(event) => {
@@ -2828,7 +2828,7 @@ export function CommandWavesConsole() {
                 </summary>
                 <div className="mt-3 grid gap-3">
                   <p className="text-xs leading-5 text-zinc-500">
-                    Shows local mode, storage, 6529 mode, GitHub PR adapter, review state, and review mode.
+                    Shows local mode, storage, 6529 reads, PR adapter, review state, and review mode.
                   </p>
                   <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkReadiness()}>
                     {apiBusy === "readiness" ? "Checking" : "Check readiness"}
@@ -2924,7 +2924,7 @@ export function CommandWavesConsole() {
                         <p className="text-xs leading-5 text-zinc-500">No launch gaps found in these checks.</p>
                         {launchAuditReadyEvidence.length ? (
                           <div className="grid gap-2 border-t border-zinc-900 pt-2">
-                            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Checked evidence</p>
+                            <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Checked records</p>
                             {launchAuditReadyEvidence.map((item) => (
                               <div key={item.id} className="grid gap-2 sm:grid-cols-[6rem_1fr]">
                                 <Badge className={launchAuditItemClass(item.status)}>{item.status}</Badge>
@@ -3354,7 +3354,7 @@ export function CommandWavesConsole() {
                       </div>
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      Manual evidence only. PR work needs the room decision URL. This does not add live REP, TDH, or weighted voting.
+                      Manual record only. PR work needs the room decision URL. This does not add live REP, TDH, or weighted voting.
                     </p>
                   </div>
                 ) : (
@@ -3503,7 +3503,7 @@ export function CommandWavesConsole() {
                   </Badge>
                 ))}
               </div>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Evidence used</p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Records used</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {contributionReport.evidence.map((item) => (
                   <Badge key={item} className="border-zinc-700 bg-zinc-900 text-zinc-300">
@@ -3569,7 +3569,7 @@ export function CommandWavesConsole() {
                 <div>
               <p className="text-sm leading-6 text-zinc-400">{developerFeePlan.summary}</p>
               <p className="mt-2 text-xs leading-5 text-zinc-500">
-                Planning evidence only. Humans approve the budget and move funds outside this app.
+                Planning record only. Humans approve the budget and move funds outside this app.
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" onClick={() => void copyDeveloperFeePlanDraft()}>
@@ -3583,7 +3583,7 @@ export function CommandWavesConsole() {
               </Badge>
             </div>
             <div className="grid gap-3 xl:grid-cols-3">
-              <CompactList title="Evidence" items={developerFeePlan.evidenceInputs} />
+              <CompactList title="Records" items={developerFeePlan.evidenceInputs} />
               <CompactList title="Decisions" items={developerFeePlan.requiredDecisions} />
               <CompactList title="Blocked" items={developerFeePlan.blockedActions} />
                 </div>

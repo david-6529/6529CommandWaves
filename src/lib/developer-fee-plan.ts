@@ -18,7 +18,7 @@ export function createDeveloperFeePlan(wave: CommandWave, contributionReport: Co
   return {
     mode: "manual_review",
     summary: reviewedWorkCount
-      ? `Manual fee planning can use ${reviewedWorkCount} ${reviewedWorkLabel} and ${visibleContributorCount} ${contributorLabel} as evidence.`
+      ? `Manual fee planning can use ${reviewedWorkCount} ${reviewedWorkLabel} and ${visibleContributorCount} ${contributorLabel} as records.`
       : "Manual fee planning starts after a reviewed change exists.",
     evidenceInputs: [
       "Approved work and vote record.",
@@ -53,10 +53,10 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
     "6529 hook developer fee plan",
     "",
     `6529 discussion: ${wave.waveUrl}`,
-    `GitHub repo: ${wave.repoUrl}`,
+    `Code repo: ${wave.repoUrl}`,
     plan.summary,
     "",
-    "Evidence for human review:",
+    "Records for human review:",
     ...plan.evidenceInputs.map((item) => `- ${item}`),
     "",
     "Visible contributors for review:",

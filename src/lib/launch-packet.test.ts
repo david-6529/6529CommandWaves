@@ -43,7 +43,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Proposal work: 6 report points");
     expect(packet.text).toContain("Decision receipts: 2 report points");
     expect(packet.text).toContain("1 Guardian review proof");
-    expect(packet.text).toContain("## Developer Fee Evidence");
+    expect(packet.text).toContain("## Developer Fee Records");
     expect(packet.text).toContain("## Verification");
     expect(packet.text).toContain("Setup proof: https://hooks.example/api/command-wave/setup/proof");
     expect(packet.text).toContain("Command-wave state: https://hooks.example/api/command-wave/state");

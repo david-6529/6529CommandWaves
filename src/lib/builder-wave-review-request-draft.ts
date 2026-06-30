@@ -9,7 +9,7 @@ function prUrl(execution: ExecutionRecord | null) {
   );
 }
 
-function buildEvidenceLines(execution: ExecutionRecord | null) {
+function buildRecordLines(execution: ExecutionRecord | null) {
   if (!execution) {
     return ["- PR record is not attached yet."];
   }
@@ -35,7 +35,7 @@ export function createBuilderWaveReviewRequestDraft({
     "6529 hook review request",
     "",
     `6529 discussion: ${wave.waveUrl}`,
-    `GitHub repo: ${wave.repoUrl}`,
+    `Code repo: ${wave.repoUrl}`,
     `Work: ${proposal.id} - ${proposal.title}`,
     `PR: ${prUrl(execution) ?? "not recorded yet"}`,
     "",
@@ -46,7 +46,7 @@ export function createBuilderWaveReviewRequestDraft({
     humanizeLegacyCommandCopy(proposal.spec),
     "",
     "Build record:",
-    ...buildEvidenceLines(execution),
+    ...buildRecordLines(execution),
     "",
     "Review checklist:",
     "- PR matches the approved work and limits.",

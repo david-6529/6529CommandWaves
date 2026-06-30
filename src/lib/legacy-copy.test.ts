@@ -14,7 +14,7 @@ describe("legacy command copy", () => {
 
   it("maps old hook builder product language to the current project framing", () => {
     expect(humanizeLegacyCommandCopy("Created 6529 Hook Builder and attached the builder wave plus GitHub repo.")).toBe(
-      "Created 6529 Hook Project and attached the 6529 discussion and GitHub repo.",
+      "Created 6529 Hook Project and attached the 6529 room and code repo.",
     );
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder 6529 decision receipt.")).toBe(
       "Decision recorded a 6529 decision receipt.",

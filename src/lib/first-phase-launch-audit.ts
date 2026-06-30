@@ -298,7 +298,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
         id: "flow_wave_decision_receipt",
         label: "6529 decision receipt",
         status: "ready",
-        detail: `Decision evidence recorded for ${proposal.id}.`,
+        detail: `Decision record exists for ${proposal.id}.`,
         source: "flow",
       },
     ];
@@ -392,7 +392,7 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
         id: "flow_audit_packet",
         label: "Audit packet",
         status: "ready",
-        detail: "Launch packet can include PR, review proof, contribution, and fee evidence.",
+        detail: "Launch packet can include PR, review proof, contribution, and fee records.",
         source: "flow",
       },
     ];

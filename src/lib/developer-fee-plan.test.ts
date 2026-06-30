@@ -33,7 +33,7 @@ describe("developer fee plan", () => {
 
     expect(draft).toContain("6529 hook developer fee plan");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
-    expect(draft).toContain("Evidence for human review:");
+    expect(draft).toContain("Records for human review:");
     expect(draft).toContain("- Contribution report rationale.");
     expect(draft).toContain("Visible contributors for review:");
     expect(draft).toContain("- david: report score");

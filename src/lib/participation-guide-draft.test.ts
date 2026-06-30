@@ -8,7 +8,7 @@ describe("participation guide draft", () => {
 
     expect(draft).toContain("6529 hook participation guide");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Contributor rules: https://github.com/6529-Collections/6529-hook/blob/main/CONTRIBUTING.md");
     expect(draft).toContain("Participation notes:");
     expect(draft).toContain("Builder loop:");
@@ -39,7 +39,7 @@ describe("participation guide draft", () => {
       repoUrl: "not a repo",
     });
 
-    expect(draft).toContain("GitHub repo: not a repo");
+    expect(draft).toContain("Code repo: not a repo");
     expect(draft).not.toContain("Contributor rules:");
   });
 });

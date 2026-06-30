@@ -111,7 +111,7 @@ describe("command wave persistence", () => {
 
     expect(wave.executions[0]?.summary).toBe(demoWave.executions[0]?.summary);
     expect(wave.proposals[0]?.status).toBe("complete");
-    expect(wave.ledger[0]?.message).toBe("Created the 6529 hook project and attached the builder wave plus GitHub repo.");
+    expect(wave.ledger[0]?.message).toBe("Created the 6529 hook project and attached the 6529 room and code repo.");
   });
 
   it("keeps custom local hook demo activity during stale status migration", async () => {

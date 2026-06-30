@@ -22,7 +22,7 @@ describe("launch status draft", () => {
 
     expect(draft).toContain("6529 hook launch status");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain("- Setup check: Verify the wave, repo, contributor rules, and PR template before inviting contributors.");
@@ -33,7 +33,7 @@ describe("launch status draft", () => {
     expect(draft).not.toContain("\u2014");
   });
 
-  it("states when checked evidence has no launch gaps", () => {
+  it("states when checked records have no launch gaps", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({
@@ -71,7 +71,7 @@ describe("launch status draft", () => {
     expect(audit.status).toBe("ready");
     expect(draft).toContain("Status: ready");
     expect(draft).toContain("Next action: Start the first public loop");
-    expect(draft).toContain("- No launch gaps found in the checked evidence.");
+    expect(draft).toContain("- No launch gaps found in the checked records.");
     expect(draft).not.toContain("\u2014");
   });
 });

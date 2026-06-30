@@ -22,7 +22,7 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "6529 hook launch brief",
     "",
     `6529 discussion: ${wave.waveUrl}`,
-    `GitHub repo: ${wave.repoUrl}`,
+    `Code repo: ${wave.repoUrl}`,
     ...(rulesLine ? [rulesLine] : []),
     "",
     "Goal: coordinate the first public build for a non-upgradeable 6529 hook through this discussion and one smart contract repo.",
@@ -44,6 +44,6 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "- Contribution report scores are not REP, TDH, payments, permissions, or merge rights.",
     `- ${participationLine(wave.gates)}`,
     "",
-    "Next step: propose one scoped command, then record the 6529 decision URL before using a Codex packet.",
+    "Next step: propose one scoped hook change, then record the 6529 decision URL before using a Codex packet.",
   ].join("\n");
 }

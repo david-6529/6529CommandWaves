@@ -9,7 +9,7 @@ export type LaunchStatusVerificationTargets = {
 
 function openItemLines(audit: FirstPhaseLaunchAudit) {
   if (!audit.openItems.length) {
-    return ["- No launch gaps found in the checked evidence."];
+    return ["- No launch gaps found in the checked records."];
   }
 
   return audit.openItems.slice(0, 5).map((item) => `- ${item.label}: ${item.detail}`);
@@ -28,7 +28,7 @@ export function createLaunchStatusDraft({
     "6529 hook launch status",
     "",
     `6529 discussion: ${wave.waveUrl}`,
-    `GitHub repo: ${wave.repoUrl}`,
+    `Code repo: ${wave.repoUrl}`,
     `Status: ${audit.statusLabel}`,
     audit.summary,
     "",

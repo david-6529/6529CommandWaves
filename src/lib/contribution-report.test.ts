@@ -14,7 +14,7 @@ describe("contribution report", () => {
     });
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
     expect(report.notes.join(" ")).toContain("REP, TDH, payouts, and merge rights");
-    expect(report.notes.join(" ")).toContain("review, and ledger evidence");
+    expect(report.notes.join(" ")).toContain("review, and ledger records");
     expect(report.coverage.included).toContain("Work proposals stored by this app.");
     expect(report.coverage.included).toContain("Recorded GitHub PR links and Guardian review proof.");
     expect(report.coverage.notIncluded).toContain("Live wave posts that have not been pulled into app state.");
@@ -40,7 +40,7 @@ describe("contribution report", () => {
       proposals: 1,
       decisions: 1,
     });
-    expect(report.contributors[0].rationale).toContain("Recorded 6529 decision evidence");
+    expect(report.contributors[0].rationale).toContain("Recorded 6529 decision receipt");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
   });
 
@@ -50,7 +50,7 @@ describe("contribution report", () => {
     expect(report.generatedAt).toBe("2026-06-20T12:50:00.000Z");
   });
 
-  it("reports no evidence before app activity exists", () => {
+  it("reports no records before app activity exists", () => {
     const report = createContributionReport({
       ...demoWave,
       proposals: [],
@@ -61,7 +61,7 @@ describe("contribution report", () => {
     });
 
     expect(report.summary).toBe("No contributor activity has been recorded yet.");
-    expect(report.evidence).toEqual(["No app evidence recorded yet."]);
+    expect(report.evidence).toEqual(["No app records yet."]);
   });
 
   it("creates a copyable report draft without granting authority", () => {
@@ -72,7 +72,7 @@ describe("contribution report", () => {
 
     expect(draft).toContain("6529 hook contribution report");
     expect(draft).toContain("Generated: 2026-06-21T12:00:00.000Z");
-    expect(draft).toContain("Evidence:");
+    expect(draft).toContain("Records:");
     expect(draft).toContain("- 1 GitHub PR link");
     expect(draft).toContain("Coverage included:");
     expect(draft).toContain("- Work proposals stored by this app.");

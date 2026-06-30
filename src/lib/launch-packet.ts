@@ -181,7 +181,7 @@ function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
     `- Build: ${execution.status}`,
     `- Harness: ${execution.harness}`,
     `- Summary: ${humanizeLegacyCommandCopy(execution.summary)}`,
-    "- Build evidence:",
+    "- Build records:",
     ...limitedList(buildEvidenceItems(execution.artifacts), 6, "No build artifacts recorded."),
   ];
 }
@@ -216,8 +216,8 @@ function contributionLines(report: ContributionReport) {
     `- Summary: ${report.summary}`,
     "- Scoring rubric:",
     ...limitedList(report.scoringRubric, 6, "No scoring rubric recorded."),
-    "- Evidence used:",
-    ...limitedList(report.evidence, 6, "No app evidence recorded yet."),
+    "- Records used:",
+    ...limitedList(report.evidence, 6, "No app records yet."),
     "- Visible contributors:",
     ...limitedList(contributors, 6, "No visible contributors yet."),
     "- Notes:",
@@ -317,7 +317,7 @@ export function createLaunchPacket({
     "## Contribution Report",
     ...contributionLines(contributionReport),
     "",
-    "## Developer Fee Evidence",
+    "## Developer Fee Records",
     ...feeLines(developerFeePlan),
     "",
     "## Verification",

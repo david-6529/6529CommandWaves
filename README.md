@@ -1,60 +1,57 @@
-# 6529 Command Waves
+# 6529 Hook Room
 
 ## Short Version
 
-Command Waves is a shared workspace for building open source hooks in public. The first proof project is the 6529 Hook.
+6529 Hook Room is a simple coordination app for building the 6529 hook in public.
 
-For the first public phase, the product is simple: builders use one public 6529 room and one GitHub repo to propose,
-approve, build, and review small hook changes. Low-risk work can move quickly. Important or risky changes need a visible
-6529 decision before they enter the repo. A reviewer gate checks PRs in CI against the approved command, rules, risk, and
-hook guardrails before humans merge.
+The first public phase connects one 6529 room to one smart contract repo. Builders talk in the room, turn one idea into a
+small proposal, record the 6529 decision, build a draft PR, review it, and share the result back with a clear log.
 
-The same loop can become a reusable public open source protocol later. The first launch stays focused on one hook, one
-6529 room, and one GitHub smart contract repo. The app shows the current task, recent room context, GitHub PR
-state, code review evidence, activity log, and contribution report.
+The same loop can become reusable infrastructure for public open source work later. For now, the product stays focused on
+one successful hook build.
 
-The app keeps the loop visible:
+The builder flow is:
 
-1. Review who can participate.
-2. Share ideas in the room.
-3. Propose one PR-sized change.
-4. Decide whether it should enter the repo.
-5. Build the PR.
-6. Review the result before humans merge.
-7. Log what happened.
+1. Choose the hook project.
+2. Read what is happening now.
+3. Chat with the room.
+4. Suggest one small change.
+5. Record the room decision.
+6. Build the PR.
+7. Review before humans merge.
+8. Share the update.
 
-The simple project view is:
+The simple product shape is:
 
 `Access -> Room -> PR -> Review`
 
 ## Current Status
 
-This repo is an MVP prototype for one public hook-building room. The first target is the 6529 Hook. The product direction
-is a standalone project site now, with a reusable public hook-building platform possible later once the first loop works.
+This repo is an MVP prototype for one public hook-building room. The app is a standalone 6529 Hook project site first. It
+is designed so the same pattern can become a broader public builder protocol after the first loop works.
 
 What exists now:
 
-- A Next app product surface named `6529 Hook Room`.
-- One active 6529 hook project connected to one public 6529 room and one GitHub repo.
-- A room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and a simple
-  proposal flow.
-- Work types for Code PR, Question, Update, and Context.
-- Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets,
-  Codex work packets, and contribution reports.
-- Scoped API routes for setup, proposals, local votes, decision receipts, PR evidence, reviews, launch audit, setup proof,
-  and public command-wave state.
-- Hook proposal preflight checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder
-  authority claims.
-- A deterministic reviewer foundation with Command Waves manifests, guardian attestations, proof replay, risky path checks,
-  and hook contract signal checks.
-- Local file storage for the demo flow and optional Postgres storage via `db/001_command_waves.sql`.
+- A Next app product surface focused on the `6529 Hook Room`.
+- One active hook project with a public 6529 room and a code repo.
+- A room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and proposal
+  flow.
+- Simple work types: Code PR, Question, Update, and Context.
+- Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets, Codex work
+  packets, and contribution reports.
+- Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
+- Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
+  and public project state.
+- A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
+  contract signal checks.
+- Local file storage for the demo flow and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
 What remains manual or MVP-only:
 
-- 6529 posting is still manual. The app drafts text and opens the discussion, but a human posts it.
+- 6529 posting is still manual. The app drafts text and opens the room, but a human posts it.
 - REP, TDH, holder, allowlist, and QnA gates are advisory notes until live wallet/session/score checks are wired.
-- Local votes are app records. PR commands require a manually recorded 6529 decision URL before code work starts.
-- Codex execution is a controlled packet and local/demo adapter today, not autonomous production branch creation.
+- Local votes are app records. PR work requires a manually recorded 6529 decision URL before code work starts.
+- Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation.
 - The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
   deploy, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
@@ -63,23 +60,23 @@ What remains manual or MVP-only:
 
 What we are working on next:
 
-1. Keep simplifying the first screen so it feels like an active coordination room, not a guide.
-2. Make it obvious what is happening with the hook, who is involved, and how a new builder can help.
-3. Finish the first public loop: discussion, scoped proposal, 6529 decision, PR evidence, reviewer proof, and share-back.
+1. Keep the first screen focused on the active hook room, not a guide.
+2. Make it obvious what is happening, who is involved, and how a new builder can help.
+3. Finish the first public loop: discussion, scoped proposal, 6529 decision, PR record, reviewer proof, and share-back.
 4. Harden persistence, auth, live 6529 reads, GitHub branch/PR operations, and external guardian trust boundaries.
 5. Expand contribution analysis after the workflow is useful and understandable.
 
 ## Why This Exists
 
-Agents are useful, but broad tool access gets dangerous when a group is moving at prompt speed. In phase 1, agents only
-help with reads, drafts, discussion updates, and PR commands.
+Agents can help builders move faster, but broad tool access gets risky when a group is moving quickly. In phase 1, agents
+only help with reads, drafts, room updates, and PR work after the rules allow it.
 
-Command Waves make the answers visible:
+The app makes the important answers visible:
 
 - Who decided this work should happen?
-- Did the command need a vote?
+- Did the work need a vote?
 - Did quorum pass?
-- What tool or agent ran the command?
+- What tool or agent prepared the work?
 - What changed?
 - Was the result reviewed?
 - Can humans audit the chain later?
@@ -94,7 +91,7 @@ The first public phase:
 4. Propose hook work in plain English with clear limits.
 5. Let orchestration rules classify risk and require votes for important changes.
 6. Let an agent help produce a PR when allowed.
-7. Review the PR in CI against the approved command, rules, and hook guardrails.
+7. Review the PR in CI against the approved proposal, rules, and hook guardrails.
 8. Show recent activity and a transparent contribution report.
 9. Keep the full audit log available.
 
@@ -110,7 +107,7 @@ The first public phase is a governed hook-building workflow controlled by one pu
 Current trust controls:
 
 - The MVP guardian is a repo-local GitHub Action named `Command Waves Guardian`.
-- PRs must carry a Command Waves manifest that ties code changes back to an approved wave command.
+- PRs must carry a Command Waves manifest that ties code changes back to an approved room proposal.
 - The guardian writes replayable proof artifacts: `guardian-attestation.json`, `guardian-wave-state.json`, and
   `guardian-pr-evidence.json`.
 - `npm run guardian:verify-proof` replays the guardian decision from those artifacts.
@@ -141,7 +138,7 @@ Short version:
 - Keep 6529 waves as the social/source-of-truth surface.
 - Use the app as the control panel for setup, rules, jobs, and audit views.
 - Reputation can route work, but permissions are the real security boundary.
-- Agents request actions; the platform decides what is allowed.
+- Agents request actions; the app decides what is allowed.
 - Design for local mock mode first, then production adapters.
 - Log every meaningful state transition.
 
@@ -153,7 +150,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 Default workspace:
 
 - Current hook task, next proposal, and project activity.
-- Links to the room, GitHub repo, current PR, and reviewed work.
+- Links to the room, code repo, current PR, and reviewed work.
 - Builder message composer with latest-post preview and copyable discussion draft.
 - Simple proposal form for one PR-sized hook change with limits and success criteria.
 - Builder list with 6529 profile links and informational activity points.
@@ -164,13 +161,13 @@ Safety and review:
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer gate foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
-- PR patch checks for upgradeability, delegatecall, deployment, governance, and parameter writes when patch evidence exists.
+- PR patch checks for upgradeability, delegatecall, deployment, governance, and parameter writes when patch records exist.
 
 Audit and launch:
 
 - Recent activity log with export.
-- Activity report drawer for app evidence and manual planning context.
-- Launch checklist with setup, readiness, checklist, and next-action evidence.
+- Activity report drawer for app records and manual planning context.
+- Launch checklist with setup, readiness, checklist, and next-action records.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 
@@ -178,7 +175,7 @@ Maintainer setup:
 
 - Collapsed project setup and guardrail controls at the bottom of the page.
 - 6529 wave search by name or pasted wave URL/ID.
-- GitHub repo link and setup validation for contributor rules and PR template markers.
+- Code repo link and setup validation for contributor rules and PR template markers.
 - Local file persistence and Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
 ## Run Locally
@@ -218,8 +215,8 @@ keeps them warning-only for the first public loop.
 
 ## Durable Storage
 
-For a small first loop, local file storage can prove the wave-to-PR workflow while 6529 holds the public discussion and
-decision receipts. Before broad participation, use Postgres so setup, proposals, votes, decisions, PR evidence, reviews,
+For a small first loop, local file storage can prove the room-to-PR workflow while 6529 holds the public discussion and
+decision receipts. Before broad participation, use Postgres so setup, proposals, votes, decisions, PR records, reviews,
 and ledger events survive server restarts.
 
 1. Create a Postgres database.
@@ -254,7 +251,7 @@ Run the same deterministic verifier checks locally:
 npm run guardian:check
 ```
 
-Run the PR evidence adapter against a GitHub pull request event:
+Run the PR record adapter against a GitHub pull request event:
 
 ```bash
 GITHUB_EVENT_PATH=event.json COMMAND_WAVE_STATE_PATH=wave.json npm run guardian:pr-check
@@ -272,15 +269,15 @@ npm run guardian:verify-proof
 For local demos only, set `COMMAND_WAVE_ALLOW_DEMO_STATE=true` to use the built-in demo wave state.
 
 When the PR adapter runs in GitHub Actions, it writes `guardian-attestation.json`, writes the exact
-`guardian-wave-state.json` snapshot it checked, writes `guardian-pr-evidence.json`, appends a Markdown proof summary to the
-job summary, replays the proof, and uploads the files as a `guardian-proof` workflow artifact.
+`guardian-wave-state.json` snapshot it checked, writes `guardian-pr-evidence.json`, appends a Markdown proof summary to
+the job summary, replays the proof, and uploads the files as a `guardian-proof` workflow artifact.
 
-The attestation includes hashes of the wave state, proposal, poll, rules, PR manifest, and changed paths. The replay
+The attestation includes hashes of the room state, proposal, poll, rules, PR manifest, and changed paths. The replay
 script recomputes the guardian result from the uploaded artifacts. That is the simple fairness proof: anyone with the same
 inputs can rerun the deterministic guardian and get the same result.
 
 This is the simple first step. The PR adapter feeds changed paths, PR manifests, and wave state into the same verifier so
-GitHub can block merges that do not match the wave rules. Pull requests without a Command Waves manifest fail the guardian
+GitHub can block merges that do not match the room rules. Pull requests without a Command Waves manifest fail the guardian
 check instead of bypassing it.
 
 The current guardian enforcement mode is `repo_local_github_action`. That is good enough for the MVP because guardian code
@@ -313,8 +310,8 @@ Verify a published setup proof against GitHub required-check payloads:
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
 ```
 
-When the setup proof includes `commandWaveStateUrl`, the same command also checks that the state URL returns the governed wave
-and a matching state hash.
+When the setup proof includes `commandWaveStateUrl`, the same command also checks that the state URL returns the governed
+room state and a matching state hash.
 
 For a stricter production audit that fails until the guardian is external to the repo:
 
@@ -342,7 +339,7 @@ LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=
 
 The command exits nonzero until the launch audit is ready. For offline verification, set `LAUNCH_AUDIT_PATH`.
 
-Expose the current command-wave state to the guardian with:
+Expose the current room state to the guardian with:
 
 ```bash
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
@@ -360,7 +357,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `PUT /api/command-wave`: disabled in phase 1. Use scoped setup, proposal, vote, decision, run, and review routes.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.
 - `DELETE /api/command-wave`: reset the local demo.
-- `POST /api/command-wave/proposals`: submit a command proposal.
+- `POST /api/command-wave/proposals`: submit a work proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
 - `POST /api/command-wave/decision`: record a manual 6529 decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from the room.
 - `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded 6529 decision receipt.

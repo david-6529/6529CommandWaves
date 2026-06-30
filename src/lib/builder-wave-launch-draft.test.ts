@@ -8,7 +8,7 @@ describe("builder wave launch draft", () => {
 
     expect(draft).toContain("6529 hook launch brief");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Contributor rules: https://github.com/6529-Collections/6529-hook/blob/main/CONTRIBUTING.md");
     expect(draft).toContain("coordinate the first public build for a non-upgradeable 6529 hook");
     expect(draft).toContain("Wait for a 6529 decision before PR work starts.");
@@ -38,7 +38,7 @@ describe("builder wave launch draft", () => {
       repoUrl: "not a repo",
     });
 
-    expect(draft).toContain("GitHub repo: not a repo");
+    expect(draft).toContain("Code repo: not a repo");
     expect(draft).not.toContain("Contributor rules:");
   });
 });

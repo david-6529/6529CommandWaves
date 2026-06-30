@@ -11,7 +11,7 @@ export const firstPhaseScopeInventory: PhaseScopeInventory = {
     "Manual 6529 decision receipts before PR work runs.",
     "Codex work packets for prepared branches and draft PRs.",
     "Reviewer checks for manifests, risky files, caps, and hook guardrails.",
-    "Contribution and fee evidence for separate human decisions.",
+    "Contribution and fee records for separate human decisions.",
   ],
   parkLater: [
     "Live REP, TDH, holder, allowlist, or QnA authority.",

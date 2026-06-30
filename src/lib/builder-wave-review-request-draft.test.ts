@@ -12,7 +12,7 @@ describe("builder wave review request draft", () => {
 
     expect(draft).toContain("6529 hook review request");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain(`Work: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
     expect(draft).toContain("PR: https://github.com/6529-Collections/6529-hook/pull/12");
     expect(draft).toContain("Build record:");

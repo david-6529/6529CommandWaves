@@ -12,11 +12,11 @@ describe("6529 decision draft", () => {
 
     expect(draft).toContain("6529 hook decision request");
     expect(draft).toContain(`6529 discussion: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`GitHub repo: ${demoWave.repoUrl}`);
-    expect(draft).toContain(`Command: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
+    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Proposal: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
     expect(draft).toContain("Local tally: 5 yes, 1 no.");
     expect(draft).toContain("Decision needed: approve, reject, or ask for edits");
-    expect(draft).toContain("link the 6529 decision drop URL back into Command Waves");
+    expect(draft).toContain("link the 6529 decision drop URL back into the app");
     expect(draft).not.toContain("\u2014");
   });
 
