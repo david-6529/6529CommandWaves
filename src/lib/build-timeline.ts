@@ -91,7 +91,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
       detail: "Add the decision URL before PR work starts.",
       status: "current",
       href: wave.waveUrl,
-      hrefLabel: "Open discussion",
+      hrefLabel: "Open 6529",
     };
   }
 
@@ -102,7 +102,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     detail: "Code work waits for a visible 6529 decision.",
     status: "current",
     href: wave.waveUrl,
-    hrefLabel: "Open discussion",
+    hrefLabel: "Open 6529",
   };
 }
 
