@@ -1807,7 +1807,7 @@ export function CommandWavesConsole() {
               {!activeProposal ? (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-base leading-7 text-zinc-400">Start with one small, testable hook change.</p>
-                  <JumpLink href="#start-building">Propose</JumpLink>
+                  <JumpLink href="#start-building">Suggest work</JumpLink>
                 </div>
               ) : activePollCanVote ? (
                 <div className="mt-2 grid gap-3">
@@ -1819,12 +1819,6 @@ export function CommandWavesConsole() {
                       Copy decision request
                     </Button>
                     {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
-                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
-                      Log local yes
-                    </Button>
-                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
-                      Log local no
-                    </Button>
                   </div>
                   {decisionDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
                 </div>
@@ -3277,7 +3271,7 @@ export function CommandWavesConsole() {
                         <p className="text-sm font-semibold text-zinc-100">{activePollTitle}</p>
                         <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
-                          <p className="mt-1 text-xs text-zinc-500">Voting as {proposer || "unnamed voter"}.</p>
+                          <p className="mt-1 text-xs text-zinc-500">Local test vote as {proposer || "unnamed voter"}.</p>
                         ) : null}
                       </div>
                       <Badge className={statusClass(activePoll.status)}>{activePoll.status.replaceAll("_", " ")}</Badge>
@@ -3297,10 +3291,10 @@ export function CommandWavesConsole() {
                     {activePollCanVote ? (
                       <div className="mt-3 flex gap-2">
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
-                          Log yes
+                          Record local yes
                         </Button>
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
-                          Log no
+                          Record local no
                         </Button>
                       </div>
                     ) : null}
