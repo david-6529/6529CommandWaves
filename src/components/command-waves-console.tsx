@@ -1337,7 +1337,7 @@ export function CommandWavesConsole() {
     }
   }
 
-  async function copyBuilderWaveChatDraft() {
+  async function copyBuilderWaveChatDraft({ openDiscussion = false } = {}) {
     if (!waveRoomMessage.trim()) {
       setWaveRoomNotice("Write a message first.");
       return;
@@ -1345,6 +1345,12 @@ export function CommandWavesConsole() {
 
     try {
       await navigator.clipboard.writeText(builderWaveChatDraft);
+      if (openDiscussion && wave.waveUrl) {
+        window.open(wave.waveUrl, "_blank", "noopener,noreferrer");
+        setWaveRoomNotice("Discussion post copied. Opened 6529 discussion.");
+        return;
+      }
+
       setWaveRoomNotice("Discussion post copied.");
     } catch {
       setWaveRoomNotice("Copy failed. Select the discussion post and copy it manually.");
@@ -1789,6 +1795,13 @@ export function CommandWavesConsole() {
                 />
               </Field>
               <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  disabled={!waveRoomMessage.trim() || !wave.waveUrl}
+                  onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
+                >
+                  Copy and open
+                </Button>
                 <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
                   Copy discussion post
                 </Button>
