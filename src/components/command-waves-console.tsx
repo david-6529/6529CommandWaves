@@ -237,6 +237,15 @@ type WaveSearchResponse = ApiErrorPayload & {
   results?: WaveSearchResult[];
 };
 
+type RoomPostResponse = ApiErrorPayload & {
+  post?: {
+    waveId: string;
+    dropId: string | null;
+    url: string | null;
+    mode: "mock" | "live";
+  };
+};
+
 type SetupValidationResponse = ApiErrorPayload & {
   validation?: SetupValidation;
 };
@@ -311,6 +320,29 @@ async function requestContextPreview(waveId: string) {
   }
 
   return payload.preview;
+}
+
+async function requestRoomPost(waveUrl: string, content: string, accessKey?: string) {
+  const headers = new Headers();
+
+  headers.set("content-type", "application/json");
+  attachAdminApiKey(headers, accessKey);
+
+  const response = await fetch("/api/6529/room-post", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      waveUrl,
+      content,
+    }),
+  });
+  const payload = (await response.json()) as RoomPostResponse;
+
+  if (!response.ok || !payload.post) {
+    throw new Error(formatApiError(payload, "Room post failed."));
+  }
+
+  return payload.post;
 }
 
 function contextModeLabel(preview: WaveContextPreview) {
@@ -393,6 +425,7 @@ type BusyState =
   | "readiness"
   | "search"
   | "context"
+  | "roomPost"
   | "proposal"
   | "vote"
   | "decision"
@@ -797,6 +830,7 @@ export function CommandWavesConsole() {
   const [contributionReportNotice, setContributionReportNotice] = useState("");
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
+  const [roomPostUrl, setRoomPostUrl] = useState("");
   const [waveRoomMessage, setWaveRoomMessage] = useState("");
   const [selectedMemberIdentity, setSelectedMemberIdentity] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
@@ -1048,6 +1082,8 @@ export function CommandWavesConsole() {
     () => createBuilderWaveChatDraft(wave, phaseNextAction, waveRoomMessage),
     [phaseNextAction, wave, waveRoomMessage],
   );
+  const roomPostTargetUrl = primaryHookProject?.waveUrl ?? wave.waveUrl;
+  const canPostRoomMessage = Boolean(waveRoomMessage.trim() && roomPostTargetUrl);
   const builderWaveQuickPosts = useMemo(
     () => createBuilderWaveQuickPosts({ handle: proposer, title: currentFocusTitle }),
     [currentFocusTitle, proposer],
@@ -1251,6 +1287,7 @@ export function CommandWavesConsole() {
     setContributionReportNotice("");
     setDeveloperFeePlanNotice("");
     setWaveRoomNotice("");
+    setRoomPostUrl("");
     setProjectContextPreviews({});
     setSetupContextPreview(null);
     setDecisionDraftNotice("");
@@ -1481,9 +1518,39 @@ export function CommandWavesConsole() {
     }
   }
 
+  async function postBuilderWaveChatDraft() {
+    if (!waveRoomMessage.trim()) {
+      setWaveRoomNotice("Write a message first.");
+      return;
+    }
+
+    if (!roomPostTargetUrl) {
+      setWaveRoomNotice("Choose a room before posting.");
+      return;
+    }
+
+    setApiBusy("roomPost");
+    setApiError("");
+    setWaveRoomNotice("");
+    setRoomPostUrl("");
+
+    try {
+      const post = await requestRoomPost(roomPostTargetUrl, builderWaveChatDraft, accessKey);
+
+      setWaveRoomMessage("");
+      setRoomPostUrl(post.url ?? "");
+      setWaveRoomNotice(post.mode === "mock" ? "Posted to the mock room." : "Posted to the room.");
+    } catch (error) {
+      setWaveRoomNotice(error instanceof Error ? error.message : "Room post failed.");
+    } finally {
+      setApiBusy(null);
+    }
+  }
+
   function resetBuilderWaveChatDraft() {
     setWaveRoomMessage("");
     setWaveRoomNotice("Message cleared.");
+    setRoomPostUrl("");
   }
 
   function showMemberProfile(identity: string) {
@@ -1963,6 +2030,15 @@ export function CommandWavesConsole() {
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
                   type="button"
+                  variant={canPostRoomMessage ? "primary" : "secondary"}
+                  disabled={isBusy || !canPostRoomMessage}
+                  onClick={() => void postBuilderWaveChatDraft()}
+                >
+                  {apiBusy === "roomPost" ? "Posting" : "Post to room"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
                   disabled={!waveRoomMessage.trim() || !wave.waveUrl}
                   onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
                 >
@@ -1986,6 +2062,16 @@ export function CommandWavesConsole() {
                 </Button>
               </div>
               {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
+              {roomPostUrl ? (
+                <a
+                  className="mt-1 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                  href={roomPostUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open posted message
+                </a>
+              ) : null}
             </div>
 
             {visibleRoomMembers.length ? (

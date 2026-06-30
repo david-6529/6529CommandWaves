@@ -48,7 +48,8 @@ What exists now:
 
 What remains manual or MVP-only:
 
-- 6529 posting is still manual. The app drafts text and opens the room, but a human posts it.
+- Room posting works when a 6529 bot wallet is configured. Without bot credentials, the app drafts text and opens the
+  room for a human to post manually.
 - REP, TDH, holder, allowlist, and QnA gates are advisory notes until live wallet/session/score checks are wired.
 - Local votes are app records. PR work requires a manually recorded 6529 decision URL before code work starts.
 - Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation.
@@ -151,7 +152,7 @@ Default workspace:
 
 - Current hook task, next proposal, and project activity.
 - Links to the room, code repo, current PR, and reviewed work.
-- Builder message composer with latest-post preview and copyable discussion draft.
+- Builder message composer with direct room posting when configured, latest-post preview, and copyable discussion draft.
 - Simple proposal form for one PR-sized hook change with limits and success criteria.
 - Builder list with 6529 profile links and informational activity points.
 
@@ -189,6 +190,8 @@ npm run dev
 Open the local URL printed by Next.
 
 6529 mock mode is the safe default. Set `6529_MOCK_MODE=false` only when you are ready to use the live 6529 API.
+Room posting also requires `6529_BOT_BEARER_TOKEN` and `6529_BOT_WALLET_ADDRESS`; otherwise builders can copy the draft
+and post manually in the room.
 
 With the example env, command-wave demo state is stored in `.data/command-wave.json`.
 
@@ -349,6 +352,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
+- `POST /api/6529/room-post`: post a human-triggered chat message when the bot wallet is configured.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
@@ -364,9 +368,9 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.
 
-Command-wave mutation routes are open only for local demo mode when `ADMIN_API_KEY` is blank. Once `ADMIN_API_KEY` is set,
-send it as either `x-admin-api-key: <key>` or `Authorization: Bearer <key>`. In production, missing `ADMIN_API_KEY` is a
-server misconfiguration and mutations fail closed.
+Command-wave mutation routes and room posting are open only for local demo mode when `ADMIN_API_KEY` is blank. Once
+`ADMIN_API_KEY` is set, send it as either `x-admin-api-key: <key>` or `Authorization: Bearer <key>`. In production,
+missing `ADMIN_API_KEY` is a server misconfiguration and protected actions fail closed.
 
 The web console has a collapsed **Access key** field in setup. It stores the key in browser session storage and sends it
 only for protected actions. This is an MVP bridge for testing protected routes; production should replace it with proper
