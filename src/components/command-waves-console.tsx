@@ -87,6 +87,12 @@ const roomRuleHighlights = [
   "Decision before PR work.",
   "Reviewer check before merge.",
 ];
+const publicLaunchSetupItems = [
+  ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
+  ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
+  ["6529_MOCK_MODE=false", "Uses live 6529 reads instead of local mock data."],
+  ["COMMAND_WAVE_STATE_URL", "Gives guardian PR checks the public wave state."],
+];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
   "hook_parameter_explicit_bound",
@@ -2697,6 +2703,17 @@ export function CommandWavesConsole() {
                   <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void checkReadiness()}>
                     {apiBusy === "readiness" ? "Checking" : "Check readiness"}
                   </Button>
+                  <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Public launch setup</p>
+                    <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {publicLaunchSetupItems.map(([name, detail]) => (
+                        <div key={name} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0 sm:first:border-t sm:first:pt-2">
+                          <dt className="break-all text-sm font-semibold text-zinc-100">{name}</dt>
+                          <dd className="mt-1 text-xs leading-5 text-zinc-500">{detail}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
                   <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
                     <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Review proof URLs</p>
                     <div className="mt-3 grid gap-3 lg:grid-cols-3">

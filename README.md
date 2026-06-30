@@ -82,7 +82,7 @@ artifacts. Until then, the MVP is useful and auditable, but not the strongest po
 First launch tasks:
 
 1. Pick the first real 6529 discussion and hook repo, then publish the launch playbook.
-2. Wire live 6529 proposal and vote state into `COMMAND_WAVE_STATE_URL`.
+2. Set `COMMAND_WAVE_STATE_URL` to the deployed `/api/command-wave/state` endpoint before making the guardian a required PR check.
 
 Hardening tasks after the first public loop:
 
@@ -158,6 +158,21 @@ Before opening a PR, run the local app gate:
 ```bash
 npm run verify
 ```
+
+## First Public Launch Env
+
+Before inviting broad participation, set the first-loop launch variables:
+
+```bash
+NEXT_PUBLIC_APP_URL=https://your-app.example
+ADMIN_API_KEY=<strong random key>
+6529_MOCK_MODE=false
+COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
+```
+
+`ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR
+checks the public wave state. Postgres storage and the GitHub PR adapter are useful hardening steps, but the launch audit
+keeps them warning-only for the first public loop.
 
 ## Durable Storage
 
@@ -280,7 +295,7 @@ For offline verification, set `SETUP_PROOF_PATH` and `SETUP_GITHUB_PAYLOADS_PATH
 Verify the first-loop launch audit:
 
 ```bash
-LAUNCH_AUDIT_URL=https://your-app.example/api/command-wave/launch/audit npm run launch:audit
+LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=1' npm run launch:audit
 ```
 
 The command exits nonzero until the launch audit is ready. For offline verification, set `LAUNCH_AUDIT_PATH`.

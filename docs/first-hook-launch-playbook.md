@@ -66,6 +66,15 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 
 ## Launch Sequence
 
+Public launch env:
+
+```bash
+NEXT_PUBLIC_APP_URL=https://your-app.example
+ADMIN_API_KEY=<strong random key>
+6529_MOCK_MODE=false
+COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
+```
+
 1. Pick the builder wave and GitHub repo.
 2. Run the launch check once to expose setup blockers.
 3. Confirm the hook repo has `CONTRIBUTING.md` and a PR template with Command Waves manifest markers.
@@ -85,10 +94,10 @@ A QnA gate can be useful for onboarding, but it should stay manual in this phase
 17. Use the contribution report and fee plan as evidence for any separate payout vote.
 18. Review the wave update draft and share it manually in the builder wave.
 19. Keep the launch packet with the PR so later contributors can audit the loop.
-20. Run the launch check again and fix blockers before broad participation.
+20. Run the launch audit with `?remote=1` and fix blockers before broad participation.
 
-The launch check focuses on the first public loop. Warning-only hardening items such as Postgres storage, the GitHub PR adapter,
-and required-check wave-state sources can wait until broader participation, but failed or misconfigured items still block.
+The launch check focuses on the first public loop. Postgres storage and the GitHub PR adapter are warning-only hardening
+items for this first loop. Failed checks still block broad participation.
 
 ## Success Criteria
 
