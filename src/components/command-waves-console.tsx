@@ -26,7 +26,6 @@ import { createContributionReport, createContributionReportDraft } from "@/lib/c
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { commandWaveProductCopy } from "@/lib/product-copy";
-import { createHookProgress, type HookProgressStatus } from "@/lib/hook-progress";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import {
   createFirstPhaseLaunchAudit,
@@ -450,22 +449,6 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
 
   if (status === "active") {
     return statusClass("reviewing");
-  }
-
-  return "border-zinc-700 bg-zinc-900 text-zinc-400";
-}
-
-function hookProgressStatusClass(status: HookProgressStatus) {
-  if (status === "done") {
-    return statusClass("complete");
-  }
-
-  if (status === "current") {
-    return statusClass("reviewing");
-  }
-
-  if (status === "blocked") {
-    return statusClass("blocked");
   }
 
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
@@ -957,8 +940,6 @@ export function CommandWavesConsole() {
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
-  const activePrLinkLabel = readyForNextHookChange ? "Open last PR" : "Open PR";
-  const hookProgress = useMemo(() => createHookProgress(wave, title), [title, wave]);
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -1166,17 +1147,6 @@ export function CommandWavesConsole() {
             : activeProposal
               ? "Follow the next open step for this hook change."
               : "Choose one small hook change the room can discuss.";
-  const roomDashboardItems = [
-    ["Current change", currentFocusTitle],
-    ["Next move", roomNeedLabel],
-    [
-      "Room",
-      hasRecentDiscussionPosts && primaryProjectContextPreview
-        ? `${primaryProjectContextPreview.dropCount} 6529 posts`
-        : `${roomFeed.length} updates`,
-    ],
-    ["Builders", `${builderRoster.length} visible`],
-  ];
   const visibleRoomMembers = builderRoster.slice(0, 3);
   const selectedMember =
     builderRoster.find((member) => member.identity === selectedMemberIdentity) ?? builderRoster[0] ?? null;
@@ -1754,7 +1724,7 @@ export function CommandWavesConsole() {
   return (
     <main className="min-h-screen bg-black text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-800 pb-5">
+        <header className="border-b border-zinc-800 pb-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-4xl">
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">
@@ -1764,21 +1734,18 @@ export function CommandWavesConsole() {
                 {commandWaveProductCopy.headline}
               </h1>
               <p className="mt-2 max-w-3xl text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm leading-6 text-zinc-400">
+                <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{commandWaveProductCopy.simpleFlow}</Badge>
+                <span>{roomNeedLabel}</span>
+                <span>{builderRoster.length} visible builders</span>
+              </div>
             </div>
             <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-              <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
-              <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{commandWaveProductCopy.simpleFlow}</Badge>
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
+              {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Repo</LinkButton> : null}
             </div>
           </div>
-
-          <dl className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {roomDashboardItems.map(([label, value]) => (
-              <div key={label} className="rounded-md border border-zinc-800 bg-zinc-950/60 p-3">
-                <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
-                <dd className="mt-1 text-base font-semibold leading-6 text-zinc-100">{value}</dd>
-              </div>
-            ))}
-          </dl>
 
           <nav className="mt-4 flex flex-wrap gap-2" aria-label="Room actions">
             <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -1788,8 +1755,6 @@ export function CommandWavesConsole() {
             <JumpLink href="#start-building">Propose change</JumpLink>
             <JumpLink href="#active-builders">Members</JumpLink>
             <JumpLink href="#recent-activity">Activity</JumpLink>
-            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
-            {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Repo</LinkButton> : null}
           </nav>
         </header>
 
@@ -1797,7 +1762,7 @@ export function CommandWavesConsole() {
           <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current hook change</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Now</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
@@ -1805,44 +1770,25 @@ export function CommandWavesConsole() {
             <p className="mt-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
 
             <div className="mt-4 rounded-md border border-cyan-800/70 bg-cyan-950/20 p-3">
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-200">Next move</p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-200">Do next</p>
+                <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{roomNeedLabel}</Badge>
+              </div>
               <p className="mt-1 text-base leading-7 text-zinc-100">{roomNeedDetail}</p>
             </div>
 
-            <ol className="mt-4 grid grid-cols-2 gap-2 border-y border-zinc-800 py-3 sm:grid-cols-4">
-              {hookProgress.map((step) => (
-                <li key={step.id} className="border-t border-zinc-800 pt-2 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{step.label}</p>
-                    <Badge className={hookProgressStatusClass(step.status)}>{step.status}</Badge>
-                  </div>
-                  <p className="mt-1 hidden text-sm leading-6 text-zinc-400 sm:block">{step.detail}</p>
-                </li>
-              ))}
-            </ol>
-
             {primaryHookProject ? (
-              <div className="mt-4 grid gap-3 border-y border-zinc-800 py-3 sm:grid-cols-[1fr_auto]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Access</p>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
-                  </div>
-                  <p className="mt-1 text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
+              <div className="mt-4 border-t border-zinc-800 pt-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
                 </div>
-                <div className="flex flex-wrap gap-2 sm:justify-end">
-                  <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
-                    Ask to join
-                  </Button>
-                  {primaryHookProject.waveUrl ? <LinkButton href={primaryHookProject.waveUrl}>Discussion</LinkButton> : null}
-                  {primaryHookProject.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Repo</LinkButton> : null}
-                  {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>{activePrLinkLabel}</LinkButton> : null}
-                </div>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-500">{participationAccess.summary}</p>
               </div>
             ) : null}
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next move</p>
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Actions</p>
               {!activeProposal ? (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-base leading-7 text-zinc-400">Start with one small, testable hook change.</p>
