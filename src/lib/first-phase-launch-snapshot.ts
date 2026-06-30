@@ -69,6 +69,7 @@ export async function createFirstPhaseLaunchSnapshot(
     wave,
   });
   const commandWaveStateUrl = commandWaveStateUrlFromEnv(env) ?? appRouteUrl("/api/command-wave/state", env);
+  const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
 
   return {
     version: "command-wave-launch-audit-v0.1",
@@ -83,7 +84,7 @@ export async function createFirstPhaseLaunchSnapshot(
     verificationTargets: {
       setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
       commandWaveStateUrl,
-      launchAuditUrl: appRouteUrl("/api/command-wave/launch/audit", env),
+      launchAuditUrl: appRouteUrl(launchAuditPath, env),
     },
     setupValidation,
     readiness: {

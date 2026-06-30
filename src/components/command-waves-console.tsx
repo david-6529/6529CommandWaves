@@ -207,6 +207,7 @@ const wavePreviewMaxMessages = 50;
 const setupProofPath = "/api/command-wave/setup/proof";
 const commandWaveStatePath = "/api/command-wave/state";
 const launchAuditPath = "/api/command-wave/launch/audit";
+const remoteLaunchAuditPath = `${launchAuditPath}?remote=1`;
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
   const headers = new Headers(init?.headers);
@@ -956,7 +957,7 @@ export function CommandWavesConsole() {
     () => ({
       setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
-      launchAuditUrl: appUrlFromOrigin(launchAuditPath, publicAppOrigin),
+      launchAuditUrl: appUrlFromOrigin(remoteLaunchAuditPath, publicAppOrigin),
     }),
     [publicAppOrigin],
   );
@@ -2739,12 +2740,12 @@ export function CommandWavesConsole() {
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">Launch audit</p>
-                        <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{launchAuditPath}</p>
+                        <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{remoteLaunchAuditPath}</p>
                         <div className="mt-2 flex flex-wrap gap-2">
-                          <Button type="button" variant="secondary" onClick={() => void copyLaunchUrl(launchAuditPath, "Launch audit URL")}>
+                          <Button type="button" variant="secondary" onClick={() => void copyLaunchUrl(remoteLaunchAuditPath, "Launch audit URL")}>
                             Copy audit URL
                           </Button>
-                          <LinkButton href={launchAuditPath}>Open audit</LinkButton>
+                          <LinkButton href={remoteLaunchAuditPath}>Open audit</LinkButton>
                         </div>
                       </div>
                     </div>

@@ -116,6 +116,9 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_audit_packet: "Prepare the launch packet",
   setup_not_checked: "Run launch setup check",
   setup_remote_check: "Run launch setup check",
+  setup_wave_reachable: "Pick reachable 6529 wave",
+  setup_repo_reachable: "Pick reachable GitHub repo",
+  setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",
@@ -214,11 +217,21 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
 
   if (!setupValidation.canSave) {
     const firstFailure = setupValidation.checks.find((item) => item.status === "fail");
+    const failureId =
+      firstFailure?.id === "wave_reachable" || firstFailure?.id === "repo_reachable"
+        ? `setup_${firstFailure.id}`
+        : "setup_project_check";
+    const failureLabel =
+      firstFailure?.id === "wave_reachable"
+        ? "6529 wave"
+        : firstFailure?.id === "repo_reachable"
+          ? "GitHub repo"
+          : "Setup check";
 
     return [
       {
-        id: "setup_project_check",
-        label: "Setup check",
+        id: failureId,
+        label: failureLabel,
         status: "blocked",
         detail: firstFailure?.message ?? "Fix the 6529 wave and GitHub repo before inviting contributors.",
         source: "setup",

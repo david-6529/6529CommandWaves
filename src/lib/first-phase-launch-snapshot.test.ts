@@ -65,6 +65,9 @@ describe("first phase launch snapshot", () => {
     });
 
     expect(snapshot.setupCheckMode).toBe("remote");
+    expect(snapshot.verificationTargets.launchAuditUrl).toBe(
+      "https://command-waves.example.com/api/command-wave/launch/audit?remote=1",
+    );
   });
 
   it("does not emit em dash characters", async () => {

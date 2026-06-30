@@ -155,6 +155,44 @@ describe("first phase launch audit", () => {
     ]);
   });
 
+  it("names unreachable setup targets in the next action", () => {
+    const setupValidation: SetupValidation = {
+      ...productionSetupValidation,
+      checks: [
+        ...productionSetupValidation.checks,
+        {
+          id: "repo_reachable",
+          label: "Repo reachable",
+          status: "fail",
+          message: "GitHub repo check failed: 404 Not Found",
+        },
+      ],
+      canSave: false,
+      canRunCode: false,
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: productionReadyChecks,
+      setupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.nextAction).toMatchObject({
+      status: "blocked",
+      itemId: "setup_repo_reachable",
+      title: "Pick reachable GitHub repo",
+      detail: "GitHub repo check failed: 404 Not Found",
+    });
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "setup_repo_reachable",
+        label: "GitHub repo",
+        status: "blocked",
+      }),
+    );
+  });
+
   it("keeps launch in setup mode when the PR template is missing", () => {
     const setupValidation: SetupValidation = {
       ...productionSetupValidation,
