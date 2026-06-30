@@ -52,6 +52,18 @@ import { toolPolicyForKind } from "@/lib/safety/tool-policy";
 import { createWaveUpdateDraft } from "@/lib/wave-update-draft";
 
 type CommandKindOption = { value: CommandKind; label: string; description: string };
+type ProposalTypeOption = {
+  kind: CommandKind;
+  label: string;
+  detail: string;
+  title: string;
+  request: string;
+  limits: string;
+  requestLabel: string;
+  limitsLabel: string;
+  requestPlaceholder: string;
+  limitsPlaceholder: string;
+};
 
 const commandKinds: CommandKindOption[] = [
   { value: "read_context", label: commandKindLabel("read_context"), description: "Summarize or inspect wave/repo state." },
@@ -68,6 +80,61 @@ const firstPhaseProposalKindValues: CommandKind[] = ["open_pr", "draft_response"
 const firstPhaseProposalKinds = firstPhaseProposalKindValues
   .map((value) => commandKinds.find((item) => item.value === value))
   .filter((item): item is CommandKindOption => Boolean(item));
+const defaultProposalTitle = "Add fee cap tests";
+const defaultProposalRequest =
+  "Add tests that prove the 6529 hook fee parameter cannot exceed 100 bps and that zero fee still works.";
+const defaultProposalLimits =
+  "Test-only PR for the current hook contract. Keep the hook immutable. No deploy scripts, payments, owner changes, role changes, proxy, or delegatecall. Include bound-focused tests for the 100 bps max fee.";
+const proposalTypeOptions: ProposalTypeOption[] = [
+  {
+    kind: "open_pr",
+    label: "Code PR",
+    detail: "Change repo code after a decision.",
+    title: defaultProposalTitle,
+    request: defaultProposalRequest,
+    limits: defaultProposalLimits,
+    requestLabel: "Change",
+    limitsLabel: "Boundaries and tests",
+    requestPlaceholder: "Describe the exact hook change.",
+    limitsPlaceholder: "Name caps, tests, and anything out of scope.",
+  },
+  {
+    kind: "draft_response",
+    label: "Question",
+    detail: "Ask the room to shape an answer.",
+    title: "Clarify fee cap options",
+    request: "Compare the simplest fee cap options for the hook and list the tradeoffs builders should discuss.",
+    limits: "Keep it short. Do not propose code, deployment, ownership changes, or uncapped parameters.",
+    requestLabel: "Question",
+    limitsLabel: "Answer limits",
+    requestPlaceholder: "Ask what builders should discuss or decide.",
+    limitsPlaceholder: "Name what the answer should include or avoid.",
+  },
+  {
+    kind: "post_to_wave",
+    label: "Update",
+    detail: "Draft a public room update.",
+    title: "Share current hook status",
+    request: "Summarize the current hook change, decision status, PR status, and next move for the room.",
+    limits: "Post manually. Do not claim a merge, deploy, payment, live REP gate, or final decision unless it is recorded.",
+    requestLabel: "Update",
+    limitsLabel: "Posting limits",
+    requestPlaceholder: "Describe the room update to draft.",
+    limitsPlaceholder: "Name claims to include or avoid.",
+  },
+  {
+    kind: "read_context",
+    label: "Context",
+    detail: "Ask for a quick read of state.",
+    title: "Read latest hook context",
+    request: "Read the latest room activity and repo state, then summarize what changed and what needs attention.",
+    limits: "Read only. Do not write posts, open PRs, run scripts, deploy, spend funds, or change rules.",
+    requestLabel: "Context request",
+    limitsLabel: "Read limits",
+    requestPlaceholder: "Ask what context the room needs.",
+    limitsPlaceholder: "Name what should stay out of scope.",
+  },
+];
 
 const hookGuardrails = [
   "No upgradeable hook contracts by default.",
@@ -728,13 +795,9 @@ export function CommandWavesConsole() {
   );
   const [proposer, setProposer] = useState("david");
   const [kind, setKind] = useState<CommandKind>("open_pr");
-  const [title, setTitle] = useState("Add fee cap tests");
-  const [prompt, setPrompt] = useState(
-    "Add tests that prove the 6529 hook fee parameter cannot exceed 100 bps and that zero fee still works.",
-  );
-  const [spec, setSpec] = useState(
-    "Test-only PR for the current hook contract. Keep the hook immutable. No deploy scripts, payments, owner changes, role changes, proxy, or delegatecall. Include bound-focused tests for the 100 bps max fee.",
-  );
+  const [title, setTitle] = useState(defaultProposalTitle);
+  const [prompt, setPrompt] = useState(defaultProposalRequest);
+  const [spec, setSpec] = useState(defaultProposalLimits);
   const [budgetUsd, setBudgetUsd] = useState("10");
   const [decisionReference, setDecisionReference] = useState("");
   const [apiBusy, setApiBusy] = useState<BusyState | null>(null);
@@ -765,6 +828,7 @@ export function CommandWavesConsole() {
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
+  const selectedProposalType = proposalTypeOptions.find((item) => item.kind === kind) ?? proposalTypeOptions[0];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const hookProposalPreflight = useMemo(
     () => createHookProposalPreflight({ command: prompt, criteria: spec }),
@@ -1445,6 +1509,21 @@ export function CommandWavesConsole() {
     });
   }
 
+  function proposalTemplateValues() {
+    return new Set(proposalTypeOptions.flatMap((item) => [item.title, item.request, item.limits]));
+  }
+
+  function chooseProposalType(option: ProposalTypeOption) {
+    const templateValues = proposalTemplateValues();
+
+    setKind(option.kind);
+    setProposalDraftNotice("");
+    setApiError("");
+    setTitle((current) => (!current.trim() || templateValues.has(current) ? option.title : current));
+    setPrompt((current) => (!current.trim() || templateValues.has(current) ? option.request : current));
+    setSpec((current) => (!current.trim() || templateValues.has(current) ? option.limits : current));
+  }
+
   function prepareQuickPost(post: BuilderWaveQuickPost) {
     setWaveRoomMessage(post.message);
     setWaveRoomNotice(`${post.label} draft ready.`);
@@ -2010,33 +2089,62 @@ export function CommandWavesConsole() {
             <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Propose</p>
             <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Propose a hook change</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Turn one idea into a decision-ready PR scope.
+              Turn one idea into a clear room post.
             </p>
             <div className="mt-4 grid gap-3">
               <Field label="Handle">
                 <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
               </Field>
+              <div>
+                <p className="mb-2 text-base font-semibold text-zinc-200">Work type</p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {proposalTypeOptions.map((option) => {
+                    const selected = option.kind === kind;
+
+                    return (
+                      <button
+                        key={option.kind}
+                        type="button"
+                        aria-pressed={selected}
+                        className={`cursor-pointer rounded-md border p-2.5 text-left transition sm:p-3 ${
+                          selected
+                            ? "border-cyan-500 bg-cyan-950/35 text-zinc-50"
+                            : "border-zinc-800 bg-black text-zinc-300 hover:border-cyan-800 hover:bg-zinc-950"
+                        }`}
+                        onClick={() => chooseProposalType(option)}
+                      >
+                        <span className="block text-base font-semibold">{option.label}</span>
+                        <span className="mt-1 block text-sm leading-5 text-zinc-500">{option.detail}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-sm leading-6 text-zinc-500">
+                  {selectedProposalType.label}: {simpleDecisionRoute.toLowerCase()}.{" "}
+                  {hookProposalPreflightRequired ? "PR checks run before saving." : "No PR will be opened."}
+                </p>
+              </div>
               <Field label="Title">
                 <Textarea
                   rows={2}
                   value={title}
-                  placeholder="Add fee cap tests"
+                  placeholder={selectedProposalType.title}
                   onChange={(event) => setTitle(event.target.value)}
                 />
               </Field>
-              <Field label="Change">
+              <Field label={selectedProposalType.requestLabel}>
                 <Textarea
                   rows={4}
                   value={prompt}
-                  placeholder="Describe the exact hook change or question."
+                  placeholder={selectedProposalType.requestPlaceholder}
                   onChange={(event) => setPrompt(event.target.value)}
                 />
               </Field>
-              <Field label="Boundaries and tests">
+              <Field label={selectedProposalType.limitsLabel}>
                 <Textarea
                   rows={4}
                   value={spec}
-                  placeholder="Name caps, tests, and anything out of scope."
+                  placeholder={selectedProposalType.limitsPlaceholder}
                   onChange={(event) => setSpec(event.target.value)}
                 />
               </Field>

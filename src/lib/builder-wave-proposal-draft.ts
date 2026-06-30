@@ -18,6 +18,66 @@ function cleanLine(value: string, fallback: string) {
   return value.trim().replace(/\s+/g, " ") || fallback;
 }
 
+function proposalHeading(kind: CommandKind) {
+  if (kind === "draft_response") {
+    return "Hook question";
+  }
+
+  if (kind === "post_to_wave") {
+    return "Hook room update";
+  }
+
+  if (kind === "read_context") {
+    return "Hook context request";
+  }
+
+  return "Hook change proposal";
+}
+
+function requestHeading(kind: CommandKind) {
+  if (kind === "draft_response") {
+    return "Question:";
+  }
+
+  if (kind === "post_to_wave") {
+    return "Update needed:";
+  }
+
+  if (kind === "read_context") {
+    return "Context needed:";
+  }
+
+  return "What I want to change:";
+}
+
+function limitsHeading(kind: CommandKind) {
+  if (kind === "draft_response") {
+    return "Answer limits:";
+  }
+
+  if (kind === "post_to_wave") {
+    return "Posting limits:";
+  }
+
+  if (kind === "read_context") {
+    return "Read limits:";
+  }
+
+  return "Limits and tests:";
+}
+
+function decisionLine(kind: CommandKind) {
+  if (kind === "open_pr") {
+    return "Please approve, reject, or ask for edits before any PR work starts.";
+  }
+
+  if (kind === "post_to_wave") {
+    return "Please approve, reject, or ask for edits before this is shared.";
+  }
+
+  return "Please answer, approve, or ask for edits in the room.";
+}
+
 export function createBuilderWaveProposalDraft({
   wave,
   title,
@@ -33,21 +93,21 @@ export function createBuilderWaveProposalDraft({
   const budget = cleanLine(budgetUsd, "0");
 
   return [
-    "Hook change proposal",
+    proposalHeading(kind),
     "",
     `Change: ${cleanLine(title, "Untitled hook work")}`,
     `Proposer: ${cleanLine(proposer, "unknown")}`,
     `Discussion: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     "",
-    "What I want to change:",
+    requestHeading(kind),
     cleanLine(request, "No request written yet."),
     "",
-    "Limits and tests:",
+    limitsHeading(kind),
     cleanLine(limits, "No limits written yet."),
     "",
     "Decision:",
-    "Please approve, reject, or ask for edits before any PR work starts.",
+    decisionLine(kind),
     "",
     "Safety:",
     `- ${commandKindLabel(kind)}, ${cleanLine(risk, "unknown")} risk, ${cleanLine(decisionRoute, "needs review")}.`,

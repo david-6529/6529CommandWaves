@@ -46,12 +46,38 @@ describe("6529 discussion proposal draft", () => {
       ruleReason: "",
     });
 
+    expect(draft).toContain("Hook question");
     expect(draft).toContain("Proposer: unknown");
     expect(draft).toContain("Change: Untitled hook work");
+    expect(draft).toContain("Question:");
+    expect(draft).toContain("Answer limits:");
     expect(draft).toContain("No request written yet.");
     expect(draft).toContain("No limits written yet.");
+    expect(draft).toContain("Please answer, approve, or ask for edits in the room.");
     expect(draft).toContain("Budget cap: 0 USD");
     expect(draft).toContain("- Draft response, unknown risk, needs review.");
     expect(draft).toContain("- No rule reason recorded.");
+  });
+
+  it("uses non-PR decision language for room updates", () => {
+    const draft = createBuilderWaveProposalDraft({
+      wave: demoWave,
+      title: "Share status",
+      proposer: "david",
+      kind: "post_to_wave",
+      request: "Draft the room status.",
+      limits: "Do not claim approval unless recorded.",
+      budgetUsd: "0",
+      risk: "low",
+      decisionRoute: "can run",
+      ruleReason: "Discussion updates are support work.",
+    });
+
+    expect(draft).toContain("Hook room update");
+    expect(draft).toContain("Update needed:");
+    expect(draft).toContain("Posting limits:");
+    expect(draft).toContain("Please approve, reject, or ask for edits before this is shared.");
+    expect(draft).not.toContain("before any PR work starts");
+    expect(draft).not.toContain("\u2014");
   });
 });
