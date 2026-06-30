@@ -1462,16 +1462,16 @@ export function CommandWavesConsole() {
       if (openDiscussion && wave.waveUrl) {
         setWaveRoomNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
-            ? "Discussion post copied. Opened 6529 discussion."
-            : "Discussion post copied. Open the 6529 discussion manually.",
+            ? "Message copied. Opened room."
+            : "Message copied. Open the room manually.",
         );
         return;
       }
 
-      setWaveRoomNotice("Discussion post copied.");
+      setWaveRoomNotice("Message copied.");
     } catch {
       discussionTab?.close();
-      setWaveRoomNotice("Copy failed. Select the discussion post and copy it manually.");
+      setWaveRoomNotice("Copy failed. Select the message and copy it manually.");
     }
   }
 
@@ -1539,13 +1539,13 @@ export function CommandWavesConsole() {
       if (openDiscussion && wave.waveUrl) {
         setProposalDraftNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
-            ? "Proposal post copied. Opened 6529 discussion."
-            : "Proposal post copied. Open the 6529 discussion manually.",
+            ? "Proposal copied. Opened room."
+            : "Proposal copied. Open the room manually.",
         );
         return;
       }
 
-      setProposalDraftNotice("Proposal post copied.");
+      setProposalDraftNotice("Proposal copied.");
     } catch {
       discussionTab?.close();
       setProposalDraftNotice("Copy failed. Select the proposal text and copy it manually.");
@@ -1895,13 +1895,13 @@ export function CommandWavesConsole() {
                       disabled={!wave.waveUrl}
                       onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
                     >
-                      Copy post
+                      Copy and open
                     </Button>
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                      Copy text
+                      Copy only
                     </Button>
                     <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                      {apiBusy === "proposal" ? "Recording" : "Record in app"}
+                      {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                     </Button>
                     <JumpLink href="#start-building">Edit details</JumpLink>
                     {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open last PR</LinkButton> : null}
@@ -1955,10 +1955,10 @@ export function CommandWavesConsole() {
                   disabled={!waveRoomMessage.trim() || !wave.waveUrl}
                   onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
                 >
-                  Copy post
+                  Copy and open
                 </Button>
                 <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                  Copy text
+                  Copy only
                 </Button>
                 <Button
                   type="button"
@@ -1968,7 +1968,7 @@ export function CommandWavesConsole() {
                     void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
                   }
                 >
-                  {apiBusy === "context" ? "Loading" : "Refresh posts"}
+                  {apiBusy === "context" ? "Loading" : "Refresh room"}
                 </Button>
                 <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
                   Clear
@@ -2143,18 +2143,18 @@ export function CommandWavesConsole() {
                 disabled={!wave.waveUrl}
                 onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
               >
-                Copy post
+                Copy and open
               </Button>
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                Copy text
+                Copy only
               </Button>
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Recording" : "Record in app"}
+                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
               <JumpLink href="#wave-room">Chat</JumpLink>
             </div>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
-              Post to the public discussion first. Record in app only after the room can see it.
+              Post to the room first. Save it here only after the room can see it.
             </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
@@ -2394,7 +2394,7 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
                   Copy guide
                 </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529</LinkButton> : null}
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
               </div>
               {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
             </div>
@@ -2409,7 +2409,7 @@ export function CommandWavesConsole() {
             </Badge>
           </summary>
           <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
-            Active hook, 6529 discussion, repo evidence, gate notes, and the next repo action.
+            Active hook, room, repo evidence, gate notes, and the next repo action.
           </p>
           <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
@@ -2422,7 +2422,7 @@ export function CommandWavesConsole() {
                       <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
                       <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge className="border-zinc-700 bg-black text-zinc-300">wave {project.waveLabel}</Badge>
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">room {project.waveLabel}</Badge>
                         <Badge className="border-zinc-700 bg-black text-zinc-300">repo {project.repoLabel}</Badge>
                       </div>
                     </div>
@@ -2459,7 +2459,7 @@ export function CommandWavesConsole() {
                         </ul>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open 6529</LinkButton> : null}
+                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open room</LinkButton> : null}
                         <Button
                           type="button"
                           variant="secondary"
@@ -2747,7 +2747,7 @@ export function CommandWavesConsole() {
                   >
                     Copy participation guide
                   </Button>
-                  <LinkButton href={waveUrl}>Open 6529</LinkButton>
+                  <LinkButton href={waveUrl}>Open room</LinkButton>
                 </div>
                 {participationGuideNotice ? (
                   <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p>
@@ -2794,7 +2794,7 @@ export function CommandWavesConsole() {
               </div>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
-                  <span>6529 discussion launch brief</span>
+                  <span>Room launch brief</span>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-400">copyable</Badge>
                 </summary>
                 <div className="mt-3 grid gap-3">
@@ -3180,13 +3180,13 @@ export function CommandWavesConsole() {
               <div className="rounded-md border border-zinc-800 bg-black p-3">
                 <p className="text-sm font-semibold text-zinc-100">Discussion brief</p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Copy this into the 6529 discussion. Submit locally only after it matches the discussion and risk path.
+                  Copy this into the room. Save locally only after it matches the discussion and risk path.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                    Copy brief
+                    Copy proposal
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529</LinkButton> : null}
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
                 </div>
                 {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
               </div>
@@ -3302,13 +3302,13 @@ export function CommandWavesConsole() {
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
                         <p className="text-sm font-semibold text-zinc-100">Decision request</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Copy this to ask the 6529 discussion for the actual decision, then record the 6529 drop URL.
+                          Copy this to ask the room for the actual decision, then record the decision URL.
                         </p>
                         <div className="mt-3 grid gap-2 sm:grid-cols-2">
                           <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
                             Copy request
                           </Button>
-                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529</LinkButton> : null}
+                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
                         </div>
                         {decisionDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{decisionDraftNotice}</p> : null}
                       </div>
@@ -3355,7 +3355,7 @@ export function CommandWavesConsole() {
                       </div>
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      Manual evidence only. PR work needs the 6529 discussion drop URL. This does not add live REP, TDH, or weighted voting.
+                      Manual evidence only. PR work needs the room decision URL. This does not add live REP, TDH, or weighted voting.
                     </p>
                   </div>
                 ) : (
@@ -3576,7 +3576,7 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={() => void copyDeveloperFeePlanDraft()}>
                   Copy planning draft
                 </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529</LinkButton> : null}
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
               </div>
               {developerFeePlanNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{developerFeePlanNotice}</p> : null}
               <Badge className="mt-3 border-amber-700 bg-amber-950/45 text-amber-100">
@@ -3595,7 +3595,7 @@ export function CommandWavesConsole() {
 
         <details id="share-back" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Share back to 6529</span>
+            <span>Share back to room</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>
           </summary>
           <div className="mt-4">
@@ -3603,13 +3603,13 @@ export function CommandWavesConsole() {
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
-                  Edit the short update, share it manually in the 6529 discussion, and keep the launch packet with the PR audit trail.
+                  Edit the short update, share it manually in the room, and keep the launch packet with the PR audit trail.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
                     Copy update
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open 6529</LinkButton> : null}
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
                   <Button type="button" variant="secondary" onClick={resetWaveUpdateDraft}>
                     Reset draft
                   </Button>
