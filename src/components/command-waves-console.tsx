@@ -324,6 +324,10 @@ function contextModeLabel(preview: WaveContextPreview) {
   return preview.context.mode === "all" ? "all history" : preview.context.mode;
 }
 
+function postCountLabel(count: number) {
+  return `${count} ${count === 1 ? "post" : "posts"}`;
+}
+
 async function requestWaveSearch(query: string) {
   const response = await fetch(`/api/6529/waves/search?q=${encodeURIComponent(query)}&limit=6`);
   const payload = (await response.json()) as WaveSearchResponse;
@@ -1291,7 +1295,7 @@ export function CommandWavesConsole() {
       } else {
         setSetupContextPreview(preview);
       }
-      setApiNotice(`Wave posts loaded for ${preview.dropCount} drops.`);
+      setApiNotice(`Room posts loaded: ${postCountLabel(preview.dropCount)}.`);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Context preview failed.");
     } finally {
@@ -2005,7 +2009,7 @@ export function CommandWavesConsole() {
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">
-                  {hasRecentDiscussionPosts ? "Latest posts" : "Room activity"}
+                  {hasRecentDiscussionPosts ? "Room posts" : "Room activity"}
                 </p>
                 {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
                   <span className="flex flex-wrap gap-2">
@@ -2013,7 +2017,7 @@ export function CommandWavesConsole() {
                       {contextModeLabel(primaryProjectContextPreview)}
                     </Badge>
                     <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                      {primaryProjectContextPreview.dropCount} drops
+                      {postCountLabel(primaryProjectContextPreview.dropCount)}
                     </Badge>
                   </span>
                 ) : (
@@ -2026,7 +2030,7 @@ export function CommandWavesConsole() {
                     <div key={drop.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold text-zinc-300">
-                          {drop.author} / {drop.id}
+                          {drop.author}
                         </p>
                         {drop.url ? (
                           <a
@@ -2035,7 +2039,7 @@ export function CommandWavesConsole() {
                             target="_blank"
                             rel="noreferrer"
                           >
-                            Open drop
+                            Open post
                           </a>
                         ) : null}
                       </div>
@@ -2486,7 +2490,7 @@ export function CommandWavesConsole() {
                           <div className="flex flex-wrap items-center gap-2">
                             <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{contextModeLabel(contextPreview)}</Badge>
                             <Badge className={contextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                              {contextPreview.dropCount} drops
+                              {postCountLabel(contextPreview.dropCount)}
                             </Badge>
                           </div>
                           <div className="mt-2 grid gap-2">
@@ -2494,7 +2498,7 @@ export function CommandWavesConsole() {
                               <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <p className="text-xs font-semibold text-zinc-500">
-                                    {drop.author} / {drop.id}
+                                    {drop.author}
                                   </p>
                                   {drop.url ? (
                                     <a
@@ -2503,7 +2507,7 @@ export function CommandWavesConsole() {
                                       target="_blank"
                                       rel="noreferrer"
                                     >
-                                      Open drop
+                                      Open post
                                     </a>
                                   ) : null}
                                 </div>
@@ -2976,7 +2980,7 @@ export function CommandWavesConsole() {
                     </Badge>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-zinc-300">
-                    Found {setupContextPreview.dropCount} drops after checking {setupContextPreview.context.searchedMessages} messages.
+                    Found {postCountLabel(setupContextPreview.dropCount)} after checking {setupContextPreview.context.searchedMessages} messages.
                   </p>
                   <p className="mt-1 text-xs text-zinc-500">
                     {setupContextPreview.fromDropId ?? "no first drop"} to {setupContextPreview.toDropId ?? "no latest drop"}
@@ -2986,7 +2990,7 @@ export function CommandWavesConsole() {
                       <div key={drop.id} className="border-t border-zinc-900 pt-2">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-xs font-semibold text-zinc-500">
-                            {drop.author} / {drop.id}
+                            {drop.author}
                           </p>
                           {drop.url ? (
                             <a
@@ -2995,7 +2999,7 @@ export function CommandWavesConsole() {
                               target="_blank"
                               rel="noreferrer"
                             >
-                              Open drop
+                              Open post
                             </a>
                           ) : null}
                         </div>
