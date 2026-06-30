@@ -2063,47 +2063,47 @@ export function CommandWavesConsole() {
 
         <section id="start-building" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Propose</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Propose a hook change</h2>
+            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Suggest</p>
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Write a room post</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-              Turn one idea into a clear room post.
+              Bring one useful idea to the builders.
             </p>
             <div className="mt-4 grid gap-3">
-              <Field label="Handle">
-                <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
-              </Field>
-              <div>
-                <p className="mb-2 text-base font-semibold text-zinc-200">Work type</p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {proposalTypeOptions.map((option) => {
-                    const selected = option.kind === kind;
+              <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
+                <div>
+                  <p className="mb-2 text-base font-semibold text-zinc-200">Type</p>
+                  <div className="flex flex-wrap gap-2">
+                    {proposalTypeOptions.map((option) => {
+                      const selected = option.kind === kind;
 
-                    return (
-                      <button
-                        key={option.kind}
-                        type="button"
-                        aria-pressed={selected}
-                        className={`cursor-pointer rounded-md border p-2.5 text-left transition sm:p-3 ${
-                          selected
-                            ? "border-cyan-500 bg-cyan-950/35 text-zinc-50"
-                            : "border-zinc-800 bg-black text-zinc-300 hover:border-cyan-800 hover:bg-zinc-950"
-                        }`}
-                        onClick={() => chooseProposalType(option)}
-                      >
-                        <span className="block text-base font-semibold">{option.label}</span>
-                        <span className="mt-1 block text-sm leading-5 text-zinc-500">{option.detail}</span>
-                      </button>
-                    );
-                  })}
+                      return (
+                        <button
+                          key={option.kind}
+                          type="button"
+                          aria-pressed={selected}
+                          className={`inline-flex h-11 cursor-pointer items-center justify-center rounded-md border px-4 text-base font-semibold transition ${
+                            selected
+                              ? "border-cyan-500 bg-cyan-950/35 text-zinc-50"
+                              : "border-zinc-800 bg-black text-zinc-300 hover:border-cyan-800 hover:bg-zinc-950"
+                          }`}
+                          onClick={() => chooseProposalType(option)}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-zinc-500">
+                    {selectedProposalType.detail} {simpleDecisionRoute}.{" "}
+                    {hookProposalPreflightRequired ? "PR checks run before saving." : "No PR will be opened."}
+                  </p>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  {selectedProposalType.label}: {simpleDecisionRoute.toLowerCase()}.{" "}
-                  {hookProposalPreflightRequired ? "PR checks run before saving." : "No PR will be opened."}
-                </p>
+                <Field label="Handle">
+                  <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
+                </Field>
               </div>
               <Field label="Title">
-                <Textarea
-                  rows={2}
+                <Input
                   value={title}
                   placeholder={selectedProposalType.title}
                   onChange={(event) => setTitle(event.target.value)}
@@ -2115,6 +2115,7 @@ export function CommandWavesConsole() {
                   value={prompt}
                   placeholder={selectedProposalType.requestPlaceholder}
                   onChange={(event) => setPrompt(event.target.value)}
+                  className="min-h-24"
                 />
               </Field>
               <Field label={selectedProposalType.limitsLabel}>
@@ -2123,6 +2124,7 @@ export function CommandWavesConsole() {
                   value={spec}
                   placeholder={selectedProposalType.limitsPlaceholder}
                   onChange={(event) => setSpec(event.target.value)}
+                  className="min-h-24"
                 />
               </Field>
             </div>
@@ -2143,7 +2145,7 @@ export function CommandWavesConsole() {
               <JumpLink href="#wave-room">Chat</JumpLink>
             </div>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
-              Copy the post to the public discussion first. Record it here once the room can see it.
+              Post to the public discussion first. Record in app only after the room can see it.
             </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
