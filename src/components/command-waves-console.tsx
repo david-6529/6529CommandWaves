@@ -745,6 +745,7 @@ export function CommandWavesConsole() {
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
   const [waveRoomMessage, setWaveRoomMessage] = useState("");
+  const [selectedMemberIdentity, setSelectedMemberIdentity] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
@@ -1103,6 +1104,8 @@ export function CommandWavesConsole() {
     ["Builders", `${builderRoster.length} visible`],
   ];
   const visibleRoomMembers = builderRoster.slice(0, 3);
+  const selectedMember =
+    builderRoster.find((member) => member.identity === selectedMemberIdentity) ?? builderRoster[0] ?? null;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1427,6 +1430,21 @@ export function CommandWavesConsole() {
     setWaveRoomNotice("Message cleared.");
   }
 
+  function showMemberProfile(identity: string) {
+    setSelectedMemberIdentity(identity);
+    window.requestAnimationFrame(() => {
+      document.getElementById("active-builders")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function messageMember(identity: string) {
+    setWaveRoomMessage(`@${identity} `);
+    setWaveRoomNotice("Message draft ready.");
+    window.requestAnimationFrame(() => {
+      document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   function prepareQuickPost(post: BuilderWaveQuickPost) {
     setWaveRoomMessage(post.message);
     setWaveRoomNotice(`${post.label} draft ready.`);
@@ -1673,8 +1691,8 @@ export function CommandWavesConsole() {
             <JumpLink href="#start-building">Propose change</JumpLink>
             <JumpLink href="#active-builders">Members</JumpLink>
             <JumpLink href="#recent-activity">Activity</JumpLink>
-            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>6529</LinkButton> : null}
-            {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>GitHub</LinkButton> : null}
+            {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
+            {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Repo</LinkButton> : null}
           </nav>
         </header>
 
@@ -1719,8 +1737,8 @@ export function CommandWavesConsole() {
                   <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
                     Ask to join
                   </Button>
-                  {primaryHookProject.waveUrl ? <LinkButton href={primaryHookProject.waveUrl}>6529</LinkButton> : null}
-                  {primaryHookProject.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>GitHub</LinkButton> : null}
+                  {primaryHookProject.waveUrl ? <LinkButton href={primaryHookProject.waveUrl}>Discussion</LinkButton> : null}
+                  {primaryHookProject.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Repo</LinkButton> : null}
                   {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>{activePrLinkLabel}</LinkButton> : null}
                 </div>
               </div>
@@ -1736,13 +1754,13 @@ export function CommandWavesConsole() {
               ) : activePollCanVote ? (
                 <div className="mt-2 grid gap-3">
                   <p className="text-base leading-7 text-zinc-400">
-                    Ask the 6529 discussion for a decision before code work starts.
+                    Ask the room for a visible decision before code work starts.
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
                       Copy decision request
                     </Button>
-                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>6529</LinkButton> : null}
+                    {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
                     <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
                       Log local yes
                     </Button>
@@ -1812,7 +1830,7 @@ export function CommandWavesConsole() {
                       disabled={!wave.waveUrl}
                       onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
                     >
-                      Copy for 6529
+                      Copy post
                     </Button>
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                       Copy text
@@ -1840,9 +1858,9 @@ export function CommandWavesConsole() {
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builder room</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Chat</h2>
-                <p className="mt-2 text-base leading-7 text-zinc-400">Draft a message for the 6529 discussion.</p>
+                <p className="mt-2 text-base leading-7 text-zinc-400">Draft a message for the room.</p>
               </div>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>6529</LinkButton> : null}
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Discussion</LinkButton> : null}
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
@@ -1872,7 +1890,7 @@ export function CommandWavesConsole() {
                   disabled={!waveRoomMessage.trim() || !wave.waveUrl}
                   onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
                 >
-                  Copy for 6529
+                  Copy post
                 </Button>
                 <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
                   Copy text
@@ -1902,10 +1920,15 @@ export function CommandWavesConsole() {
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
                   {visibleRoomMembers.map((member) => (
-                    <div key={member.identity} className="rounded-md border border-zinc-800 bg-black p-3">
-                      <p className="truncate text-base font-semibold text-zinc-100">{member.identity}</p>
-                      <p className="mt-1 text-sm leading-5 text-zinc-500">{member.role}</p>
-                    </div>
+                    <button
+                      key={member.identity}
+                      type="button"
+                      className="cursor-pointer rounded-md border border-zinc-800 bg-black p-3 text-left transition hover:border-cyan-700 hover:bg-zinc-950"
+                      onClick={() => showMemberProfile(member.identity)}
+                    >
+                      <span className="block truncate text-base font-semibold text-zinc-100">{member.identity}</span>
+                      <span className="mt-1 block text-sm leading-5 text-zinc-500">{member.role}</span>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -1914,7 +1937,7 @@ export function CommandWavesConsole() {
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">
-                  {hasRecentDiscussionPosts ? "Latest 6529 posts" : "Room activity"}
+                  {hasRecentDiscussionPosts ? "Latest posts" : "Room activity"}
                 </p>
                 {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
                   <span className="flex flex-wrap gap-2">
@@ -2024,7 +2047,7 @@ export function CommandWavesConsole() {
                 disabled={!wave.waveUrl}
                 onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
               >
-                Copy for 6529
+                Copy post
               </Button>
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                 Copy text
@@ -2076,7 +2099,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</p>
               <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Active hook rooms</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Each hook has a 6529 discussion, a GitHub repo, and one next move.
+                Each hook has a public discussion, a repo, and one next move.
               </p>
             </div>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
@@ -2107,8 +2130,8 @@ export function CommandWavesConsole() {
                   </dl>
                 </div>
                 <div className="flex flex-wrap gap-2 lg:justify-end">
-                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Open 6529</LinkButton> : null}
-                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
+                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Discussion</LinkButton> : null}
+                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Repo</LinkButton> : null}
                   <JumpLink href="#wave-room">Message</JumpLink>
                 </div>
               </div>
@@ -2180,6 +2203,30 @@ export function CommandWavesConsole() {
               {builderRoster.length} visible
             </Badge>
           </div>
+          {selectedMember ? (
+            <div className="mt-4 grid gap-3 border-y border-zinc-800 py-4 lg:grid-cols-[1fr_auto]">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Member profile</p>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{selectedMember.role}</Badge>
+                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{selectedMember.scoreLabel}</Badge>
+                </div>
+                <h3 className="mt-2 text-2xl font-semibold text-zinc-50">{selectedMember.identity}</h3>
+                <p className="mt-2 text-base leading-7 text-zinc-400">{selectedMember.activity}</p>
+                <p className="mt-1 text-sm leading-6 text-zinc-500">{selectedMember.detail}</p>
+                <p className="mt-1 text-sm leading-6 text-zinc-500">
+                  Activity scores are context for builders. They do not grant permissions, payouts, or merge rights.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-start gap-2 lg:justify-end">
+                <Button type="button" variant="secondary" onClick={() => messageMember(selectedMember.identity)}>
+                  Message
+                </Button>
+                <LinkButton href={memberProfileUrl(selectedMember.identity)}>6529 profile</LinkButton>
+                <JumpLink href="#wave-room">Chat</JumpLink>
+              </div>
+            </div>
+          ) : null}
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {builderRoster.length ? (
               builderRoster.map((member) => (
@@ -2194,9 +2241,10 @@ export function CommandWavesConsole() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 md:justify-end">
                     <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.authorityNote}</Badge>
-                    <LinkButton href={memberProfileUrl(member.identity)}>Open 6529 profile</LinkButton>
-                    <JumpLink href="#wave-room">Message</JumpLink>
+                    <Button type="button" variant="secondary" onClick={() => showMemberProfile(member.identity)}>
+                      Profile
+                    </Button>
+                    <LinkButton href={memberProfileUrl(member.identity)}>6529 profile</LinkButton>
                   </div>
                 </div>
               ))
