@@ -289,7 +289,7 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
   const payload = (await response.json()) as WaveApiResponse;
 
   if (!response.ok || !payload.wave) {
-    throw new Error(formatApiError(payload, "Command wave request failed."));
+    throw new Error(formatApiError(payload, "Project request failed."));
   }
 
   return payload.wave;
@@ -333,7 +333,7 @@ async function requestWaveSearch(query: string) {
   const payload = (await response.json()) as WaveSearchResponse;
 
   if (!response.ok || !payload.results) {
-    throw new Error(formatApiError(payload, "Wave search failed."));
+    throw new Error(formatApiError(payload, "Room search failed."));
   }
 
   return payload.results;
@@ -728,7 +728,7 @@ function eventTypeLabel(type: string) {
   const labels: Record<string, string> = {
     wave_created: "project created",
     rules_defined: "setup updated",
-    proposal_submitted: "command proposed",
+    proposal_submitted: "work proposed",
     rule_check: "safety check",
     poll_opened: "vote opened",
     poll_passed: "vote passed",
@@ -1179,7 +1179,7 @@ export function CommandWavesConsole() {
         })
         .catch((error: unknown) => {
           if (!controller.signal.aborted) {
-            setApiError(error instanceof Error ? error.message : "Could not load command wave.");
+            setApiError(error instanceof Error ? error.message : "Could not load the project.");
           }
         })
         .finally(() => {
@@ -1274,7 +1274,7 @@ export function CommandWavesConsole() {
       applyWave(nextWave);
       setApiNotice(success);
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : "Command wave action failed.");
+      setApiError(error instanceof Error ? error.message : "Project action failed.");
     } finally {
       setApiBusy(null);
     }
@@ -1318,9 +1318,9 @@ export function CommandWavesConsole() {
       const results = await requestWaveSearch(query);
 
       setWaveSearchResults(results);
-      setApiNotice(results.length ? `Found ${results.length} wave option${results.length === 1 ? "" : "s"}.` : "No waves found.");
+      setApiNotice(results.length ? `Found ${results.length} room option${results.length === 1 ? "" : "s"}.` : "No rooms found.");
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : "Wave search failed.");
+      setApiError(error instanceof Error ? error.message : "Room search failed.");
     } finally {
       setApiBusy(null);
     }
@@ -1378,7 +1378,7 @@ export function CommandWavesConsole() {
             gates: gateNotes.split("\n"),
           }),
         }, accessKey),
-      "Setup saved to the backend ledger.",
+      "Setup saved.",
     );
   }
 
@@ -1855,7 +1855,7 @@ export function CommandWavesConsole() {
                     </Button>
                     {canCopyCodexPacket ? (
                       <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void copyCodexWorkPacket()}>
-                        {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
+                        {apiBusy === "codex" ? "Copying" : "Copy build packet"}
                       </Button>
                     ) : null}
                   </div>
@@ -2202,7 +2202,7 @@ export function CommandWavesConsole() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Active hook rooms</h2>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Hook rooms</h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
                 Each hook has a public room, a code repo, and one next move.
               </p>
@@ -2374,7 +2374,7 @@ export function CommandWavesConsole() {
 
         <details id="more-tools" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Operator tools</span>
+            <span>Maintainer tools</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">advanced</Badge>
           </summary>
           <div className="mt-4 grid gap-4">
@@ -2417,13 +2417,13 @@ export function CommandWavesConsole() {
 
             <details id="project-details" className="border-b border-zinc-800 pb-4">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-            <span>Project evidence</span>
+            <span>Hook details</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
           </summary>
           <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
-            Active hook, room, repo evidence, gate notes, and the next repo action.
+            Hook room, code repo, access notes, and the next code step.
           </p>
           <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
@@ -2437,7 +2437,7 @@ export function CommandWavesConsole() {
                       <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         <Badge className="border-zinc-700 bg-black text-zinc-300">room {project.waveLabel}</Badge>
-                        <Badge className="border-zinc-700 bg-black text-zinc-300">repo {project.repoLabel}</Badge>
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">code {project.repoLabel}</Badge>
                       </div>
                     </div>
                     <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
@@ -2447,8 +2447,8 @@ export function CommandWavesConsole() {
 
                   <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     {[
-                      ["Gate", project.gateSnapshotLabel],
-                      ["Decision path", project.orchestrationSnapshotLabel],
+                      ["Access", project.gateSnapshotLabel],
+                      ["Decision", project.orchestrationSnapshotLabel],
                       ["PR", project.codeSnapshotLabel],
                       ["Review", project.reviewStatusLabel],
                     ].map(([label, value]) => (
@@ -2524,7 +2524,7 @@ export function CommandWavesConsole() {
 
                     <div className="border-t border-zinc-800 pt-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">GitHub evidence</p>
+                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Code</p>
                         <Badge className={nextActionStatusClass(project.nextActionStatus)}>{project.nextActionLabel}</Badge>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.platformRole}</p>
@@ -2547,7 +2547,7 @@ export function CommandWavesConsole() {
                           <dd>{project.reviewStatusLabel}</dd>
                         </div>
                         <div>
-                          <dt className="font-semibold text-zinc-300">Evidence</dt>
+                          <dt className="font-semibold text-zinc-300">Records</dt>
                           <dd>{project.evidenceLabel}</dd>
                         </div>
                         <div>
@@ -2569,7 +2569,7 @@ export function CommandWavesConsole() {
 
             <details className="border-b border-zinc-800 pb-4">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-            <span>Readiness checklist</span>
+            <span>Launch checklist</span>
             <span className="flex flex-wrap justify-end gap-2">
               <Badge className={launchAuditStatusClass(launchAudit.status)}>{launchAudit.statusLabel}</Badge>
               <Badge className="border-zinc-700 bg-black text-zinc-300">
@@ -2656,9 +2656,9 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Set the first hook project wave and repo. The same shape can list more public hooks after the first loop works.
+                Set the first hook room and code repo. More hook rooms can use the same shape later.
               </p>
-              <Field label="6529 wave">
+              <Field label="6529 room">
                 <Input
                   value={waveUrl}
                   onChange={(event) => {
@@ -2668,11 +2668,11 @@ export function CommandWavesConsole() {
                 />
               </Field>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <Field label="Find a wave">
+                <Field label="Find a room">
                   <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
                     <Input
                       value={waveSearchQuery}
-                      placeholder="Type a wave name"
+                      placeholder="Type a room name"
                       onChange={(event) => setWaveSearchQuery(event.target.value)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter") {
@@ -3025,10 +3025,10 @@ export function CommandWavesConsole() {
             </div>
           </Panel>
 
-            <Panel title="Safety rules" eyebrow={wave.rules.version}>
+            <Panel title="Build rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
-                Phase 1 accepts reads, drafts, room updates, and PR commands. Scripts, deploys, funds, and rule changes stay parked.
+                Phase 1 accepts reads, drafts, room updates, and PR work. Scripts, deploys, funds, and rule changes stay parked.
               </p>
               <div className="grid gap-3 lg:grid-cols-2">
                 <CompactList title="Use now" items={firstPhaseScopeInventory.useNow} />
@@ -3057,7 +3057,7 @@ export function CommandWavesConsole() {
                 </ul>
               </div>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
-                <summary className="text-sm font-semibold text-zinc-100">Show command rules and tool access</summary>
+                <summary className="text-sm font-semibold text-zinc-100">Show detailed rules and tool access</summary>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {commandKinds.map((item) => {
                     const rule = wave.rules.rulesByKind[item.value];
@@ -3096,7 +3096,7 @@ export function CommandWavesConsole() {
 
             <details id="suggest-hook-work" className="border-b border-zinc-800 pb-4">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-            <span>Advanced proposal tools</span>
+            <span>More proposal controls</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
           </summary>
           <section className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
@@ -3121,7 +3121,7 @@ export function CommandWavesConsole() {
                     <p className="mt-1 text-xs leading-5 text-zinc-500">
                       {hookProposalPreflightRequired
                         ? hookProposalPreflight.summary
-                        : "Required only when the command opens a PR."}
+                        : "Required only when this opens a PR."}
                     </p>
                   </div>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
@@ -3148,7 +3148,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">No PR opened</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Use this command for context, drafts, or room updates. PR commands still need hook preflight.
+                          Use this for context, drafts, or room updates. PR work still needs hook preflight.
                         </p>
                       </div>
                     </div>
@@ -3210,14 +3210,14 @@ export function CommandWavesConsole() {
             </div>
           </Panel>
 
-          <Panel title="PR and review" eyebrow="Code evidence">
+          <Panel title="Code and review" eyebrow="Code review">
             {activeProposal ? (
               <div className="space-y-4">
                 {!phaseWork.prProposal ? (
                   <div className="rounded-md border border-amber-800 bg-amber-950/25 p-3">
-                    <p className="text-sm font-semibold text-amber-100">No PR command yet</p>
+                    <p className="text-sm font-semibold text-amber-100">No PR change yet</p>
                     <p className="mt-1 text-xs leading-5 text-amber-100/80">
-                      This support command can be decided, but the hook phase still needs one PR-sized command before build and review.
+                      This support item can be decided, but the hook phase still needs one PR-sized change before build and review.
                     </p>
                   </div>
                 ) : null}
@@ -3255,14 +3255,12 @@ export function CommandWavesConsole() {
                   <div className="rounded-md border border-zinc-800 bg-black p-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
-                        <p className="text-sm font-semibold text-zinc-100">Support commands</p>
+                        <p className="text-sm font-semibold text-zinc-100">Support items</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
                           Context, drafts, and room updates stay separate from the PR build target.
                         </p>
                       </div>
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
-                        {countLabel(supportProposals.length, "command")}
-                      </Badge>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{countLabel(supportProposals.length, "item")}</Badge>
                     </div>
                     <div className="mt-3 grid gap-2">
                       {visibleSupportProposals.map((proposal) => (
@@ -3374,7 +3372,7 @@ export function CommandWavesConsole() {
                   </div>
                 ) : (
                   <p className="rounded-md border border-emerald-800 bg-emerald-950/25 p-3 text-sm text-emerald-100">
-                    This command can run without a vote under the current rules.
+                    This work can be logged without a vote under the current rules.
                   </p>
                 )}
 
@@ -3388,7 +3386,7 @@ export function CommandWavesConsole() {
                           ? activePrHasWaveDecision
                             ? "Ready to build the approved PR."
                             : "Record the 6529 decision receipt before the PR build step."
-                          : "Only PR commands use the agent build step in phase 1."}
+                          : "Only code PR work uses the build step in phase 1."}
                     </p>
                     {activeExecution?.artifacts.length ? (
                       <ul className="mt-2 space-y-1 text-sm text-zinc-300">
@@ -3415,7 +3413,7 @@ export function CommandWavesConsole() {
                         disabled={isBusy}
                         onClick={() => void copyCodexWorkPacket()}
                       >
-                        {apiBusy === "codex" ? "Copying" : "Copy Codex packet"}
+                        {apiBusy === "codex" ? "Copying" : "Copy build packet"}
                       </Button>
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
@@ -3423,7 +3421,7 @@ export function CommandWavesConsole() {
                         ? activeExecution
                           ? "Logged PR evidence only. It does not merge, deploy, or spend funds."
                           : "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
-                        : "Use support commands for context, drafts, or room updates outside the PR build step."}
+                        : "Use support items for context, drafts, or room updates outside the PR build step."}
                     </p>
                     {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
                   </div>
@@ -3483,7 +3481,7 @@ export function CommandWavesConsole() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-zinc-400">No commands yet. Propose one to start.</p>
+              <p className="text-sm text-zinc-400">No work yet. Suggest one to start.</p>
             )}
             </Panel>
           </section>

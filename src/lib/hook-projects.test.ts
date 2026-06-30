@@ -16,9 +16,9 @@ describe("active hook projects", () => {
         waveLabel: "6529-hook-builder",
         repoLabel: "6529-Collections/6529-hook",
         currentFocus: demoWave.proposals[0].title,
-        participation: "Read the wave, draft replies for manual posting, and track repo work.",
-        waveRole: "Live discussion, proposals, decisions, and updates.",
-        platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+        participation: "Follow the room, draft replies for manual posting, and track code work.",
+        waveRole: "Where builders talk, propose, decide, and share updates.",
+        platformRole: "Code state, PR record, review proof, launch packet, and contribution report.",
         gateDetails: [
           "Builder wave allowlist for phase 1, manual note only",
           "REP or TDH gates are planned, not enforced here",
@@ -31,11 +31,11 @@ describe("active hook projects", () => {
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
         nextActionDetail: "The approved hook work has PR, review, discussion update, and launch packet evidence.",
-        waveStatus: "Wave decision recorded with 5 yes and 1 no.",
+        waveStatus: "Room decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
         reviewStatusLabel: "review passed",
-        evidenceLabel: "1 command, 1 run, 1 review",
+        evidenceLabel: "1 proposal, 1 run, 1 review",
       }),
     ]);
   });
@@ -52,12 +52,12 @@ describe("active hook projects", () => {
       status: "setup",
       waveLabel: "No builder wave",
       repoLabel: "No GitHub repo",
-      currentFocus: "Choose the first PR-sized hook command.",
+      currentFocus: "Choose the first PR-sized hook change.",
       nextActionStatus: "action",
       nextActionLabel: "next",
       nextActionTitle: "Set the project",
       nextActionDetail: "Confirm one builder wave and one GitHub repo before proposals start.",
-      waveStatus: "Wave has not selected a PR-sized hook command yet.",
+      waveStatus: "No PR-sized hook change selected yet.",
       gateSnapshotLabel: "manual gate",
       gateDetails: [
         "Builder wave allowlist for phase 1, manual note only",
@@ -65,7 +65,7 @@ describe("active hook projects", () => {
         "AI contribution report scores are not permissions",
       ],
       orchestrationSnapshotLabel: "needs idea",
-      codeStatus: "No PR-sized hook command yet.",
+      codeStatus: "No PR-sized hook change yet.",
       codeSnapshotLabel: "no PR yet",
     });
   });
@@ -79,10 +79,10 @@ describe("active hook projects", () => {
     });
 
     expect(projects[0]).toMatchObject({
-      waveStatus: "Wave decision recorded with 5 yes and 1 no.",
+      waveStatus: "Room decision recorded with 5 yes and 1 no.",
       gateSnapshotLabel: "manual gate",
       orchestrationSnapshotLabel: "high approved",
-      codeStatus: "Approved PR command is ready to build.",
+      codeStatus: "Approved PR change is ready to build.",
       codeSnapshotLabel: "ready to build",
       nextActionTitle: "Build the approved PR",
       nextActionDetail: "Use the approved packet or prepared branch, then record the PR evidence.",
@@ -186,7 +186,7 @@ describe("active hook projects", () => {
       name: "Community Hook",
       waveLabel: "community-hook-builder",
       repoLabel: "6529-Collections/community-hook",
-      currentFocus: "Choose the first PR-sized hook command.",
+      currentFocus: "Choose the first PR-sized hook change.",
     });
   });
 

@@ -74,15 +74,15 @@ function waveStatus(wave: CommandWave) {
   const poll = phaseWork.prPoll;
 
   if (!proposal) {
-    return "Wave has not selected a PR-sized hook command yet.";
+    return "No PR-sized hook change selected yet.";
   }
 
   if (poll?.decision?.url) {
-    return `Wave decision recorded with ${poll.yesVotes} yes and ${poll.noVotes} no.`;
+    return `Room decision recorded with ${poll.yesVotes} yes and ${poll.noVotes} no.`;
   }
 
   if (poll?.status === "passed") {
-    return "Vote passed locally. Record the 6529 decision URL.";
+    return "Vote passed locally. Add the 6529 decision URL.";
   }
 
   if (poll) {
@@ -156,14 +156,14 @@ function codeStatus(wave: CommandWave) {
   }
 
   if (phaseWork.prProposal?.status === "approved") {
-    return "Approved PR command is ready to build.";
+    return "Approved PR change is ready to build.";
   }
 
   if (phaseWork.prProposal) {
-    return "PR command is waiting for wave approval.";
+    return "PR change is waiting for room approval.";
   }
 
-  return "No PR-sized hook command yet.";
+  return "No PR-sized hook change yet.";
 }
 
 function codeSnapshotLabel(wave: CommandWave) {
@@ -216,7 +216,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
   return waves.map((wave) => {
     const phaseWork = selectPhaseWork(wave);
     const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
-    const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook command.";
+    const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
     const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim());
     const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
 
@@ -230,9 +230,9 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       waveLabel: waveLabel(wave.waveUrl),
       repoLabel: repoLabel(wave.repoUrl),
       currentFocus,
-      participation: "Read the wave, draft replies for manual posting, and track repo work.",
-      waveRole: "Live discussion, proposals, decisions, and updates.",
-      platformRole: "GitHub repo state, PR evidence, review proof, launch packet, and contribution report.",
+      participation: "Follow the room, draft replies for manual posting, and track code work.",
+      waveRole: "Where builders talk, propose, decide, and share updates.",
+      platformRole: "Code state, PR record, review proof, launch packet, and contribution report.",
       gateDetails: gateDetails(wave),
       gateSnapshotLabel: gateSnapshotLabel(wave),
       orchestrationSnapshotLabel: orchestrationSnapshotLabel(wave),
@@ -246,7 +246,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       latestPrUrl: findPullRequestUrl(wave),
       reviewStatusLabel: reviewStatus(wave),
       evidenceLabel: [
-        countLabel(wave.proposals.length, "command"),
+        countLabel(wave.proposals.length, "proposal"),
         countLabel(wave.executions.length, "run"),
         countLabel(wave.reviews.length, "review"),
       ].join(", "),
