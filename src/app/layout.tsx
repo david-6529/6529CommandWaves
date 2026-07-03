@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { commandWaveProductCopy } from "@/lib/product-copy";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "6529 Hook Room",
-  description: "Coordinate the 6529 hook build: discuss scope, record decisions, build PRs, and review before merge.",
+  title: commandWaveProductCopy.headline,
+  description: commandWaveProductCopy.subhead,
 };
 
 export default function RootLayout({
