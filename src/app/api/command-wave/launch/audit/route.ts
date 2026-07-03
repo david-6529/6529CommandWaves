@@ -13,6 +13,8 @@ export async function GET(request: Request) {
   try {
     const checkSetupRemote = shouldCheckSetupRemote(request);
 
+    assertRateLimit(request, { namespace: "launch_audit", max: 30, windowMs: 60_000 });
+
     if (checkSetupRemote) {
       assertRateLimit(request, { namespace: "launch_audit_remote", max: 10, windowMs: 60_000 });
     }
