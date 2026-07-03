@@ -21,10 +21,12 @@ describe("admin API auth", () => {
   });
 
   it("accepts bearer auth for server-to-server callers", () => {
+    const key = "strong-admin-key-for-tests";
+
     expect(() =>
-      requireAdminRequest(request({ authorization: "Bearer secret" }), {
+      requireAdminRequest(request({ authorization: `Bearer ${key}` }), {
         NODE_ENV: "production",
-        ADMIN_API_KEY: "secret",
+        ADMIN_API_KEY: key,
       }),
     ).not.toThrow();
   });
@@ -34,5 +36,20 @@ describe("admin API auth", () => {
     expect(() => requireAdminRequest(request(), { NODE_ENV: "production" })).toThrow(
       "ADMIN_API_KEY is required before mutating command-wave state.",
     );
+  });
+
+  it("fails closed in production when the admin key is weak or placeholder", () => {
+    expect(() =>
+      requireAdminRequest(request({ "x-admin-api-key": "short-launch-key" }), {
+        NODE_ENV: "production",
+        ADMIN_API_KEY: "short-launch-key",
+      }),
+    ).toThrow("Use a strong ADMIN_API_KEY with at least 24 characters before mutating command-wave state.");
+    expect(() =>
+      requireAdminRequest(request({ "x-admin-api-key": "replace-with-a-strong-random-key" }), {
+        NODE_ENV: "production",
+        ADMIN_API_KEY: "replace-with-a-strong-random-key",
+      }),
+    ).toThrow("Replace placeholder ADMIN_API_KEY with a strong random key before mutating command-wave state.");
   });
 });

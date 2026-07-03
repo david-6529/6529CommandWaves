@@ -1,6 +1,4 @@
-function hasValue(value: string | undefined) {
-  return Boolean(value?.trim());
-}
+import { hasEnvValue, isPlaceholderValue, isProductionEnv } from "./env-placeholders";
 
 function bearerToken(value: string | null) {
   const match = value?.match(/^Bearer\s+(.+)$/i);
@@ -23,7 +21,27 @@ function safeEqual(left: string, right: string) {
 }
 
 export function adminAuthRequired(env: Record<string, string | undefined> = process.env) {
-  return hasValue(env.ADMIN_API_KEY) || env.NODE_ENV === "production";
+  return hasEnvValue(env.ADMIN_API_KEY) || isProductionEnv(env);
+}
+
+function adminApiKeyConfigurationError(key: string | undefined, env: Record<string, string | undefined>) {
+  if (!hasEnvValue(key)) {
+    return "ADMIN_API_KEY is required before mutating command-wave state.";
+  }
+
+  if (!isProductionEnv(env)) {
+    return null;
+  }
+
+  if (isPlaceholderValue(key)) {
+    return "Replace placeholder ADMIN_API_KEY with a strong random key before mutating command-wave state.";
+  }
+
+  if ((key?.trim().length ?? 0) < 24) {
+    return "Use a strong ADMIN_API_KEY with at least 24 characters before mutating command-wave state.";
+  }
+
+  return null;
 }
 
 export function requireAdminRequest(request: Request, env: Record<string, string | undefined> = process.env) {
@@ -32,14 +50,16 @@ export function requireAdminRequest(request: Request, env: Record<string, string
   }
 
   const expectedKey = env.ADMIN_API_KEY?.trim();
+  const configurationError = adminApiKeyConfigurationError(expectedKey, env);
 
-  if (!expectedKey) {
-    throw Object.assign(new Error("ADMIN_API_KEY is required before mutating command-wave state."), { status: 503 });
+  if (configurationError) {
+    throw Object.assign(new Error(configurationError), { status: 503 });
   }
 
+  const configuredKey = expectedKey ?? "";
   const suppliedKey = request.headers.get("x-admin-api-key")?.trim() || bearerToken(request.headers.get("authorization"));
 
-  if (!suppliedKey || !safeEqual(suppliedKey, expectedKey)) {
+  if (!suppliedKey || !safeEqual(suppliedKey, configuredKey)) {
     throw Object.assign(new Error("Admin API key required."), { status: 401 });
   }
 }
