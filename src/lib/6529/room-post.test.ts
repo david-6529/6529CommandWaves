@@ -97,4 +97,16 @@ describe("6529 room posting", () => {
       status: 400,
     });
   });
+
+  it("rejects oversized room messages", async () => {
+    await expect(
+      postRoomMessage({
+        waveId: "6529-hook-builder",
+        content: "x".repeat(4001),
+      }),
+    ).rejects.toMatchObject({
+      message: "Keep room messages under 4000 characters.",
+      status: 400,
+    });
+  });
 });

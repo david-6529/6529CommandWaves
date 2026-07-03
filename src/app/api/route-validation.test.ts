@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as previewContext } from "./6529/context/preview/route";
+import { POST as postRoomMessage } from "./6529/room-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
@@ -22,8 +23,10 @@ async function responsePayload(response: Response) {
 
 describe("API route validation", () => {
   const previousMockMode = process.env["6529_MOCK_MODE"];
+  const previousAdminKey = process.env.ADMIN_API_KEY;
 
   beforeEach(() => {
+    delete process.env.ADMIN_API_KEY;
     process.env["6529_MOCK_MODE"] = "true";
     resetMockDropsForTests();
     resetRateLimitsForTest();
@@ -37,6 +40,12 @@ describe("API route validation", () => {
       delete process.env["6529_MOCK_MODE"];
     } else {
       process.env["6529_MOCK_MODE"] = previousMockMode;
+    }
+
+    if (previousAdminKey === undefined) {
+      delete process.env.ADMIN_API_KEY;
+    } else {
+      process.env.ADMIN_API_KEY = previousAdminKey;
     }
   });
 
@@ -82,6 +91,23 @@ describe("API route validation", () => {
     expect(response.status).toBe(400);
     await expect(responsePayload(response)).resolves.toMatchObject({
       error: "6529 wave id must be 160 characters or less.",
+    });
+  });
+
+  it("rejects oversized room posts at the route", async () => {
+    const response = await postRoomMessage(
+      request("https://command-waves.example.com/api/6529/room-post", {
+        method: "POST",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/mock-command-wave",
+          content: "x".repeat(4001),
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "Keep room messages under 4000 characters.",
     });
   });
 });
