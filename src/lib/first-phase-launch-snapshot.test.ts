@@ -70,6 +70,23 @@ describe("first phase launch snapshot", () => {
     );
   });
 
+  it("does not publish placeholder app URLs as production verification targets", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: {
+        ...launchEnv,
+        NODE_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "https://your-app.example",
+      },
+    });
+
+    expect(snapshot.verificationTargets).toEqual({
+      setupProofUrl: "/api/command-wave/setup/proof",
+      commandWaveStateUrl: "/api/command-wave/state",
+      launchAuditUrl: "/api/command-wave/launch/audit",
+    });
+  });
+
   it("does not emit em dash characters", async () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",

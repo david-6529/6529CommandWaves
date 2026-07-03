@@ -1,5 +1,6 @@
 import { commandWaveStateUrlFromEnv } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
+import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createPhaseChecklist } from "./phase-checklist";
 import { validateCommandWaveSetup, type SetupValidation } from "./setup-validation";
@@ -38,7 +39,9 @@ type FirstPhaseLaunchSnapshotOptions = {
 };
 
 function appRouteUrl(path: string, env: Record<string, string | undefined>) {
-  const appUrl = env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/+$/, "");
+  const appUrl = hasProductionValue(env.NEXT_PUBLIC_APP_URL, env)
+    ? env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/+$/, "")
+    : "";
 
   return appUrl ? `${appUrl}${path}` : path;
 }
