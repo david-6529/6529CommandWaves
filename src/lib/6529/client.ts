@@ -3,6 +3,7 @@ import { normalizeWaveDropsResponse } from "./normalize";
 import type { DropPollRequest, PostDropOptions } from "./types";
 
 const maxWaveIdLength = 160;
+const waveIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
@@ -22,6 +23,13 @@ export function normalizeWaveId(value: string) {
 
   if (waveId.length > maxWaveIdLength) {
     throw Object.assign(new Error(`6529 wave id must be ${maxWaveIdLength} characters or less.`), { status: 400 });
+  }
+
+  if (waveId && !waveIdPattern.test(waveId)) {
+    throw Object.assign(
+      new Error("6529 wave id can only include letters, numbers, hyphens, underscores, or periods."),
+      { status: 400 },
+    );
   }
 
   return waveId;

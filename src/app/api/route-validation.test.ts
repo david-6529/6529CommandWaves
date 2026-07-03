@@ -119,6 +119,23 @@ describe("API route validation", () => {
     });
   });
 
+  it("rejects malformed setup wave IDs at the route", async () => {
+    const response = await validateSetup(
+      request("https://command-waves.example.com/api/command-wave/setup/validate", {
+        method: "POST",
+        body: JSON.stringify({
+          waveUrl: "../bad wave",
+          repoUrl: "6529-Collections/6529-hook",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "6529 wave id can only include letters, numbers, hyphens, underscores, or periods.",
+    });
+  });
+
   it("rejects oversized room posts at the route", async () => {
     const response = await postRoomMessage(
       request("https://command-waves.example.com/api/6529/room-post", {

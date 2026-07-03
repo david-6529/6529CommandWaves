@@ -17,6 +17,15 @@ describe("6529 normalization", () => {
     );
   });
 
+  it("rejects malformed wave IDs", () => {
+    expect(() => normalizeWaveId("bad wave")).toThrow(
+      "6529 wave id can only include letters, numbers, hyphens, underscores, or periods.",
+    );
+    expect(() => normalizeWaveId("../other-wave")).toThrow(
+      "6529 wave id can only include letters, numbers, hyphens, underscores, or periods.",
+    );
+  });
+
   it("normalizes drop content, author, serial, and timestamps", () => {
     const drop = normalizeWaveDrop({
       drop_id: "drop-1",
