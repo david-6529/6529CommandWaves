@@ -48,6 +48,19 @@ describe("Codex work packet", () => {
     ).toThrow("Record the 6529 decision receipt before creating a Codex work packet.");
   });
 
+  it("only creates packets for PR commands", () => {
+    expect(() =>
+      createCodexWorkPacket({
+        wave: demoWave,
+        proposal: {
+          ...demoWave.proposals[0],
+          kind: "draft_response",
+        },
+        poll: null,
+      }),
+    ).toThrow("Codex work packets are only available for PR commands.");
+  });
+
   it("requires a 6529 discussion URL for PR work packet receipts", () => {
     const proposal = {
       ...demoWave.proposals[0],

@@ -40,6 +40,10 @@ export function createCodexWorkPacket({
   runManifest?: CommandRunManifest;
   baseBranch?: string;
 }): CodexWorkPacket {
+  if (proposal.kind !== "open_pr") {
+    throw Object.assign(new Error("Codex work packets are only available for PR commands."), { status: 409 });
+  }
+
   if (proposal.kind === "open_pr" && !pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     throw Object.assign(new Error("Record the 6529 decision receipt before creating a Codex work packet."), {
       status: 409,
