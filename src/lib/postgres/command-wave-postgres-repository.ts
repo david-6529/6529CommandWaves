@@ -462,11 +462,16 @@ export async function deleteCommandWaveFromPostgres(client: PostgresQueryClient)
   await client.query("delete from command_waves");
 }
 
-export function postgresCommandWaveRepository(client: PostgresQueryClient = getPool()): CommandWaveRepository {
+export function postgresCommandWaveRepository(
+  client?: PostgresQueryClient,
+  connectionString = process.env.DATABASE_URL,
+): CommandWaveRepository {
+  const queryClient = () => client ?? getPool(connectionString);
+
   return {
     mode: "postgres",
-    load: () => loadCommandWaveFromPostgres(client),
-    save: (wave) => saveCommandWaveToPostgres(client, wave),
-    delete: () => deleteCommandWaveFromPostgres(client),
+    load: () => loadCommandWaveFromPostgres(queryClient()),
+    save: (wave) => saveCommandWaveToPostgres(queryClient(), wave),
+    delete: () => deleteCommandWaveFromPostgres(queryClient()),
   };
 }

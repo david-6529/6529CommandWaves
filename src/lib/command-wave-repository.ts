@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import type { CommandWave } from "./command-waves";
+import { hasProductionValue, isProductionEnv } from "./env-placeholders";
 import { postgresCommandWaveRepository } from "./postgres/command-wave-postgres-repository";
 
 export type CommandWaveRepository = {
@@ -81,8 +82,8 @@ export function getCommandWaveRepository(env: Record<string, string | undefined>
     return memoryRepository();
   }
 
-  if (env.COMMAND_WAVE_STORE === "postgres" || (env.NODE_ENV === "production" && env.DATABASE_URL)) {
-    return postgresCommandWaveRepository();
+  if (env.COMMAND_WAVE_STORE === "postgres" || (isProductionEnv(env) && hasProductionValue(env.DATABASE_URL, env))) {
+    return postgresCommandWaveRepository(undefined, env.DATABASE_URL);
   }
 
   if (env.NODE_ENV === "test") {
