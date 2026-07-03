@@ -1,8 +1,8 @@
-# 6529 Hook Build Room
+# Build the 6529 Hook Together
 
 ## Short Version
 
-6529 Hook Build Room is a simple coordination app for building the 6529 hook in public.
+This is a simple coordination app for building the 6529 hook in public.
 
 The first public phase connects one 6529 room to one smart contract repo. Builders talk in the room, turn one idea into a
 small proposal, record the 6529 decision, build a draft PR, review it, and share the result back with a clear log.
@@ -32,7 +32,7 @@ is designed so the same pattern can become a broader public builder protocol aft
 
 What exists now:
 
-- A Next app product surface focused on the `6529 Hook Build Room`.
+- A Next app product surface focused on building the 6529 hook together.
 - One active hook project with a public 6529 room and a code repo.
 - A simplified room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and
   proposal flow folded as needed.
@@ -43,7 +43,7 @@ What exists now:
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
-- Shared JSON body validation for API routes so malformed or non-object request bodies return clean 400 errors.
+- Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
   contract signal checks.
 - Local file storage for the demo flow and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
