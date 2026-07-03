@@ -1857,36 +1857,29 @@ export function CommandWavesConsole() {
 
   return (
     <main className="min-h-screen bg-black text-base text-zinc-100">
-      <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-800 pb-4">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
+        <header className="border-b border-zinc-800 pb-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-4xl">
-              <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl font-semibold tracking-normal text-zinc-50 sm:text-5xl">
                 {commandWaveProductCopy.headline}
               </h1>
-              <p className="mt-2 max-w-2xl text-lg leading-8 text-zinc-300">{commandWaveProductCopy.subhead}</p>
-            </div>
-            <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Room</LinkButton> : null}
-              {primaryHookProject?.repoUrl ? <LinkButton href={primaryHookProject.repoUrl}>Code</LinkButton> : null}
+              <p className="mt-3 max-w-3xl text-xl leading-8 text-zinc-300">{commandWaveProductCopy.subhead}</p>
             </div>
           </div>
 
           <nav className="mt-4 flex flex-wrap gap-2" aria-label="Room actions">
-            <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
-              Join
-            </Button>
             <JumpLink href="#wave-room">Chat</JumpLink>
             <Button type="button" variant="secondary" onClick={openSuggestSection}>
               Suggest work
             </Button>
-            <Button type="button" variant="secondary" onClick={openBuildersSection}>
-              Members
+            <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
+              Join
             </Button>
           </nav>
         </header>
 
-        <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[1.08fr_0.92fr]">
+        <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[0.95fr_1.05fr]">
           <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -1968,7 +1961,7 @@ export function CommandWavesConsole() {
                       Propose code PR
                     </Button>
                     <Button type="button" variant="secondary" onClick={openActivitySection}>
-                      Build log
+                      History
                     </Button>
                   </div>
                 </div>
@@ -2003,7 +1996,7 @@ export function CommandWavesConsole() {
 
             <details className="mt-4 border-t border-zinc-800 pt-3">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
-                <span>Rules</span>
+                <span>How this works</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
               </summary>
               <div className="mt-3 grid gap-3">
@@ -2037,7 +2030,7 @@ export function CommandWavesConsole() {
           <section id="wave-room" className="order-2 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-2">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="text-2xl font-semibold text-zinc-50">Room</h2>
+                <h2 className="text-2xl font-semibold text-zinc-50">Chat</h2>
               </div>
               <div className="flex flex-wrap gap-2">
                 {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
@@ -2048,16 +2041,6 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
-              <details className="mb-3 border-y border-zinc-800 py-2">
-                <summary className="cursor-pointer text-sm font-semibold text-zinc-300">Templates</summary>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {builderWaveQuickPosts.map((post) => (
-                    <Button key={post.id} type="button" variant="secondary" onClick={() => prepareQuickPost(post)}>
-                      {post.label}
-                    </Button>
-                  ))}
-                </div>
-              </details>
               <Field label="Message">
                 <Textarea
                   rows={3}
@@ -2109,11 +2092,27 @@ export function CommandWavesConsole() {
                   Open posted message
                 </a>
               ) : null}
+              <details className="mt-3 border-y border-zinc-800 py-2">
+                <summary className="cursor-pointer text-sm font-semibold text-zinc-300">Message ideas</summary>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {builderWaveQuickPosts.map((post) => (
+                    <Button key={post.id} type="button" variant="secondary" onClick={() => prepareQuickPost(post)}>
+                      {post.label}
+                    </Button>
+                  ))}
+                </div>
+              </details>
             </div>
 
-            <div className="mt-4 border-t border-zinc-800 pt-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest room activity</p>
+            <details className="mt-4 border-t border-zinc-800 pt-3">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+                <span>Latest activity</span>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                  {hasRecentDiscussionPosts ? "room post" : "local log"}
+                </Badge>
+              </summary>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm leading-6 text-zinc-500">A short snapshot of what the room is discussing.</p>
                 <Button
                   type="button"
                   variant="secondary"
@@ -2172,7 +2171,7 @@ export function CommandWavesConsole() {
                   ))}
                 </div>
               )}
-            </div>
+            </details>
           </section>
         </section>
 
@@ -2304,7 +2303,7 @@ export function CommandWavesConsole() {
           onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Hook details</span>
+            <span>Project snapshot</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
@@ -2350,7 +2349,7 @@ export function CommandWavesConsole() {
           onToggle={(event) => setActivityOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Build log</span>
+            <span>History</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{buildTimeline.length} steps</Badge>
           </summary>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
@@ -2511,7 +2510,7 @@ export function CommandWavesConsole() {
 
             <details id="project-details" className="border-b border-zinc-800 pb-4">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-            <span>Hook details</span>
+            <span>Project setup</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
@@ -2696,7 +2695,7 @@ export function CommandWavesConsole() {
                   Suggest a change
                 </Button>
                 <Button type="button" variant="secondary" onClick={openActivitySection}>
-                  View activity
+                  View history
                 </Button>
               </div>
             </div>
@@ -3591,8 +3590,8 @@ export function CommandWavesConsole() {
 
         <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Activity report</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">informational</Badge>
+            <span>Reports and updates</span>
+            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
           </summary>
           <div className="mt-4 grid gap-5">
             <Panel title="Activity report" eyebrow="Human review">
@@ -3703,14 +3702,8 @@ export function CommandWavesConsole() {
               </div>
             </Panel>
           </div>
-        </details>
 
-        <details id="share-back" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Share back to room</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">copyable</Badge>
-          </summary>
-          <div className="mt-4">
+          <div id="share-back" className="mt-5">
             <Panel title="Room update draft" eyebrow="Share back">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>

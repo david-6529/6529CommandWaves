@@ -3,12 +3,12 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.headline).toBe("Build the 6529 Hook Together");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.subhead).toBe(
-      "Discuss scope, approve changes, and review PRs in one shared room.",
+      "A shared workspace to discuss hook changes, approve work, and review PRs together.",
     );
-    expect(commandWaveProductCopy.positioning).toBe("A focused workspace for one public hook build.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Discuss, decide, review");
+    expect(commandWaveProductCopy.positioning).toBe("One room, one repo, one approved change at a time.");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Discuss, approve, review");
   });
 
   it("keeps unsafe authority claims out of the first-screen explanation", () => {
@@ -26,7 +26,7 @@ describe("Command Waves product copy", () => {
   });
 
   it("keeps the first hook ahead of the later reusable protocol", () => {
-    expect(commandWaveProductCopy.headline).toBe("Build the 6529 Hook Together");
+    expect(commandWaveProductCopy.headline).toBe("6529 Hook Room");
     expect(commandWaveProductCopy.headline.toLowerCase()).toContain("6529 hook");
     expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("changes");
     expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("pr");

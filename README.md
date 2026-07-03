@@ -1,8 +1,8 @@
-# Build the 6529 Hook Together
+# 6529 Hook Room
 
 ## Short Version
 
-This is a simple coordination app for building the 6529 hook in public.
+This is a simple shared workspace for building the 6529 hook in public.
 
 The first public phase connects one 6529 room to one smart contract repo. Builders talk in the room, turn one idea into a
 small proposal, record the 6529 decision, build a draft PR, review it, and share the result back with a clear log.
