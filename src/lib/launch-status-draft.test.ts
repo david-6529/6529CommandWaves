@@ -38,8 +38,14 @@ describe("launch status draft", () => {
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: getReadinessChecks({
         NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
-        ADMIN_API_KEY: "admin",
+        DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
+        ADMIN_API_KEY: "strong-admin-key-for-launch",
         "6529_MOCK_MODE": "false",
+        NODE_ENV: "production",
+        COMMAND_WAVE_STORE: "postgres",
+        COMMAND_WAVE_REPO_ADAPTER: "github",
+        COMMAND_WAVE_GITHUB_TOKEN: "ghp_launch_readiness_token_1234567890",
+        COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave/state",
       }),
       setupValidation: {
         waveId: "6529-hook-builder",

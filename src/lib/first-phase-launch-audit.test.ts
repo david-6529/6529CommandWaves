@@ -257,7 +257,7 @@ describe("first phase launch audit", () => {
     });
   });
 
-  it("does not treat later hardening warnings as first-loop launch gaps", () => {
+  it("surfaces production hardening warnings as launch gaps", () => {
     const firstLoopChecks = getReadinessChecks({
       NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
       ADMIN_API_KEY: "admin",
@@ -270,12 +270,26 @@ describe("first phase launch audit", () => {
       wave: demoWave,
     });
 
-    expect(audit.status).toBe("ready");
-    expect(audit.openItems).toEqual([]);
-    expect(audit.items.map((item) => item.id)).not.toContain("readiness_database");
-    expect(audit.items.map((item) => item.id)).not.toContain("readiness_command_wave_store");
-    expect(audit.items.map((item) => item.id)).not.toContain("readiness_github_pr_adapter");
-    expect(audit.items.map((item) => item.id)).not.toContain("readiness_guardian_wave_state");
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.blockers).toEqual([]);
+    expect(audit.openItems).toEqual([
+      expect.objectContaining({
+        id: "readiness_database",
+        status: "needed",
+      }),
+      expect.objectContaining({
+        id: "readiness_command_wave_store",
+        status: "needed",
+      }),
+      expect.objectContaining({
+        id: "readiness_github_pr_adapter",
+        status: "needed",
+      }),
+      expect.objectContaining({
+        id: "readiness_guardian_wave_state",
+        status: "needed",
+      }),
+    ]);
   });
 
   it("keeps live 6529 mode as a first-loop launch gap", () => {

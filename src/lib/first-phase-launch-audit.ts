@@ -45,13 +45,6 @@ const launchReadinessCheckIds = new Set([
   "guardian_mode",
 ]);
 
-const firstLoopOptionalReadinessWarningIds = new Set([
-  "database",
-  "command_wave_store",
-  "github_pr_adapter",
-  "guardian_wave_state",
-]);
-
 function phaseItemStatus(status: PhaseChecklistStatus): FirstPhaseLaunchAuditItemStatus {
   if (status === "done") {
     return "ready";
@@ -77,11 +70,7 @@ function readinessItemStatus(status: ReadinessCheck["status"]): FirstPhaseLaunch
 }
 
 function includeLaunchReadinessCheck(check: ReadinessCheck) {
-  if (!launchReadinessCheckIds.has(check.id)) {
-    return false;
-  }
-
-  return !(check.status === "warn" && firstLoopOptionalReadinessWarningIds.has(check.id));
+  return launchReadinessCheckIds.has(check.id);
 }
 
 function statusLabel(status: FirstPhaseLaunchAuditStatus) {
