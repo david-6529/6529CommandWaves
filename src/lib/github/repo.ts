@@ -36,6 +36,10 @@ export const requiredHookRepoFiles = [
 
 const commandPrManifestStart = "<!-- command-waves:manifest:start -->";
 const commandPrManifestEnd = "<!-- command-waves:manifest:end -->";
+const maxGitHubOwnerLength = 100;
+const maxGitHubRepoLength = 100;
+const githubOwnerPattern = /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/;
+const githubRepoPattern = /^[A-Za-z0-9._-]+$/;
 
 export function parseGitHubRepoUrl(value: string): GitHubRepoRef | null {
   const trimmed = value.trim();
@@ -56,7 +60,14 @@ export function parseGitHubRepoUrl(value: string): GitHubRepoRef | null {
   const owner = match[1]!;
   const repo = match[2]!.replace(/\.git$/, "");
 
-  if (!owner || !repo) {
+  if (
+    !owner ||
+    !repo ||
+    owner.length > maxGitHubOwnerLength ||
+    repo.length > maxGitHubRepoLength ||
+    !githubOwnerPattern.test(owner) ||
+    !githubRepoPattern.test(repo)
+  ) {
     return null;
   }
 

@@ -45,6 +45,13 @@ describe("GitHub repo helpers", () => {
     });
   });
 
+  it("rejects oversized or malformed GitHub references", () => {
+    expect(parseGitHubRepoUrl(`${"a".repeat(101)}/repo`)).toBeNull();
+    expect(parseGitHubRepoUrl(`owner/${"r".repeat(101)}`)).toBeNull();
+    expect(parseGitHubRepoUrl("bad_owner/repo")).toBeNull();
+    expect(parseGitHubRepoUrl("owner/repo name")).toBeNull();
+  });
+
   it("builds stable command branch names", () => {
     expect(commandBranchName("cmd-042", "Add a Command Waves overview!")).toBe("command/cmd-042-add-a-command-waves-overview");
   });
