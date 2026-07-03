@@ -354,7 +354,8 @@ Verify the first-loop launch audit:
 LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=1' npm run launch:audit
 ```
 
-The command exits nonzero until the launch audit is ready. For offline verification, set `LAUNCH_AUDIT_PATH`.
+The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
+`LAUNCH_AUDIT_PATH`.
 
 Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed by Next:
 

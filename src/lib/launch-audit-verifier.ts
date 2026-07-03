@@ -53,6 +53,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const launchAudit = isRecord(snapshot?.launchAudit) ? snapshot.launchAudit : null;
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
+  const setupCheckMode = asString(snapshot?.setupCheckMode);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
   const blockers = collectItemSummaries(launchAudit?.blockers);
   const openItems = collectItemSummaries(launchAudit?.openItems);
@@ -68,6 +69,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       "launch_status",
       launchStatus === "ready" ? "pass" : "fail",
       launchStatus === "ready" ? "First public loop is ready." : `First public loop is ${launchStatus}.`,
+    ),
+    check(
+      "remote_setup",
+      setupCheckMode === "remote" ? "pass" : "fail",
+      setupCheckMode === "remote"
+        ? "Remote wave and repo setup checks ran."
+        : "Launch audit must be generated with remote setup checks.",
     ),
     check(
       "blockers",

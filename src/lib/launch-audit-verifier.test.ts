@@ -45,6 +45,7 @@ describe("launch audit verifier", () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: readyEnv,
+      checkSetupRemote: true,
       setupValidation: readySetupValidation,
     });
     const result = verifyLaunchAuditPayload(snapshot);
@@ -57,6 +58,21 @@ describe("launch audit verifier", () => {
       blockers: [],
     });
     expect(result.nextAction?.title).toBe("Start the first public loop");
+  });
+
+  it("fails a shape-only setup audit before public launch", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload(snapshot);
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must be generated with remote setup checks.",
+    });
   });
 
   it("fails a blocked audit and lists blocker details", async () => {
@@ -90,6 +106,7 @@ describe("launch audit verifier", () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: readyEnv,
+      checkSetupRemote: true,
       setupValidation: readySetupValidation,
     });
 
