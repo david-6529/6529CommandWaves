@@ -262,6 +262,19 @@ type ReadinessResponse = ApiErrorPayload & {
   checks: ReadinessCheck[];
 };
 
+type LaunchAuditResponse = ApiErrorPayload & {
+  audit?: {
+    setupValidation: SetupValidation;
+    readiness: ReadinessResponse;
+    launchAudit: {
+      statusLabel: string;
+      nextAction: {
+        title: string;
+      };
+    };
+  };
+};
+
 type CodexWorkPacketResponse = ApiErrorPayload & {
   packet?: {
     proposalId: string;
@@ -435,6 +448,19 @@ async function requestReadiness() {
   return payload;
 }
 
+async function requestRemoteLaunchAudit() {
+  const response = await fetchWithClientTimeout(remoteLaunchAuditPath, {
+    headers: { accept: "application/json" },
+  });
+  const payload = await readApiJson<LaunchAuditResponse>(response, "Launch audit failed.");
+
+  if (!response.ok || !payload.audit) {
+    throw new Error(formatApiError(payload, "Launch audit failed."));
+  }
+
+  return payload.audit;
+}
+
 async function requestCodexWorkPacket(proposalId: string, accessKey?: string) {
   const headers = new Headers();
 
@@ -460,6 +486,7 @@ type BusyState =
   | "saving"
   | "setup"
   | "readiness"
+  | "launch"
   | "search"
   | "context"
   | "roomPost"
@@ -1206,11 +1233,15 @@ export function CommandWavesConsole() {
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
-  const launchNextActionItemId = launchAudit.nextAction.itemId;
-  const launchActionRunsSetup = launchNextActionItemId === "setup_not_checked" || launchNextActionItemId === "setup_remote_check";
-  const launchActionRunsReadiness = launchNextActionItemId === "readiness_not_checked";
+  const launchNextActionItemId = launchAudit.nextAction.itemId ?? "";
+  const launchActionRunsSetup =
+    launchNextActionItemId === "setup_not_checked" ||
+    launchNextActionItemId === "setup_remote_check" ||
+    launchNextActionItemId.startsWith("setup_");
+  const launchActionRunsReadiness =
+    launchNextActionItemId === "readiness_not_checked" || launchNextActionItemId.startsWith("readiness_");
   const launchActionButtonText = launchActionRunsSetup
-    ? apiBusy === "setup"
+    ? apiBusy === "setup" || apiBusy === "launch"
       ? "Checking"
       : "Run setup check"
     : launchActionRunsReadiness
@@ -1462,6 +1493,24 @@ export function CommandWavesConsole() {
     }
   }
 
+  async function checkLaunchAudit() {
+    setReadinessControlsOpen(true);
+    setApiBusy("launch");
+    setApiError("");
+
+    try {
+      const result = await requestRemoteLaunchAudit();
+
+      setSetupValidation(result.setupValidation);
+      setReadiness(result.readiness);
+      setApiNotice(`Launch checked: ${result.launchAudit.statusLabel}. ${result.launchAudit.nextAction.title}.`);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Launch audit failed.");
+    } finally {
+      setApiBusy(null);
+    }
+  }
+
   function saveSetup() {
     void runWaveAction(
       "saving",
@@ -1511,7 +1560,7 @@ export function CommandWavesConsole() {
   function runLaunchNextAction() {
     if (launchActionRunsSetup) {
       openSetupControls();
-      void checkSetup();
+      void checkLaunchAudit();
       return;
     }
 
