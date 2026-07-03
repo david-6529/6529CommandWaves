@@ -70,10 +70,17 @@ describe("API route rate limits", () => {
   });
 
   it("rate limits room posting after admin auth", async () => {
+    const adminKey = "strong-admin-key-for-route-tests";
+
+    process.env.ADMIN_API_KEY = adminKey;
+
     for (let index = 0; index < 10; index += 1) {
       const response = await postRoomMessage(
         request("https://command-waves.example.com/api/6529/room-post", {
           method: "POST",
+          headers: {
+            "x-admin-api-key": adminKey,
+          },
           body: JSON.stringify({
             waveUrl: "https://6529.io/waves/mock-command-wave",
             content: `Room post ${index}`,
@@ -87,6 +94,9 @@ describe("API route rate limits", () => {
     const limited = await postRoomMessage(
       request("https://command-waves.example.com/api/6529/room-post", {
         method: "POST",
+        headers: {
+          "x-admin-api-key": adminKey,
+        },
         body: JSON.stringify({
           waveUrl: "https://6529.io/waves/mock-command-wave",
           content: "Room post over limit",
