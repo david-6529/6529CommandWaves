@@ -11,6 +11,26 @@ function hasValue(value: string | undefined) {
   return Boolean(value?.trim());
 }
 
+function isPlaceholderValue(value: string | undefined) {
+  const normalized = value?.trim().toLowerCase() ?? "";
+
+  return Boolean(
+    normalized &&
+      (normalized.includes("replace-with") ||
+        normalized.includes("your-app.example") ||
+        normalized.includes("user:password@host") ||
+        normalized === "postgresql://example" ||
+        normalized === "token" ||
+        normalized === "admin" ||
+        normalized === "password" ||
+        normalized === "secret"),
+  );
+}
+
+function hasProductionValue(value: string | undefined, env: Record<string, string | undefined>) {
+  return hasValue(value) && !(productionMode(env) && isPlaceholderValue(value));
+}
+
 function localFileStoreEnabled(env: Record<string, string | undefined>) {
   return Boolean(
     env.COMMAND_WAVE_STORE === "file" ||
@@ -27,12 +47,16 @@ function productionMode(env: Record<string, string | undefined>) {
 }
 
 function guardianWaveStateConfigured(env: Record<string, string | undefined>) {
-  return hasValue(env.COMMAND_WAVE_STATE_PATH) || hasValue(env.COMMAND_WAVE_STATE_URL);
+  return hasProductionValue(env.COMMAND_WAVE_STATE_PATH, env) || hasProductionValue(env.COMMAND_WAVE_STATE_URL, env);
 }
 
 function guardianWaveStateMessage(env: Record<string, string | undefined>, configured: boolean) {
   if (configured) {
     return "Guardian PR checks have a real wave-state source.";
+  }
+
+  if (productionMode(env) && (isPlaceholderValue(env.COMMAND_WAVE_STATE_URL) || isPlaceholderValue(env.COMMAND_WAVE_STATE_PATH))) {
+    return "Replace placeholder COMMAND_WAVE_STATE_URL with the deployed state URL before guardian PR checks run.";
   }
 
   const suggestedUrl = commandWaveStateUrlFromEnv(env);
@@ -77,6 +101,15 @@ function appUrlCheck(appUrl: string | undefined, env: Record<string, string | un
     };
   }
 
+  if (productionMode(env) && isPlaceholderValue(trimmed)) {
+    return {
+      id: "app_url",
+      label: "App URL",
+      status: "fail",
+      message: "Replace placeholder NEXT_PUBLIC_APP_URL with the deployed app URL before public launch.",
+    };
+  }
+
   return {
     id: "app_url",
     label: "App URL",
@@ -97,6 +130,15 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
     };
   }
 
+  if (productionMode(env) && isPlaceholderValue(key)) {
+    return {
+      id: "admin_api_key",
+      label: "Admin API key",
+      status: "fail",
+      message: "Replace placeholder ADMIN_API_KEY with a strong random key before public launch.",
+    };
+  }
+
   if (productionMode(env) && key.length < 24) {
     return {
       id: "admin_api_key",
@@ -114,11 +156,79 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
   };
 }
 
+function databaseCheck(env: Record<string, string | undefined>): ReadinessCheck {
+  if (!hasValue(env.DATABASE_URL)) {
+    return {
+      id: "database",
+      label: "Database",
+      status: "warn",
+      message: "Add DATABASE_URL before durable public audit storage.",
+    };
+  }
+
+  if (productionMode(env) && isPlaceholderValue(env.DATABASE_URL)) {
+    return {
+      id: "database",
+      label: "Database",
+      status: "fail",
+      message: "Replace placeholder DATABASE_URL with a real Postgres connection string before public launch.",
+    };
+  }
+
+  return {
+    id: "database",
+    label: "Database",
+    status: "pass",
+    message: "Configured.",
+  };
+}
+
+function githubPrToken(env: Record<string, string | undefined>) {
+  return env.COMMAND_WAVE_GITHUB_TOKEN?.trim() || env.GITHUB_TOKEN?.trim() || "";
+}
+
+function githubPrAdapterCheck(env: Record<string, string | undefined>, enabled: boolean): ReadinessCheck {
+  const token = githubPrToken(env);
+
+  if (!enabled) {
+    return {
+      id: "github_pr_adapter",
+      label: "GitHub PR adapter",
+      status: "warn",
+      message: "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.",
+    };
+  }
+
+  if (!hasValue(token)) {
+    return {
+      id: "github_pr_adapter",
+      label: "GitHub PR adapter",
+      status: "fail",
+      message: "GitHub PR creation is enabled but COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN is missing.",
+    };
+  }
+
+  if (productionMode(env) && isPlaceholderValue(token)) {
+    return {
+      id: "github_pr_adapter",
+      label: "GitHub PR adapter",
+      status: "fail",
+      message: "Replace placeholder GitHub token before enabling GitHub PR creation.",
+    };
+  }
+
+  return {
+    id: "github_pr_adapter",
+    label: "GitHub PR adapter",
+    status: "pass",
+    message: "GitHub PR creation is enabled and credentialed.",
+  };
+}
+
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const mockMode = env["6529_MOCK_MODE"] !== "false";
-  const githubPrConfigured = hasValue(env.COMMAND_WAVE_GITHUB_TOKEN) || hasValue(env.GITHUB_TOKEN);
-  const hasDatabase = hasValue(env.DATABASE_URL);
+  const hasDatabase = hasProductionValue(env.DATABASE_URL, env);
   const hasLocalFileStore = localFileStoreEnabled(env);
   const hasPostgresStore = postgresStoreEnabled(env);
   const hasGuardianWaveState = guardianWaveStateConfigured(env);
@@ -127,19 +237,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
 
   return [
     appUrlCheck(appUrl, env),
-    hasDatabase
-      ? {
-          id: "database",
-          label: "Database",
-          status: "pass",
-          message: "Configured.",
-        }
-      : {
-          id: "database",
-          label: "Database",
-          status: "warn",
-          message: "Add DATABASE_URL before durable public audit storage.",
-        },
+    databaseCheck(env),
     {
       id: "command_wave_store",
       label: "Command wave store",
@@ -147,7 +245,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       message: hasPostgresStore
         ? hasDatabase
           ? "Postgres persistence configured."
-          : "Postgres store selected but DATABASE_URL is missing."
+          : "Postgres store selected but DATABASE_URL is missing or placeholder."
         : hasLocalFileStore
           ? "Local file persistence is active. Good for development, not durable public audit storage."
           : "In-memory only. State resets when the server restarts.",
@@ -159,16 +257,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       status: mockMode ? "warn" : "pass",
       message: mockMode ? "Set 6529_MOCK_MODE=false before public launch." : "Live 6529 API mode.",
     },
-    {
-      id: "github_pr_adapter",
-      label: "GitHub PR adapter",
-      status: hasGithubPrAdapter ? (githubPrConfigured ? "pass" : "fail") : "warn",
-      message: hasGithubPrAdapter
-        ? githubPrConfigured
-          ? "GitHub PR creation is enabled and credentialed."
-          : "GitHub PR creation is enabled but COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN is missing."
-        : "Local PR adapter is active. Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.",
-    },
+    githubPrAdapterCheck(env, hasGithubPrAdapter),
     {
       id: "guardian_wave_state",
       label: "Guardian wave state",
