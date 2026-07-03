@@ -35,4 +35,14 @@ describe("command wave state snapshot", () => {
     ).toBe("https://state.example/wave.json");
     expect(commandWaveStateUrlFromEnv({})).toBeNull();
   });
+
+  it("ignores placeholder state URLs in production", () => {
+    expect(
+      commandWaveStateUrlFromEnv({
+        NODE_ENV: "production",
+        COMMAND_WAVE_STATE_URL: "https://your-app.example/api/command-wave/state",
+        NEXT_PUBLIC_APP_URL: "https://your-app.example",
+      }),
+    ).toBeNull();
+  });
 });

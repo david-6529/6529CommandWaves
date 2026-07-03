@@ -132,7 +132,7 @@ describe("setup proof", () => {
       demoWave,
       setupProofOptionsFromEnv({
         COMMAND_WAVE_STORE: "postgres",
-        DATABASE_URL: "postgresql://example",
+        DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
       }),
     );
 
@@ -142,6 +142,28 @@ describe("setup proof", () => {
       databaseConfigured: true,
       limitation: null,
     });
+    expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("does not treat placeholder production env values as setup proof evidence", () => {
+    const proof = createSetupProof(
+      demoWave,
+      setupProofOptionsFromEnv({
+        NODE_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "https://your-app.example",
+        COMMAND_WAVE_STORE: "postgres",
+        DATABASE_URL: "postgresql://user:password@host:5432/command_waves",
+        COMMAND_WAVE_STATE_URL: "https://your-app.example/api/command-wave/state",
+      }),
+    );
+
+    expect(proof.storage).toMatchObject({
+      mode: "postgres",
+      durability: "volatile",
+      databaseConfigured: false,
+    });
+    expect(proof.storage.limitation).toBe("Postgres storage is selected but DATABASE_URL is missing.");
+    expect(proof.verificationTargets.commandWaveStateUrl).toBeNull();
     expect(verifySetupProofHash(proof)).toBe(true);
   });
 

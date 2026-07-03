@@ -1,6 +1,7 @@
 import { normalizeWaveId } from "./6529/client";
 import { commandWaveStateUrlFromEnv } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
+import { hasProductionValue } from "./env-placeholders";
 import { parseGitHubRepoUrl } from "./github/repo";
 import { REVIEWER_GATE_VERSION } from "./github/pr-reviewer-gate";
 import { hashValue } from "./run-manifest";
@@ -150,7 +151,9 @@ function normalizeGuardianProof(guardian: SetupProofGuardian): SetupProofGuardia
 }
 
 function envValue(env: Record<string, string | undefined>, key: string) {
-  return env[key]?.trim() || undefined;
+  const value = env[key]?.trim();
+
+  return value && hasProductionValue(value, env) ? value : undefined;
 }
 
 function storageModeFromEnv(env: Record<string, string | undefined>): SetupProofStorageMode {

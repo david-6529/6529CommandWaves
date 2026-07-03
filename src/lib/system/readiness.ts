@@ -1,4 +1,5 @@
 import { commandWaveStateUrlFromEnv } from "../command-wave-state";
+import { hasEnvValue, hasProductionValue, isPlaceholderValue, isProductionEnv } from "../env-placeholders";
 
 export type ReadinessCheck = {
   id: string;
@@ -6,30 +7,6 @@ export type ReadinessCheck = {
   status: "pass" | "warn" | "fail";
   message: string;
 };
-
-function hasValue(value: string | undefined) {
-  return Boolean(value?.trim());
-}
-
-function isPlaceholderValue(value: string | undefined) {
-  const normalized = value?.trim().toLowerCase() ?? "";
-
-  return Boolean(
-    normalized &&
-      (normalized.includes("replace-with") ||
-        normalized.includes("your-app.example") ||
-        normalized.includes("user:password@host") ||
-        normalized === "postgresql://example" ||
-        normalized === "token" ||
-        normalized === "admin" ||
-        normalized === "password" ||
-        normalized === "secret"),
-  );
-}
-
-function hasProductionValue(value: string | undefined, env: Record<string, string | undefined>) {
-  return hasValue(value) && !(productionMode(env) && isPlaceholderValue(value));
-}
 
 function localFileStoreEnabled(env: Record<string, string | undefined>) {
   return Boolean(
@@ -39,11 +16,7 @@ function localFileStoreEnabled(env: Record<string, string | undefined>) {
 }
 
 function postgresStoreEnabled(env: Record<string, string | undefined>) {
-  return Boolean(env.COMMAND_WAVE_STORE === "postgres" || (env.NODE_ENV === "production" && hasValue(env.DATABASE_URL)));
-}
-
-function productionMode(env: Record<string, string | undefined>) {
-  return env.NODE_ENV === "production";
+  return Boolean(env.COMMAND_WAVE_STORE === "postgres" || (isProductionEnv(env) && hasEnvValue(env.DATABASE_URL)));
 }
 
 function guardianWaveStateConfigured(env: Record<string, string | undefined>) {
@@ -55,7 +28,7 @@ function guardianWaveStateMessage(env: Record<string, string | undefined>, confi
     return "Guardian PR checks have a real wave-state source.";
   }
 
-  if (productionMode(env) && (isPlaceholderValue(env.COMMAND_WAVE_STATE_URL) || isPlaceholderValue(env.COMMAND_WAVE_STATE_PATH))) {
+  if (isProductionEnv(env) && (isPlaceholderValue(env.COMMAND_WAVE_STATE_URL) || isPlaceholderValue(env.COMMAND_WAVE_STATE_PATH))) {
     return "Replace placeholder COMMAND_WAVE_STATE_URL with the deployed state URL before guardian PR checks run.";
   }
 
@@ -79,7 +52,7 @@ function guardianMode(env: Record<string, string | undefined>) {
 }
 
 function appUrlCheck(appUrl: string | undefined, env: Record<string, string | undefined>): ReadinessCheck {
-  if (!hasValue(appUrl)) {
+  if (!hasEnvValue(appUrl)) {
     return {
       id: "app_url",
       label: "App URL",
@@ -92,7 +65,7 @@ function appUrlCheck(appUrl: string | undefined, env: Record<string, string | un
   const isHttps = trimmed.startsWith("https://");
   const isLocalhost = trimmed.startsWith("http://localhost") || trimmed.startsWith("http://127.0.0.1");
 
-  if (productionMode(env) && !isHttps) {
+  if (isProductionEnv(env) && !isHttps) {
     return {
       id: "app_url",
       label: "App URL",
@@ -101,7 +74,7 @@ function appUrlCheck(appUrl: string | undefined, env: Record<string, string | un
     };
   }
 
-  if (productionMode(env) && isPlaceholderValue(trimmed)) {
+  if (isProductionEnv(env) && isPlaceholderValue(trimmed)) {
     return {
       id: "app_url",
       label: "App URL",
@@ -130,7 +103,7 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
     };
   }
 
-  if (productionMode(env) && isPlaceholderValue(key)) {
+  if (isProductionEnv(env) && isPlaceholderValue(key)) {
     return {
       id: "admin_api_key",
       label: "Admin API key",
@@ -139,7 +112,7 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
     };
   }
 
-  if (productionMode(env) && key.length < 24) {
+  if (isProductionEnv(env) && key.length < 24) {
     return {
       id: "admin_api_key",
       label: "Admin API key",
@@ -157,7 +130,7 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
 }
 
 function databaseCheck(env: Record<string, string | undefined>): ReadinessCheck {
-  if (!hasValue(env.DATABASE_URL)) {
+  if (!hasEnvValue(env.DATABASE_URL)) {
     return {
       id: "database",
       label: "Database",
@@ -166,7 +139,7 @@ function databaseCheck(env: Record<string, string | undefined>): ReadinessCheck 
     };
   }
 
-  if (productionMode(env) && isPlaceholderValue(env.DATABASE_URL)) {
+  if (isProductionEnv(env) && isPlaceholderValue(env.DATABASE_URL)) {
     return {
       id: "database",
       label: "Database",
@@ -199,7 +172,7 @@ function githubPrAdapterCheck(env: Record<string, string | undefined>, enabled: 
     };
   }
 
-  if (!hasValue(token)) {
+  if (!hasEnvValue(token)) {
     return {
       id: "github_pr_adapter",
       label: "GitHub PR adapter",
@@ -208,7 +181,7 @@ function githubPrAdapterCheck(env: Record<string, string | undefined>, enabled: 
     };
   }
 
-  if (productionMode(env) && isPlaceholderValue(token)) {
+  if (isProductionEnv(env) && isPlaceholderValue(token)) {
     return {
       id: "github_pr_adapter",
       label: "GitHub PR adapter",
@@ -261,8 +234,8 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
     {
       id: "guardian_wave_state",
       label: "Guardian wave state",
-      status: hasGuardianWaveState ? "pass" : productionMode(env) ? "fail" : "warn",
-      message: productionMode(env)
+      status: hasGuardianWaveState ? "pass" : isProductionEnv(env) ? "fail" : "warn",
+      message: isProductionEnv(env)
         ? guardianWaveStateMessage(env, hasGuardianWaveState)
         : hasGuardianWaveState
           ? guardianWaveStateMessage(env, true)
