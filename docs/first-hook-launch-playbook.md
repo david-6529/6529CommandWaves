@@ -80,7 +80,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
 1. Pick the builder room and GitHub repo.
-2. Run the launch check once to expose setup blockers.
+2. Open Maintainer tools, run Launch readiness, and use the launch check to expose setup blockers.
 3. Confirm the hook repo has `CONTRIBUTING.md` and a PR template with Command Waves manifest markers.
 4. Copy the room launch brief from setup.
 5. Post the brief with the room, repo link, participation notes, and hook scope.
@@ -98,7 +98,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 17. Use the contribution report and fee plan as evidence for any separate payout vote.
 18. Review the room update draft and share it manually in the builder room.
 19. Keep the launch packet with the PR so later contributors can audit the loop.
-20. Run the launch audit with `?remote=1` and fix blockers before broad participation.
+20. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
 
 The launch check focuses on the first public loop. A ready launch audit now requires the deployed app URL, admin key,
 durable storage, live 6529 mode, GitHub PR adapter, and guardian wave-state URL. Failed checks block broad participation.

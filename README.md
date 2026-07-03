@@ -41,6 +41,8 @@ What exists now:
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
+- Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
+- Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
@@ -171,6 +173,7 @@ Audit and launch:
 - Recent activity log with export.
 - Activity report drawer for app records and manual planning context.
 - Launch checklist with setup, readiness, checklist, and next-action records.
+- Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 
