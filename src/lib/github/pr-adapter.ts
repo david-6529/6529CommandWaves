@@ -6,7 +6,6 @@ type FetchLike = (input: string | URL, init?: RequestInit) => Promise<Response>;
 export type GitHubPullRequestAdapterOptions = {
   apiBaseUrl?: string;
   defaultBaseBranch?: string;
-  draftPullRequests?: boolean;
   fetchImpl?: FetchLike;
   token?: string;
   env?: Record<string, string | undefined>;
@@ -55,6 +54,10 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         });
       }
 
+      if (input.draft === false) {
+        throw Object.assign(new Error("GitHub PR adapter only opens draft PRs in phase 1."), { status: 400 });
+      }
+
       const response = await fetchImpl(
         `${apiBaseUrl.replace(/\/$/, "")}/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}/pulls`,
         {
@@ -70,7 +73,7 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
             body: input.body,
             head: input.branchName,
             base: githubBaseBranch(options, input),
-            draft: input.draft ?? options.draftPullRequests ?? true,
+            draft: true,
             maintainer_can_modify: input.maintainerCanModify ?? false,
           }),
         },

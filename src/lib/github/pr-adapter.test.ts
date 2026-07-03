@@ -75,6 +75,29 @@ describe("GitHub pull request adapter", () => {
     ).rejects.toThrow("Opening GitHub PRs requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN.");
   });
 
+  it("rejects non-draft pull request requests in phase 1", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Ready PR",
+        body: "Command Waves manifest here.",
+        branchName: "command/ready-pr",
+        draft: false,
+      }),
+    ).rejects.toThrow("GitHub PR adapter only opens draft PRs in phase 1.");
+    expect(called).toBe(false);
+  });
+
   it("surfaces GitHub API failures", async () => {
     const adapter = createGitHubPullRequestAdapter({
       token: "token",
