@@ -273,10 +273,51 @@ type CodexWorkPacketResponse = ApiErrorPayload & {
 
 const accessKeyStorageKey = "command-waves-access-key";
 const wavePreviewMaxMessages = 50;
+const clientRequestTimeoutMs = 15_000;
 const setupProofPath = "/api/command-wave/setup/proof";
 const commandWaveStatePath = "/api/command-wave/state";
 const launchAuditPath = "/api/command-wave/launch/audit";
 const remoteLaunchAuditPath = `${launchAuditPath}?remote=1`;
+
+async function fetchWithClientTimeout(input: string | URL, init: RequestInit = {}) {
+  const controller = new AbortController();
+  let timedOut = false;
+  const timeout = window.setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, clientRequestTimeoutMs);
+  const abortFromCaller = () => controller.abort();
+
+  if (init.signal?.aborted) {
+    controller.abort();
+  } else {
+    init.signal?.addEventListener("abort", abortFromCaller, { once: true });
+  }
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (timedOut) {
+      throw new Error("Request timed out. Try again.");
+    }
+
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+    init.signal?.removeEventListener("abort", abortFromCaller);
+  }
+}
+
+async function readApiJson<T>(response: Response, fallbackMessage: string) {
+  try {
+    return (await response.json()) as T;
+  } catch {
+    throw new Error(`${fallbackMessage} returned invalid JSON.`);
+  }
+}
 
 async function requestWave(path: string, init?: RequestInit, accessKey?: string) {
   const headers = new Headers(init?.headers);
@@ -284,11 +325,11 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
   headers.set("content-type", "application/json");
   attachAdminApiKey(headers, accessKey);
 
-  const response = await fetch(path, {
+  const response = await fetchWithClientTimeout(path, {
     ...init,
     headers,
   });
-  const payload = (await response.json()) as WaveApiResponse;
+  const payload = await readApiJson<WaveApiResponse>(response, "Project request failed.");
 
   if (!response.ok || !payload.wave) {
     throw new Error(formatApiError(payload, "Project request failed."));
@@ -298,7 +339,7 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
 }
 
 async function requestContextPreview(waveId: string) {
-  const response = await fetch("/api/6529/context/preview", {
+  const response = await fetchWithClientTimeout("/api/6529/context/preview", {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -309,7 +350,7 @@ async function requestContextPreview(waveId: string) {
       maxMessages: wavePreviewMaxMessages,
     }),
   });
-  const payload = (await response.json()) as ContextPreviewResponse;
+  const payload = await readApiJson<ContextPreviewResponse>(response, "Context preview failed.");
 
   if (!response.ok || !payload.preview) {
     throw new Error(formatApiError(payload, "Context preview failed."));
@@ -324,7 +365,7 @@ async function requestRoomPost(waveUrl: string, content: string, accessKey?: str
   headers.set("content-type", "application/json");
   attachAdminApiKey(headers, accessKey);
 
-  const response = await fetch("/api/6529/room-post", {
+  const response = await fetchWithClientTimeout("/api/6529/room-post", {
     method: "POST",
     headers,
     body: JSON.stringify({
@@ -332,7 +373,7 @@ async function requestRoomPost(waveUrl: string, content: string, accessKey?: str
       content,
     }),
   });
-  const payload = (await response.json()) as RoomPostResponse;
+  const payload = await readApiJson<RoomPostResponse>(response, "Room post failed.");
 
   if (!response.ok || !payload.post) {
     throw new Error(formatApiError(payload, "Room post failed."));
@@ -354,8 +395,8 @@ function postCountLabel(count: number) {
 }
 
 async function requestWaveSearch(query: string) {
-  const response = await fetch(`/api/6529/waves/search?q=${encodeURIComponent(query)}&limit=6`);
-  const payload = (await response.json()) as WaveSearchResponse;
+  const response = await fetchWithClientTimeout(`/api/6529/waves/search?q=${encodeURIComponent(query)}&limit=6`);
+  const payload = await readApiJson<WaveSearchResponse>(response, "Room search failed.");
 
   if (!response.ok || !payload.results) {
     throw new Error(formatApiError(payload, "Room search failed."));
@@ -365,14 +406,14 @@ async function requestWaveSearch(query: string) {
 }
 
 async function requestSetupValidation(waveUrl: string, repoUrl: string) {
-  const response = await fetch("/api/command-wave/setup/validate", {
+  const response = await fetchWithClientTimeout("/api/command-wave/setup/validate", {
     method: "POST",
     headers: {
       "content-type": "application/json",
     },
     body: JSON.stringify({ waveUrl, repoUrl }),
   });
-  const payload = (await response.json()) as SetupValidationResponse;
+  const payload = await readApiJson<SetupValidationResponse>(response, "Setup check failed.");
 
   if (!response.ok || !payload.validation) {
     throw new Error(formatApiError(payload, "Setup check failed."));
@@ -382,10 +423,10 @@ async function requestSetupValidation(waveUrl: string, repoUrl: string) {
 }
 
 async function requestReadiness() {
-  const response = await fetch("/api/readiness", {
+  const response = await fetchWithClientTimeout("/api/readiness", {
     headers: { accept: "application/json" },
   });
-  const payload = (await response.json()) as ReadinessResponse;
+  const payload = await readApiJson<ReadinessResponse>(response, "Readiness check failed.");
 
   if (!response.ok || !payload.checks) {
     throw new Error(formatApiError(payload, "Readiness check failed."));
@@ -400,12 +441,12 @@ async function requestCodexWorkPacket(proposalId: string, accessKey?: string) {
   headers.set("content-type", "application/json");
   attachAdminApiKey(headers, accessKey);
 
-  const response = await fetch("/api/command-wave/codex-packet", {
+  const response = await fetchWithClientTimeout("/api/command-wave/codex-packet", {
     method: "POST",
     headers,
     body: JSON.stringify({ proposalId }),
   });
-  const payload = (await response.json()) as CodexWorkPacketResponse;
+  const payload = await readApiJson<CodexWorkPacketResponse>(response, "Codex work packet failed.");
 
   if (!response.ok || !payload.packet) {
     throw new Error(formatApiError(payload, "Codex work packet failed."));
