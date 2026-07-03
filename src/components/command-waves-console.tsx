@@ -1167,6 +1167,14 @@ export function CommandWavesConsole() {
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
   const roomStatusItems = useMemo(() => createHookProgress(wave, title), [title, wave]);
+  const compactCurrentStatus = roomStatusItems.find((item) => item.status === "current") ?? roomStatusItems[0];
+  const compactWaitingLabels = roomStatusItems.filter((item) => item.status === "waiting").map((item) => item.label);
+  const compactRoomStatus = [
+    compactCurrentStatus ? `${compactCurrentStatus.label} ${compactCurrentStatus.status}.` : "",
+    compactWaitingLabels.length ? `${compactWaitingLabels.join(", ")} waiting.` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
@@ -1917,7 +1925,18 @@ export function CommandWavesConsole() {
               <p className="mt-1 text-base leading-7 text-zinc-100">{roomNeedDetail}</p>
             </div>
 
-            <div className="mt-4 border-t border-zinc-800 pt-3">
+            <div className="mt-4 border-t border-zinc-800 pt-3 sm:hidden">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</p>
+                {primaryHookProject ? (
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
+                ) : null}
+              </div>
+              <p className="mt-2 text-sm leading-6 text-zinc-400">{compactRoomStatus}</p>
+              <p className="mt-1 text-sm leading-6 text-zinc-400">{roomRuleSummary}</p>
+            </div>
+
+            <div className="mt-4 hidden border-t border-zinc-800 pt-3 sm:block">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Status</p>
               <dl className="mt-2 grid gap-2 sm:grid-cols-4">
                 {roomStatusItems.map((item) => (
@@ -1932,7 +1951,7 @@ export function CommandWavesConsole() {
             </div>
 
             {primaryHookProject ? (
-              <div className="mt-4 border-t border-zinc-800 pt-3">
+              <div className="mt-4 hidden border-t border-zinc-800 pt-3 sm:block">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
@@ -1940,7 +1959,7 @@ export function CommandWavesConsole() {
               </div>
             ) : null}
 
-            <div className="mt-4 border-t border-zinc-800 pt-3">
+            <div className="mt-4 hidden border-t border-zinc-800 pt-3 sm:block">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
               <p className="mt-1 text-base leading-7 text-zinc-300">{roomRuleSummary}</p>
             </div>
