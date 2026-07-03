@@ -10,9 +10,12 @@ type RateLimitBucket = {
 };
 
 const buckets = new Map<string, RateLimitBucket>();
+const maxClientIdentityLength = 128;
 
 function firstHeaderValue(value: string | null) {
-  return value?.split(",")[0]?.trim() ?? "";
+  const first = value?.split(",")[0]?.trim() ?? "";
+
+  return first.length > maxClientIdentityLength ? first.slice(0, maxClientIdentityLength) : first;
 }
 
 function clientIdentity(request: Request) {

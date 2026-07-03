@@ -56,4 +56,15 @@ describe("rate limit", () => {
     expect(() => assertRateLimit(second, options, 1_001)).not.toThrow();
     expect(() => assertRateLimit(first, { ...options, namespace: "search" }, 1_002)).not.toThrow();
   });
+
+  it("caps oversized client identity headers", () => {
+    const sharedPrefix = "a".repeat(128);
+    const first = request({ "x-forwarded-for": `${sharedPrefix}x` });
+    const second = request({ "x-forwarded-for": `${sharedPrefix}y` });
+    const options = { namespace: "context", max: 1, windowMs: 60_000 };
+
+    assertRateLimit(first, options, 1_000);
+
+    expect(() => assertRateLimit(second, options, 1_001)).toThrow("Too many requests. Try again shortly.");
+  });
 });
