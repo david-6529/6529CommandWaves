@@ -54,6 +54,37 @@ function guardianMode(env: Record<string, string | undefined>) {
   return mode === "repo_local_github_action" || mode === "external_github_app" ? mode : "unknown";
 }
 
+function appUrlCheck(appUrl: string | undefined, env: Record<string, string | undefined>): ReadinessCheck {
+  if (!hasValue(appUrl)) {
+    return {
+      id: "app_url",
+      label: "App URL",
+      status: "warn",
+      message: "Set NEXT_PUBLIC_APP_URL to the deployed app URL before public launch.",
+    };
+  }
+
+  const trimmed = appUrl!.trim();
+  const isHttps = trimmed.startsWith("https://");
+  const isLocalhost = trimmed.startsWith("http://localhost") || trimmed.startsWith("http://127.0.0.1");
+
+  if (productionMode(env) && !isHttps) {
+    return {
+      id: "app_url",
+      label: "App URL",
+      status: "fail",
+      message: "Set NEXT_PUBLIC_APP_URL to the HTTPS deployed app URL before public launch.",
+    };
+  }
+
+  return {
+    id: "app_url",
+    label: "App URL",
+    status: isHttps || isLocalhost ? "pass" : "warn",
+    message: trimmed,
+  };
+}
+
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const mockMode = env["6529_MOCK_MODE"] !== "false";
@@ -66,19 +97,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
   const guardianModeValue = guardianMode(env);
 
   return [
-    hasValue(appUrl)
-      ? {
-          id: "app_url",
-          label: "App URL",
-          status: appUrl!.startsWith("https://") || appUrl!.startsWith("http://localhost") ? "pass" : "warn",
-          message: appUrl!,
-        }
-      : {
-          id: "app_url",
-          label: "App URL",
-          status: "warn",
-          message: "Set NEXT_PUBLIC_APP_URL to the deployed app URL before public launch.",
-        },
+    appUrlCheck(appUrl, env),
     hasDatabase
       ? {
           id: "database",

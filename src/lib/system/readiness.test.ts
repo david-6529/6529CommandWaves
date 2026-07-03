@@ -51,6 +51,18 @@ describe("readiness checks", () => {
     });
   });
 
+  it("fails localhost app URLs in production mode", () => {
+    const checks = getReadinessChecks({
+      NODE_ENV: "production",
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+    });
+
+    expect(checks.find((check) => check.id === "app_url")).toMatchObject({
+      status: "fail",
+      message: "Set NEXT_PUBLIC_APP_URL to the HTTPS deployed app URL before public launch.",
+    });
+  });
+
   it("passes guardian wave-state readiness when a source is configured", () => {
     const checks = getReadinessChecks({
       NODE_ENV: "production",
