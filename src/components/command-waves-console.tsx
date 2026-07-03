@@ -3591,16 +3591,16 @@ export function CommandWavesConsole() {
 
         <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
-            <span>Contribution report</span>
+            <span>Activity report</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">informational</Badge>
           </summary>
           <div className="mt-4 grid gap-5">
-            <Panel title="Contribution report" eyebrow="Informational">
+            <Panel title="Activity report" eyebrow="Human review">
               <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                 <div>
               <p className="text-sm leading-6 text-zinc-400">{contributionReport.summary}</p>
               <p className="mt-2 text-xs leading-5 text-zinc-500">
-                This report summarizes visible app activity. It does not grant REP, TDH, payouts, permissions, or merge rights.
+                AI-readable activity evidence for humans to review. It does not grant REP, TDH, payouts, permissions, or merge rights.
               </p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" onClick={() => void copyContributionReportDraft()}>
@@ -3616,7 +3616,7 @@ export function CommandWavesConsole() {
                   </Badge>
                 ))}
               </div>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Records used</p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Evidence</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {contributionReport.evidence.map((item) => (
                   <Badge key={item} className="border-zinc-700 bg-zinc-900 text-zinc-300">
@@ -3642,7 +3642,7 @@ export function CommandWavesConsole() {
                   </ul>
                 </div>
               </div>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Scoring rubric</p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-normal text-zinc-500">Report points</p>
               <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-500">
                 {contributionReport.scoringRubric.map((item) => (
                   <li key={item}>- {item}</li>
@@ -3659,7 +3659,7 @@ export function CommandWavesConsole() {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                     <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
-                      report activity {contributor.score}
+                      {contributor.score} report points
                     </Badge>
                     <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
                       {countLabel(contributor.proposals, "proposal")}
