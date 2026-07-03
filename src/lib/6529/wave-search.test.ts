@@ -47,4 +47,11 @@ describe("6529 wave search", () => {
   it("ignores one-character searches", async () => {
     await expect(searchWaves("m")).resolves.toEqual([]);
   });
+
+  it("rejects oversized search queries", async () => {
+    await expect(searchWaves("x".repeat(121))).rejects.toMatchObject({
+      message: "Wave search must be 120 characters or less.",
+      status: 400,
+    });
+  });
 });

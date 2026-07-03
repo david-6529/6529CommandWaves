@@ -8,6 +8,8 @@ export type WaveSearchResult = {
   source: "6529";
 };
 
+const maxWaveSearchQueryLength = 120;
+
 function isRecord(value: unknown): value is JsonRecord {
   return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
@@ -77,6 +79,12 @@ export function normalizeWaveSearchResult(rawWave: unknown): WaveSearchResult | 
 export async function searchWaves(query: string, params: { limit?: number } = {}) {
   const normalizedQuery = query.trim();
   const limit = Math.min(Math.max(params.limit ?? 8, 1), 20);
+
+  if (normalizedQuery.length > maxWaveSearchQueryLength) {
+    throw Object.assign(new Error(`Wave search must be ${maxWaveSearchQueryLength} characters or less.`), {
+      status: 400,
+    });
+  }
 
   if (normalizedQuery.length < 2) {
     return [];
