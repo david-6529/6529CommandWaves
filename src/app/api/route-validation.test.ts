@@ -3,7 +3,13 @@ import { POST as previewContext } from "./6529/context/preview/route";
 import { POST as postRoomMessage } from "./6529/room-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
+import { POST as recordDecision } from "./command-wave/decision/route";
+import { POST as executeCommand } from "./command-wave/execute/route";
+import { POST as submitProposalRoute } from "./command-wave/proposals/route";
+import { POST as reviewCommand } from "./command-wave/review/route";
+import { DELETE as resetWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
+import { POST as recordVoteRoute } from "./command-wave/votes/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
 import {
   clearCommandWaveStoreForTests,
@@ -26,6 +32,8 @@ function request(url: string, init: RequestInit = {}) {
 async function responsePayload(response: Response) {
   return response.json() as Promise<Record<string, unknown>>;
 }
+
+type RouteHandler = (request: Request) => Response | Promise<Response>;
 
 describe("API route validation", () => {
   const previousMockMode = process.env["6529_MOCK_MODE"];
@@ -127,6 +135,36 @@ describe("API route validation", () => {
       error: "Keep room messages under 4000 characters.",
     });
   });
+
+  it.each([
+    ["setup update", updateSetup, "/api/command-wave", "PATCH"],
+    ["state replacement", replaceWave, "/api/command-wave", "PUT"],
+    ["state reset", resetWave, "/api/command-wave", "DELETE"],
+    ["proposal submit", submitProposalRoute, "/api/command-wave/proposals", "POST"],
+    ["vote record", recordVoteRoute, "/api/command-wave/votes", "POST"],
+    ["decision record", recordDecision, "/api/command-wave/decision", "POST"],
+    ["PR build", executeCommand, "/api/command-wave/execute", "POST"],
+    ["review record", reviewCommand, "/api/command-wave/review", "POST"],
+    ["Codex packet", createCodexPacket, "/api/command-wave/codex-packet", "POST"],
+    ["room post", postRoomMessage, "/api/6529/room-post", "POST"],
+  ] satisfies [string, RouteHandler, string, string][])(
+    "requires admin auth for %s routes when configured",
+    async (_label, handler, path, method) => {
+      process.env.ADMIN_API_KEY = "strong-admin-key-for-route-tests";
+
+      const response = await handler(
+        request(`https://command-waves.example.com${path}`, {
+          method,
+          body: method === "DELETE" ? null : JSON.stringify({}),
+        }),
+      );
+
+      expect(response.status).toBe(401);
+      await expect(responsePayload(response)).resolves.toMatchObject({
+        error: "Admin API key required.",
+      });
+    },
+  );
 
   it("creates Codex packets for approved PR proposals at the route", async () => {
     const response = await createCodexPacket(
