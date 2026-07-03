@@ -36,7 +36,8 @@ Current local adapter status:
 
 Current GitHub PR adapter status:
 
-- Opens draft PRs through the GitHub API from an existing prepared branch.
+- Opens draft PRs through the GitHub API from an existing prepared same-repo branch.
+- Rejects fork refs, raw SHAs, tags, and ambiguous refs before calling GitHub.
 - Requires `COMMAND_WAVE_GITHUB_TOKEN` or `GITHUB_TOKEN`.
 - Uses `COMMAND_WAVE_GITHUB_BASE_BRANCH` when set, otherwise `main`.
 - Does not create branches, commit changes, merge PRs, deploy contracts, or spend funds.

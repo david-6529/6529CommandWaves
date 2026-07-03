@@ -23,6 +23,36 @@ function githubBaseBranch(options: GitHubPullRequestAdapterOptions, input: RepoP
   return input.baseBranch ?? options.defaultBaseBranch ?? envValue(options.env ?? process.env, "COMMAND_WAVE_GITHUB_BASE_BRANCH") ?? "main";
 }
 
+function isFullSha(value: string) {
+  return /^[0-9a-f]{40}$/i.test(value);
+}
+
+function validatePreparedBranchName(value: string, label: string) {
+  const branch = value.trim();
+  const invalid =
+    !branch ||
+    branch.length > 160 ||
+    isFullSha(branch) ||
+    branch.startsWith("/") ||
+    branch.startsWith(".") ||
+    branch.startsWith("refs/") ||
+    branch.startsWith("heads/") ||
+    branch.startsWith("tags/") ||
+    branch.startsWith("remotes/") ||
+    branch.endsWith("/") ||
+    branch.endsWith(".") ||
+    branch.endsWith(".lock") ||
+    branch.includes("..") ||
+    branch.includes("@{") ||
+    /[\s~^:?*[\\\x00-\x1f\x7f]/.test(branch);
+
+  if (invalid) {
+    throw Object.assign(new Error(`${label} must be a prepared branch name in the target repo.`), { status: 400 });
+  }
+
+  return branch;
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
@@ -48,6 +78,8 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
       }
 
+      const headBranch = validatePreparedBranchName(input.branchName, "Head branch");
+      const baseBranch = validatePreparedBranchName(githubBaseBranch(options, input), "Base branch");
       if (!token) {
         throw Object.assign(new Error("Opening GitHub PRs requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN."), {
           status: 503,
@@ -71,8 +103,8 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
           body: JSON.stringify({
             title: input.title,
             body: input.body,
-            head: input.branchName,
-            base: githubBaseBranch(options, input),
+            head: headBranch,
+            base: baseBranch,
             draft: true,
             maintainer_can_modify: input.maintainerCanModify ?? false,
           }),

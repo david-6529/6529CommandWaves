@@ -98,6 +98,60 @@ describe("GitHub pull request adapter", () => {
     expect(called).toBe(false);
   });
 
+  it("requires prepared branch names in the target repo", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Fork branch",
+        body: "Command Waves manifest here.",
+        branchName: "other-owner:command/fork-branch",
+      }),
+    ).rejects.toThrow("Head branch must be a prepared branch name in the target repo.");
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Raw SHA",
+        body: "Command Waves manifest here.",
+        branchName: "0123456789abcdef0123456789abcdef01234567",
+      }),
+    ).rejects.toThrow("Head branch must be a prepared branch name in the target repo.");
+    expect(called).toBe(false);
+  });
+
+  it("validates configured base branch names", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      defaultBaseBranch: "refs/heads/main",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Bad base",
+        body: "Command Waves manifest here.",
+        branchName: "command/good-branch",
+      }),
+    ).rejects.toThrow("Base branch must be a prepared branch name in the target repo.");
+    expect(called).toBe(false);
+  });
+
   it("surfaces GitHub API failures", async () => {
     const adapter = createGitHubPullRequestAdapter({
       token: "token",

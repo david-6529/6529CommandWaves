@@ -315,8 +315,8 @@ To open real GitHub PRs from prepared agent branches, configure:
 - `COMMAND_WAVE_GITHUB_TOKEN` or `GITHUB_TOKEN`
 - `COMMAND_WAVE_GITHUB_BASE_BRANCH`, optional, defaults to `main`
 
-The GitHub adapter only opens draft PRs from an existing branch. It does not create branches, merge PRs, deploy contracts,
-or spend funds.
+The GitHub adapter only opens draft PRs from an existing same-repo branch name. It rejects fork refs, raw SHAs, tags, and
+ambiguous refs. It does not create branches, merge PRs, deploy contracts, or spend funds.
 
 Verify a published setup proof against GitHub required-check payloads:
 
