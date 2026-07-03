@@ -14,6 +14,7 @@
     "guardian:pr-check": "tsx scripts/guardian-pr-check.ts",
     "guardian:verify-proof": "tsx scripts/verify-guardian-proof.ts",
     "launch:audit": "tsx scripts/verify-launch-audit.ts",
+    "smoke:app": "tsx scripts/smoke-app.ts",
     "setup:verify": "tsx scripts/verify-setup-proof.ts"
   },
   "dependencies": {

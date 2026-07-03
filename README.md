@@ -360,12 +360,13 @@ Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed
 
 ```bash
 LOCAL_APP_URL=http://localhost:5001
+SMOKE_BASE_URL=$LOCAL_APP_URL npm run smoke:app
 SETUP_PROOF_URL=$LOCAL_APP_URL/api/command-wave/setup/proof npm run setup:verify
 LAUNCH_AUDIT_URL=$LOCAL_APP_URL/api/command-wave/launch/audit npm run launch:audit
 ```
 
-Local verification should load cleanly and still exit nonzero until production env, live 6529 mode, and the required
-guardian check are configured.
+The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero until production
+env, live 6529 mode, durable storage, GitHub PR adapter, guardian state, and the required guardian check are configured.
 
 Expose the current room state to the guardian with:
 
