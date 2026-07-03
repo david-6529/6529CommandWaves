@@ -8,7 +8,7 @@ import { getReadinessChecks } from "./system/readiness";
 const productionReadyChecks = getReadinessChecks({
   NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
   DATABASE_URL: "postgresql://example",
-  ADMIN_API_KEY: "admin",
+  ADMIN_API_KEY: "strong-admin-key-for-launch",
   "6529_MOCK_MODE": "false",
   NODE_ENV: "production",
   COMMAND_WAVE_STORE: "postgres",

@@ -32,7 +32,7 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({
       NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
       DATABASE_URL: "postgresql://example",
-      ADMIN_API_KEY: "admin",
+      ADMIN_API_KEY: "strong-admin-key-for-launch",
       "6529_MOCK_MODE": "false",
       NODE_ENV: "production",
     });
@@ -60,6 +60,18 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "app_url")).toMatchObject({
       status: "fail",
       message: "Set NEXT_PUBLIC_APP_URL to the HTTPS deployed app URL before public launch.",
+    });
+  });
+
+  it("fails weak admin keys in production mode", () => {
+    const checks = getReadinessChecks({
+      NODE_ENV: "production",
+      ADMIN_API_KEY: "admin",
+    });
+
+    expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
+      status: "fail",
+      message: "Use a strong ADMIN_API_KEY with at least 24 characters before public launch.",
     });
   });
 

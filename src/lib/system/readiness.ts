@@ -85,6 +85,35 @@ function appUrlCheck(appUrl: string | undefined, env: Record<string, string | un
   };
 }
 
+function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessCheck {
+  const key = env.ADMIN_API_KEY?.trim() ?? "";
+
+  if (!key) {
+    return {
+      id: "admin_api_key",
+      label: "Admin API key",
+      status: "fail",
+      message: "Set ADMIN_API_KEY before public launch so protected actions require a key.",
+    };
+  }
+
+  if (productionMode(env) && key.length < 24) {
+    return {
+      id: "admin_api_key",
+      label: "Admin API key",
+      status: "fail",
+      message: "Use a strong ADMIN_API_KEY with at least 24 characters before public launch.",
+    };
+  }
+
+  return {
+    id: "admin_api_key",
+    label: "Admin API key",
+    status: "pass",
+    message: "Configured.",
+  };
+}
+
 export function getReadinessChecks(env: Record<string, string | undefined> = process.env): ReadinessCheck[] {
   const appUrl = env.NEXT_PUBLIC_APP_URL;
   const mockMode = env["6529_MOCK_MODE"] !== "false";
@@ -123,19 +152,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           ? "Local file persistence is active. Good for development, not durable public audit storage."
           : "In-memory only. State resets when the server restarts.",
     },
-    hasValue(env.ADMIN_API_KEY)
-      ? {
-          id: "admin_api_key",
-          label: "Admin API key",
-          status: "pass",
-          message: "Configured.",
-        }
-      : {
-          id: "admin_api_key",
-          label: "Admin API key",
-          status: "fail",
-          message: "Set ADMIN_API_KEY before public launch so protected actions require a key.",
-        },
+    adminApiKeyCheck(env),
     {
       id: "6529_mode",
       label: "6529 mode",
