@@ -76,4 +76,31 @@ describe("API responses", () => {
       status: 400,
     });
   });
+
+  it("rejects oversized JSON bodies before parsing", async () => {
+    const request = new Request("https://command-waves.example.com/api/test", {
+      method: "POST",
+      headers: {
+        "content-length": "65537",
+      },
+      body: JSON.stringify({ waveUrl: "mock-command-wave" }),
+    });
+
+    await expect(readJsonObject(request)).rejects.toMatchObject({
+      message: "Request body must be 65536 bytes or less.",
+      status: 413,
+    });
+  });
+
+  it("allows route-specific JSON body size limits", async () => {
+    const request = new Request("https://command-waves.example.com/api/test", {
+      method: "POST",
+      headers: {
+        "content-length": "20",
+      },
+      body: JSON.stringify({ ok: true }),
+    });
+
+    await expect(readJsonObject(request, { maxBytes: 64 })).resolves.toEqual({ ok: true });
+  });
 });

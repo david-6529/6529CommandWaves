@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 
 const noStoreCacheControl = "no-store, max-age=0";
+const defaultJsonBodyMaxBytes = 64 * 1024;
+
+type ReadJsonObjectOptions = {
+  maxBytes?: number;
+};
 
 function withDefaultNoStore(init?: ResponseInit): ResponseInit {
   const headers = new Headers(init?.headers);
@@ -23,8 +28,26 @@ export function json(data: unknown, init?: ResponseInit) {
   return Response.json(data, withDefaultNoStore(init));
 }
 
-export async function readJsonObject(request: Request) {
+function requestContentLength(request: Request) {
+  const value = request.headers.get("content-length")?.trim();
+
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+export async function readJsonObject(request: Request, options: ReadJsonObjectOptions = {}) {
+  const maxBytes = options.maxBytes ?? defaultJsonBodyMaxBytes;
+  const contentLength = requestContentLength(request);
   let body: unknown;
+
+  if (contentLength !== null && contentLength > maxBytes) {
+    throw Object.assign(new Error(`Request body must be ${maxBytes} bytes or less.`), { status: 413 });
+  }
 
   try {
     body = await request.json();
