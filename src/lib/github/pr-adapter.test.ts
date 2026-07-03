@@ -167,4 +167,41 @@ describe("GitHub pull request adapter", () => {
       }),
     ).rejects.toThrow("GitHub PR creation failed: 422 Unprocessable Entity - bad head branch");
   });
+
+  it("rejects invalid GitHub PR creation JSON", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => new Response("not json"),
+    });
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Bad JSON",
+        body: "Bad JSON",
+        branchName: "command/bad-json",
+      }),
+    ).rejects.toThrow("GitHub PR creation response must be valid JSON.");
+  });
+
+  it("bounds GitHub PR creation response bodies", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () =>
+        new Response("x".repeat(1_000_001), {
+          headers: {
+            "content-length": "1000001",
+          },
+        }),
+    });
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Large response",
+        body: "Large response",
+        branchName: "command/large-response",
+      }),
+    ).rejects.toThrow("Response body from https://api.github.com/repos/6529-Collections/6529-hook/pulls must be 1000000 bytes or less.");
+  });
 });

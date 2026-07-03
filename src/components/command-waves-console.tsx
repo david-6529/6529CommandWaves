@@ -1857,31 +1857,24 @@ export function CommandWavesConsole() {
 
   return (
     <main className="min-h-screen bg-black text-base text-zinc-100">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-5 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-900 pb-4">
-          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
-            <div className="max-w-2xl">
+      <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-6 sm:px-6 lg:px-8">
+        <header className="border-b border-zinc-900 pb-5">
+          <div className="flex flex-col gap-4">
+            <div className="max-w-3xl">
               <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
                 {commandWaveProductCopy.headline}
               </h1>
               <p className="mt-2 max-w-2xl text-lg leading-7 text-zinc-300">{commandWaveProductCopy.subhead}</p>
-              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-zinc-500">
-                <span className="text-zinc-300">{primaryHookProject?.name ?? wave.name}</span>
-                {wave.waveUrl ? (
-                  <a className="text-cyan-300 hover:text-cyan-200" href={wave.waveUrl} target="_blank" rel="noreferrer">
-                    Room
-                  </a>
-                ) : null}
-                {repoUrl ? (
-                  <a className="text-cyan-300 hover:text-cyan-200" href={repoUrl} target="_blank" rel="noreferrer">
-                    Repo
-                  </a>
-                ) : null}
-                <span>{participationAccess.label}</span>
+              <div className="mt-4 flex flex-wrap gap-2" aria-label="Build flow">
+                {commandWaveProductCopy.simpleFlow.split(", ").map((item) => (
+                  <span key={item} className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm font-semibold text-zinc-300">
+                    {item}
+                  </span>
+                ))}
               </div>
             </div>
 
-            <nav className="flex flex-wrap gap-2 lg:justify-end" aria-label="Room actions">
+            <nav className="flex flex-wrap gap-2" aria-label="Room actions">
               <JumpLink href="#wave-room">Chat</JumpLink>
               <Button type="button" variant="secondary" onClick={openSuggestSection}>
                 Suggest work
@@ -1889,6 +1882,8 @@ export function CommandWavesConsole() {
               <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
                 Join
               </Button>
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Room</LinkButton> : null}
+              {repoUrl ? <LinkButton href={repoUrl}>Repo</LinkButton> : null}
             </nav>
           </div>
         </header>
@@ -1896,16 +1891,18 @@ export function CommandWavesConsole() {
         <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[0.95fr_1.05fr]">
           <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 className="text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current task</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
+                <p className="mt-2 line-clamp-2 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
 
-            <div className="mt-3 border-t border-zinc-800 pt-3">
-              <p className="text-base leading-7 text-zinc-300">
-                <span className="font-semibold text-zinc-100">Next:</span> {roomNeedLabel}. {roomNeedDetail}
-              </p>
+            <div className="mt-4 rounded-md border border-zinc-800 bg-black p-3">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
+              <p className="mt-1 text-lg font-semibold text-zinc-50">{roomNeedLabel}</p>
+              <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{roomNeedDetail}</p>
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
@@ -2317,33 +2314,25 @@ export function CommandWavesConsole() {
           onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
-            <span>Project snapshot</span>
+            <span>Hooks</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
           </summary>
-          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+          <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => (
-              <div key={project.id} className="grid gap-3 py-4 lg:grid-cols-[1fr_auto]">
+              <div key={project.id} className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950/60 p-3 lg:grid-cols-[1fr_auto]">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-xl font-semibold text-zinc-50">{project.name}</h3>
                     <Badge className={nextActionStatusClass(project.nextActionStatus)}>{project.nextActionLabel}</Badge>
                   </div>
                   <p className="mt-2 text-base leading-7 text-zinc-400">{project.currentFocus}</p>
-                  <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                    {[
-                      ["Room", project.waveLabel],
-                      ["Code", project.repoLabel],
-                      ["Access", project.gateSnapshotLabel],
-                      ["Review", project.reviewStatusLabel],
-                    ].map(([label, value]) => (
-                      <div key={label} className="border-t border-zinc-800 pt-2">
-                        <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
-                        <dd className="mt-1 text-base font-semibold text-zinc-100">{value}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Badge className="border-zinc-700 bg-black text-zinc-300">{project.waveLabel}</Badge>
+                    <Badge className="border-zinc-700 bg-black text-zinc-300">{project.repoLabel}</Badge>
+                    <Badge className="border-zinc-700 bg-black text-zinc-300">{project.reviewStatusLabel}</Badge>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2 lg:justify-end">
                   {project.waveUrl ? <LinkButton href={project.waveUrl}>Room</LinkButton> : null}

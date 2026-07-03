@@ -1,4 +1,5 @@
 import type { RepoAdapter, RepoPullRequestInput } from "../adapters";
+import { fetchTextResponseWithTimeout } from "../http-fetch";
 import { parseGitHubRepoUrl, pullRequestUrl } from "./repo";
 
 type FetchLike = (input: string | URL, init?: RequestInit) => Promise<Response>;
@@ -65,6 +66,10 @@ function payloadText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+const githubNonOkStatuses = Array.from({ length: 400 }, (_value, index) => index + 200).filter(
+  (status) => status < 200 || status > 299,
+);
+
 export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapterOptions = {}): RepoAdapter {
   const apiBaseUrl = options.apiBaseUrl ?? "https://api.github.com";
   const fetchImpl = options.fetchImpl ?? fetch;
@@ -90,9 +95,11 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         throw Object.assign(new Error("GitHub PR adapter only opens draft PRs in phase 1."), { status: 400 });
       }
 
-      const response = await fetchImpl(
+      const response = await fetchTextResponseWithTimeout(
         `${apiBaseUrl.replace(/\/$/, "")}/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}/pulls`,
         {
+          allowedStatuses: githubNonOkStatuses,
+          fetchImpl,
           method: "POST",
           headers: {
             accept: "application/vnd.github+json",
@@ -111,8 +118,8 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         },
       );
 
-      if (!response.ok) {
-        const detail = await response.text().catch(() => "");
+      if (response.status < 200 || response.status > 299) {
+        const detail = response.text;
 
         throw Object.assign(
           new Error(`GitHub PR creation failed: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`),
@@ -120,7 +127,14 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         );
       }
 
-      const payload = asRecord(await response.json());
+      let payload: Record<string, unknown> | null;
+
+      try {
+        payload = asRecord(JSON.parse(response.text));
+      } catch {
+        throw Object.assign(new Error("GitHub PR creation response must be valid JSON."), { status: 502 });
+      }
+
       const prNumber = payloadNumber(payload);
       const head = asRecord(payload?.head);
       const htmlUrl = payloadText(payload?.html_url);
