@@ -3413,7 +3413,9 @@ export function CommandWavesConsole() {
                         <p className="text-sm font-semibold text-zinc-100">{activePollTitle}</p>
                         <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
-                          <p className="mt-1 text-xs text-zinc-500">Local test vote as {proposer || "unnamed voter"}.</p>
+                          <p className="mt-1 text-xs text-zinc-500">
+                            Optional demo tally only. The 6529 room decision is the approval source.
+                          </p>
                         ) : null}
                       </div>
                       <Badge className={statusClass(activePoll.status)}>{activePoll.status.replaceAll("_", " ")}</Badge>
@@ -3433,10 +3435,10 @@ export function CommandWavesConsole() {
                     {activePollCanVote ? (
                       <div className="mt-3 flex gap-2">
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
-                          Record local yes
+                          Add demo yes
                         </Button>
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
-                          Record local no
+                          Add demo no
                         </Button>
                       </div>
                     ) : null}
@@ -3497,7 +3499,7 @@ export function CommandWavesConsole() {
                       </div>
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      Manual record only. PR work needs the room decision URL. This does not add live REP, TDH, or weighted voting.
+                      App tally only. PR work needs the room decision URL. This does not add live REP, TDH, or weighted voting.
                     </p>
                   </div>
                 ) : (

@@ -27,7 +27,7 @@ const actionCopyByStep: Record<
   },
   decision: {
     title: "Get the room decision",
-    detail: "Vote or record the 6529 decision URL before work runs.",
+    detail: "Ask the room to decide, then record the 6529 decision URL before work runs.",
   },
   build: {
     title: "Build the approved PR",
