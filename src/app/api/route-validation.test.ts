@@ -2,8 +2,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as previewContext } from "./6529/context/preview/route";
 import { POST as postRoomMessage } from "./6529/room-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
+import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
+import {
+  clearCommandWaveStoreForTests,
+  resetCommandWave,
+  submitCommandProposal,
+} from "@/lib/command-wave-store";
 import { resetRateLimitsForTest } from "@/lib/rate-limit";
 
 function request(url: string, init: RequestInit = {}) {
@@ -24,15 +30,20 @@ async function responsePayload(response: Response) {
 describe("API route validation", () => {
   const previousMockMode = process.env["6529_MOCK_MODE"];
   const previousAdminKey = process.env.ADMIN_API_KEY;
+  const previousStoreMode = process.env.COMMAND_WAVE_STORE;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     delete process.env.ADMIN_API_KEY;
     process.env["6529_MOCK_MODE"] = "true";
+    process.env.COMMAND_WAVE_STORE = "memory";
+    clearCommandWaveStoreForTests();
+    await resetCommandWave();
     resetMockDropsForTests();
     resetRateLimitsForTest();
   });
 
   afterEach(() => {
+    clearCommandWaveStoreForTests();
     resetMockDropsForTests();
     resetRateLimitsForTest();
 
@@ -46,6 +57,12 @@ describe("API route validation", () => {
       delete process.env.ADMIN_API_KEY;
     } else {
       process.env.ADMIN_API_KEY = previousAdminKey;
+    }
+
+    if (previousStoreMode === undefined) {
+      delete process.env.COMMAND_WAVE_STORE;
+    } else {
+      process.env.COMMAND_WAVE_STORE = previousStoreMode;
     }
   });
 
@@ -108,6 +125,66 @@ describe("API route validation", () => {
     expect(response.status).toBe(400);
     await expect(responsePayload(response)).resolves.toMatchObject({
       error: "Keep room messages under 4000 characters.",
+    });
+  });
+
+  it("creates Codex packets for approved PR proposals at the route", async () => {
+    const response = await createCodexPacket(
+      request("https://command-waves.example.com/api/command-wave/codex-packet", {
+        method: "POST",
+        body: JSON.stringify({
+          proposalId: "cmd-001",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      packet: {
+        mode: "manual_codex",
+        proposalId: "cmd-001",
+      },
+    });
+  });
+
+  it("rejects missing Codex packet proposals at the route", async () => {
+    const response = await createCodexPacket(
+      request("https://command-waves.example.com/api/command-wave/codex-packet", {
+        method: "POST",
+        body: JSON.stringify({
+          proposalId: "cmd-missing",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(404);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "Proposal not found.",
+    });
+  });
+
+  it("rejects non-PR Codex packet proposals at the route", async () => {
+    await submitCommandProposal({
+      title: "Draft scope note",
+      proposer: "tester",
+      kind: "draft_response",
+      prompt: "Draft a note about phase 1 scope.",
+      spec: "Draft only.",
+      budgetUsd: 0,
+    });
+
+    const response = await createCodexPacket(
+      request("https://command-waves.example.com/api/command-wave/codex-packet", {
+        method: "POST",
+        body: JSON.stringify({
+          proposalId: "cmd-002",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(409);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "Codex work packets are only available for PR commands.",
     });
   });
 });
