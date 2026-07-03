@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { hasEnvValue, isPlaceholderValue, isProductionEnv } from "./env-placeholders";
 import { assertRateLimit } from "./rate-limit";
 
@@ -13,18 +14,12 @@ function bearerToken(value: string | null) {
   return match?.[1]?.trim() ?? "";
 }
 
+function digestSecret(value: string) {
+  return createHash("sha256").update(value, "utf8").digest();
+}
+
 function safeEqual(left: string, right: string) {
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  let diff = 0;
-
-  for (let index = 0; index < left.length; index += 1) {
-    diff |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  }
-
-  return diff === 0;
+  return timingSafeEqual(digestSecret(left), digestSecret(right));
 }
 
 export function adminAuthRequired(env: Record<string, string | undefined> = process.env) {
