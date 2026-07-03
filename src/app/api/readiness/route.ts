@@ -1,11 +1,18 @@
-import { json } from "@/lib/api";
+import { handleRouteError, json } from "@/lib/api";
+import { assertRateLimit } from "@/lib/rate-limit";
 import { getReadinessChecks, getReadinessSummary } from "@/lib/system/readiness";
 
-export async function GET() {
-  const checks = getReadinessChecks();
+export async function GET(request: Request) {
+  try {
+    assertRateLimit(request, { namespace: "readiness", max: 30, windowMs: 60_000 });
 
-  return json({
-    summary: getReadinessSummary(checks),
-    checks,
-  });
+    const checks = getReadinessChecks();
+
+    return json({
+      summary: getReadinessSummary(checks),
+      checks,
+    });
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }

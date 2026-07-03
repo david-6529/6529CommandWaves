@@ -2,9 +2,16 @@ import { handleRouteError, json, readJsonObject } from "@/lib/api";
 import { requireAdminRequest } from "@/lib/admin-auth";
 import { getCommandWave, resetCommandWave, updateCommandWaveSetup } from "@/lib/command-wave-store";
 import { rejectPhaseOneStateReplacement } from "@/lib/phase-one-api-policy";
+import { assertRateLimit } from "@/lib/rate-limit";
 
-export async function GET() {
-  return json({ wave: await getCommandWave() });
+export async function GET(request: Request) {
+  try {
+    assertRateLimit(request, { namespace: "command_wave_read", max: 60, windowMs: 60_000 });
+
+    return json({ wave: await getCommandWave() });
+  } catch (error) {
+    return handleRouteError(error);
+  }
 }
 
 export async function PUT(request: Request) {
