@@ -2199,14 +2199,11 @@ export function CommandWavesConsole() {
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center gap-3 text-lg font-semibold text-zinc-50">
             <span>
               <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">Suggest</span>
               <span className="block">Suggest the next step</span>
             </span>
-            <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
-              {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
-            </Badge>
           </summary>
           <div className="mt-4 max-w-4xl">
             <p className="max-w-3xl text-base leading-7 text-zinc-400">
@@ -2334,14 +2331,11 @@ export function CommandWavesConsole() {
           open={hookDetailsOpen}
           onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center gap-3 text-lg font-semibold text-zinc-50">
             <span>
               <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</span>
               <span className="block">Hook details</span>
             </span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
-              {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
-            </Badge>
           </summary>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {activeHookProjects.map((project) => (
@@ -2383,14 +2377,11 @@ export function CommandWavesConsole() {
           open={activityOpen}
           onToggle={(event) => setActivityOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center gap-3 text-lg font-semibold text-zinc-50">
             <span>
               <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">Timeline</span>
               <span className="block">Build log</span>
             </span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
-              {buildTimeline.filter((item) => item.status === "done").length} done
-            </Badge>
           </summary>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {buildTimeline.map((item) => (
@@ -2437,14 +2428,11 @@ export function CommandWavesConsole() {
           open={buildersOpen}
           onToggle={(event) => setBuildersOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center gap-3 text-lg font-semibold text-zinc-50">
             <span>
               <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">People</span>
               <span className="block">Members</span>
             </span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
-              {builderRoster.length} visible
-            </Badge>
           </summary>
           {selectedMember ? (
             <div className="mt-4 grid gap-3 border-y border-zinc-800 py-4 lg:grid-cols-[1fr_auto]">
