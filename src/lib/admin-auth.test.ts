@@ -1,11 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { adminAuthRequired, requireAdminRequest } from "./admin-auth";
+import { resetRateLimitsForTest } from "./rate-limit";
 
 function request(headers: HeadersInit = {}) {
   return new Request("https://command-waves.example.com/api/command-wave", { headers });
 }
 
 describe("admin API auth", () => {
+  beforeEach(() => {
+    resetRateLimitsForTest();
+  });
+
   it("does not require an admin key for local demo mode when no key is configured", () => {
     expect(adminAuthRequired({ NODE_ENV: "development" })).toBe(false);
     expect(() => requireAdminRequest(request(), { NODE_ENV: "development" })).not.toThrow();
@@ -51,5 +56,20 @@ describe("admin API auth", () => {
         ADMIN_API_KEY: "replace-with-a-strong-random-key",
       }),
     ).toThrow("Replace placeholder ADMIN_API_KEY with a strong random key before mutating command-wave state.");
+  });
+
+  it("rate limits protected admin attempts", () => {
+    const env = {
+      NODE_ENV: "production",
+      ADMIN_API_KEY: "strong-admin-key-for-tests",
+    };
+
+    for (let index = 0; index < 120; index += 1) {
+      expect(() => requireAdminRequest(request({ "x-admin-api-key": "wrong" }), env)).toThrow("Admin API key required.");
+    }
+
+    expect(() => requireAdminRequest(request({ "x-admin-api-key": "wrong" }), env)).toThrow(
+      "Too many requests. Try again shortly.",
+    );
   });
 });

@@ -1,4 +1,11 @@
 import { hasEnvValue, isPlaceholderValue, isProductionEnv } from "./env-placeholders";
+import { assertRateLimit } from "./rate-limit";
+
+const adminAuthRateLimit = {
+  namespace: "admin_auth",
+  max: 120,
+  windowMs: 60_000,
+} as const;
 
 function bearerToken(value: string | null) {
   const match = value?.match(/^Bearer\s+(.+)$/i);
@@ -48,6 +55,8 @@ export function requireAdminRequest(request: Request, env: Record<string, string
   if (!adminAuthRequired(env)) {
     return;
   }
+
+  assertRateLimit(request, adminAuthRateLimit);
 
   const expectedKey = env.ADMIN_API_KEY?.trim();
   const configurationError = adminApiKeyConfigurationError(expectedKey, env);
