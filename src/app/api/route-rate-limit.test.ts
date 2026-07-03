@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as postRoomMessage } from "./6529/room-post/route";
 import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
+import { GET as getSetupProof } from "./command-wave/setup/proof/route";
+import { GET as getCommandWaveState } from "./command-wave/state/route";
+import { GET as getReadiness } from "./readiness/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
 import { clearCommandWaveStoreForTests } from "@/lib/command-wave-store";
 import { resetRateLimitsForTest } from "@/lib/rate-limit";
@@ -54,20 +57,28 @@ describe("API route rate limits", () => {
     }
   });
 
-  it("rate limits launch audit reads", async () => {
-    for (let index = 0; index < 30; index += 1) {
-      const response = await getLaunchAudit(request("https://command-waves.example.com/api/command-wave/launch/audit"));
+  it.each([
+    ["launch audit", getLaunchAudit, "/api/command-wave/launch/audit", 30],
+    ["setup proof", getSetupProof, "/api/command-wave/setup/proof", 30],
+    ["command-wave state", getCommandWaveState, "/api/command-wave/state", 60],
+    ["readiness", getReadiness, "/api/readiness", 30],
+  ] satisfies [string, (request: Request) => Response | Promise<Response>, string, number][])(
+    "rate limits %s reads",
+    async (_label, handler, path, max) => {
+      for (let index = 0; index < max; index += 1) {
+        const response = await handler(request(`https://command-waves.example.com${path}`));
 
-      expect(response.status).toBe(200);
-    }
+        expect(response.status).toBe(200);
+      }
 
-    const limited = await getLaunchAudit(request("https://command-waves.example.com/api/command-wave/launch/audit"));
+      const limited = await handler(request(`https://command-waves.example.com${path}`));
 
-    expect(limited.status).toBe(429);
-    await expect(limited.json()).resolves.toMatchObject({
-      error: "Too many requests. Try again shortly.",
-    });
-  });
+      expect(limited.status).toBe(429);
+      await expect(limited.json()).resolves.toMatchObject({
+        error: "Too many requests. Try again shortly.",
+      });
+    },
+  );
 
   it("rate limits room posting after admin auth", async () => {
     const adminKey = "strong-admin-key-for-route-tests";
