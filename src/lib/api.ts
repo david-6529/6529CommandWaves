@@ -23,6 +23,22 @@ export function json(data: unknown, init?: ResponseInit) {
   return Response.json(data, withDefaultNoStore(init));
 }
 
+export async function readJsonObject(request: Request) {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    throw Object.assign(new Error("Request body must be valid JSON."), { status: 400 });
+  }
+
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw Object.assign(new Error("Request body must be a JSON object."), { status: 400 });
+  }
+
+  return body as Record<string, unknown>;
+}
+
 function getErrorStatus(error: unknown) {
   const status =
     typeof error === "object" && error !== null && "status" in error

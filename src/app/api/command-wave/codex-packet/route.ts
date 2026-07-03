@@ -1,5 +1,5 @@
 import { requireAdminRequest } from "@/lib/admin-auth";
-import { handleRouteError, json } from "@/lib/api";
+import { handleRouteError, json, readJsonObject } from "@/lib/api";
 import { createCodexWorkPacket } from "@/lib/codex-work-packet";
 import { getCommandWave } from "@/lib/command-wave-store";
 
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   try {
     requireAdminRequest(request);
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await readJsonObject(request);
     const proposalId = asText(body.proposalId);
     const wave = await getCommandWave();
     const proposal = wave.proposals.find((item) => item.id === proposalId);

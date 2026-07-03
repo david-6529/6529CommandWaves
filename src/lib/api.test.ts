@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { handleRouteError, json } from "./api";
+import { handleRouteError, json, readJsonObject } from "./api";
 
 describe("API responses", () => {
   it("defaults JSON responses to no-store", () => {
@@ -42,5 +42,38 @@ describe("API responses", () => {
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBe("30");
     expect(response.headers.get("Cache-Control")).toBe("no-store, max-age=0");
+  });
+
+  it("reads JSON object bodies", async () => {
+    const request = new Request("https://command-waves.example.com/api/test", {
+      method: "POST",
+      body: JSON.stringify({ waveUrl: "mock-command-wave" }),
+    });
+
+    await expect(readJsonObject(request)).resolves.toEqual({ waveUrl: "mock-command-wave" });
+  });
+
+  it("rejects malformed JSON bodies clearly", async () => {
+    const request = new Request("https://command-waves.example.com/api/test", {
+      method: "POST",
+      body: "{",
+    });
+
+    await expect(readJsonObject(request)).rejects.toMatchObject({
+      message: "Request body must be valid JSON.",
+      status: 400,
+    });
+  });
+
+  it("rejects non-object JSON bodies clearly", async () => {
+    const request = new Request("https://command-waves.example.com/api/test", {
+      method: "POST",
+      body: JSON.stringify(["mock-command-wave"]),
+    });
+
+    await expect(readJsonObject(request)).rejects.toMatchObject({
+      message: "Request body must be a JSON object.",
+      status: 400,
+    });
   });
 });
