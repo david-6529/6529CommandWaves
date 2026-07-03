@@ -41,6 +41,18 @@ function isRecord(value: unknown): value is JsonRecord {
   return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
 
+function optionalWindowDate(value: unknown, label: string) {
+  if (!value) {
+    return undefined;
+  }
+
+  if (typeof value !== "string") {
+    throw Object.assign(new Error(`${label} must be an ISO date string.`), { status: 400 });
+  }
+
+  return value;
+}
+
 function parseWindowDate(value?: string) {
   if (!value) {
     return undefined;
@@ -69,6 +81,10 @@ function primaryWaveId(value: unknown) {
   return normalizeWaveId(value);
 }
 
+function relatedWaveRecords(value: unknown) {
+  return Array.isArray(value) ? value.slice(0, MAX_RELATED_WAVES).filter(isRecord) : [];
+}
+
 function buildContextSources(params: WaveContextParams): WaveContextSource[] {
   const sources: WaveContextSource[] = [
     {
@@ -79,7 +95,7 @@ function buildContextSources(params: WaveContextParams): WaveContextSource[] {
   ];
   const seen = new Set(sources.map((source) => source.waveId));
 
-  for (const related of params.relatedWaves?.slice(0, MAX_RELATED_WAVES) ?? []) {
+  for (const related of relatedWaveRecords(params.relatedWaves)) {
     const waveId = typeof related.waveId === "string" ? normalizeWaveId(related.waveId) : "";
 
     if (!waveId || seen.has(waveId)) {
@@ -89,7 +105,7 @@ function buildContextSources(params: WaveContextParams): WaveContextSource[] {
     seen.add(waveId);
     sources.push({
       waveId,
-      label: normalizeSourceLabel(related.label, "Related wave"),
+      label: normalizeSourceLabel(typeof related.label === "string" ? related.label : undefined, "Related wave"),
       primary: false,
     });
   }
@@ -267,8 +283,16 @@ export async function fetchWaveContext(params: WaveContextParams) {
     });
   }
 
-  const fromMs = explicitWindow ? parseWindowDate(params.contextFrom) : includeAllHistory ? undefined : now - DAY_MS;
-  const toMs = explicitWindow ? parseWindowDate(params.contextTo) : includeAllHistory ? undefined : now;
+  const fromMs = explicitWindow
+    ? parseWindowDate(optionalWindowDate(params.contextFrom, "Context window start"))
+    : includeAllHistory
+      ? undefined
+      : now - DAY_MS;
+  const toMs = explicitWindow
+    ? parseWindowDate(optionalWindowDate(params.contextTo, "Context window end"))
+    : includeAllHistory
+      ? undefined
+      : now;
 
   if (fromMs && toMs && fromMs > toMs) {
     throw Object.assign(new Error("Context window start must be before context window end."), {

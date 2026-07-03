@@ -113,6 +113,39 @@ describe("6529 wave context", () => {
     });
   });
 
+  it("ignores malformed related wave entries", async () => {
+    const context = await fetchWaveContext({
+      waveId: "mock-command-wave",
+      includeAllHistory: true,
+      relatedWaves: [
+        null,
+        42,
+        { waveId: "" },
+        { waveId: "mock-command-wave" },
+        { waveId: "mock-related-wave", label: "  Side room  " },
+      ] as unknown as Parameters<typeof fetchWaveContext>[0]["relatedWaves"],
+    });
+
+    expect(context.context.sources).toHaveLength(2);
+    expect(context.context.sources[1]).toMatchObject({
+      waveId: "mock-related-wave",
+      label: "Side room",
+      primary: false,
+    });
+  });
+
+  it("rejects non-string context window values", async () => {
+    await expect(
+      fetchWaveContext({
+        waveId: "mock-command-wave",
+        contextFrom: 123 as unknown as string,
+      }),
+    ).rejects.toMatchObject({
+      message: "Context window start must be an ISO date string.",
+      status: 400,
+    });
+  });
+
   it("rejects conflicting all-history and explicit date windows", async () => {
     await expect(
       fetchWaveContext({

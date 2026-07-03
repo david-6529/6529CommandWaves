@@ -1167,14 +1167,6 @@ export function CommandWavesConsole() {
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
   const roomStatusItems = useMemo(() => createHookProgress(wave, title), [title, wave]);
-  const compactCurrentStatus = roomStatusItems.find((item) => item.status === "current") ?? roomStatusItems[0];
-  const compactWaitingLabels = roomStatusItems.filter((item) => item.status === "waiting").map((item) => item.label);
-  const compactRoomStatus = [
-    compactCurrentStatus ? `${compactCurrentStatus.label} ${compactCurrentStatus.status}.` : "",
-    compactWaitingLabels.length ? `${compactWaitingLabels.join(", ")} waiting.` : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
@@ -1224,7 +1216,6 @@ export function CommandWavesConsole() {
             : activeProposal
               ? "Follow the next open step for this hook change."
               : "Choose one small hook change the room can discuss.";
-  const visibleRoomMembers = builderRoster.slice(0, 3);
   const selectedMember =
     builderRoster.find((member) => member.identity === selectedMemberIdentity) ?? builderRoster[0] ?? null;
   const otherBuilderRoster = selectedMember
@@ -1882,7 +1873,6 @@ export function CommandWavesConsole() {
                 {commandWaveProductCopy.headline}
               </h1>
               <p className="mt-2 max-w-3xl text-lg leading-8 text-zinc-200">{commandWaveProductCopy.subhead}</p>
-              <p className="mt-3 text-sm leading-6 text-zinc-400">{builderRoster.length} visible builders</p>
             </div>
             <div className="flex flex-wrap items-start gap-2 lg:justify-end">
               {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Room</LinkButton> : null}
@@ -1892,11 +1882,11 @@ export function CommandWavesConsole() {
 
           <nav className="mt-4 flex flex-wrap gap-2" aria-label="Room actions">
             <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
-              Ask to join
+              Join
             </Button>
             <JumpLink href="#wave-room">Chat</JumpLink>
             <Button type="button" variant="secondary" onClick={openSuggestSection}>
-              Suggest
+              Suggest work
             </Button>
             <Button type="button" variant="secondary" onClick={openBuildersSection}>
               Members
@@ -1908,76 +1898,29 @@ export function CommandWavesConsole() {
           <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Now</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Current step</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
-            {!readyForNextHookChange ? (
-              <p className="mt-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
-            ) : null}
 
             <div className="mt-4 rounded-md border border-cyan-800/70 bg-cyan-950/20 p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-200">Do next</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-200">Next</p>
                 <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{roomNeedLabel}</Badge>
               </div>
               <p className="mt-1 text-base leading-7 text-zinc-100">{roomNeedDetail}</p>
             </div>
 
-            <div className="mt-4 border-t border-zinc-800 pt-3 sm:hidden">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</p>
-                {primaryHookProject ? (
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
-                ) : null}
-              </div>
-              <p className="mt-2 text-sm leading-6 text-zinc-400">{compactRoomStatus}</p>
-              <p className="mt-1 text-sm leading-6 text-zinc-400">{roomRuleSummary}</p>
-            </div>
-
-            <div className="mt-4 hidden border-t border-zinc-800 pt-3 sm:block">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Status</p>
-              <dl className="mt-2 grid gap-2 sm:grid-cols-4">
-                {roomStatusItems.map((item) => (
-                  <div key={item.id} className="border-t border-zinc-800 pt-2 first:border-t-0 first:pt-0 sm:first:border-t sm:first:pt-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <dt className="text-sm font-semibold text-zinc-300">{item.label}</dt>
-                      <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            {primaryHookProject ? (
-              <div className="mt-4 hidden border-t border-zinc-800 pt-3 sm:block">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="mt-4 hidden border-t border-zinc-800 pt-3 sm:block">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
-              <p className="mt-1 text-base leading-7 text-zinc-300">{roomRuleSummary}</p>
-            </div>
-
             <div className="mt-4 border-t border-zinc-800 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Actions</p>
               {!activeProposal ? (
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <p className="text-base leading-7 text-zinc-400">Start with one small, testable hook change.</p>
+                <div className="flex flex-wrap items-center gap-2">
                   <Button type="button" variant="secondary" onClick={openSuggestSection}>
                     Suggest work
                   </Button>
                 </div>
               ) : activePollCanVote ? (
-                <div className="mt-2 grid gap-3">
-                  <p className="text-base leading-7 text-zinc-400">
-                    Ask the room for a visible decision before code work starts.
-                  </p>
+                <div className="grid gap-3">
                   <div className="flex flex-wrap gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
                       Copy decision request
@@ -1987,10 +1930,7 @@ export function CommandWavesConsole() {
                   {decisionDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
                 </div>
               ) : showDecisionRecorder ? (
-                <div className="mt-2 grid gap-3">
-                  <p className="text-base leading-7 text-zinc-400">
-                    Add the 6529 decision URL so the code work has a source of truth.
-                  </p>
+                <div className="grid gap-3">
                   <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
                     <Input
                       value={decisionReference}
@@ -2003,10 +1943,7 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               ) : showBuildAction ? (
-                <div className="mt-2 grid gap-3">
-                  <p className="text-base leading-7 text-zinc-400">
-                    Build only after the approved 6529 decision is recorded.
-                  </p>
+                <div className="grid gap-3">
                   <div className="flex flex-wrap gap-2">
                     <Button type="button" disabled={isBusy || !canBuildApprovedPr} onClick={buildApprovedPr}>
                       {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
@@ -2020,10 +1957,7 @@ export function CommandWavesConsole() {
                   {codexPacketNotice ? <p className="text-sm leading-6 text-cyan-300">{codexPacketNotice}</p> : null}
                 </div>
               ) : canRunReview ? (
-                <div className="mt-2 grid gap-3">
-                  <p className="text-base leading-7 text-zinc-400">
-                    Review the PR record against the approved proposal.
-                  </p>
+                <div className="grid gap-3">
                   <div className="flex flex-wrap gap-2">
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
                       Copy review request
@@ -2036,10 +1970,7 @@ export function CommandWavesConsole() {
                   {reviewRequestNotice ? <p className="text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
                 </div>
               ) : activeSupportProposal ? (
-                <div className="mt-2 grid gap-3">
-                  <p className="text-base leading-7 text-zinc-400">
-                    {activeSupportProposalLabel} is recorded for the room. It does not open a PR.
-                  </p>
+                <div className="grid gap-3">
                   <div className="flex flex-wrap gap-2">
                     <Button type="button" variant="secondary" onClick={() => discussSupportProposal(activeSupportProposal)}>
                       Discuss in room
@@ -2053,7 +1984,7 @@ export function CommandWavesConsole() {
                   </div>
                 </div>
               ) : readyForNextHookChange ? (
-                <div className="mt-2 grid gap-3">
+                <div className="grid gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <Button
                       type="button"
@@ -2077,45 +2008,82 @@ export function CommandWavesConsole() {
                   {apiError ? <p className="text-sm leading-6 text-red-300">{apiError}</p> : null}
                 </div>
               ) : (
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <p className="text-base leading-7 text-zinc-400">Suggest the next scoped change.</p>
+                <div className="flex flex-wrap items-center gap-2">
                   <Button type="button" variant="secondary" onClick={openSuggestSection}>
                     Suggest work
                   </Button>
                 </div>
               )}
             </div>
+
+            <details className="mt-4 border-t border-zinc-800 pt-3">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
+                <span>Status and rules</span>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
+              </summary>
+              <div className="mt-3 grid gap-3">
+                <p className="text-sm leading-6 text-zinc-400">{currentFocusDescription}</p>
+                <dl className="grid gap-2 sm:grid-cols-4">
+                  {roomStatusItems.map((item) => (
+                    <div key={item.id} className="border-t border-zinc-800 pt-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <dt className="text-sm font-semibold text-zinc-300">{item.label}</dt>
+                        <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </dl>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="border-t border-zinc-800 pt-2">
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">
+                      {participationGateNotes[0] ?? "Participation gate is not set yet."}
+                    </p>
+                  </div>
+                  <div className="border-t border-zinc-800 pt-2">
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rule</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{roomRuleSummary}</p>
+                  </div>
+                </div>
+              </div>
+            </details>
           </section>
 
           <section id="wave-room" className="order-2 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-2">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Builder room</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Room chat</h2>
-                <p className="mt-2 text-base leading-7 text-zinc-400">Ask a question, offer help, or suggest the next small change.</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Room</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk with builders</h2>
               </div>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+              <div className="flex flex-wrap gap-2">
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+                <Button type="button" variant="secondary" onClick={openBuildersSection}>
+                  Members
+                </Button>
+              </div>
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Start with</p>
-                {builderWaveQuickPosts.map((post) => (
-                  <Button key={post.id} type="button" variant="secondary" onClick={() => prepareQuickPost(post)}>
-                    {post.label}
-                  </Button>
-                ))}
-              </div>
-              <Field label="Message to the room">
+              <details className="mb-3 border-y border-zinc-800 py-2">
+                <summary className="cursor-pointer text-sm font-semibold text-zinc-300">Quick starts</summary>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {builderWaveQuickPosts.map((post) => (
+                    <Button key={post.id} type="button" variant="secondary" onClick={() => prepareQuickPost(post)}>
+                      {post.label}
+                    </Button>
+                  ))}
+                </div>
+              </details>
+              <Field label="Message">
                 <Textarea
-                  rows={4}
+                  rows={3}
                   value={waveRoomMessage}
                   placeholder="Ask a question, share context, or suggest a small hook change."
                   onChange={(event) => {
                     setWaveRoomMessage(event.target.value);
                     setWaveRoomNotice("");
                   }}
-                  className="min-h-32 resize-none"
+                  className="min-h-28 resize-none"
                 />
               </Field>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -2140,22 +2108,10 @@ export function CommandWavesConsole() {
                     <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
                       Copy only
                     </Button>
+                    <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                      Clear
+                    </Button>
                   </>
-                ) : null}
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isBusy || !primaryHookProject?.waveUrl}
-                  onClick={() =>
-                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
-                  }
-                >
-                  {apiBusy === "context" ? "Loading" : "Refresh room"}
-                </Button>
-                {hasRoomMessage ? (
-                  <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                    Clear
-                  </Button>
                 ) : null}
               </div>
               {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
@@ -2171,55 +2127,26 @@ export function CommandWavesConsole() {
               ) : null}
             </div>
 
-            {visibleRoomMembers.length ? (
-              <div className="mt-4 border-t border-zinc-800 pt-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">People</p>
-                  <Button type="button" variant="secondary" onClick={openBuildersSection}>
-                    View all
-                  </Button>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {visibleRoomMembers.map((member) => (
-                    <button
-                      key={member.identity}
-                      type="button"
-                      className="inline-flex h-10 cursor-pointer items-center rounded-full border border-zinc-800 bg-black px-3 text-sm font-semibold text-zinc-100 transition hover:border-cyan-700 hover:text-cyan-200"
-                      onClick={() => showMemberProfile(member.identity)}
-                    >
-                      {member.identity}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
             <div className="mt-4 border-t border-zinc-800 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">
-                  {hasRecentDiscussionPosts ? "Room posts" : "Room activity"}
-                </p>
-                {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
-                  <span className="flex flex-wrap gap-2">
-                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
-                      {contextModeLabel(primaryProjectContextPreview)}
-                    </Badge>
-                    <Badge className={primaryProjectContextPreview.context.hitCap ? riskClass("medium") : statusClass("complete")}>
-                      {postCountLabel(primaryProjectContextPreview.dropCount)}
-                    </Badge>
-                  </span>
-                ) : (
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">app activity</Badge>
-                )}
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest</p>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isBusy || !primaryHookProject?.waveUrl}
+                  onClick={() =>
+                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                  }
+                >
+                  {apiBusy === "context" ? "Loading" : "Refresh"}
+                </Button>
               </div>
               {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
                 <div className="mt-3 grid gap-3">
                   {primaryProjectContextPreview.sampleDrops.slice(-1).map((drop) => (
                     <div key={drop.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-zinc-300">
-                          {drop.author}
-                        </p>
+                        <p className="text-sm font-semibold text-zinc-300">{drop.author}</p>
                         {drop.url ? (
                           <a
                             className="text-sm font-semibold text-cyan-300 hover:text-cyan-200"
