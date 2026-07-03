@@ -1,5 +1,27 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getReadinessChecks, getReadinessSummary } from "./readiness";
+
+function parseEnvExample(path: string) {
+  return Object.fromEntries(
+    readFileSync(resolve(path), "utf8")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"))
+      .map((line) => {
+        const separatorIndex = line.indexOf("=");
+        const key = line.slice(0, separatorIndex).trim();
+        const rawValue = line.slice(separatorIndex + 1).trim();
+        const value =
+          (rawValue.startsWith("\"") && rawValue.endsWith("\"")) || (rawValue.startsWith("'") && rawValue.endsWith("'"))
+            ? rawValue.slice(1, -1)
+            : rawValue;
+
+        return [key, value];
+      }),
+  );
+}
 
 describe("readiness checks", () => {
   it("warns about local-only infrastructure and fails missing admin protection", () => {
@@ -110,6 +132,16 @@ describe("readiness checks", () => {
       status: "fail",
       message: "Replace placeholder COMMAND_WAVE_STATE_URL with the deployed state URL before guardian PR checks run.",
     });
+  });
+
+  it("keeps the production env example from passing unchanged", () => {
+    const checks = getReadinessChecks(parseEnvExample(".env.production.example"));
+
+    expect(checks.find((check) => check.id === "app_url")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "database")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({ status: "fail" });
   });
 
   it("passes guardian wave-state readiness when a source is configured", () => {
