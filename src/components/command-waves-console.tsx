@@ -848,8 +848,16 @@ export function CommandWavesConsole() {
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [hookDetailsOpen, setHookDetailsOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const [buildersOpen, setBuildersOpen] = useState(false);
   const publicAppOrigin = useSyncExternalStore(subscribeToStaticOrigin, appOriginSnapshot, emptyAppOriginSnapshot);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
+  const suggestRef = useRef<HTMLDetailsElement>(null);
+  const hookDetailsRef = useRef<HTMLDetailsElement>(null);
+  const activityRef = useRef<HTMLDetailsElement>(null);
+  const buildersRef = useRef<HTMLDetailsElement>(null);
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -1446,6 +1454,25 @@ export function CommandWavesConsole() {
     });
   }
 
+  function openFoldedSection(ref: React.RefObject<HTMLDetailsElement | null>, setOpen: (open: boolean) => void) {
+    setOpen(true);
+    window.requestAnimationFrame(() => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function openSuggestSection() {
+    openFoldedSection(suggestRef, setSuggestOpen);
+  }
+
+  function openActivitySection() {
+    openFoldedSection(activityRef, setActivityOpen);
+  }
+
+  function openBuildersSection() {
+    openFoldedSection(buildersRef, setBuildersOpen);
+  }
+
   function runLaunchNextAction() {
     if (launchActionRunsSetup) {
       openSetupControls();
@@ -1591,9 +1618,7 @@ export function CommandWavesConsole() {
 
   function showMemberProfile(identity: string) {
     setSelectedMemberIdentity(identity);
-    window.requestAnimationFrame(() => {
-      document.getElementById("active-builders")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    openBuildersSection();
   }
 
   function messageMember(identity: string) {
@@ -1862,8 +1887,12 @@ export function CommandWavesConsole() {
               Ask to join
             </Button>
             <JumpLink href="#wave-room">Chat</JumpLink>
-            <JumpLink href="#start-building">Suggest</JumpLink>
-            <JumpLink href="#active-builders">Members</JumpLink>
+            <Button type="button" variant="secondary" onClick={openSuggestSection}>
+              Suggest
+            </Button>
+            <Button type="button" variant="secondary" onClick={openBuildersSection}>
+              Members
+            </Button>
           </nav>
         </header>
 
@@ -1921,7 +1950,9 @@ export function CommandWavesConsole() {
               {!activeProposal ? (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-base leading-7 text-zinc-400">Start with one small, testable hook change.</p>
-                  <JumpLink href="#start-building">Suggest work</JumpLink>
+                  <Button type="button" variant="secondary" onClick={openSuggestSection}>
+                    Suggest work
+                  </Button>
                 </div>
               ) : activePollCanVote ? (
                 <div className="mt-2 grid gap-3">
@@ -1994,8 +2025,12 @@ export function CommandWavesConsole() {
                     <Button type="button" variant="secondary" onClick={() => discussSupportProposal(activeSupportProposal)}>
                       Discuss in room
                     </Button>
-                    <JumpLink href="#start-building">Propose code PR</JumpLink>
-                    <JumpLink href="#recent-activity">Build log</JumpLink>
+                    <Button type="button" variant="secondary" onClick={openSuggestSection}>
+                      Propose code PR
+                    </Button>
+                    <Button type="button" variant="secondary" onClick={openActivitySection}>
+                      Build log
+                    </Button>
                   </div>
                 </div>
               ) : readyForNextHookChange ? (
@@ -2014,7 +2049,9 @@ export function CommandWavesConsole() {
                     <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                       {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                     </Button>
-                    <JumpLink href="#start-building">Edit details</JumpLink>
+                    <Button type="button" variant="secondary" onClick={openSuggestSection}>
+                      Edit details
+                    </Button>
                     {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open last PR</LinkButton> : null}
                   </div>
                   {proposalDraftNotice ? <p className="text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
@@ -2023,7 +2060,9 @@ export function CommandWavesConsole() {
               ) : (
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <p className="text-base leading-7 text-zinc-400">Suggest the next scoped change.</p>
-                  <JumpLink href="#start-building">Suggest work</JumpLink>
+                  <Button type="button" variant="secondary" onClick={openSuggestSection}>
+                    Suggest work
+                  </Button>
                 </div>
               )}
             </div>
@@ -2117,32 +2156,20 @@ export function CommandWavesConsole() {
               <div className="mt-4 border-t border-zinc-800 pt-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">People</p>
-                  <JumpLink href="#active-builders">View all</JumpLink>
+                  <Button type="button" variant="secondary" onClick={openBuildersSection}>
+                    View all
+                  </Button>
                 </div>
-                <div className="mt-3 divide-y divide-zinc-900 border-y border-zinc-900">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {visibleRoomMembers.map((member) => (
-                    <div key={member.identity} className="grid gap-2 py-3 sm:grid-cols-[1fr_auto]">
-                      <button
-                        type="button"
-                        className="group cursor-pointer text-left"
-                        onClick={() => showMemberProfile(member.identity)}
-                      >
-                        <span className="block truncate text-base font-semibold text-zinc-100 transition group-hover:text-cyan-200">
-                          {member.identity}
-                        </span>
-                        <span className="mt-1 block text-sm leading-5 text-zinc-500">
-                          {member.role}, {member.activity}
-                        </span>
-                      </button>
-                      <a
-                        className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-800 bg-black px-3 text-sm font-semibold text-zinc-200 transition hover:border-cyan-700 hover:bg-zinc-950 hover:text-cyan-200"
-                        href={memberProfileUrl(member.identity)}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        6529 profile
-                      </a>
-                    </div>
+                    <button
+                      key={member.identity}
+                      type="button"
+                      className="inline-flex h-10 cursor-pointer items-center rounded-full border border-zinc-800 bg-black px-3 text-sm font-semibold text-zinc-100 transition hover:border-cyan-700 hover:text-cyan-200"
+                      onClick={() => showMemberProfile(member.identity)}
+                    >
+                      {member.identity}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -2168,7 +2195,7 @@ export function CommandWavesConsole() {
               </div>
               {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
                 <div className="mt-3 grid gap-3">
-                  {primaryProjectContextPreview.sampleDrops.slice(-2).map((drop) => (
+                  {primaryProjectContextPreview.sampleDrops.slice(-1).map((drop) => (
                     <div key={drop.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold text-zinc-300">
@@ -2191,7 +2218,7 @@ export function CommandWavesConsole() {
                 </div>
               ) : (
                 <div className="mt-3 grid gap-3">
-                  {roomFeed.map((item) => (
+                  {roomFeed.slice(0, 1).map((item) => (
                     <div key={item.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
@@ -2219,11 +2246,24 @@ export function CommandWavesConsole() {
           </section>
         </section>
 
-        <section id="start-building" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Suggest</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Suggest the next step</h2>
-            <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
+        <details
+          id="start-building"
+          ref={suggestRef}
+          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          open={suggestOpen}
+          onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
+        >
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>
+              <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">Suggest</span>
+              <span className="block">Suggest the next step</span>
+            </span>
+            <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
+              {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
+            </Badge>
+          </summary>
+          <div className="mt-4 max-w-4xl">
+            <p className="max-w-3xl text-base leading-7 text-zinc-400">
               Choose a small hook change, question, update, or context read.
             </p>
             <div className="mt-4 grid gap-3">
@@ -2339,21 +2379,24 @@ export function CommandWavesConsole() {
               </div>
             </details>
           </div>
-        </section>
+        </details>
 
-        <section id="active-hooks" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Hook rooms</h2>
-              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Each hook has a public room, a code repo, and one next move.
-              </p>
-            </div>
+        <details
+          id="active-hooks"
+          ref={hookDetailsRef}
+          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          open={hookDetailsOpen}
+          onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
+        >
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>
+              <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">Hooks</span>
+              <span className="block">Hook details</span>
+            </span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
-          </div>
+          </summary>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {activeHookProjects.map((project) => (
               <div key={project.id} className="grid gap-3 py-4 lg:grid-cols-[1fr_auto]">
@@ -2385,21 +2428,24 @@ export function CommandWavesConsole() {
               </div>
             ))}
           </div>
-        </section>
+        </details>
 
-        <section id="recent-activity" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Timeline</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Build log</h2>
-              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Proposal, decision, PR, review, and next task.
-              </p>
-            </div>
+        <details
+          id="recent-activity"
+          ref={activityRef}
+          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          open={activityOpen}
+          onToggle={(event) => setActivityOpen(event.currentTarget.open)}
+        >
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>
+              <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">Timeline</span>
+              <span className="block">Build log</span>
+            </span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {buildTimeline.filter((item) => item.status === "done").length} done
             </Badge>
-          </div>
+          </summary>
           <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
             {buildTimeline.map((item) => (
               <div key={item.id} className="grid gap-3 py-4 md:grid-cols-[8rem_1fr_auto]">
@@ -2436,21 +2482,24 @@ export function CommandWavesConsole() {
               </div>
             </details>
           ) : null}
-        </section>
+        </details>
 
-        <section id="active-builders" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">People</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Builders in the room</h2>
-              <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-400">
-                Open a profile, message someone, or check visible activity.
-              </p>
-            </div>
+        <details
+          id="active-builders"
+          ref={buildersRef}
+          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          open={buildersOpen}
+          onToggle={(event) => setBuildersOpen(event.currentTarget.open)}
+        >
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+            <span>
+              <span className="block text-sm font-semibold uppercase tracking-normal text-cyan-300">People</span>
+              <span className="block">Members</span>
+            </span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {builderRoster.length} visible
             </Badge>
-          </div>
+          </summary>
           {selectedMember ? (
             <div className="mt-4 grid gap-3 border-y border-zinc-800 py-4 lg:grid-cols-[1fr_auto]">
               <div>
@@ -2513,7 +2562,7 @@ export function CommandWavesConsole() {
               </div>
             )}
           </div>
-        </section>
+        </details>
 
         <details id="more-tools" className="scroll-mt-4 border-b border-zinc-800 pb-5">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
@@ -2741,8 +2790,12 @@ export function CommandWavesConsole() {
               <h3 className="mt-2 text-base font-semibold text-zinc-50">{phaseNextAction.title}</h3>
               <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <JumpLink href="#start-building">Suggest a change</JumpLink>
-                <JumpLink href="#recent-activity">View activity</JumpLink>
+                <Button type="button" variant="secondary" onClick={openSuggestSection}>
+                  Suggest a change
+                </Button>
+                <Button type="button" variant="secondary" onClick={openActivitySection}>
+                  View activity
+                </Button>
               </div>
             </div>
 
