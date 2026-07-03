@@ -1857,30 +1857,44 @@ export function CommandWavesConsole() {
 
   return (
     <main className="min-h-screen bg-black text-base text-zinc-100">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-800 pb-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl font-semibold tracking-normal text-zinc-50 sm:text-5xl">
+      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-5 sm:px-6 lg:px-8">
+        <header className="border-b border-zinc-900 pb-4">
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
+            <div className="max-w-2xl">
+              <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
                 {commandWaveProductCopy.headline}
               </h1>
-              <p className="mt-3 max-w-3xl text-xl leading-8 text-zinc-300">{commandWaveProductCopy.subhead}</p>
+              <p className="mt-2 max-w-2xl text-lg leading-7 text-zinc-300">{commandWaveProductCopy.subhead}</p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold text-zinc-500">
+                <span className="text-zinc-300">{primaryHookProject?.name ?? wave.name}</span>
+                {wave.waveUrl ? (
+                  <a className="text-cyan-300 hover:text-cyan-200" href={wave.waveUrl} target="_blank" rel="noreferrer">
+                    Room
+                  </a>
+                ) : null}
+                {repoUrl ? (
+                  <a className="text-cyan-300 hover:text-cyan-200" href={repoUrl} target="_blank" rel="noreferrer">
+                    Repo
+                  </a>
+                ) : null}
+                <span>{participationAccess.label}</span>
+              </div>
             </div>
-          </div>
 
-          <nav className="mt-4 flex flex-wrap gap-2" aria-label="Room actions">
-            <JumpLink href="#wave-room">Chat</JumpLink>
-            <Button type="button" variant="secondary" onClick={openSuggestSection}>
-              Suggest work
-            </Button>
-            <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
-              Join
-            </Button>
-          </nav>
+            <nav className="flex flex-wrap gap-2 lg:justify-end" aria-label="Room actions">
+              <JumpLink href="#wave-room">Chat</JumpLink>
+              <Button type="button" variant="secondary" onClick={openSuggestSection}>
+                Suggest work
+              </Button>
+              <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
+                Join
+              </Button>
+            </nav>
+          </div>
         </header>
 
         <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-          <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-1">
+          <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
@@ -1995,8 +2009,8 @@ export function CommandWavesConsole() {
             </div>
 
             <details className="mt-4 border-t border-zinc-800 pt-3">
-              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
-                <span>How this works</span>
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-400">
+                <span>Rules</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
               </summary>
               <div className="mt-3 grid gap-3">
@@ -2027,7 +2041,7 @@ export function CommandWavesConsole() {
             </details>
           </section>
 
-          <section id="wave-room" className="order-2 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 lg:order-2">
+          <section id="wave-room" className="order-2 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 lg:order-2">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold text-zinc-50">Chat</h2>
@@ -2045,7 +2059,7 @@ export function CommandWavesConsole() {
                 <Textarea
                   rows={3}
                   value={waveRoomMessage}
-                  placeholder="Ask a question, share context, or suggest a small hook change."
+                  placeholder="Ask a question or suggest a small hook change."
                   onChange={(event) => {
                     setWaveRoomMessage(event.target.value);
                     setWaveRoomNotice("");
@@ -2105,8 +2119,8 @@ export function CommandWavesConsole() {
             </div>
 
             <details className="mt-4 border-t border-zinc-800 pt-3">
-              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
-                <span>Latest activity</span>
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-400">
+                <span>Activity</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
                   {hasRecentDiscussionPosts ? "room post" : "local log"}
                 </Badge>
@@ -2178,11 +2192,11 @@ export function CommandWavesConsole() {
         <details
           id="start-building"
           ref={suggestRef}
-          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          className="scroll-mt-4 border-b border-zinc-900 py-3"
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center gap-3 text-lg font-semibold text-zinc-50">Suggest work</summary>
+          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-300">Suggest work</summary>
           <div className="mt-4 max-w-4xl">
             <div className="mt-4 grid gap-3">
               <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
@@ -2298,11 +2312,11 @@ export function CommandWavesConsole() {
         <details
           id="active-hooks"
           ref={hookDetailsRef}
-          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          className="scroll-mt-4 border-b border-zinc-900 py-3"
           open={hookDetailsOpen}
           onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
             <span>Project snapshot</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
@@ -2344,11 +2358,11 @@ export function CommandWavesConsole() {
         <details
           id="recent-activity"
           ref={activityRef}
-          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          className="scroll-mt-4 border-b border-zinc-900 py-3"
           open={activityOpen}
           onToggle={(event) => setActivityOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
             <span>History</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{buildTimeline.length} steps</Badge>
           </summary>
@@ -2393,11 +2407,11 @@ export function CommandWavesConsole() {
         <details
           id="active-builders"
           ref={buildersRef}
-          className="scroll-mt-4 border-b border-zinc-800 pb-5"
+          className="scroll-mt-4 border-b border-zinc-900 py-3"
           open={buildersOpen}
           onToggle={(event) => setBuildersOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
             <span>Members</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{builderRoster.length}</Badge>
           </summary>
@@ -2465,8 +2479,8 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details id="more-tools" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+        <details id="more-tools" className="scroll-mt-4 border-b border-zinc-900 py-3">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
             <span>Maintainer tools</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">advanced</Badge>
           </summary>
@@ -3588,8 +3602,8 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details id="reports" className="scroll-mt-4 border-b border-zinc-800 pb-5">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-lg font-semibold text-zinc-50">
+        <details id="reports" className="scroll-mt-4 border-b border-zinc-900 py-3">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
             <span>Reports and updates</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
           </summary>

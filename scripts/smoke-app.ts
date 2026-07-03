@@ -1,3 +1,5 @@
+import { commandWaveProductCopy } from "../src/lib/product-copy";
+
 type JsonObject = Record<string, unknown>;
 
 const baseUrl = normalizeBaseUrl(
@@ -53,7 +55,8 @@ function objectValue(value: JsonObject, key: string) {
 async function main() {
   const html = await fetchText("/");
 
-  assert(html.includes("6529 Hook Room"), "Home page did not include the product name.");
+  assert(html.includes(commandWaveProductCopy.headline), "Home page did not include the product headline.");
+  assert(html.includes(commandWaveProductCopy.subhead), "Home page did not include the product subhead.");
   assertNoEmDash("Home page", html);
 
   const readiness = await fetchJson("/api/readiness");
