@@ -352,6 +352,17 @@ LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=
 
 The command exits nonzero until the launch audit is ready. For offline verification, set `LAUNCH_AUDIT_PATH`.
 
+Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed by Next:
+
+```bash
+LOCAL_APP_URL=http://localhost:5001
+SETUP_PROOF_URL=$LOCAL_APP_URL/api/command-wave/setup/proof npm run setup:verify
+LAUNCH_AUDIT_URL=$LOCAL_APP_URL/api/command-wave/launch/audit npm run launch:audit
+```
+
+Local verification should load cleanly and still exit nonzero until production env, live 6529 mode, and the required
+guardian check are configured.
+
 Expose the current room state to the guardian with:
 
 ```bash
