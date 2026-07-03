@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { fetchJsonWithTimeout } from "../src/lib/http-fetch";
 import { verifyLaunchAuditPayload } from "../src/lib/launch-audit-verifier";
 
 function readJsonFile<T>(path: string): T {
@@ -7,17 +8,11 @@ function readJsonFile<T>(path: string): T {
 }
 
 async function readJsonUrl<T>(url: string): Promise<T> {
-  const response = await fetch(url, {
+  return fetchJsonWithTimeout<T>(url, {
     headers: {
       accept: "application/json",
     },
   });
-
-  if (!response.ok) {
-    throw new Error(`Could not fetch ${url}: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json() as Promise<T>;
 }
 
 async function loadLaunchAuditPayload() {

@@ -13,6 +13,7 @@ import {
 } from "../src/lib/github/actions-pr-evidence";
 import { formatGuardianStepSummary } from "../src/lib/github/guardian-summary";
 import { createGuardianPullRequestAttestation } from "../src/lib/github/pr-reviewer-gate";
+import { fetchJsonWithTimeout } from "../src/lib/http-fetch";
 import type { HookChangedFile } from "../src/lib/safety/hook-diff-policy";
 
 function readJsonFile<T>(path: string): T {
@@ -28,18 +29,13 @@ async function fetchChangedFiles(filesUrl: string, token?: string) {
     url.searchParams.set("per_page", "100");
     url.searchParams.set("page", String(page));
 
-    const response = await fetch(url, {
+    const payload = await fetchJsonWithTimeout<unknown>(url, {
       headers: {
         accept: "application/vnd.github+json",
         ...(token ? { authorization: `Bearer ${token}` } : {}),
       },
     });
-
-    if (!response.ok) {
-      throw new Error(`Could not fetch PR files: ${response.status} ${response.statusText}`);
-    }
-
-    const pageFiles = changedFilesFromGitHubFilesPayload(await response.json());
+    const pageFiles = changedFilesFromGitHubFilesPayload(payload);
 
     files.push(...pageFiles);
 
@@ -60,15 +56,15 @@ async function loadWaveState() {
   }
 
   if (waveStateUrl?.trim()) {
-    const response = await fetch(waveStateUrl);
+    const payload = await fetchJsonWithTimeout<CommandWave | { wave?: CommandWave }>(waveStateUrl, {
+      headers: {
+        accept: "application/json",
+      },
+    });
 
-    if (!response.ok) {
-      throw new Error(`Could not fetch command wave state: ${response.status} ${response.statusText}`);
-    }
-
-    const payload = await response.json() as { wave?: CommandWave };
-
-    return payload.wave ?? payload as CommandWave;
+    return payload && typeof payload === "object" && "wave" in payload && payload.wave
+      ? payload.wave
+      : (payload as CommandWave);
   }
 
   if (!demoWaveStateAllowed(process.env)) {

@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { fetchJsonWithTimeout, type TimedFetchError } from "../src/lib/http-fetch";
 import type { SetupProof } from "../src/lib/setup-proof";
 import { verifySetupProofAgainstGitHubPayloads } from "../src/lib/setup-verifier";
 
@@ -16,39 +17,28 @@ function readJsonFile<T>(path: string): T {
 }
 
 async function readJsonUrl<T>(url: string, token?: string): Promise<T> {
-  const response = await fetch(url, {
+  return fetchJsonWithTimeout<T>(url, {
     headers: {
       accept: "application/json",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
   });
-
-  if (!response.ok) {
-    throw new Error(`Could not fetch ${url}: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json() as Promise<T>;
 }
 
 async function readOptionalJsonUrl(url: string, token?: string): Promise<unknown> {
-  const response = await fetch(url, {
-    headers: {
-      accept: "application/json",
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-  });
+  try {
+    return await readJsonUrl<unknown>(url, token);
+  } catch (error) {
+    const fetchError = error as TimedFetchError;
 
-  if (!response.ok) {
     return {
       setupVerifierFetchError: {
-        url,
-        status: response.status,
-        statusText: response.statusText,
+        url: fetchError.url ?? url,
+        status: fetchError.status ?? 0,
+        statusText: fetchError.statusText ?? (error instanceof Error ? error.message : "Fetch failed"),
       },
     } satisfies FetchErrorPayload;
   }
-
-  return response.json() as Promise<unknown>;
 }
 
 async function loadSetupProof() {
@@ -115,7 +105,7 @@ function setupVerifierFetchError(value: unknown) {
   const status = typeof payload.status === "number" ? payload.status : 0;
   const statusText = typeof payload.statusText === "string" ? payload.statusText : "";
 
-  return url && status ? { url, status, statusText } : null;
+  return url && Number.isFinite(status) ? { url, status, statusText } : null;
 }
 
 async function main() {

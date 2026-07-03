@@ -1,3 +1,4 @@
+import { fetchJsonWithTimeout, fetchTextWithTimeout } from "../src/lib/http-fetch";
 import { commandWaveProductCopy } from "../src/lib/product-copy";
 
 type JsonObject = Record<string, unknown>;
@@ -24,24 +25,20 @@ function assertNoEmDash(label: string, value: string) {
   assert(!value.includes("\u2014"), `${label} contains an em dash.`);
 }
 
-async function fetchResponse(path: string) {
-  const response = await fetch(appUrl(path), {
+async function fetchText(path: string) {
+  return fetchTextWithTimeout(appUrl(path), {
     headers: {
       accept: "application/json, text/html;q=0.9",
     },
   });
-
-  assert(response.ok, `${path} returned ${response.status}.`);
-
-  return response;
-}
-
-async function fetchText(path: string) {
-  return (await fetchResponse(path)).text();
 }
 
 async function fetchJson(path: string) {
-  const json = await (await fetchResponse(path)).json();
+  const json = await fetchJsonWithTimeout<unknown>(appUrl(path), {
+    headers: {
+      accept: "application/json",
+    },
+  });
 
   assert(typeof json === "object" && json !== null && !Array.isArray(json), `${path} did not return a JSON object.`);
 
