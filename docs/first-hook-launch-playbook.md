@@ -70,9 +70,13 @@ Public launch env:
 
 ```bash
 NEXT_PUBLIC_APP_URL=https://your-app.example
+COMMAND_WAVE_STORE=postgres
+DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 6529_MOCK_MODE=false
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
+COMMAND_WAVE_REPO_ADAPTER=github
+COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
 1. Pick the builder room and GitHub repo.
@@ -96,8 +100,8 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 19. Keep the launch packet with the PR so later contributors can audit the loop.
 20. Run the launch audit with `?remote=1` and fix blockers before broad participation.
 
-The launch check focuses on the first public loop. Postgres storage and the GitHub PR adapter are warning-only hardening
-items for this first loop. Failed checks still block broad participation.
+The launch check focuses on the first public loop. A ready launch audit now requires the deployed app URL, admin key,
+durable storage, live 6529 mode, GitHub PR adapter, and guardian wave-state URL. Failed checks block broad participation.
 
 ## Success Criteria
 
