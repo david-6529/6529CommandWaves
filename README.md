@@ -209,19 +209,23 @@ Before inviting broad participation, set the first-loop launch variables:
 
 ```bash
 NEXT_PUBLIC_APP_URL=https://your-app.example
+COMMAND_WAVE_STORE=postgres
+DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 6529_MOCK_MODE=false
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
+COMMAND_WAVE_REPO_ADAPTER=github
+COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
 `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR
-checks the public wave state. Postgres storage and the GitHub PR adapter are useful hardening steps, but the launch audit
-keeps them warning-only for the first public loop.
+checks the public wave state. The ready launch audit requires durable storage and the GitHub PR adapter so the public
+workflow can survive restarts and record draft PRs predictably.
 
-The local demo still reports launch blockers until `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`, live 6529 mode, setup
-validation, and the required guardian check are configured.
+The local demo still reports launch gaps until `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode,
+GitHub PR adapter, guardian state, setup validation, and the required guardian check are configured.
 
 ## Durable Storage
 
