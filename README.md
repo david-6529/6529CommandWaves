@@ -213,6 +213,8 @@ ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 ```
 
+Use [.env.production.example](.env.production.example) as the deployment checklist.
+
 `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR
 checks the public wave state. Postgres storage and the GitHub PR adapter are useful hardening steps, but the launch audit
 keeps them warning-only for the first public loop.
