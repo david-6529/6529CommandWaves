@@ -78,6 +78,27 @@ describe("6529 wave context", () => {
     });
   });
 
+  it("caps excessive context preview sizes", async () => {
+    const preview = await previewWaveContext({
+      waveId: "mock-command-wave",
+      includeAllHistory: true,
+      maxMessages: 10_000,
+    });
+
+    expect(preview.context.maxMessages).toBe(500);
+    expect(preview.context.maxMessagesPerWave).toBe(500);
+  });
+
+  it("normalizes invalid context preview sizes", async () => {
+    const preview = await previewWaveContext({
+      waveId: "mock-command-wave",
+      includeAllHistory: true,
+      maxMessages: Number.NaN,
+    });
+
+    expect(preview.context.maxMessages).toBe(500);
+  });
+
   it("rejects missing primary wave ids clearly", async () => {
     const missingWaveIdInput = {} as Parameters<typeof previewWaveContext>[0];
 

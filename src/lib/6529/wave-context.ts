@@ -4,8 +4,9 @@ import type { JsonRecord, WaveDrop } from "./types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WAVE_DROPS_PAGE_SIZE = 200;
-const DEFAULT_RECENT_CONTEXT_CAP = 10_000;
-const DEFAULT_FULL_HISTORY_CONTEXT_CAP = 20_000;
+const DEFAULT_RECENT_CONTEXT_CAP = 200;
+const DEFAULT_FULL_HISTORY_CONTEXT_CAP = 500;
+const MAX_CONTEXT_MESSAGES = 500;
 const MAX_RELATED_WAVES = 8;
 
 export type RelatedWaveContextParams = {
@@ -151,6 +152,13 @@ function sortDropsChronologically(drops: WaveDrop[]) {
   });
 }
 
+function normalizedMaxMessages(value: number | undefined, includeAllHistory: boolean) {
+  const defaultCap = includeAllHistory ? DEFAULT_FULL_HISTORY_CONTEXT_CAP : DEFAULT_RECENT_CONTEXT_CAP;
+  const requested = typeof value === "number" && Number.isFinite(value) ? value : defaultCap;
+
+  return Math.min(Math.max(Math.floor(requested), 1), MAX_CONTEXT_MESSAGES);
+}
+
 function dropRange(drops: WaveDrop[]) {
   const timestamps = drops
     .map(dropCreatedAtMs)
@@ -268,7 +276,7 @@ export async function fetchWaveContext(params: WaveContextParams) {
     });
   }
 
-  const maxMessages = params.maxMessages ?? (includeAllHistory ? DEFAULT_FULL_HISTORY_CONTEXT_CAP : DEFAULT_RECENT_CONTEXT_CAP);
+  const maxMessages = normalizedMaxMessages(params.maxMessages, includeAllHistory);
   const sources = buildContextSources(params);
   const maxMessagesPerWave = Math.max(1, Math.ceil(maxMessages / sources.length));
   const sourceResults: Array<Awaited<ReturnType<typeof fetchSingleWaveContext>>> = [];
