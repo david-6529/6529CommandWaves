@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fetchJsonWithTimeout, fetchTextWithTimeout } from "./http-fetch";
+import { fetchJsonWithTimeout, fetchTextResponseWithTimeout, fetchTextWithTimeout } from "./http-fetch";
 
 describe("timed HTTP fetch helper", () => {
   it("reads JSON from HTTP URLs", async () => {
@@ -29,6 +29,19 @@ describe("timed HTTP fetch helper", () => {
       message: "Could not fetch https://command-waves.example.com/state.json: 404 Not Found",
       status: 404,
       statusText: "Not Found",
+    });
+  });
+
+  it("can return allowed non-2xx text responses", async () => {
+    const response = await fetchTextResponseWithTimeout("https://command-waves.example.com/missing.json", {
+      allowedStatuses: [404],
+      fetchImpl: async () => new Response("missing", { status: 404, statusText: "Not Found" }),
+    });
+
+    expect(response).toMatchObject({
+      status: 404,
+      statusText: "Not Found",
+      text: "missing",
     });
   });
 

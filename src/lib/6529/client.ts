@@ -1,6 +1,7 @@
 import { getMockPollDrop, getMockPostDrop, getMockWave, getMockWaveDrops, is6529MockMode } from "./mock";
 import { normalizeWaveDropsResponse } from "./normalize";
 import type { DropPollRequest, PostDropOptions } from "./types";
+import { fetchTextWithTimeout } from "../http-fetch";
 
 const maxWaveIdLength = 160;
 const waveIdPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
@@ -44,7 +45,7 @@ async function apiFetch<T>(path: string, options: RequestOptions = {}) {
     }
   }
 
-  const response = await fetch(url, {
+  const text = await fetchTextWithTimeout(url, {
     method: options.method ?? "GET",
     headers: {
       accept: "application/json",
@@ -52,23 +53,17 @@ async function apiFetch<T>(path: string, options: RequestOptions = {}) {
       ...(options.token ? { authorization: `Bearer ${options.token}` } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
-    cache: "no-store",
   });
 
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-
-    throw Object.assign(
-      new Error(`6529 API request failed: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`),
-      { status: response.status },
-    );
-  }
-
-  if (response.status === 204) {
+  if (!text.trim()) {
     return undefined as T;
   }
 
-  return response.json() as Promise<T>;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw Object.assign(new Error("6529 API response must be valid JSON."), { status: 502 });
+  }
 }
 
 export async function getWave(waveIdOrUrl: string) {

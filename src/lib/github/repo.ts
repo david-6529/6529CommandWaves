@@ -1,3 +1,5 @@
+import { fetchJsonWithTimeout, fetchTextResponseWithTimeout } from "../http-fetch";
+
 export type GitHubRepoRef = {
   owner: string;
   repo: string;
@@ -169,7 +171,7 @@ function contentTextFromPayload(rawBody: string) {
   return rawBody;
 }
 
-async function validateRequiredFile(file: (typeof requiredHookRepoFiles)[number], response: Response) {
+async function validateRequiredFile(file: (typeof requiredHookRepoFiles)[number], rawBody: string) {
   if (file.path !== ".github/PULL_REQUEST_TEMPLATE.md") {
     return {
       valid: true,
@@ -177,7 +179,7 @@ async function validateRequiredFile(file: (typeof requiredHookRepoFiles)[number]
     };
   }
 
-  const content = contentTextFromPayload(await response.text());
+  const content = contentTextFromPayload(rawBody);
   const hasManifestMarkers = content.includes(commandPrManifestStart) && content.includes(commandPrManifestEnd);
 
   return {
@@ -199,18 +201,10 @@ export async function getGitHubRepoMetadata(
     throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
   }
 
-  const response = await fetchImpl(`${githubApiBaseUrl(options)}${repoApiPath(repo)}`, {
+  const payload = asRecord(await fetchJsonWithTimeout<unknown>(`${githubApiBaseUrl(options)}${repoApiPath(repo)}`, {
     headers: githubApiHeaders(options),
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw Object.assign(new Error(`GitHub repo check failed: ${response.status} ${response.statusText}`), {
-      status: response.status,
-    });
-  }
-
-  const payload = asRecord(await response.json());
+    fetchImpl,
+  }));
 
   return {
     ...repo,
@@ -233,9 +227,10 @@ export async function getGitHubRepoRequiredFiles(
 
   return Promise.all(
     requiredHookRepoFiles.map(async (file) => {
-      const response = await fetchImpl(repoContentUrl(repo, file.path, options), {
+      const response = await fetchTextResponseWithTimeout(repoContentUrl(repo, file.path, options), {
+        allowedStatuses: [404],
+        fetchImpl,
         headers: githubApiHeaders(options),
-        cache: "no-store",
       });
 
       if (response.status === 404) {
@@ -248,13 +243,7 @@ export async function getGitHubRepoRequiredFiles(
         };
       }
 
-      if (!response.ok) {
-        throw Object.assign(new Error(`GitHub file check failed: ${response.status} ${response.statusText}`), {
-          status: response.status,
-        });
-      }
-
-      const validation = await validateRequiredFile(file, response);
+      const validation = await validateRequiredFile(file, response.text);
 
       return {
         ...file,

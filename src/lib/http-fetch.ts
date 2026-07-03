@@ -1,6 +1,7 @@
 type FetchLike = (input: string | URL, init?: RequestInit) => Promise<Response>;
 
 export type TimedFetchOptions = Omit<RequestInit, "signal"> & {
+  allowedStatuses?: number[];
   fetchImpl?: FetchLike;
   maxBytes?: number;
   timeoutMs?: number;
@@ -10,6 +11,14 @@ export type TimedFetchError = Error & {
   status?: number;
   statusText?: string;
   url?: string;
+};
+
+export type TimedTextResponse = {
+  headers: Headers;
+  status: number;
+  statusText: string;
+  text: string;
+  url: string;
 };
 
 const defaultTimeoutMs = 10_000;
@@ -84,8 +93,17 @@ async function responseText(response: Response, url: string, maxBytes: number) {
   return text + decoder.decode();
 }
 
-export async function fetchTextWithTimeout(input: string | URL, options: TimedFetchOptions = {}) {
-  const { fetchImpl = fetch, maxBytes = defaultMaxBytes, timeoutMs = defaultTimeoutMs, ...init } = options;
+export async function fetchTextResponseWithTimeout(
+  input: string | URL,
+  options: TimedFetchOptions = {},
+): Promise<TimedTextResponse> {
+  const {
+    allowedStatuses = [],
+    fetchImpl = fetch,
+    maxBytes = defaultMaxBytes,
+    timeoutMs = defaultTimeoutMs,
+    ...init
+  } = options;
   const url = httpUrl(input);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -97,7 +115,7 @@ export async function fetchTextWithTimeout(input: string | URL, options: TimedFe
       signal: controller.signal,
     });
 
-    if (!response.ok) {
+    if (!response.ok && !allowedStatuses.includes(response.status)) {
       throw fetchError(`Could not fetch ${url.toString()}: ${response.status} ${response.statusText}`, {
         status: response.status,
         statusText: response.statusText,
@@ -105,7 +123,13 @@ export async function fetchTextWithTimeout(input: string | URL, options: TimedFe
       });
     }
 
-    return await responseText(response, url.toString(), maxBytes);
+    return {
+      headers: response.headers,
+      status: response.status,
+      statusText: response.statusText,
+      text: await responseText(response, url.toString(), maxBytes),
+      url: url.toString(),
+    };
   } catch (error) {
     if (controller.signal.aborted) {
       throw fetchError(`Request timed out after ${timeoutMs}ms: ${url.toString()}`, { url: url.toString() });
@@ -117,9 +141,13 @@ export async function fetchTextWithTimeout(input: string | URL, options: TimedFe
   }
 }
 
+export async function fetchTextWithTimeout(input: string | URL, options: TimedFetchOptions = {}) {
+  return (await fetchTextResponseWithTimeout(input, options)).text;
+}
+
 export async function fetchJsonWithTimeout<T = unknown>(input: string | URL, options: TimedFetchOptions = {}) {
   const url = input instanceof URL ? input.toString() : input;
-  const text = await fetchTextWithTimeout(input, options);
+  const { text } = await fetchTextResponseWithTimeout(input, options);
 
   try {
     return JSON.parse(text) as T;
