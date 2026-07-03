@@ -51,7 +51,12 @@ export function assertRateLimit(request: Request, options: RateLimitOptions, now
   }
 
   if (bucket.count >= options.max) {
-    throw Object.assign(new Error("Too many requests. Try again shortly."), { status: 429 });
+    const retryAfterSeconds = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+
+    throw Object.assign(new Error("Too many requests. Try again shortly."), {
+      status: 429,
+      headers: { "Retry-After": String(retryAfterSeconds) },
+    });
   }
 
   bucket.count += 1;

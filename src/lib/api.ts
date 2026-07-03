@@ -9,6 +9,10 @@ function withDefaultNoStore(init?: ResponseInit): ResponseInit {
     headers.set("Cache-Control", noStoreCacheControl);
   }
 
+  if (!headers.has("X-Content-Type-Options")) {
+    headers.set("X-Content-Type-Options", "nosniff");
+  }
+
   return {
     ...init,
     headers,
@@ -28,6 +32,17 @@ function getErrorStatus(error: unknown) {
   return Number.isFinite(status) && status >= 400 && status <= 599 ? status : 500;
 }
 
+function getErrorHeaders(error: unknown) {
+  const headers =
+    typeof error === "object" && error !== null && "headers" in error
+      ? (error as { headers: unknown }).headers
+      : undefined;
+
+  return headers instanceof Headers || Array.isArray(headers) || (headers && typeof headers === "object")
+    ? (headers as HeadersInit)
+    : undefined;
+}
+
 export function handleRouteError(error: unknown) {
   const errorId = randomUUID();
   const status = getErrorStatus(error);
@@ -38,5 +53,5 @@ export function handleRouteError(error: unknown) {
     console.error(`[api.route_error:${errorId}]`, error);
   }
 
-  return json({ error: responseMessage, errorId }, { status });
+  return json({ error: responseMessage, errorId }, { status, headers: getErrorHeaders(error) });
 }

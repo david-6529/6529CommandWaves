@@ -6,6 +6,7 @@ describe("API responses", () => {
     const response = json({ ok: true });
 
     expect(response.headers.get("Cache-Control")).toBe("no-store, max-age=0");
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
   });
 
   it("preserves explicit cache headers", () => {
@@ -28,5 +29,18 @@ describe("API responses", () => {
     expect(response.status).toBe(400);
     expect(response.headers.get("Cache-Control")).toBe("no-store, max-age=0");
     expect(payload.error).toBe("Bad request");
+  });
+
+  it("preserves safe error headers", () => {
+    const response = handleRouteError(
+      Object.assign(new Error("Too many requests. Try again shortly."), {
+        status: 429,
+        headers: { "Retry-After": "30" },
+      }),
+    );
+
+    expect(response.status).toBe(429);
+    expect(response.headers.get("Retry-After")).toBe("30");
+    expect(response.headers.get("Cache-Control")).toBe("no-store, max-age=0");
   });
 });

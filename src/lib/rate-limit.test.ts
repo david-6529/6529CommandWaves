@@ -19,6 +19,23 @@ describe("rate limit", () => {
     expect(() => assertRateLimit(req, options, 3_000)).toThrow("Too many requests. Try again shortly.");
   });
 
+  it("adds retry timing to blocked requests", () => {
+    const req = request({ "x-forwarded-for": "203.0.113.11" });
+    const options = { namespace: "context", max: 1, windowMs: 60_000 };
+
+    assertRateLimit(req, options, 1_000);
+
+    try {
+      assertRateLimit(req, options, 3_100);
+      throw new Error("Expected rate limit.");
+    } catch (error) {
+      expect(error).toMatchObject({
+        status: 429,
+        headers: { "Retry-After": "58" },
+      });
+    }
+  });
+
   it("resets after the window", () => {
     const req = request({ "x-real-ip": "203.0.113.20" });
     const options = { namespace: "context", max: 1, windowMs: 100 };
