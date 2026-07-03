@@ -44,6 +44,14 @@ function requestBodyTooLargeError(maxBytes: number) {
   return Object.assign(new Error(`Request body must be ${maxBytes} bytes or less.`), { status: 413 });
 }
 
+function requestContentType(request: Request) {
+  return request.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
+}
+
+function isJsonContentType(value: string) {
+  return value === "application/json" || value.endsWith("+json");
+}
+
 async function readBodyText(request: Request, maxBytes: number) {
   if (!request.body) {
     return "";
@@ -80,7 +88,12 @@ async function readBodyText(request: Request, maxBytes: number) {
 export async function readJsonObject(request: Request, options: ReadJsonObjectOptions = {}) {
   const maxBytes = options.maxBytes ?? defaultJsonBodyMaxBytes;
   const contentLength = requestContentLength(request);
+  const contentType = requestContentType(request);
   let body: unknown;
+
+  if (!isJsonContentType(contentType)) {
+    throw Object.assign(new Error("Content-Type must be application/json."), { status: 415 });
+  }
 
   if (contentLength !== null && contentLength > maxBytes) {
     throw requestBodyTooLargeError(maxBytes);

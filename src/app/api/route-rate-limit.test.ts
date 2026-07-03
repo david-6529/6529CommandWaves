@@ -10,12 +10,12 @@ import { resetRateLimitsForTest } from "@/lib/rate-limit";
 
 function request(url: string, init: RequestInit = {}) {
   return new Request(url, {
+    ...init,
     headers: {
       "content-type": "application/json",
       "x-forwarded-for": "203.0.113.77",
       ...(init.headers ?? {}),
     },
-    ...init,
   });
 }
 

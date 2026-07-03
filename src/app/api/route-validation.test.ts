@@ -20,12 +20,12 @@ import { resetRateLimitsForTest } from "@/lib/rate-limit";
 
 function request(url: string, init: RequestInit = {}) {
   return new Request(url, {
+    ...init,
     headers: {
       "content-type": "application/json",
       "x-forwarded-for": "203.0.113.81",
       ...(init.headers ?? {}),
     },
-    ...init,
   });
 }
 
@@ -133,6 +133,23 @@ describe("API route validation", () => {
     expect(response.status).toBe(400);
     await expect(responsePayload(response)).resolves.toMatchObject({
       error: "Keep room messages under 4000 characters.",
+    });
+  });
+
+  it("rejects non-JSON mutation bodies at the route", async () => {
+    const response = await submitProposalRoute(
+      request("https://command-waves.example.com/api/command-wave/proposals", {
+        method: "POST",
+        headers: {
+          "content-type": "text/plain",
+        },
+        body: JSON.stringify({}),
+      }),
+    );
+
+    expect(response.status).toBe(415);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "Content-Type must be application/json.",
     });
   });
 

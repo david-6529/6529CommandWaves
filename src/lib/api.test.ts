@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { handleRouteError, json, readJsonObject } from "./api";
 
+function jsonRequest(init: RequestInit = {}) {
+  const headers = new Headers(init.headers);
+
+  if (!headers.has("content-type")) {
+    headers.set("content-type", "application/json");
+  }
+
+  return new Request("https://command-waves.example.com/api/test", {
+    ...init,
+    method: init.method ?? "POST",
+    headers,
+  });
+}
+
 describe("API responses", () => {
   it("defaults JSON responses to no-store", () => {
     const response = json({ ok: true });
@@ -45,17 +59,49 @@ describe("API responses", () => {
   });
 
   it("reads JSON object bodies", async () => {
-    const request = new Request("https://command-waves.example.com/api/test", {
-      method: "POST",
+    const request = jsonRequest({
       body: JSON.stringify({ waveUrl: "mock-command-wave" }),
     });
 
     await expect(readJsonObject(request)).resolves.toEqual({ waveUrl: "mock-command-wave" });
   });
 
-  it("rejects malformed JSON bodies clearly", async () => {
-    const request = new Request("https://command-waves.example.com/api/test", {
+  it("accepts structured JSON content types", async () => {
+    const request = jsonRequest({
+      headers: {
+        "content-type": "application/vnd.command-wave+json",
+      },
+      body: JSON.stringify({ ok: true }),
+    });
+
+    await expect(readJsonObject(request)).resolves.toEqual({ ok: true });
+  });
+
+  it("rejects missing or non-JSON content types", async () => {
+    const missingTypeRequest = new Request("https://command-waves.example.com/api/test", {
       method: "POST",
+      body: JSON.stringify({ ok: true }),
+    });
+    const textRequest = new Request("https://command-waves.example.com/api/test", {
+      method: "POST",
+      headers: {
+        "content-type": "text/plain",
+      },
+      body: JSON.stringify({ ok: true }),
+    });
+
+    await expect(readJsonObject(missingTypeRequest)).rejects.toMatchObject({
+      message: "Content-Type must be application/json.",
+      status: 415,
+    });
+    await expect(readJsonObject(textRequest)).rejects.toMatchObject({
+      message: "Content-Type must be application/json.",
+      status: 415,
+    });
+  });
+
+  it("rejects malformed JSON bodies clearly", async () => {
+    const request = jsonRequest({
       body: "{",
     });
 
@@ -66,8 +112,7 @@ describe("API responses", () => {
   });
 
   it("rejects non-object JSON bodies clearly", async () => {
-    const request = new Request("https://command-waves.example.com/api/test", {
-      method: "POST",
+    const request = jsonRequest({
       body: JSON.stringify(["mock-command-wave"]),
     });
 
@@ -78,8 +123,7 @@ describe("API responses", () => {
   });
 
   it("rejects oversized JSON bodies before parsing", async () => {
-    const request = new Request("https://command-waves.example.com/api/test", {
-      method: "POST",
+    const request = jsonRequest({
       headers: {
         "content-length": "65537",
       },
@@ -93,8 +137,7 @@ describe("API responses", () => {
   });
 
   it("rejects oversized JSON bodies without content-length headers", async () => {
-    const request = new Request("https://command-waves.example.com/api/test", {
-      method: "POST",
+    const request = jsonRequest({
       body: JSON.stringify({ text: "x".repeat(65_536) }),
     });
 
@@ -105,8 +148,7 @@ describe("API responses", () => {
   });
 
   it("allows route-specific JSON body size limits", async () => {
-    const request = new Request("https://command-waves.example.com/api/test", {
-      method: "POST",
+    const request = jsonRequest({
       headers: {
         "content-length": "20",
       },
