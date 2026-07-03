@@ -40,17 +40,56 @@ function requestContentLength(request: Request) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
+function requestBodyTooLargeError(maxBytes: number) {
+  return Object.assign(new Error(`Request body must be ${maxBytes} bytes or less.`), { status: 413 });
+}
+
+async function readBodyText(request: Request, maxBytes: number) {
+  if (!request.body) {
+    return "";
+  }
+
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let size = 0;
+  let text = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      size += value.byteLength;
+
+      if (size > maxBytes) {
+        throw requestBodyTooLargeError(maxBytes);
+      }
+
+      text += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return text + decoder.decode();
+}
+
 export async function readJsonObject(request: Request, options: ReadJsonObjectOptions = {}) {
   const maxBytes = options.maxBytes ?? defaultJsonBodyMaxBytes;
   const contentLength = requestContentLength(request);
   let body: unknown;
 
   if (contentLength !== null && contentLength > maxBytes) {
-    throw Object.assign(new Error(`Request body must be ${maxBytes} bytes or less.`), { status: 413 });
+    throw requestBodyTooLargeError(maxBytes);
   }
 
+  const rawBody = await readBodyText(request, maxBytes);
+
   try {
-    body = await request.json();
+    body = JSON.parse(rawBody) as unknown;
   } catch {
     throw Object.assign(new Error("Request body must be valid JSON."), { status: 400 });
   }
