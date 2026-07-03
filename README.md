@@ -1,8 +1,8 @@
-# 6529 Hook Room
+# 6529 Hook Build Room
 
 ## Short Version
 
-6529 Hook Room is a simple coordination app for building the 6529 hook in public.
+6529 Hook Build Room is a simple coordination app for building the 6529 hook in public.
 
 The first public phase connects one 6529 room to one smart contract repo. Builders talk in the room, turn one idea into a
 small proposal, record the 6529 decision, build a draft PR, review it, and share the result back with a clear log.
@@ -23,7 +23,7 @@ The builder flow is:
 
 The simple product shape is:
 
-`Access -> Room -> PR -> Review`
+`Access -> Room -> Decision -> PR -> Review`
 
 ## Current Status
 
@@ -32,10 +32,10 @@ is designed so the same pattern can become a broader public builder protocol aft
 
 What exists now:
 
-- A Next app product surface focused on the `6529 Hook Room`.
+- A Next app product surface focused on the `6529 Hook Build Room`.
 - One active hook project with a public 6529 room and a code repo.
-- A room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and proposal
-  flow.
+- A simplified room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and
+  proposal flow folded as needed.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
@@ -43,6 +43,7 @@ What exists now:
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
+- Shared JSON body validation for API routes so malformed or non-object request bodies return clean 400 errors.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
   contract signal checks.
 - Local file storage for the demo flow and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
@@ -62,10 +63,10 @@ What remains manual or MVP-only:
 
 What we are working on next:
 
-1. Keep the first screen focused on the active hook room, not a guide.
-2. Make it obvious what is happening, who is involved, and how a new builder can help.
+1. Pick the first real public 6529 room and hook repo.
+2. Configure launch env, durable storage, and the required guardian check.
 3. Finish the first public loop: discussion, scoped proposal, 6529 decision, PR record, reviewer proof, and share-back.
-4. Harden persistence, auth, live 6529 reads, GitHub branch/PR operations, and external guardian trust boundaries.
+4. Wire live wallet/session gate checks when the manual gate process is proven.
 5. Expand contribution analysis after the workflow is useful and understandable.
 
 ## Why This Exists
@@ -151,7 +152,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 
 Default workspace:
 
-- Current hook task, next proposal, and project activity.
+- Current hook task, next move, and folded status/rules.
 - Links to the room, code repo, current PR, and reviewed work.
 - Builder message composer with direct room posting when configured, latest-post preview, and copyable discussion draft.
 - Simple proposal form for one PR-sized hook change with limits and success criteria.
@@ -218,6 +219,9 @@ Use [.env.production.example](.env.production.example) as the deployment checkli
 `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR
 checks the public wave state. Postgres storage and the GitHub PR adapter are useful hardening steps, but the launch audit
 keeps them warning-only for the first public loop.
+
+The local demo still reports launch blockers until `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`, live 6529 mode, setup
+validation, and the required guardian check are configured.
 
 ## Durable Storage
 
@@ -383,6 +387,7 @@ only for protected actions. This is an MVP bridge for testing protected routes; 
 wallet/session auth before opening the console broadly.
 
 API errors include an `errorId` so a user-visible error can be matched to server logs.
+Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and null bodies return 400-level errors.
 
 ## Next Production Steps
 
