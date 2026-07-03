@@ -162,6 +162,9 @@ describe("setup verifier", () => {
     );
 
     expect(result.status).toBe("pass");
+    expect(result.checks.find((item) => item.id === "command_wave_state_version")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "command_wave_state_available")).toMatchObject({
       status: "pass",
     });
@@ -200,6 +203,34 @@ describe("setup verifier", () => {
 
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "command_wave_state_identity")).toMatchObject({
+      status: "fail",
+    });
+  });
+
+  it("fails when the command-wave state target returns a raw wave", () => {
+    const proof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
+    });
+    const result = verifySetupProofAgainstGitHubPayloads(
+      proof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      {
+        commandWaveState: demoWave,
+      },
+    );
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "command_wave_state_version")).toMatchObject({
+      status: "fail",
+    });
+    expect(result.checks.find((item) => item.id === "command_wave_state_available")).toMatchObject({
       status: "fail",
     });
   });

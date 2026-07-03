@@ -54,10 +54,12 @@ function isCommandWave(value: unknown): value is CommandWave {
 
 function commandWaveStateFromPayload(payload: unknown) {
   const record = isRecord(payload) ? payload : null;
-  const wave = isCommandWave(record?.wave) ? record.wave : isCommandWave(payload) ? payload : null;
+  const version = record?.version === "command-wave-state-v0.1" ? record.version : null;
+  const wave = version && isCommandWave(record?.wave) ? record.wave : null;
   const waveStateHash = asString(record?.waveStateHash);
 
   return {
+    version,
     wave,
     waveStateHash,
   };
@@ -207,6 +209,15 @@ export function verifySetupProofAgainstGitHubPayloads(
     const state = commandWaveStateFromPayload(options.commandWaveState);
     const wave = state.wave;
 
+    checks.push(
+      check(
+        "command_wave_state_version",
+        state.version === "command-wave-state-v0.1" ? "pass" : "fail",
+        state.version === "command-wave-state-v0.1"
+          ? "Command-wave state URL returned the expected snapshot version."
+          : "Command-wave state URL must return a command-wave-state-v0.1 snapshot.",
+      ),
+    );
     checks.push(
       check(
         "command_wave_state_available",

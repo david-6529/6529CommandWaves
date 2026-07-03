@@ -327,8 +327,8 @@ SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run se
 If GitHub returns 404 for a rules endpoint, the verifier prints `GITHUB_TARGET_UNAVAILABLE` and continues. The audit still
 fails unless the required guardian check is found in another fetched payload or in `SETUP_GITHUB_PAYLOADS_PATH`.
 
-When the setup proof includes `commandWaveStateUrl`, the same command also checks that the state URL returns the governed
-room state and a matching state hash.
+When the setup proof includes `commandWaveStateUrl`, the same command also checks that the state URL returns a
+`command-wave-state-v0.1` snapshot for the governed room with a matching state hash.
 
 For a stricter production audit that fails until the guardian is external to the repo:
 
