@@ -10,6 +10,13 @@ describe("6529 normalization", () => {
     expect(normalizeWaveId("  raw-wave-id  ")).toBe("raw-wave-id");
   });
 
+  it("rejects oversized wave IDs", () => {
+    expect(() => normalizeWaveId("x".repeat(161))).toThrow("6529 wave id must be 160 characters or less.");
+    expect(() => normalizeWaveId(`https://6529.io/waves/${"x".repeat(161)}`)).toThrow(
+      "6529 wave id must be 160 characters or less.",
+    );
+  });
+
   it("normalizes drop content, author, serial, and timestamps", () => {
     const drop = normalizeWaveDrop({
       drop_id: "drop-1",

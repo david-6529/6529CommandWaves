@@ -2,6 +2,8 @@ import { getMockPollDrop, getMockPostDrop, getMockWave, getMockWaveDrops, is6529
 import { normalizeWaveDropsResponse } from "./normalize";
 import type { DropPollRequest, PostDropOptions } from "./types";
 
+const maxWaveIdLength = 160;
+
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
@@ -16,8 +18,13 @@ export function get6529ApiBaseUrl() {
 export function normalizeWaveId(value: string) {
   const trimmed = value.trim();
   const urlMatch = trimmed.match(/\/waves\/([^/?#\s]+)/);
+  const waveId = (urlMatch?.[1] ?? trimmed).trim();
 
-  return (urlMatch?.[1] ?? trimmed).trim();
+  if (waveId.length > maxWaveIdLength) {
+    throw Object.assign(new Error(`6529 wave id must be ${maxWaveIdLength} characters or less.`), { status: 400 });
+  }
+
+  return waveId;
 }
 
 async function apiFetch<T>(path: string, options: RequestOptions = {}) {
