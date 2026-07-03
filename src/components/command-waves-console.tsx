@@ -1099,7 +1099,8 @@ export function CommandWavesConsole() {
     [phaseNextAction, wave, waveRoomMessage],
   );
   const roomPostTargetUrl = primaryHookProject?.waveUrl ?? wave.waveUrl;
-  const canPostRoomMessage = Boolean(waveRoomMessage.trim() && roomPostTargetUrl);
+  const hasRoomMessage = Boolean(waveRoomMessage.trim());
+  const canPostRoomMessage = Boolean(hasRoomMessage && roomPostTargetUrl);
   const builderWaveQuickPosts = useMemo(
     () => createBuilderWaveQuickPosts({ handle: proposer, title: currentFocusTitle }),
     [currentFocusTitle, proposer],
@@ -2068,17 +2069,21 @@ export function CommandWavesConsole() {
                 >
                   {apiBusy === "roomPost" ? "Posting" : "Post to room"}
                 </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={!waveRoomMessage.trim() || !wave.waveUrl}
-                  onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
-                >
-                  Copy and open
-                </Button>
-                <Button type="button" variant="secondary" disabled={!waveRoomMessage.trim()} onClick={() => void copyBuilderWaveChatDraft()}>
-                  Copy only
-                </Button>
+                {hasRoomMessage ? (
+                  <>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      disabled={!wave.waveUrl}
+                      onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
+                    >
+                      Copy and open
+                    </Button>
+                    <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveChatDraft()}>
+                      Copy only
+                    </Button>
+                  </>
+                ) : null}
                 <Button
                   type="button"
                   variant="secondary"
@@ -2089,9 +2094,11 @@ export function CommandWavesConsole() {
                 >
                   {apiBusy === "context" ? "Loading" : "Refresh room"}
                 </Button>
-                <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
-                  Clear
-                </Button>
+                {hasRoomMessage ? (
+                  <Button type="button" variant="secondary" onClick={resetBuilderWaveChatDraft}>
+                    Clear
+                  </Button>
+                ) : null}
               </div>
               {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
               {roomPostUrl ? (
