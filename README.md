@@ -164,7 +164,7 @@ Safety and review:
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer gate foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
-- PR patch checks for upgradeability, delegatecall, deployment, governance, and parameter writes when patch records exist.
+- PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, and parameter writes when patch records exist.
 
 Audit and launch:
 

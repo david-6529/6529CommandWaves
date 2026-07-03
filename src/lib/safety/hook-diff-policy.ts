@@ -8,6 +8,7 @@ export type HookChangedFile = {
 export type HookPatchSignalLabel =
   | "upgradeability_pattern"
   | "delegatecall"
+  | "destructive_opcode"
   | "deployment_action"
   | "governance_authority"
   | "parameter_write";
@@ -41,6 +42,13 @@ const patchRules: Array<{
     risk: "critical",
     pattern: /\bdelegatecall\s*\(/i,
     reason: "Added Solidity code contains delegatecall.",
+    defaultBlocked: true,
+  },
+  {
+    label: "destructive_opcode",
+    risk: "critical",
+    pattern: /\b(selfdestruct|suicide)\s*\(/i,
+    reason: "Added Solidity code contains a destructive opcode.",
     defaultBlocked: true,
   },
   {
@@ -139,7 +147,7 @@ export function riskAllowsHookPatchSignal({
   upgradeabilityExceptionApproved?: boolean;
 }) {
   if (signal.defaultBlocked) {
-    return risk === "critical" && upgradeabilityExceptionApproved;
+    return signal.label === "upgradeability_pattern" && risk === "critical" && upgradeabilityExceptionApproved;
   }
 
   if (signal.risk === "high") {

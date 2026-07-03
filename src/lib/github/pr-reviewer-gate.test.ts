@@ -397,6 +397,46 @@ describe("PR reviewer gate", () => {
     expect(result.checks.find((item) => item.id.startsWith("hook_patch_upgradeability_pattern"))?.status).toBe("fail");
   });
 
+  it("blocks destructive Solidity opcodes in patch content", () => {
+    const wave = approvedDemoWave();
+    const proposal = {
+      ...wave.proposals[0],
+      id: "cmd-patch-destructive",
+      risk: "critical" as const,
+      prompt: "Draft hook cleanup internals.",
+      spec: "No destructive opcode exception is approved.",
+    };
+    const poll = {
+      ...wave.polls[0],
+      proposalId: proposal.id,
+    };
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
+      changedPaths: ["contracts/Hook.sol"],
+      changedFiles: [
+        {
+          path: "contracts/Hook.sol",
+          patch: [
+            "@@",
+            "+contract Hook {",
+            "+  function destroy() external { selfdestruct(payable(msg.sender)); }",
+            "+}",
+          ].join("\n"),
+        },
+      ],
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.hookPatchSignals).toContainEqual(
+      expect.objectContaining({ label: "destructive_opcode", risk: "critical", defaultBlocked: true }),
+    );
+    expect(result.checks.find((item) => item.id.startsWith("hook_patch_destructive_opcode"))?.status).toBe("fail");
+  });
+
   it("requires critical approval for guardian proof code changes", () => {
     const wave = approvedDemoWave();
     const proposal = wave.proposals[0];
