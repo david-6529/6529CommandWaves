@@ -3,6 +3,14 @@ import { dirname, resolve } from "node:path";
 import type { SetupProof } from "../src/lib/setup-proof";
 import { verifySetupProofAgainstGitHubPayloads } from "../src/lib/setup-verifier";
 
+type FetchErrorPayload = {
+  setupVerifierFetchError: {
+    url: string;
+    status: number;
+    statusText: string;
+  };
+};
+
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
 }
@@ -20,6 +28,27 @@ async function readJsonUrl<T>(url: string, token?: string): Promise<T> {
   }
 
   return response.json() as Promise<T>;
+}
+
+async function readOptionalJsonUrl(url: string, token?: string): Promise<unknown> {
+  const response = await fetch(url, {
+    headers: {
+      accept: "application/json",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    return {
+      setupVerifierFetchError: {
+        url,
+        status: response.status,
+        statusText: response.statusText,
+      },
+    } satisfies FetchErrorPayload;
+  }
+
+  return response.json() as Promise<unknown>;
 }
 
 async function loadSetupProof() {
@@ -53,7 +82,7 @@ async function loadGitHubPayloads(proof: SetupProof) {
     throw new Error("Setup proof does not include GitHub verification targets.");
   }
 
-  return Promise.all(urls.map((url) => readJsonUrl<unknown>(url, process.env.GITHUB_TOKEN)));
+  return Promise.all(urls.map((url) => readOptionalJsonUrl(url, process.env.GITHUB_TOKEN)));
 }
 
 async function loadCommandWaveState(proof: SetupProof) {
@@ -73,9 +102,26 @@ function writeResult(path: string | undefined, value: unknown) {
   writeFileSync(outputPath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function setupVerifierFetchError(value: unknown) {
+  const record = value && typeof value === "object" && !Array.isArray(value) ? value : null;
+  const error = record && "setupVerifierFetchError" in record ? record.setupVerifierFetchError : null;
+
+  if (!error || typeof error !== "object" || Array.isArray(error)) {
+    return null;
+  }
+
+  const payload = error as Record<string, unknown>;
+  const url = typeof payload.url === "string" ? payload.url : "";
+  const status = typeof payload.status === "number" ? payload.status : 0;
+  const statusText = typeof payload.statusText === "string" ? payload.statusText : "";
+
+  return url && status ? { url, status, statusText } : null;
+}
+
 async function main() {
   const proof = await loadSetupProof();
   const payloads = await loadGitHubPayloads(proof);
+  const fetchErrors = payloads.map(setupVerifierFetchError).filter((item): item is NonNullable<typeof item> => Boolean(item));
   const commandWaveState = await loadCommandWaveState(proof);
   const result = verifySetupProofAgainstGitHubPayloads(proof, payloads, {
     requireExternalGuardian: process.env.SETUP_REQUIRE_EXTERNAL_GUARDIAN === "true",
@@ -88,6 +134,10 @@ async function main() {
   console.log(`Setup verification: ${result.status}`);
   console.log(`Required checks: ${result.requiredChecks.join(", ") || "none"}`);
   console.log(`Observed required checks: ${result.observedRequiredChecks.join(", ") || "none"}`);
+
+  for (const item of fetchErrors) {
+    console.log(`GITHUB_TARGET_UNAVAILABLE ${item.status}: ${item.url} ${item.statusText}`.trim());
+  }
 
   for (const item of result.checks) {
     console.log(`${item.status.toUpperCase()} ${item.id}: ${item.message}`);
