@@ -15,7 +15,7 @@ describe("command wave state snapshot", () => {
       wave: demoWave,
       guardian: {
         envVar: "COMMAND_WAVE_STATE_URL",
-        expectedPayload: "wave",
+        expectedPayload: "command-wave-state-v0.1 snapshot",
       },
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));

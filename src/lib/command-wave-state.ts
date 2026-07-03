@@ -9,7 +9,7 @@ export type CommandWaveStateSnapshot = {
   waveStateHash: string;
   guardian: {
     envVar: "COMMAND_WAVE_STATE_URL";
-    expectedPayload: "wave";
+    expectedPayload: "command-wave-state-v0.1 snapshot";
   };
 };
 
@@ -24,7 +24,7 @@ export function createCommandWaveStateSnapshot(
     waveStateHash: hashValue(wave),
     guardian: {
       envVar: "COMMAND_WAVE_STATE_URL",
-      expectedPayload: "wave",
+      expectedPayload: "command-wave-state-v0.1 snapshot",
     },
   };
 }
