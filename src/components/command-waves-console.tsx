@@ -1969,7 +1969,7 @@ export function CommandWavesConsole() {
                 <p className="mt-1 text-xl font-semibold text-zinc-50">{primaryHookProject?.name ?? wave.name}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{primaryHookProject?.currentFocus ?? currentFocusTitle}</p>
                 <div className="mt-3 border-t border-zinc-800 pt-3">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Work loop</p>
                   <p className="mt-1 text-sm font-semibold leading-6 text-zinc-100">{phaseNextAction.title}</p>
                 </div>
               </div>
