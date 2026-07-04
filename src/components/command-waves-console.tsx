@@ -892,7 +892,6 @@ export function CommandWavesConsole() {
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
   const [roomPostUrl, setRoomPostUrl] = useState("");
   const [waveRoomMessage, setWaveRoomMessage] = useState("");
-  const [selectedMemberIdentity, setSelectedMemberIdentity] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
@@ -908,15 +907,11 @@ export function CommandWavesConsole() {
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const [suggestOpen, setSuggestOpen] = useState(false);
-  const [hookDetailsOpen, setHookDetailsOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
-  const [buildersOpen, setBuildersOpen] = useState(false);
   const publicAppOrigin = useSyncExternalStore(subscribeToStaticOrigin, appOriginSnapshot, emptyAppOriginSnapshot);
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
   const suggestRef = useRef<HTMLDetailsElement>(null);
-  const hookDetailsRef = useRef<HTMLDetailsElement>(null);
   const activityRef = useRef<HTMLDetailsElement>(null);
-  const buildersRef = useRef<HTMLDetailsElement>(null);
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -1280,11 +1275,6 @@ export function CommandWavesConsole() {
             : activeProposal
               ? "Follow the next open step for this hook change."
               : "Choose one small hook change the room can discuss.";
-  const selectedMember =
-    builderRoster.find((member) => member.identity === selectedMemberIdentity) ?? builderRoster[0] ?? null;
-  const otherBuilderRoster = selectedMember
-    ? builderRoster.filter((member) => member.identity !== selectedMember.identity)
-    : builderRoster;
   const projectOverviewItems = [
     ["Room", primaryHookProject?.waveLabel ?? "No room"],
     ["Repo", primaryHookProject?.repoLabel ?? "No repo"],
@@ -1564,10 +1554,6 @@ export function CommandWavesConsole() {
     openFoldedSection(activityRef, setActivityOpen);
   }
 
-  function openBuildersSection() {
-    openFoldedSection(buildersRef, setBuildersOpen);
-  }
-
   function runLaunchNextAction() {
     if (launchActionRunsSetup) {
       openSetupControls();
@@ -1709,11 +1695,6 @@ export function CommandWavesConsole() {
     setWaveRoomMessage("");
     setWaveRoomNotice("Message cleared.");
     setRoomPostUrl("");
-  }
-
-  function showMemberProfile(identity: string) {
-    setSelectedMemberIdentity(identity);
-    openBuildersSection();
   }
 
   function messageMember(identity: string) {
@@ -2254,9 +2235,6 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Who is in the swarm</h2>
               </div>
-              <Button type="button" variant="secondary" onClick={openBuildersSection}>
-                View all
-              </Button>
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {visibleBuilderProfiles.length ? (
@@ -2456,44 +2434,6 @@ export function CommandWavesConsole() {
         </details>
 
         <details
-          id="active-hooks"
-          ref={hookDetailsRef}
-          className="scroll-mt-4 border-b border-zinc-900 py-3"
-          open={hookDetailsOpen}
-          onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
-        >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
-            <span>Project details</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
-              {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
-            </Badge>
-          </summary>
-          <div className="mt-4 grid gap-3">
-            {activeHookProjects.map((project) => (
-              <div key={project.id} className="grid gap-3 rounded-md border border-zinc-800 bg-zinc-950/60 p-3 lg:grid-cols-[1fr_auto]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-xl font-semibold text-zinc-50">{project.name}</h3>
-                    <Badge className={nextActionStatusClass(project.nextActionStatus)}>{project.nextActionLabel}</Badge>
-                  </div>
-                  <p className="mt-2 text-base leading-7 text-zinc-400">{project.currentFocus}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Badge className="border-zinc-700 bg-black text-zinc-300">{project.waveLabel}</Badge>
-                    <Badge className="border-zinc-700 bg-black text-zinc-300">{project.repoLabel}</Badge>
-                    <Badge className="border-zinc-700 bg-black text-zinc-300">{project.reviewStatusLabel}</Badge>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 lg:justify-end">
-                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Room</LinkButton> : null}
-                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Code</LinkButton> : null}
-                  <JumpLink href="#wave-room">Message</JumpLink>
-                </div>
-              </div>
-            ))}
-          </div>
-        </details>
-
-        <details
           id="recent-activity"
           ref={activityRef}
           className="scroll-mt-4 border-b border-zinc-900 py-3"
@@ -2540,95 +2480,6 @@ export function CommandWavesConsole() {
               </div>
             </details>
           ) : null}
-        </details>
-
-        <details
-          id="active-builders"
-          ref={buildersRef}
-          className="scroll-mt-4 border-b border-zinc-900 py-3"
-          open={buildersOpen}
-          onToggle={(event) => setBuildersOpen(event.currentTarget.open)}
-        >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
-            <span>All member activity</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{builderRoster.length}</Badge>
-          </summary>
-          {selectedMember ? (
-            <div className="mt-4 grid gap-3 border-y border-zinc-800 py-4 lg:grid-cols-[1fr_auto]">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Member</p>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{selectedMember.role}</Badge>
-                  <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{selectedMember.scoreLabel}</Badge>
-                </div>
-                <h3 className="mt-2 text-2xl font-semibold text-zinc-50">{selectedMember.identity}</h3>
-                <p className="mt-2 text-base leading-7 text-zinc-400">{selectedMember.activity}</p>
-                <p className="mt-1 text-sm leading-6 text-zinc-500">{selectedMember.detail}</p>
-                <dl className="mt-3 grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-5">
-                  {selectedMember.stats.slice(0, 5).map((stat) => (
-                    <div key={`${selectedMember.identity}-${stat.label}`} className="rounded border border-zinc-800 bg-zinc-950 px-2 py-2">
-                      <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{stat.label}</dt>
-                      <dd className="mt-1 text-sm font-semibold text-zinc-100">{stat.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Evidence: {selectedMember.basis.slice(0, 3).join(", ") || selectedMember.activity}
-                </p>
-                <p className="mt-1 text-sm leading-6 text-zinc-500">
-                  Activity is informational. It does not grant permissions, payouts, or merge rights.
-                </p>
-              </div>
-              <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-                <Button type="button" variant="secondary" onClick={() => messageMember(selectedMember.identity)}>
-                  Message
-                </Button>
-                <LinkButton href={memberProfileUrl(selectedMember.identity)}>6529 profile</LinkButton>
-              </div>
-            </div>
-          ) : null}
-          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-            {builderRoster.length ? (
-              otherBuilderRoster.length ? (
-                otherBuilderRoster.map((member) => (
-                  <div key={member.identity} className="grid gap-3 py-4 md:grid-cols-[1fr_auto]">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-xl font-semibold text-zinc-50">{member.identity}</p>
-                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
-                      </div>
-                      <p className="mt-2 text-base leading-7 text-zinc-400">{member.activity}</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-500">{member.detail}</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-500">
-                        Evidence: {member.basis.slice(0, 2).join(", ") || member.activity}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 md:justify-end">
-                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
-                      <Button type="button" variant="secondary" onClick={() => showMemberProfile(member.identity)}>
-                        Profile
-                      </Button>
-                      <LinkButton href={memberProfileUrl(member.identity)}>6529 profile</LinkButton>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="py-4">
-                  <p className="text-base font-semibold text-zinc-100">No other visible members yet</p>
-                  <p className="mt-1 text-base leading-7 text-zinc-500">
-                    More builders will appear after they propose, vote, or record activity.
-                  </p>
-                </div>
-              )
-            ) : (
-              <div className="py-4">
-                <p className="text-base font-semibold text-zinc-100">No visible members yet</p>
-                <p className="mt-1 text-base leading-7 text-zinc-500">
-                  Propose a change, vote, or record a decision to appear here.
-                </p>
-              </div>
-            )}
-          </div>
         </details>
 
         <details id="more-tools" className="scroll-mt-4 border-b border-zinc-900 py-3">
