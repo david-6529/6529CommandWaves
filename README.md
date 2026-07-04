@@ -23,7 +23,7 @@ The builder flow is:
 
 The simple product shape is:
 
-`Access -> Room -> Decision -> PR -> Review`
+`Access -> Room -> Decision -> PR -> Review -> Log`
 
 ## Current Status
 
@@ -34,8 +34,8 @@ What exists now:
 
 - A Next app product surface focused on building the 6529 hook together.
 - One active hook project with a public 6529 room and a code repo.
-- A simplified room-first UI with the current hook change, next move, chat composer, latest activity, member profiles, and
-  proposal flow folded as needed.
+- A simplified room-first UI with a project overview, work-loop status, current hook change, chat composer, room snapshot,
+  latest log, member profiles, rules of the game, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
@@ -62,6 +62,7 @@ What remains manual or MVP-only:
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting uses visible app activity and room posts pulled into the app. Full scoring across GitHub commits,
   reviews, merges, and off-app activity is still future work.
+- The demo work loop can be complete while the public launch audit remains blocked by deployment and environment setup.
 
 What we are working on next:
 
@@ -154,11 +155,13 @@ setup and audit tools stay collapsed until a maintainer needs them.
 
 Default workspace:
 
-- Current hook task, next move, and folded status/rules.
+- Project overview with work-loop status, room, repo, access, review, and first public launch links.
+- Current hook task, visible decision need, PR status, latest log, and next action.
 - Links to the room, code repo, current PR, and reviewed work.
-- Builder message composer with direct room posting when configured, latest-post preview, and copyable discussion draft.
-- Simple proposal form for one PR-sized hook change with limits and success criteria.
-- Builder list with 6529 profile links, visible room activity, and informational activity points.
+- Builder message composer with direct room posting when configured, a visible room snapshot, and copyable discussion draft.
+- Folded proposal form for one PR-sized hook change with limits, safety checks, and success criteria.
+- Builder profiles with 6529 profile links, evidence, visible room activity, and informational activity points.
+- Rules of the game next to the builder profiles: who can play, how work moves, and hook guardrails.
 
 Safety and review:
 
@@ -172,10 +175,12 @@ Audit and launch:
 
 - Recent activity log with export.
 - Activity report drawer for app records and manual planning context.
-- Launch checklist with setup, readiness, checklist, and next-action records.
+- Launch checklist with setup, readiness, flow checklist, and launch next-action records.
 - Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
+- The local demo separates work-loop status from launch readiness. Launch readiness still fails until production env,
+  durable storage, live 6529 mode, GitHub PR adapter, guardian state, and required checks are configured.
 
 Maintainer setup:
 
