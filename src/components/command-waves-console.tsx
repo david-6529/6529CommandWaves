@@ -2053,6 +2053,19 @@ export function CommandWavesConsole() {
               ))}
             </div>
 
+            {orderedLedgerEvents[0] ? (
+              <div className="mt-4 border-t border-zinc-800 pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest log</p>
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(orderedLedgerEvents[0].type)}</Badge>
+                </div>
+                <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">{orderedLedgerEvents[0].message}</p>
+                <Button type="button" variant="secondary" className="mt-3" onClick={openActivitySection}>
+                  History
+                </Button>
+              </div>
+            ) : null}
+
             <div className="mt-4 border-t border-zinc-800 pt-4">
               {!activeProposal ? (
                 <div className="flex flex-wrap items-center gap-2">

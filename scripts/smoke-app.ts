@@ -69,6 +69,7 @@ async function main() {
     "Chat",
     "Room snapshot",
     "Refresh room",
+    "Latest log",
     "Builder profiles",
     "Rules of the game",
     "orchestration agent",
