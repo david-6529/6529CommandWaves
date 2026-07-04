@@ -18,22 +18,22 @@ describe("CommandWavesConsole", () => {
     const text = renderedConsoleText();
 
     expect(text).toContain("Decentralized Coding");
-    expect(text).toContain("Project overview");
-    expect(text).toContain("A new form of swarm development for the age of AI");
-    expect(text).toContain("6529 Hook: one public room, one repo, one reviewed change at a time.");
-    expect(text).toContain("Discuss the work, decide in the room, build the PR, review it, and log the result.");
-    expect(text).toContain("Project Discuss Decide PR Review Log");
-    expect(text).toContain("Work and decisions");
-    expect(text).toContain("What needs attention");
+    expect(text).toContain("6529 Hook");
+    expect(text).toContain("A public build room for the 6529 hook.");
+    expect(text).toContain("Builders discuss scope, record decisions, open PRs, and run reviewer checks before humans merge.");
+    expect(text).toContain("Upcoming or being discussed");
+    expect(text).toContain("Work");
     expect(text).toContain("Queue");
-    expect(text).toContain("Talk to the swarm");
-    expect(text).toContain("Who is building");
-    expect(text).toContain("Profiles summarize visible room and repo activity for this hook.");
-    expect(text).toContain("Contribution signal");
-    expect(text).toContain("Project rules");
+    expect(text).toContain("Swarm chat");
+    expect(text).toContain("Talk in the build room");
+    expect(text).toContain("Builders");
+    expect(text).toContain("Profiles show visible activity in this room and repo.");
+    expect(text).toContain("Visible contribution");
+    expect(text).toContain("Rules of the build");
+    expect(text).toContain("Gate");
+    expect(text).toContain("Important or risky hook changes need a visible room decision.");
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
-    expect(text).toContain("Builders use the room to propose, question, and decide.");
     expect(text).toContain("Start in the room so builders can shape the idea.");
     expect(text).toContain("Use GitHub PRs for code changes.");
   });
@@ -48,15 +48,17 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("All member activity");
     expect(text).not.toContain("Activity report:");
     expect(text).not.toContain("not access or merge authority");
-    expect(text).not.toContain("Upcoming or being discussed");
+    expect(text).not.toContain("What needs attention");
     expect(text).not.toContain("\u2014");
   });
 
-  it("keeps optional advanced drawers on a readable light surface", () => {
+  it("keeps optional advanced drawers on the dark app surface", () => {
     const html = renderedConsoleHtml();
 
     expect(html).toContain('id="more-tools"');
     expect(html).toContain('id="reports"');
-    expect(html).toContain("advanced-light-surface");
+    expect(html).toContain("dark-app");
+    expect(html).toContain("advanced-dark-surface");
+    expect(html).toContain("bg-zinc-950");
   });
 });

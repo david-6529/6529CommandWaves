@@ -57,30 +57,26 @@ async function main() {
   const html = await fetchText("/");
 
   assertIncludes("Home page", html, commandWaveProductCopy.headline);
-  assertIncludes("Home page", html, commandWaveProductCopy.subhead);
-  for (const flowStep of commandWaveProductCopy.simpleFlow.split(", ")) {
-    assertIncludes("Home page", html, flowStep);
-  }
   for (const label of [
-    commandWaveProductCopy.projectContext,
-    "Discuss the work, decide in the room",
-    "Project overview",
-    "Work and decisions",
-    "What needs attention",
-    "Current work",
+    "dark-app",
+    "bg-zinc-950",
+    "6529 Hook",
+    "A public build room for the 6529 hook.",
+    "Builders discuss scope, record decisions, open PRs, and run reviewer checks before humans merge.",
+    "Upcoming or being discussed",
+    "Work",
     "Queue",
-    "Talk to the swarm",
-    "Latest from the room",
-    "Recent signals",
-    "Latest log",
-    "Who is building",
-    "Profiles summarize visible room and repo activity for this hook.",
-    "Contribution signal",
-    "Project rules",
+    "Swarm chat",
+    "Talk in the build room",
+    "Room signals",
+    "Latest activity",
+    "Builders",
+    "Profiles show visible activity in this room and repo.",
+    "Visible contribution",
+    "Rules of the build",
+    "Important or risky hook changes need a visible room decision.",
     "Report points summarize visible work only.",
     "They do not grant access, payouts, or merge rights.",
-    "The orchestration agent labels risk",
-    "Humans still merge and deploy",
     "Hook guardrails",
     "Suggest work",
     "Start in the room so builders can shape the idea.",
