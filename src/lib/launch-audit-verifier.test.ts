@@ -99,6 +99,11 @@ describe("launch audit verifier", () => {
     );
     expect(result.openItems.length).toBeGreaterThan(0);
     expect(result.operatorChecklist).toContain("- Set a strong ADMIN_API_KEY before public launch.");
+    expect(result.operatorChecklist).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
+    expect(result.operatorChecklist).toContain("- Set COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN with repo access.");
+    expect(result.operatorChecklist).toContain(
+      "- Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
+    );
     expect(result.nextAction?.title).toBe("Set ADMIN_API_KEY");
   });
 

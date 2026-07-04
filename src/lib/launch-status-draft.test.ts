@@ -100,6 +100,11 @@ describe("launch status draft", () => {
     expect(draft).toContain("- Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL.");
     expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project room.");
     expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_REPO_URL to the hook GitHub repo.");
+    expect(draft).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
+    expect(draft).toContain("- Set COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN with repo access.");
+    expect(draft).toContain(
+      "- Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
+    );
     expect(draft).not.toContain("\u2014");
   });
 });

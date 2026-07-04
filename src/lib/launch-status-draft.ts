@@ -74,10 +74,6 @@ export function launchOperatorChecklistLines(openItems: LaunchStatusOpenItem[]) 
         seen.add(line);
         lines.push(`- ${line}`);
       }
-
-      if (lines.length >= 8) {
-        return lines;
-      }
     }
   }
 
