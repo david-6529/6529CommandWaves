@@ -68,7 +68,10 @@ async function main() {
     "Decision",
     "Chat",
     "Builder profiles",
-    "Project rules",
+    "Rules of the game",
+    "orchestration agent",
+    "reviewer agent",
+    "humans merge",
     "Suggest work",
     "Maintainer tools",
   ]) {

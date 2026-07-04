@@ -131,17 +131,17 @@ const proposalTypeOptions: ProposalTypeOption[] = [
 ];
 
 const hookGuardrails = [
-  "No upgradeable hook contracts by default.",
+  "Hook contracts stay immutable by default.",
   ...hookParameterPolicySummary.slice(1),
-  "Deployment, payments, and governance changes stay human controlled.",
+  "Humans control merges, deploys, payments, and governance.",
   "Contribution report scores are not permissions.",
 ];
 const buildRoomRules = [
-  "Start with one small hook change.",
-  "Talk in the builder room before code work starts.",
-  "The orchestration agent labels risk and keeps work inside the rules.",
-  "Important changes need a visible decision before a PR is built.",
-  "The reviewer agent checks the PR before humans merge.",
+  "Access is reviewed before someone can change the project.",
+  "Ideas and proposals start in the room.",
+  "The orchestration agent labels risk and keeps scope small.",
+  "Important changes need a visible room decision before PR work.",
+  "The reviewer agent checks each PR before humans merge.",
 ];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
@@ -2298,8 +2298,8 @@ export function CommandWavesConsole() {
           </section>
         </section>
 
-        <section id="members-and-rules" className="grid gap-4 border-t border-zinc-900 pt-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+        <section id="members-and-rules" className="grid gap-6 border-t border-zinc-900 pt-5 lg:grid-cols-[1.1fr_0.9fr]">
+          <section className="min-w-0">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
@@ -2351,14 +2351,14 @@ export function CommandWavesConsole() {
             </div>
           </section>
 
-          <section className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+          <section className="min-w-0">
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
-              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Project rules</h2>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Rules of the game</h2>
             </div>
-            <div className="mt-4 grid gap-3">
-              <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <p className="text-sm font-semibold text-zinc-100">How work moves</p>
+            <div className="mt-4 rounded-md border border-zinc-800 bg-zinc-950/60 p-4">
+              <div>
+                <p className="text-sm font-semibold text-zinc-100">Flow</p>
                 <ol className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
                   {buildRoomRules.map((rule, index) => (
                     <li key={rule} className="grid grid-cols-[1.5rem_1fr] gap-2">
@@ -2368,7 +2368,7 @@ export function CommandWavesConsole() {
                   ))}
                 </ol>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-black p-3">
+              <div className="mt-4 border-t border-zinc-800 pt-4">
                 <p className="text-sm font-semibold text-zinc-100">Who can play</p>
                 <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
                   {participationGateNotes.slice(0, 3).map((gate) => (
@@ -2376,7 +2376,7 @@ export function CommandWavesConsole() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-black p-3">
+              <div className="mt-4 border-t border-zinc-800 pt-4">
                 <p className="text-sm font-semibold text-zinc-100">Guardrails</p>
                 <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
                   {hookGuardrails.slice(0, 4).map((guardrail) => (
