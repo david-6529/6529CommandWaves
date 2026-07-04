@@ -9,6 +9,10 @@ function renderedConsoleText() {
     .trim();
 }
 
+function renderedConsoleHtml() {
+  return renderToStaticMarkup(<CommandWavesConsole />);
+}
+
 describe("CommandWavesConsole", () => {
   it("renders the simple public hook workspace contract", () => {
     const text = renderedConsoleText();
@@ -37,5 +41,13 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Project details");
     expect(text).not.toContain("All member activity");
     expect(text).not.toContain("\u2014");
+  });
+
+  it("keeps optional advanced drawers on a readable light surface", () => {
+    const html = renderedConsoleHtml();
+
+    expect(html).toContain('id="more-tools"');
+    expect(html).toContain('id="reports"');
+    expect(html).toContain("advanced-light-surface");
   });
 });

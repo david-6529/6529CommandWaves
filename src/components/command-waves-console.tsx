@@ -2487,7 +2487,7 @@ export function CommandWavesConsole() {
             <span>Maintainer tools</span>
             <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">advanced</Badge>
           </summary>
-          <div className="mt-4 grid gap-4">
+          <div className="advanced-light-surface mt-4 grid gap-4 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-200/70">
             <details id="rules-of-game" className="border-b border-zinc-800 pb-4">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
                 <span>Room rules</span>
@@ -3610,7 +3610,7 @@ export function CommandWavesConsole() {
             <span>Reports and updates</span>
             <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">optional</Badge>
           </summary>
-          <div className="mt-4 grid gap-5">
+          <div className="advanced-light-surface mt-4 grid gap-5 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-200/70">
             <Panel title="Activity report" eyebrow="Human review">
               <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                 <div>
