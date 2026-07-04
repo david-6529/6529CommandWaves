@@ -13,6 +13,19 @@ describe("command wave state snapshot", () => {
       version: "command-wave-state-v0.1",
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: demoWave,
+      authorityBoundary: {
+        phase: "first_public_hook_build",
+        socialSourceOfTruth: "6529 wave",
+        codeSurface: "GitHub PR",
+        humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
+        appDoesNot: [
+          "Auto-merge PRs",
+          "Deploy contracts",
+          "Move funds",
+          "Grant REP, TDH, payouts, permissions, or merge rights from contribution scores",
+        ],
+        gateStatus: "REP, TDH, holder, allowlist, and QnA gates are advisory until wired and verified.",
+      },
       reports: {
         contribution: {
           mode: "informational",
@@ -31,6 +44,7 @@ describe("command wave state snapshot", () => {
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
+    expect(snapshot.authorityBoundary.agentLimits.join(" ")).toContain("Reviewer checks are evidence");
   });
 
   it("builds the public state URL from env", () => {

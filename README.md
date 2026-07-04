@@ -178,6 +178,7 @@ Audit and launch:
 - Launch checklist with setup, readiness, flow checklist, and launch next-action records.
 - Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
 - Public setup proof, command-wave state, and launch audit endpoints.
+- Public command-wave state publishes the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public command-wave state includes the informational contribution report method and notes.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The local demo separates current work status from launch readiness. Launch readiness still fails until production env,
