@@ -1,8 +1,8 @@
-# 6529 Hook Room
+# Decentralized Coding
 
 ## Short Version
 
-This is a simple shared workspace for building the 6529 hook in public.
+This is a simple shared workspace for building the 6529 hook in public through one project room and one GitHub repo.
 
 The first public phase connects one 6529 room to one smart contract repo. Builders talk in the room, turn one idea into a
 small proposal, record the 6529 decision, build a draft PR, review it, and share the result back with a clear log.
@@ -23,7 +23,7 @@ The builder flow is:
 
 The simple product shape is:
 
-`Access -> Room -> Decision -> PR -> Review -> Log`
+`Project -> Discuss -> Decide -> PR -> Review -> Log`
 
 ## Current Status
 
@@ -32,10 +32,10 @@ is designed so the same pattern can become a broader public builder protocol aft
 
 What exists now:
 
-- A Next app product surface focused on building the 6529 hook together.
+- A Next app product surface called Decentralized Coding, focused on building the 6529 hook together.
 - One active hook project with a public 6529 room and a code repo.
-- A simplified room-first UI with a project overview, current step, current hook change, chat composer, room snapshot,
-  latest log, member profiles, rules of the game, and folded proposal flow.
+- A simplified room-first UI with a project overview, current hook change, chat composer, room snapshot, latest log,
+  builder profiles, project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
@@ -155,13 +155,13 @@ setup and audit tools stay collapsed until a maintainer needs them.
 
 Default workspace:
 
-- Project overview with current step, room, repo, access, and first public launch links.
-- Current hook task, visible decision need, PR status, latest log, and next action.
-- Links to the room, code repo, current PR, and reviewed work.
+- Project overview with room, repo, access, and current status.
+- Current hook task, visible decision need, recent PR evidence, latest log, and next action.
+- Links to the room, code repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct room posting when configured, a visible room snapshot, and copyable discussion draft.
-- Folded proposal form for one PR-sized hook change with limits, safety checks, and success criteria.
-- Builder profiles with 6529 profile links, evidence, visible room activity, and informational activity points.
-- Rules of the game next to the builder profiles: who can play, how work moves, and hook guardrails.
+- Folded proposal form for one PR-sized hook change with a Discuss, Decide, Save, Build, Review flow strip.
+- Builder profiles with 6529 profile links, visible room and repo activity, and informational contribution signals.
+- Project rules next to the builder profiles: who can join, activity-report boundaries, and hook guardrails.
 
 Safety and review:
 
