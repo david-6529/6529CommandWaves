@@ -64,6 +64,7 @@ async function main() {
   }
   for (const label of [
     "Project",
+    "Next action",
     "Upcoming and discussed",
     "Decision",
     "Chat",

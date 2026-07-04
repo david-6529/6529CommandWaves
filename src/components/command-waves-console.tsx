@@ -1952,7 +1952,7 @@ export function CommandWavesConsole() {
       <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-6 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-900 pb-5">
           <div className="flex flex-col gap-4">
-            <div className="grid gap-5 lg:grid-cols-[1fr_18rem] lg:items-end">
+            <div className="grid gap-5 lg:grid-cols-[1fr_18rem] lg:items-start">
               <div className="max-w-3xl">
                 <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
                   {commandWaveProductCopy.headline}
@@ -1962,9 +1962,16 @@ export function CommandWavesConsole() {
               </div>
 
               <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-3">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project</p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project</p>
+                  <Badge className={nextActionStatusClass(phaseNextAction.status)}>{phaseNextAction.statusLabel}</Badge>
+                </div>
                 <p className="mt-1 text-xl font-semibold text-zinc-50">{primaryHookProject?.name ?? wave.name}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{primaryHookProject?.currentFocus ?? currentFocusTitle}</p>
+                <div className="mt-3 border-t border-zinc-800 pt-3">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next action</p>
+                  <p className="mt-1 text-sm font-semibold leading-6 text-zinc-100">{phaseNextAction.title}</p>
+                </div>
               </div>
             </div>
 
