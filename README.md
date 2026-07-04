@@ -177,6 +177,7 @@ Audit and launch:
 - Activity report drawer for app records and manual planning context.
 - Launch checklist with setup, readiness, flow checklist, and launch next-action records.
 - Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
+- Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public command-wave state includes the informational contribution report method and notes.

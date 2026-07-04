@@ -26,6 +26,9 @@ describe("launch status draft", () => {
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain("- Setup check: Verify the wave, repo, contributor rules, and PR template before inviting contributors.");
+    expect(draft).toContain("Operator checklist:");
+    expect(draft).toContain("- Run the setup check against the selected project room and GitHub repo.");
+    expect(draft).toContain("- Run launch readiness from the app or /api/command-wave/launch/audit?remote=1.");
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Command-wave state: ${verificationTargets.commandWaveStateUrl}`);
     expect(draft).toContain(`- Launch audit: ${verificationTargets.launchAuditUrl}`);
@@ -80,6 +83,23 @@ describe("launch status draft", () => {
     expect(draft).toContain("Status: ready");
     expect(draft).toContain("Next action: Start the first public loop");
     expect(draft).toContain("- No launch gaps found in the checked records.");
+    expect(draft).toContain("- Start the first public loop with one small reviewed hook change.");
+    expect(draft).not.toContain("\u2014");
+  });
+
+  it("names production env work in copied launch status", () => {
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: getReadinessChecks({ NODE_ENV: "production" }),
+      wave: demoWave,
+    });
+    const draft = createLaunchStatusDraft({ wave: demoWave, audit, verificationTargets });
+
+    expect(draft).toContain("Operator checklist:");
+    expect(draft).toContain("- Set a strong ADMIN_API_KEY before public launch.");
+    expect(draft).toContain("- Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL.");
+    expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project room.");
+    expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_REPO_URL to the hook GitHub repo.");
     expect(draft).not.toContain("\u2014");
   });
 });
