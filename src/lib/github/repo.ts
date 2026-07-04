@@ -1,4 +1,5 @@
 import { fetchJsonWithTimeout, fetchTextResponseWithTimeout } from "../http-fetch";
+import { extractRequiredStatusChecks } from "./required-status-checks";
 
 export type GitHubRepoRef = {
   owner: string;
@@ -144,6 +145,16 @@ function repoContentUrl(repo: GitHubRepoRef, path: string, options: GitHubRepoAp
   return url;
 }
 
+function repoRulesetsUrl(repo: GitHubRepoRef, options: GitHubRepoApiOptions) {
+  return `${githubApiBaseUrl(options)}${repoApiPath(repo)}/rulesets`;
+}
+
+function repoBranchRulesUrl(repo: GitHubRepoRef, branch: string, options: GitHubRepoApiOptions) {
+  const encodedBranch = encodeURIComponent(branch);
+
+  return `${githubApiBaseUrl(options)}${repoApiPath(repo)}/rules/branches/${encodedBranch}`;
+}
+
 function decodeBase64(value: string) {
   return atob(value.replace(/\s+/g, ""));
 }
@@ -254,4 +265,29 @@ export async function getGitHubRepoRequiredFiles(
       };
     }),
   );
+}
+
+export async function getGitHubRepoRequiredStatusChecks(repoUrl: string, options: GitHubRepoApiOptions = {}) {
+  const repo = parseGitHubRepoUrl(repoUrl);
+  const fetchImpl = options.fetchImpl ?? fetch;
+
+  if (!repo) {
+    throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
+  }
+
+  const branch = options.ref?.trim() || "main";
+  const [rulesetsPayload, branchRulesResponse] = await Promise.all([
+    fetchJsonWithTimeout<unknown>(repoRulesetsUrl(repo, options), {
+      headers: githubApiHeaders(options),
+      fetchImpl,
+    }),
+    fetchTextResponseWithTimeout(repoBranchRulesUrl(repo, branch, options), {
+      allowedStatuses: [404],
+      headers: githubApiHeaders(options),
+      fetchImpl,
+    }),
+  ]);
+  const branchRulesPayload = branchRulesResponse.status === 404 ? null : JSON.parse(branchRulesResponse.text) as unknown;
+
+  return extractRequiredStatusChecks([rulesetsPayload, branchRulesPayload]);
 }

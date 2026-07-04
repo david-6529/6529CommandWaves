@@ -176,7 +176,7 @@ Audit and launch:
 - Recent activity log with export.
 - Activity report drawer for app records and manual planning context.
 - Launch checklist with setup, readiness, flow checklist, and launch next-action records.
-- Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
+- Remote launch checks can be run from the maintainer drawer to refresh setup, required guardian check, and readiness blockers.
 - Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
@@ -237,8 +237,8 @@ Use [.env.production.example](.env.production.example) as the deployment checkli
 `COMMAND_WAVE_INITIAL_WAVE_URL` and `COMMAND_WAVE_INITIAL_REPO_URL` seed a clean first project for fresh/default state
 or local reset. Launch readiness fails production placeholder or invalid first-hook values. `ADMIN_API_KEY` protects setup,
 proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
-The ready launch audit requires durable storage and the GitHub PR adapter so the public workflow can survive restarts and
-record draft PRs predictably.
+The ready launch audit requires durable storage, the GitHub PR adapter, and the required guardian check so the public
+workflow can survive restarts and record draft PRs predictably.
 
 The local demo still reports launch gaps until the first hook room and repo are reachable, `ADMIN_API_KEY`,
 `NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode, GitHub PR adapter, guardian state, setup validation, and the

@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
+import { extractRequiredStatusChecks } from "./github/required-status-checks";
 import { createSetupProof } from "./setup-proof";
-import { extractRequiredStatusChecks, verifySetupProofAgainstGitHubPayloads } from "./setup-verifier";
+import { verifySetupProofAgainstGitHubPayloads } from "./setup-verifier";
 
 describe("setup verifier", () => {
   it("extracts required checks from ruleset payloads", () => {

@@ -23,6 +23,12 @@ const readySetupValidation: SetupValidation = {
       status: "pass",
       message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
     },
+    {
+      id: "repo_required_guardian_check",
+      label: "Required guardian check",
+      status: "pass",
+      message: "Command Waves Guardian is required by GitHub branch protection or rulesets.",
+    },
   ],
   canSave: true,
   canRunCode: true,

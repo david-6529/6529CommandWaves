@@ -64,6 +64,12 @@ const productionSetupValidation: SetupValidation = {
       status: "pass",
       message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
     },
+    {
+      id: "repo_required_guardian_check",
+      label: "Required guardian check",
+      status: "pass",
+      message: "Command Waves Guardian is required by GitHub branch protection or rulesets.",
+    },
   ],
   canSave: true,
   canRunCode: true,
@@ -135,7 +141,7 @@ describe("first phase launch audit", () => {
       status: "needs_setup",
       itemId: "setup_not_checked",
       title: "Run launch setup check",
-      detail: "Verify the wave, repo, contributor rules, and PR template before inviting contributors.",
+      detail: "Verify the wave, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
     });
   });
 
@@ -238,6 +244,42 @@ describe("first phase launch audit", () => {
         label: "PR template",
         status: "needed",
         detail: "Missing .github/PULL_REQUEST_TEMPLATE.md. Fix it before inviting contributors.",
+      }),
+    );
+  });
+
+  it("keeps launch in setup mode when the guardian check is not required", () => {
+    const setupValidation: SetupValidation = {
+      ...productionSetupValidation,
+      checks: productionSetupValidation.checks.map((check) =>
+        check.id === "repo_required_guardian_check"
+          ? {
+              ...check,
+              status: "warn",
+              message: "Command Waves Guardian was not found in GitHub required status checks. Add it before inviting contributors.",
+            }
+          : check,
+      ),
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: productionReadyChecks,
+      setupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.nextAction).toMatchObject({
+      status: "needs_setup",
+      itemId: "setup_repo_required_guardian_check",
+      title: "Require guardian check",
+    });
+    expect(audit.openItems).toContainEqual(
+      expect.objectContaining({
+        id: "setup_repo_required_guardian_check",
+        label: "Required guardian check",
+        status: "needed",
+        detail: "Command Waves Guardian was not found in GitHub required status checks. Add it before inviting contributors.",
       }),
     );
   });

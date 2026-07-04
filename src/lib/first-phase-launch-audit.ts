@@ -110,6 +110,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_repo_reachable: "Pick reachable code repo",
   setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
+  setup_repo_required_guardian_check: "Require guardian check",
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",
   readiness_not_checked: "Run readiness",
@@ -200,7 +201,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_not_checked",
         label: "Setup check",
         status: "needed",
-        detail: "Verify the wave, repo, contributor rules, and PR template before inviting contributors.",
+        detail: "Verify the wave, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
         source: "setup",
       },
     ];
@@ -231,7 +232,12 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
   }
 
   const launchChecks = setupValidation.checks.filter(
-    (item) => item.id === "wave_reachable" || item.id === "repo_reachable" || item.id === "repo_required_files" || item.id.startsWith("repo_file_"),
+    (item) =>
+      item.id === "wave_reachable" ||
+      item.id === "repo_reachable" ||
+      item.id === "repo_required_files" ||
+      item.id === "repo_required_guardian_check" ||
+      item.id.startsWith("repo_file_"),
   );
 
   if (!launchChecks.length) {
@@ -240,7 +246,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_remote_check",
         label: "Setup check",
         status: "needed",
-        detail: "Run setup check to verify the wave, repo, contributor rules, and PR template.",
+        detail: "Run setup check to verify the wave, repo, contributor rules, PR template, and required guardian check.",
         source: "setup",
       },
     ];

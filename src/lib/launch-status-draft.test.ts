@@ -25,9 +25,12 @@ describe("launch status draft", () => {
     expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
-    expect(draft).toContain("- Setup check: Verify the wave, repo, contributor rules, and PR template before inviting contributors.");
+    expect(draft).toContain(
+      "- Setup check: Verify the wave, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+    );
     expect(draft).toContain("Operator checklist:");
     expect(draft).toContain("- Run the setup check against the selected project room and GitHub repo.");
+    expect(draft).toContain("- Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.");
     expect(draft).toContain("- Run launch readiness from the app or /api/command-wave/launch/audit?remote=1.");
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Command-wave state: ${verificationTargets.commandWaveStateUrl}`);
@@ -70,6 +73,12 @@ describe("launch status draft", () => {
             label: "PR template",
             status: "pass",
             message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+          },
+          {
+            id: "repo_required_guardian_check",
+            label: "Required guardian check",
+            status: "pass",
+            message: "Command Waves Guardian is required by GitHub branch protection or rulesets.",
           },
         ],
         canSave: true,

@@ -20,11 +20,11 @@ function openItemLines(audit: FirstPhaseLaunchAudit) {
 const checklistByItemId: Record<string, string[]> = {
   setup_not_checked: [
     "Run the setup check against the selected project room and GitHub repo.",
-    "Confirm CONTRIBUTING.md and .github/PULL_REQUEST_TEMPLATE.md exist in the hook repo.",
+    "Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.",
   ],
   setup_remote_check: [
     "Run the setup check against the selected project room and GitHub repo.",
-    "Confirm CONTRIBUTING.md and .github/PULL_REQUEST_TEMPLATE.md exist in the hook repo.",
+    "Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.",
   ],
   setup_wave_reachable: ["Pick a reachable 6529 project room before inviting contributors."],
   setup_repo_reachable: ["Pick a reachable GitHub repo before inviting contributors."],
@@ -32,6 +32,7 @@ const checklistByItemId: Record<string, string[]> = {
   setup_repo_required_files: ["Add launch repo files before inviting contributors."],
   setup_repo_file_contributing_md: ["Add CONTRIBUTING.md to the hook repo."],
   setup_repo_file_github_pull_request_template_md: ["Add .github/PULL_REQUEST_TEMPLATE.md to the hook repo."],
+  setup_repo_required_guardian_check: ["Make Command Waves Guardian a required GitHub status check before inviting contributors."],
   readiness_not_checked: ["Run launch readiness from the app or /api/command-wave/launch/audit?remote=1."],
   readiness_app_url: ["Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL."],
   readiness_initial_hook_project: [

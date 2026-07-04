@@ -3,6 +3,7 @@ import { is6529MockMode } from "./6529/mock";
 import {
   getGitHubRepoMetadata,
   getGitHubRepoRequiredFiles,
+  getGitHubRepoRequiredStatusChecks,
   parseGitHubRepoUrl,
   type GitHubRepoApiOptions,
   type GitHubRepoMetadata,
@@ -38,6 +39,7 @@ type ValidationOptions = {
   checkWaveRemote?: boolean;
   checkRepoRemote?: boolean;
   githubApi?: GitHubRepoApiOptions;
+  requiredGuardianCheck?: string;
 };
 
 function asText(value: unknown) {
@@ -75,6 +77,15 @@ export function setupValidationNotice(validation: Pick<SetupValidation, "checks"
 
 function repoFileCheckId(path: string) {
   return `repo_file_${path.replaceAll(/[^a-z0-9]+/gi, "_").replaceAll(/^_+|_+$/g, "").toLowerCase()}`;
+}
+
+function requiredGuardianCheckName(options: ValidationOptions) {
+  return (
+    options.requiredGuardianCheck?.trim() ||
+    options.githubApi?.env?.COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK?.trim() ||
+    process.env.COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK?.trim() ||
+    "Command Waves Guardian"
+  );
 }
 
 export function validateSetupShape(input: SetupValidationInput): SetupValidation {
@@ -177,6 +188,37 @@ export async function validateCommandWaveSetup(
             error instanceof Error
               ? `Could not verify CONTRIBUTING.md and PR template: ${error.message}`
               : "Could not verify CONTRIBUTING.md and PR template.",
+          ),
+        );
+      }
+
+      try {
+        const requiredGuardianCheck = requiredGuardianCheckName(options);
+        const requiredStatusChecks = await getGitHubRepoRequiredStatusChecks(validation.repo.htmlUrl, {
+          ...options.githubApi,
+          ref: options.githubApi?.ref ?? repoMetadata.defaultBranch,
+        });
+        const found = requiredStatusChecks.includes(requiredGuardianCheck);
+
+        checks.push(
+          check(
+            "repo_required_guardian_check",
+            "Required guardian check",
+            found ? "pass" : "warn",
+            found
+              ? `${requiredGuardianCheck} is required by GitHub branch protection or rulesets.`
+              : `${requiredGuardianCheck} was not found in GitHub required status checks. Add it before inviting contributors.`,
+          ),
+        );
+      } catch (error) {
+        checks.push(
+          check(
+            "repo_required_guardian_check",
+            "Required guardian check",
+            "warn",
+            error instanceof Error
+              ? `Could not verify the required guardian check: ${error.message}`
+              : "Could not verify the required guardian check.",
           ),
         );
       }

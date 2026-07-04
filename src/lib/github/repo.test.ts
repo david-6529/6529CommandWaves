@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   commandBranchName,
   getGitHubRepoRequiredFiles,
+  getGitHubRepoRequiredStatusChecks,
   parseGitHubRepoUrl,
   pullRequestUrl,
 } from "./repo";
@@ -147,5 +148,58 @@ describe("GitHub repo helpers", () => {
       valid: true,
       message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
     });
+  });
+
+  it("reads required guardian checks from rulesets and branch rules", async () => {
+    const calls: string[] = [];
+    const requiredChecks = await getGitHubRepoRequiredStatusChecks("6529-Collections/6529-hook", {
+      apiBaseUrl: "https://api.example.test",
+      ref: "main",
+      fetchImpl: async (input) => {
+        const url = String(input);
+
+        calls.push(url);
+
+        if (url.endsWith("/rulesets")) {
+          return response(JSON.stringify([
+            {
+              type: "required_status_checks",
+              parameters: {
+                required_status_checks: [{ context: "Command Waves Guardian" }],
+              },
+            },
+          ]));
+        }
+
+        return response(JSON.stringify({
+          required_status_checks: {
+            contexts: ["build"],
+          },
+        }));
+      },
+    });
+
+    expect(calls).toEqual([
+      "https://api.example.test/repos/6529-Collections/6529-hook/rulesets",
+      "https://api.example.test/repos/6529-Collections/6529-hook/rules/branches/main",
+    ]);
+    expect(requiredChecks).toEqual(["build", "Command Waves Guardian"]);
+  });
+
+  it("allows missing branch rules when rulesets can be read", async () => {
+    const requiredChecks = await getGitHubRepoRequiredStatusChecks("6529-Collections/6529-hook", {
+      apiBaseUrl: "https://api.example.test",
+      fetchImpl: async (input) => {
+        const url = String(input);
+
+        if (url.endsWith("/rulesets")) {
+          return response(JSON.stringify([]));
+        }
+
+        return response("not found", { status: 404, statusText: "Not Found" });
+      },
+    });
+
+    expect(requiredChecks).toEqual([]);
   });
 });

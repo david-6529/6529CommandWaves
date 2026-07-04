@@ -78,6 +78,17 @@ describe("setup validation", () => {
               return new Response("not found", { status: 404, statusText: "Not Found" });
             }
 
+            if (url.endsWith("/rulesets")) {
+              return jsonResponse([
+                {
+                  type: "required_status_checks",
+                  parameters: {
+                    required_status_checks: [{ context: "Command Waves Guardian" }],
+                  },
+                },
+              ]);
+            }
+
             return jsonResponse({});
           },
         },
@@ -133,6 +144,17 @@ describe("setup validation", () => {
               return new Response("## Hook PR", { status: 200 });
             }
 
+            if (url.endsWith("/rulesets")) {
+              return jsonResponse([
+                {
+                  type: "required_status_checks",
+                  parameters: {
+                    required_status_checks: [{ context: "Command Waves Guardian" }],
+                  },
+                },
+              ]);
+            }
+
             return jsonResponse({});
           },
         },
@@ -176,5 +198,62 @@ describe("setup validation", () => {
           "Pick an existing public GitHub repo or configure token access. Could not fetch https://api.example.test/repos/6529-Collections/6529-hook: 404 Not Found",
       }),
     );
+  });
+
+  it("warns when the required guardian check is not enforced by GitHub", async () => {
+    const template = [
+      "## Command Waves Manifest",
+      "<!-- command-waves:manifest:start -->",
+      "{}",
+      "<!-- command-waves:manifest:end -->",
+    ].join("\n");
+    const validation = await validateCommandWaveSetup(
+      {
+        waveUrl: "mock-command-wave",
+        repoUrl: "6529-Collections/6529-hook",
+      },
+      {
+        checkRepoRemote: true,
+        githubApi: {
+          apiBaseUrl: "https://api.example.test",
+          fetchImpl: async (input) => {
+            const url = String(input);
+
+            if (url.endsWith("/repos/6529-Collections/6529-hook")) {
+              return jsonResponse({
+                default_branch: "main",
+                private: false,
+                archived: false,
+              });
+            }
+
+            if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
+              return jsonResponse({ content: btoa(template), encoding: "base64" });
+            }
+
+            if (url.endsWith("/rulesets")) {
+              return jsonResponse([]);
+            }
+
+            if (url.endsWith("/rules/branches/main")) {
+              return new Response("not found", { status: 404, statusText: "Not Found" });
+            }
+
+            return jsonResponse({});
+          },
+        },
+      },
+    );
+
+    expect(validation.canSave).toBe(true);
+    expect(validation.checks).toContainEqual(
+      expect.objectContaining({
+        id: "repo_required_guardian_check",
+        label: "Required guardian check",
+        status: "warn",
+        message: "Command Waves Guardian was not found in GitHub required status checks. Add it before inviting contributors.",
+      }),
+    );
+    expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");
   });
 });
