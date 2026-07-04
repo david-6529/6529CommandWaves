@@ -1,6 +1,7 @@
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { hasProductionValue } from "./env-placeholders";
+import { commandWaveProductCopy } from "./product-copy";
 import { hashValue } from "./run-manifest";
 
 export type CommandWaveStateSnapshot = {
@@ -36,8 +37,8 @@ export type PhaseOneProductContract = {
 };
 
 export const phaseOneProductContract: PhaseOneProductContract = {
-  name: "Decentralized Coding",
-  purpose: "Coordinate one public hook change from room discussion to reviewed PR.",
+  name: commandWaveProductCopy.headline,
+  purpose: commandWaveProductCopy.subhead,
   workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
   publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
   firstPhaseLimits: [

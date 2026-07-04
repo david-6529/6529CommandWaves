@@ -15,7 +15,7 @@ describe("command wave state snapshot", () => {
       wave: demoWave,
       productContract: {
         name: "Decentralized Coding",
-        purpose: "Coordinate one public hook change from room discussion to reviewed PR.",
+        purpose: "A new form of swarm development for the age of AI",
         workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
         publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
       },

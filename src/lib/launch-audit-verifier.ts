@@ -1,4 +1,5 @@
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
+import { commandWaveProductCopy } from "./product-copy";
 
 export type LaunchAuditVerificationCheck = {
   id: string;
@@ -91,9 +92,9 @@ function productContractReady(value: unknown) {
   const record = isRecord(value) ? value : null;
 
   return Boolean(
-    record &&
-      asString(record.name) === "Decentralized Coding" &&
-      asString(record.purpose) === "Coordinate one public hook change from room discussion to reviewed PR." &&
+      record &&
+      asString(record.name) === commandWaveProductCopy.headline &&
+      asString(record.purpose) === commandWaveProductCopy.subhead &&
       stringArrayIncludes(record.workflow, "Choose project") &&
       stringArrayIncludes(record.workflow, "Discuss work") &&
       stringArrayIncludes(record.workflow, "Record decision") &&

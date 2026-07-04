@@ -26,6 +26,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.setupCheckMode).toBe("shape");
     expect(snapshot.productContract).toMatchObject({
       name: "Decentralized Coding",
+      purpose: "A new form of swarm development for the age of AI",
       workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
       publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
     });
