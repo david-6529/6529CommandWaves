@@ -66,6 +66,7 @@ describe("launch audit verifier", () => {
       status: "pass",
     });
     expect(result.nextAction?.title).toBe("Start the first public loop");
+    expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });
 
   it("fails a shape-only setup audit before public launch", async () => {
@@ -97,6 +98,7 @@ describe("launch audit verifier", () => {
       "Admin API key: Set ADMIN_API_KEY before public launch so protected actions require a key.",
     );
     expect(result.openItems.length).toBeGreaterThan(0);
+    expect(result.operatorChecklist).toContain("- Set a strong ADMIN_API_KEY before public launch.");
     expect(result.nextAction?.title).toBe("Set ADMIN_API_KEY");
   });
 
@@ -144,6 +146,7 @@ describe("launch audit verifier", () => {
 
     expect(result.status).toBe("fail");
     expect(result.launchStatus).toBe("unknown");
+    expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "payload_shape")).toMatchObject({
       status: "fail",
     });

@@ -1,3 +1,5 @@
+import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
+
 export type LaunchAuditVerificationCheck = {
   id: string;
   status: "pass" | "fail";
@@ -15,6 +17,7 @@ export type LaunchAuditVerificationResult = {
   } | null;
   blockers: string[];
   openItems: string[];
+  operatorChecklist: string[];
   checks: LaunchAuditVerificationCheck[];
 };
 
@@ -46,6 +49,20 @@ function itemSummary(value: unknown) {
 
 function collectItemSummaries(value: unknown) {
   return Array.isArray(value) ? value.map(itemSummary) : [];
+}
+
+function checklistItem(value: unknown): LaunchStatusOpenItem {
+  const record = isRecord(value) ? value : null;
+
+  return {
+    id: asString(record?.id) ?? "unknown",
+    label: asString(record?.label) ?? "Unknown item",
+    detail: asString(record?.detail) ?? "Open the launch audit for details.",
+  };
+}
+
+function collectChecklistItems(value: unknown) {
+  return Array.isArray(value) ? value.map(checklistItem) : [];
 }
 
 function stringArrayIncludes(value: unknown, expected: string) {
@@ -99,7 +116,8 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
   const blockers = collectItemSummaries(launchAudit?.blockers);
-  const openItems = collectItemSummaries(launchAudit?.openItems);
+  const openItemRecords = collectChecklistItems(launchAudit?.openItems);
+  const openItems = openItemRecords.map((item) => (item.detail ? `${item.label}: ${item.detail}` : item.label));
   const checks: LaunchAuditVerificationCheck[] = [
     check(
       "payload_shape",
@@ -154,6 +172,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       : null,
     blockers,
     openItems,
+    operatorChecklist: launchAudit ? launchOperatorChecklistLines(openItemRecords) : [],
     checks,
   };
 }

@@ -7,6 +7,8 @@ export type LaunchStatusVerificationTargets = {
   launchAuditUrl?: string;
 };
 
+export type LaunchStatusOpenItem = Pick<FirstPhaseLaunchAudit["openItems"][number], "id" | "label" | "detail">;
+
 function openItemLines(audit: FirstPhaseLaunchAudit) {
   if (!audit.openItems.length) {
     return ["- No launch gaps found in the checked records."];
@@ -58,15 +60,15 @@ const checklistByItemId: Record<string, string[]> = {
   flow_audit_packet: ["Prepare the launch packet with PR, review, contribution, and fee records."],
 };
 
-function checklistLines(audit: FirstPhaseLaunchAudit) {
-  if (!audit.openItems.length) {
+export function launchOperatorChecklistLines(openItems: LaunchStatusOpenItem[]) {
+  if (!openItems.length) {
     return ["- Start the first public loop with one small reviewed hook change."];
   }
 
   const seen = new Set<string>();
   const lines: string[] = [];
 
-  for (const item of audit.openItems) {
+  for (const item of openItems) {
     for (const line of checklistByItemId[item.id] ?? [`Resolve ${item.label}: ${item.detail}`]) {
       if (!seen.has(line)) {
         seen.add(line);
@@ -106,7 +108,7 @@ export function createLaunchStatusDraft({
     ...openItemLines(audit),
     "",
     "Operator checklist:",
-    ...checklistLines(audit),
+    ...launchOperatorChecklistLines(audit.openItems),
     "",
     "Verification:",
     `- Setup proof: ${verificationTargets.setupProofUrl}`,
