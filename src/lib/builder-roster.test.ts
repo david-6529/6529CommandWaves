@@ -13,6 +13,13 @@ describe("builder roster", () => {
       activity: "1 proposal, 1 vote, 1 decision, 1 activity event",
       scoreLabel: "activity 10",
       authorityNote: "Informational only",
+      basis: expect.arrayContaining(["Proposal work: 6 report points"]),
+      stats: expect.arrayContaining([
+        { label: "Proposals", value: "1" },
+        { label: "Votes", value: "1" },
+        { label: "Decisions", value: "1" },
+        { label: "Log", value: "1" },
+      ]),
     });
     expect(roster.some((member) => member.identity === "gpebbles" && member.role === "Voter")).toBe(true);
   });
@@ -43,6 +50,8 @@ describe("builder roster", () => {
       scoreLabel: "room activity",
       authorityNote: "Informational only",
       detail: "Recent room post: I can review the next small hook change.",
+      basis: ["Room posts: 1 report point"],
+      stats: [{ label: "Room posts", value: "1" }],
     });
     expect(roster.some((member) => member.identity === "wave-poll")).toBe(false);
   });

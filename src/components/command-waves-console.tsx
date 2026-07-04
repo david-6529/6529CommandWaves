@@ -2317,11 +2317,22 @@ export function CommandWavesConsole() {
                           <h3 className="text-lg font-semibold text-zinc-50">{member.identity}</h3>
                           <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-zinc-400">{member.detail}</p>
-                        <p className="mt-1 text-sm leading-6 text-zinc-500">{member.activity}</p>
+                        <p className="mt-2 text-xs font-semibold uppercase tracking-normal text-zinc-500">Recent signal</p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-400">{member.detail}</p>
                       </div>
                       <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
                     </div>
+                    <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+                      {member.stats.slice(0, 5).map((stat) => (
+                        <div key={`${member.identity}-${stat.label}`} className="rounded border border-zinc-800 bg-zinc-950 px-2 py-2">
+                          <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{stat.label}</dt>
+                          <dd className="mt-1 text-sm font-semibold text-zinc-100">{stat.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <p className="mt-2 text-xs leading-5 text-zinc-500">
+                      Evidence: {member.basis.slice(0, 2).join(", ") || member.activity}
+                    </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
                         Message
@@ -2606,6 +2617,17 @@ export function CommandWavesConsole() {
                 <h3 className="mt-2 text-2xl font-semibold text-zinc-50">{selectedMember.identity}</h3>
                 <p className="mt-2 text-base leading-7 text-zinc-400">{selectedMember.activity}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{selectedMember.detail}</p>
+                <dl className="mt-3 grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-5">
+                  {selectedMember.stats.slice(0, 5).map((stat) => (
+                    <div key={`${selectedMember.identity}-${stat.label}`} className="rounded border border-zinc-800 bg-zinc-950 px-2 py-2">
+                      <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{stat.label}</dt>
+                      <dd className="mt-1 text-sm font-semibold text-zinc-100">{stat.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-2 text-sm leading-6 text-zinc-500">
+                  Evidence: {selectedMember.basis.slice(0, 3).join(", ") || selectedMember.activity}
+                </p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">
                   Activity is informational. It does not grant permissions, payouts, or merge rights.
                 </p>
@@ -2630,6 +2652,9 @@ export function CommandWavesConsole() {
                       </div>
                       <p className="mt-2 text-base leading-7 text-zinc-400">{member.activity}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-500">{member.detail}</p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-500">
+                        Evidence: {member.basis.slice(0, 2).join(", ") || member.activity}
+                      </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 md:justify-end">
                       <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>

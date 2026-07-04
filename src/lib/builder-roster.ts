@@ -1,5 +1,10 @@
 import type { ContributionContributor, ContributionReport } from "./contribution-report";
 
+export type BuilderRosterStat = {
+  label: string;
+  value: string;
+};
+
 export type BuilderRosterMember = {
   identity: string;
   role: string;
@@ -7,6 +12,8 @@ export type BuilderRosterMember = {
   scoreLabel: string;
   authorityNote: string;
   detail: string;
+  basis: string[];
+  stats: BuilderRosterStat[];
 };
 
 function countLabel(count: number, singular: string) {
@@ -74,6 +81,23 @@ function scoreLabelFor(contributor: ContributionContributor) {
   return onlyRoomActivity ? "room activity" : `activity ${contributor.score}`;
 }
 
+function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
+  const stats = [
+    ["Proposals", contributor.proposals],
+    ["Votes", contributor.votes],
+    ["Decisions", contributor.decisions],
+    ["Room posts", contributor.roomPosts],
+    ["Log", contributor.ledgerEvents],
+  ]
+    .filter(([, value]) => Number(value) > 0)
+    .map(([label, value]) => ({
+      label: String(label),
+      value: String(value),
+    }));
+
+  return stats.length ? stats : [{ label: "Activity", value: "0" }];
+}
+
 export function createBuilderRoster(
   report: ContributionReport,
   options: {
@@ -89,5 +113,7 @@ export function createBuilderRoster(
       scoreLabel: scoreLabelFor(contributor),
       authorityNote: "Informational only",
       detail: detailFor(contributor),
+      basis: contributor.scoreBasis.slice(0, 3),
+      stats: statsFor(contributor),
     }));
 }
