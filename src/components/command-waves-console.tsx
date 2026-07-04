@@ -714,10 +714,10 @@ function Button({
   );
 }
 
-function LinkButton({ href, children }: { href: string; children: React.ReactNode }) {
+function LinkButton({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
   return (
     <a
-      className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-4 text-base font-semibold text-zinc-100 transition hover:bg-zinc-800"
+      className={`inline-flex h-11 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-4 text-base font-semibold text-zinc-100 transition hover:bg-zinc-800 ${className}`}
       href={href}
       target="_blank"
       rel="noreferrer"
@@ -1959,14 +1959,22 @@ export function CommandWavesConsole() {
               <Button type="button" variant="secondary" onClick={openSuggestSection}>
                 Suggest work
               </Button>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Room</LinkButton> : null}
-              {repoUrl ? <LinkButton href={repoUrl}>Repo</LinkButton> : null}
+              {wave.waveUrl ? (
+                <span className="hidden sm:inline-flex">
+                  <LinkButton href={wave.waveUrl}>Room</LinkButton>
+                </span>
+              ) : null}
+              {repoUrl ? (
+                <span className="hidden sm:inline-flex">
+                  <LinkButton href={repoUrl}>Repo</LinkButton>
+                </span>
+              ) : null}
             </nav>
           </div>
 
           <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
             <div>
-              <p className="max-w-3xl text-2xl leading-9 text-zinc-200">{commandWaveProductCopy.subhead}</p>
+              <p className="max-w-3xl text-xl leading-8 text-zinc-200 sm:text-2xl sm:leading-9">{commandWaveProductCopy.subhead}</p>
               <p className="mt-3 max-w-3xl text-lg leading-8 text-zinc-400">
                 A public workspace where builders discuss one hook, decide what is safe to change, create reviewed PRs,
                 and keep the activity easy to follow.
