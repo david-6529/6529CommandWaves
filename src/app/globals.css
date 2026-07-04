@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #f4f4f5;
+  --background: #ffffff;
+  --foreground: #09090b;
   --font-ui-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-ui-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 @theme inline {

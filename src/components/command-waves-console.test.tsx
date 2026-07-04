@@ -14,12 +14,14 @@ describe("CommandWavesConsole", () => {
     const text = renderedConsoleText();
 
     expect(text).toContain("Decentralized Coding");
-    expect(text).toContain("6529 Hook");
+    expect(text).toContain("Project overview");
     expect(text).toContain("A new form of swarm development for the age of AI");
-    expect(text).toContain("What is happening now");
+    expect(text).toContain("Use this like a normal project room.");
+    expect(text).toContain("Work and decisions");
+    expect(text).toContain("What needs attention");
     expect(text).toContain("Talk to the swarm");
-    expect(text).toContain("Who is in the swarm");
-    expect(text).toContain("How this works");
+    expect(text).toContain("Who is building");
+    expect(text).toContain("Project rules");
     expect(text).toContain("Builders use the room to propose, question, and decide.");
   });
 

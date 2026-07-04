@@ -496,34 +496,34 @@ type BusyState =
 
 function riskClass(risk: string) {
   if (risk === "critical") {
-    return "border-red-700 bg-red-950/45 text-red-100";
+    return "border-red-200 bg-red-50 text-red-700";
   }
 
   if (risk === "high") {
-    return "border-orange-700 bg-orange-950/45 text-orange-100";
+    return "border-orange-200 bg-orange-50 text-orange-700";
   }
 
   if (risk === "medium") {
-    return "border-amber-700 bg-amber-950/45 text-amber-100";
+    return "border-amber-200 bg-amber-50 text-amber-700";
   }
 
-  return "border-emerald-700 bg-emerald-950/45 text-emerald-100";
+  return "border-emerald-200 bg-emerald-50 text-emerald-700";
 }
 
 function statusClass(status: string) {
   if (["approved", "passed", "complete", "pass"].includes(status)) {
-    return "border-emerald-700 bg-emerald-950/45 text-emerald-100";
+    return "border-emerald-200 bg-emerald-50 text-emerald-700";
   }
 
   if (["rejected", "failed", "blocked", "rule_violation"].includes(status)) {
-    return "border-red-700 bg-red-950/45 text-red-100";
+    return "border-red-200 bg-red-50 text-red-700";
   }
 
   if (["executing", "reviewing", "running", "open"].includes(status)) {
-    return "border-cyan-700 bg-cyan-950/45 text-cyan-100";
+    return "border-blue-200 bg-blue-50 text-blue-700";
   }
 
-  return "border-zinc-700 bg-zinc-900 text-zinc-200";
+  return "border-zinc-200 bg-zinc-50 text-zinc-600";
 }
 
 function checkStatusClass(status: "pass" | "warn" | "fail") {
@@ -551,7 +551,7 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
     return statusClass("reviewing");
   }
 
-  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+  return "border-zinc-200 bg-zinc-50 text-zinc-500";
 }
 
 function progressStatusClass(status: BuildTimelineStatus) {
@@ -567,7 +567,7 @@ function progressStatusClass(status: BuildTimelineStatus) {
     return statusClass("blocked");
   }
 
-  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+  return "border-zinc-200 bg-zinc-50 text-zinc-500";
 }
 
 function nextActionStatusClass(status: PhaseNextActionStatus) {
@@ -583,7 +583,7 @@ function nextActionStatusClass(status: PhaseNextActionStatus) {
     return statusClass("reviewing");
   }
 
-  return "border-zinc-700 bg-zinc-900 text-zinc-400";
+  return "border-zinc-200 bg-zinc-50 text-zinc-500";
 }
 
 function launchAuditStatusClass(status: FirstPhaseLaunchAuditStatus) {
@@ -629,11 +629,11 @@ function Badge({ children, className = "" }: { children: React.ReactNode; classN
 
 function Panel({ title, eyebrow, children }: { title: string; eyebrow?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-zinc-800 bg-zinc-950/75 p-4 shadow-sm shadow-black/20">
+    <section className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-200/70">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          {eyebrow ? <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">{eyebrow}</p> : null}
-          <h2 className="text-xl font-semibold text-zinc-50">{title}</h2>
+          {eyebrow ? <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{eyebrow}</p> : null}
+          <h2 className="text-xl font-semibold text-zinc-950">{title}</h2>
         </div>
       </div>
       {children}
@@ -643,9 +643,9 @@ function Panel({ title, eyebrow, children }: { title: string; eyebrow?: string; 
 
 function CompactList({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-md border border-zinc-800 bg-black p-3">
+    <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3">
       <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{title}</p>
-      <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-400">
+      <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-700">
         {items.map((item) => (
           <li key={item}>- {item}</li>
         ))}
@@ -656,7 +656,7 @@ function CompactList({ title, items }: { title: string; items: string[] }) {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block text-base font-semibold text-zinc-200">
+    <label className="block text-base font-semibold text-zinc-900">
       <span className="mb-2 block">{label}</span>
       {children}
     </label>
@@ -667,7 +667,8 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base font-normal text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
+      suppressHydrationWarning
+      className={`h-12 w-full rounded-md border border-zinc-300 bg-white px-4 text-base font-normal text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-blue-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -680,7 +681,8 @@ function Textarea({
     <textarea
       {...props}
       ref={inputRef}
-      className={`min-h-28 w-full resize-y rounded-md border border-zinc-800 bg-black px-4 py-3 text-base font-normal leading-7 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-cyan-500 ${props.className ?? ""}`}
+      suppressHydrationWarning
+      className={`min-h-28 w-full resize-y rounded-md border border-zinc-300 bg-white px-4 py-3 text-base font-normal leading-7 text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-blue-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -689,7 +691,8 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`h-12 w-full rounded-md border border-zinc-800 bg-black px-4 text-base font-normal text-zinc-100 outline-none transition focus:border-cyan-500 ${props.className ?? ""}`}
+      suppressHydrationWarning
+      className={`h-12 w-full rounded-md border border-zinc-300 bg-white px-4 text-base font-normal text-zinc-950 outline-none transition focus:border-blue-500 ${props.className ?? ""}`}
     />
   );
 }
@@ -703,8 +706,8 @@ function Button({
     variant === "danger"
       ? "border-red-700 bg-red-600 text-white hover:bg-red-500"
       : variant === "secondary"
-        ? "border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-        : "border-cyan-400 bg-cyan-300 text-zinc-950 hover:bg-cyan-200";
+        ? "border-zinc-300 bg-white text-zinc-950 hover:bg-zinc-50"
+        : "border-zinc-950 bg-zinc-950 text-white hover:bg-zinc-800";
 
   return (
     <button
@@ -717,7 +720,7 @@ function Button({
 function LinkButton({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) {
   return (
     <a
-      className={`inline-flex h-11 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-4 text-base font-semibold text-zinc-100 transition hover:bg-zinc-800 ${className}`}
+      className={`inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 text-base font-semibold text-zinc-950 transition hover:bg-zinc-50 ${className}`}
       href={href}
       target="_blank"
       rel="noreferrer"
@@ -730,7 +733,7 @@ function LinkButton({ href, children, className = "" }: { href: string; children
 function JumpLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
-      className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 px-4 text-base font-semibold text-zinc-100 transition hover:bg-zinc-800"
+      className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 bg-white px-4 text-base font-semibold text-zinc-950 transition hover:bg-zinc-50"
       href={href}
     >
       {children}
@@ -1925,83 +1928,65 @@ export function CommandWavesConsole() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-base text-zinc-100">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-900 pb-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-base font-semibold text-cyan-300">{commandWaveProductCopy.headline}</p>
-              <h1 className="mt-3 text-4xl font-semibold tracking-normal text-zinc-50 sm:text-5xl">
-                {primaryHookProject?.name ?? wave.name}
+    <main className="min-h-screen bg-white text-base text-zinc-950">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
+        <header className="border-b border-zinc-200 pb-6">
+          <div className="flex flex-wrap items-start justify-between gap-5">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project overview</p>
+              <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
+                {commandWaveProductCopy.headline}
               </h1>
+              <p className="mt-3 text-xl leading-8 text-zinc-700 sm:text-2xl sm:leading-9">
+                {commandWaveProductCopy.subhead}
+              </p>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
+                Use this like a normal project room. The 6529 wave is the shared record, GitHub is the code surface,
+                agents help with scope and review, and humans decide what ships.
+              </p>
             </div>
             <nav className="flex flex-wrap gap-2" aria-label="Primary actions">
               <JumpLink href="#wave-room">Chat</JumpLink>
-              <Button type="button" variant="secondary" onClick={openSuggestSection}>
+              <Button type="button" onClick={openSuggestSection}>
                 Suggest work
               </Button>
-              {wave.waveUrl ? (
-                <span className="hidden sm:inline-flex">
-                  <LinkButton href={wave.waveUrl}>Room</LinkButton>
-                </span>
-              ) : null}
-              {repoUrl ? (
-                <span className="hidden sm:inline-flex">
-                  <LinkButton href={repoUrl}>Repo</LinkButton>
-                </span>
-              ) : null}
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+              {repoUrl ? <LinkButton href={repoUrl}>Open repo</LinkButton> : null}
             </nav>
           </div>
 
-          <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
-            <div>
-              <p className="max-w-3xl text-xl leading-8 text-zinc-200 sm:text-2xl sm:leading-9">{commandWaveProductCopy.subhead}</p>
-              <p className="mt-3 max-w-3xl text-lg leading-8 text-zinc-400">
-                A public workspace where builders discuss one hook, decide what is safe to change, create reviewed PRs,
-                and keep the activity easy to follow.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2" aria-label="Simple build flow">
-                {commandWaveProductCopy.simpleFlow.split(", ").map((item) => (
-                  <span key={item} className="rounded-full border border-zinc-800 px-3 py-1 text-sm font-semibold text-zinc-300">
-                    {item}
-                  </span>
-                ))}
+          <dl className="mt-6 grid gap-0 border-y border-zinc-200 sm:grid-cols-2 lg:grid-cols-4">
+            {projectOverviewItems.map(([label, value]) => (
+              <div key={label} className="border-b border-zinc-200 py-4 sm:px-4 lg:border-b-0 lg:border-r lg:last:border-r-0">
+                <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
+                <dd className="mt-1 break-words text-lg font-semibold leading-7 text-zinc-950">{value}</dd>
               </div>
-            </div>
-
-            <dl className="grid gap-3 rounded-lg border border-zinc-800 bg-zinc-950/55 p-4">
-              {projectOverviewItems.map(([label, value]) => (
-                <div key={label} className="grid grid-cols-[5rem_1fr] gap-3 border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
-                  <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
-                  <dd className="break-words text-base font-semibold text-zinc-100">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
+            ))}
+          </dl>
         </header>
 
-        <section id="workspace" className="grid items-start gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-          <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/55 p-5">
+        <section id="workspace" className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
+          <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Work board</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">What is happening now</h2>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Work and decisions</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-950">What needs attention</h2>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
 
-            <div className="mt-5 rounded-md border border-zinc-800 bg-black p-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current focus</p>
-              <h3 className="mt-2 text-2xl font-semibold leading-8 text-zinc-50">{currentFocusTitle}</h3>
-              <p className="mt-2 line-clamp-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
+            <div className="mt-5 border-t border-zinc-200 pt-4">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current work</p>
+              <h3 className="mt-2 text-2xl font-semibold leading-8 text-zinc-950">{currentFocusTitle}</h3>
+              <p className="mt-2 line-clamp-3 text-base leading-7 text-zinc-600">{currentFocusDescription}</p>
             </div>
 
-            <div className="mt-4 rounded-md border border-zinc-800 bg-black p-4">
+            <div className="mt-5 border-t border-zinc-200 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision needed</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
                 <Badge className={decisionStateClass}>{roomNeedLabel}</Badge>
               </div>
-              <p className="mt-2 text-base leading-7 text-zinc-300">{roomNeedDetail}</p>
+              <p className="mt-2 text-base leading-7 text-zinc-700">{roomNeedDetail}</p>
               {showDecisionRecorder ? (
                 <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
                   <Input
@@ -2016,25 +2001,25 @@ export function CommandWavesConsole() {
               ) : null}
             </div>
 
-            <div className="mt-4 rounded-md border border-zinc-800 bg-black p-4">
+            <div className="mt-5 border-t border-zinc-200 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Upcoming and discussed</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Upcoming or being discussed</p>
                 <Button type="button" variant="secondary" onClick={openSuggestSection}>
                   Add work
                 </Button>
               </div>
-              <div className="mt-3 divide-y divide-zinc-800">
+              <div className="mt-3 divide-y divide-zinc-200">
                 {visibleWorkFeedItems.map((item) => (
                   <div key={item.id} className="py-3 first:pt-0 last:pb-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-zinc-300">{item.label}</p>
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{item.status}</Badge>
+                      <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
+                      <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{item.status}</Badge>
                     </div>
-                    <p className="mt-1 text-base font-semibold leading-6 text-zinc-100">{humanizeLegacyCommandCopy(item.title)}</p>
-                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-500">{humanizeLegacyCommandCopy(item.body)}</p>
+                    <p className="mt-1 text-base font-semibold leading-6 text-zinc-950">{humanizeLegacyCommandCopy(item.title)}</p>
+                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-600">{humanizeLegacyCommandCopy(item.body)}</p>
                     {item.href ? (
                       <a
-                        className="mt-2 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                        className="mt-2 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-600"
                         href={item.href}
                         target="_blank"
                         rel="noreferrer"
@@ -2047,7 +2032,7 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2 border-t border-zinc-200 pt-4">
               {!activeProposal ? (
                 <Button type="button" onClick={openSuggestSection}>
                   Suggest work
@@ -2098,16 +2083,16 @@ export function CommandWavesConsole() {
             {decisionDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
             {reviewRequestNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
-            {codexPacketNotice ? <p className="mt-2 text-sm leading-6 text-cyan-300">{codexPacketNotice}</p> : null}
-            {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
+            {codexPacketNotice ? <p className="mt-2 text-sm leading-6 text-blue-700">{codexPacketNotice}</p> : null}
+            {apiError ? <p className="mt-2 text-sm leading-6 text-red-600">{apiError}</p> : null}
 
             {latestLedgerEvent ? (
-              <div className="mt-4 rounded-md border border-zinc-800 bg-black p-4">
+              <div className="mt-5 border-t border-zinc-200 pt-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest log</p>
-                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(latestLedgerEvent.type)}</Badge>
+                  <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{eventTypeLabel(latestLedgerEvent.type)}</Badge>
                 </div>
-                <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">{latestLedgerEvent.message}</p>
+                <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-600">{latestLedgerEvent.message}</p>
                 <Button type="button" variant="secondary" className="mt-3" onClick={openActivitySection}>
                   View history
                 </Button>
@@ -2115,11 +2100,14 @@ export function CommandWavesConsole() {
             ) : null}
           </section>
 
-          <section id="wave-room" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/55 p-5">
+          <section id="wave-room" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Chat</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Talk to the swarm</h2>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-950">Talk to the swarm</h2>
+                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">
+                  Ask a question, propose a small change, or bring a concern to the room.
+                </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
@@ -2129,7 +2117,7 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-md border border-zinc-800 bg-black p-4">
+            <div className="mt-5">
               <Field label="Message">
                 <Textarea
                   rows={4}
@@ -2166,7 +2154,7 @@ export function CommandWavesConsole() {
               {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
               {roomPostUrl ? (
                 <a
-                  className="mt-1 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                  className="mt-1 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-600"
                   href={roomPostUrl}
                   target="_blank"
                   rel="noreferrer"
@@ -2176,11 +2164,11 @@ export function CommandWavesConsole() {
               ) : null}
             </div>
 
-            <section className="mt-4 rounded-md border border-zinc-800 bg-black p-4" aria-label="Room snapshot">
+            <section className="mt-5 border-t border-zinc-200 pt-4" aria-label="Room snapshot">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Room snapshot</p>
-                  <h3 className="mt-1 text-lg font-semibold text-zinc-50">Latest visible discussion</h3>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest from the room</p>
+                  <h3 className="mt-1 text-lg font-semibold text-zinc-950">Recent signals</h3>
                 </div>
                 <Button
                   type="button"
@@ -2191,15 +2179,15 @@ export function CommandWavesConsole() {
                   {apiBusy === "context" ? "Loading" : "Refresh"}
                 </Button>
               </div>
-              <div className="mt-3 divide-y divide-zinc-800">
+              <div className="mt-3 divide-y divide-zinc-200">
                 {hasRecentDiscussionPosts
-                  ? visibleRoomSnapshotDrops.map((drop) => (
+                  ? visibleRoomSnapshotDrops.slice(0, 2).map((drop) => (
                       <div key={drop.id} className="py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-300">{drop.author}</p>
+                          <p className="text-sm font-semibold text-zinc-950">{drop.author}</p>
                           {drop.url ? (
                             <a
-                              className="text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                              className="text-sm font-semibold text-blue-700 hover:text-blue-600"
                               href={drop.url}
                               target="_blank"
                               rel="noreferrer"
@@ -2208,19 +2196,19 @@ export function CommandWavesConsole() {
                             </a>
                           ) : null}
                         </div>
-                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{drop.preview}</p>
+                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-600">{drop.preview}</p>
                       </div>
                     ))
-                  : visibleRoomSnapshotFallback.map((item) => (
+                  : visibleRoomSnapshotFallback.slice(0, 2).map((item) => (
                       <div key={item.id} className="py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-300">{item.label}</p>
-                          <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{item.status}</Badge>
+                          <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
+                          <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{item.status}</Badge>
                         </div>
-                        <p className="mt-1 text-sm font-semibold leading-6 text-zinc-100">
+                        <p className="mt-1 text-sm font-semibold leading-6 text-zinc-950">
                           {humanizeLegacyCommandCopy(item.title)}
                         </p>
-                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
+                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-600">{humanizeLegacyCommandCopy(item.body)}</p>
                       </div>
                     ))}
               </div>
@@ -2228,35 +2216,35 @@ export function CommandWavesConsole() {
           </section>
         </section>
 
-        <section id="members-and-rules" className="grid gap-5 border-t border-zinc-900 pt-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section id="members-and-rules" className="grid gap-6 border-t border-zinc-200 pt-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="min-w-0">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Who is in the swarm</h2>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-950">Who is building</h2>
               </div>
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {visibleBuilderProfiles.length ? (
                 visibleBuilderProfiles.map((member) => (
-                  <article key={member.identity} className="rounded-lg border border-zinc-800 bg-zinc-950/55 p-4">
+                  <article key={member.identity} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-200/70">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-cyan-700 bg-cyan-950/40 text-base font-semibold text-cyan-100">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-base font-semibold text-zinc-800">
                         {member.identity.slice(0, 2).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="break-words text-xl font-semibold text-zinc-50">{member.identity}</h3>
-                          <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
+                          <h3 className="break-words text-xl font-semibold text-zinc-950">{member.identity}</h3>
+                          <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{member.role}</Badge>
                         </div>
-                        <p className="mt-2 text-base leading-7 text-zinc-300">{member.detail}</p>
+                        <p className="mt-2 text-base leading-7 text-zinc-700">{member.detail}</p>
                       </div>
                     </div>
                     <dl className="mt-4 grid grid-cols-3 gap-2">
                       {member.stats.slice(0, 3).map((stat) => (
-                        <div key={`${member.identity}-${stat.label}`} className="border-t border-zinc-800 pt-2">
+                        <div key={`${member.identity}-${stat.label}`} className="border-t border-zinc-200 pt-2">
                           <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{stat.label}</dt>
-                          <dd className="mt-1 text-sm font-semibold text-zinc-100">{stat.value}</dd>
+                          <dd className="mt-1 text-sm font-semibold text-zinc-950">{stat.value}</dd>
                         </div>
                       ))}
                     </dl>
@@ -2272,28 +2260,28 @@ export function CommandWavesConsole() {
                   </article>
                 ))
               ) : (
-                <div className="rounded-lg border border-zinc-800 bg-zinc-950/55 p-4 md:col-span-2">
-                  <p className="text-base font-semibold text-zinc-100">No visible members yet</p>
+                <div className="rounded-lg border border-zinc-200 bg-white p-4 md:col-span-2">
+                  <p className="text-base font-semibold text-zinc-950">No visible members yet</p>
                   <p className="mt-1 text-sm leading-6 text-zinc-500">Builders appear here after room posts, proposals, votes, or reviews.</p>
                 </div>
               )}
             </div>
           </section>
 
-          <section className="min-w-0 rounded-lg border border-zinc-800 bg-zinc-950/55 p-5">
+          <section className="min-w-0 rounded-lg border border-zinc-200 p-5">
             <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
-            <h2 className="mt-1 text-2xl font-semibold text-zinc-50">How this works</h2>
-            <ol className="mt-4 grid gap-3 text-base leading-7 text-zinc-300">
+            <h2 className="mt-1 text-2xl font-semibold text-zinc-950">Project rules</h2>
+            <ol className="mt-4 grid gap-3 text-base leading-7 text-zinc-700">
               {ruleHighlights.map((rule, index) => (
                 <li key={rule} className="grid grid-cols-[1.75rem_1fr] gap-3">
-                  <span className="font-semibold text-cyan-300">{index + 1}</span>
+                  <span className="font-semibold text-zinc-950">{index + 1}</span>
                   <span>{rule}</span>
                 </li>
               ))}
             </ol>
-            <div className="mt-5 border-t border-zinc-800 pt-4">
+            <div className="mt-5 border-t border-zinc-200 pt-4">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
-              <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+              <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-600">
                 {participationGateNotes.slice(0, 2).map((gate) => (
                   <li key={gate}>- {gate}</li>
                 ))}
@@ -2302,9 +2290,9 @@ export function CommandWavesConsole() {
                 Draft join message
               </Button>
             </div>
-            <div className="mt-5 border-t border-zinc-800 pt-4">
+            <div className="mt-5 border-t border-zinc-200 pt-4">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Hook guardrails</p>
-              <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+              <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-600">
                 {hookGuardrails.slice(0, 3).map((guardrail) => (
                   <li key={guardrail}>- {guardrail}</li>
                 ))}
@@ -2316,16 +2304,16 @@ export function CommandWavesConsole() {
         <details
           id="start-building"
           ref={suggestRef}
-          className="scroll-mt-4 border-b border-zinc-900 py-3"
+          className="scroll-mt-4 border-b border-zinc-200 py-3"
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-300">Suggest work</summary>
+          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-950">Suggest work</summary>
           <div className="mt-4 max-w-4xl">
             <div className="mt-4 grid gap-3">
               <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
                 <div>
-                  <p className="mb-2 text-base font-semibold text-zinc-200">Work type</p>
+                  <p className="mb-2 text-base font-semibold text-zinc-900">Work type</p>
                   <div className="flex flex-wrap gap-2">
                     {proposalTypeOptions.map((option) => {
                       const selected = option.kind === kind;
@@ -2337,8 +2325,8 @@ export function CommandWavesConsole() {
                           aria-pressed={selected}
                           className={`inline-flex h-11 cursor-pointer items-center justify-center rounded-md border px-4 text-base font-semibold transition ${
                             selected
-                              ? "border-cyan-500 bg-cyan-950/35 text-zinc-50"
-                              : "border-zinc-800 bg-black text-zinc-300 hover:border-cyan-800 hover:bg-zinc-950"
+                              ? "border-zinc-950 bg-zinc-950 text-white"
+                              : "border-zinc-300 bg-white text-zinc-950 hover:bg-zinc-50"
                           }`}
                           onClick={() => chooseProposalType(option)}
                         >
@@ -2398,9 +2386,9 @@ export function CommandWavesConsole() {
               Discuss it in the room first. Save only when the proposal is visible there.
             </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
-            {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
-            <details className="mt-4 border-y border-zinc-800 py-3" open={hookProposalPreflightBlocked ? true : undefined}>
-              <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3 text-base font-semibold text-zinc-100">
+            {apiError ? <p className="mt-2 text-sm leading-6 text-red-600">{apiError}</p> : null}
+            <details className="mt-4 border-y border-zinc-200 py-3" open={hookProposalPreflightBlocked ? true : undefined}>
+              <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3 text-base font-semibold text-zinc-950">
                 <span>Safety checks</span>
                 <span className="flex flex-wrap gap-2">
                   <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
@@ -2409,24 +2397,24 @@ export function CommandWavesConsole() {
                   </Badge>
                 </span>
               </summary>
-              <div className="mt-3 divide-y divide-zinc-800 border-t border-zinc-800">
+              <div className="mt-3 divide-y divide-zinc-200 border-t border-zinc-200">
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-100">Risk</p>
+                  <p className="text-base font-semibold text-zinc-950">Risk</p>
                   <Badge className={riskClass(classifiedRisk)}>{classifiedRisk}</Badge>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-100">Decision</p>
+                  <p className="text-base font-semibold text-zinc-950">Decision</p>
                   <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-100">Hook guardrails</p>
+                  <p className="text-base font-semibold text-zinc-950">Hook guardrails</p>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
                     {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
                   </Badge>
                 </div>
                 <div className="py-3">
-                  <p className="text-base font-semibold text-zinc-100">Result</p>
-                  <p className="mt-1 text-base leading-7 text-zinc-400">{simplePreflightMessage}</p>
+                  <p className="text-base font-semibold text-zinc-950">Result</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-600">{simplePreflightMessage}</p>
                 </div>
               </div>
             </details>
@@ -2436,15 +2424,15 @@ export function CommandWavesConsole() {
         <details
           id="recent-activity"
           ref={activityRef}
-          className="scroll-mt-4 border-b border-zinc-900 py-3"
+          className="scroll-mt-4 border-b border-zinc-200 py-3"
           open={activityOpen}
           onToggle={(event) => setActivityOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
             <span>History</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{buildTimeline.length} steps</Badge>
+            <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{buildTimeline.length} steps</Badge>
           </summary>
-          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+          <div className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
             {buildTimeline.map((item) => (
               <div key={item.id} className="grid gap-3 py-4 md:grid-cols-[8rem_1fr_auto]">
                 <div>
@@ -2452,8 +2440,8 @@ export function CommandWavesConsole() {
                   <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-zinc-50">{humanizeLegacyCommandCopy(item.title)}</p>
-                  <p className="mt-1 text-base leading-7 text-zinc-400">{humanizeLegacyCommandCopy(item.detail)}</p>
+                  <p className="text-lg font-semibold text-zinc-950">{humanizeLegacyCommandCopy(item.title)}</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(item.detail)}</p>
                 </div>
                 {item.href && item.hrefLabel ? (
                   <div className="flex flex-wrap gap-2 md:justify-end">
@@ -2464,16 +2452,16 @@ export function CommandWavesConsole() {
             ))}
           </div>
           {orderedLedgerEvents.length ? (
-            <details className="mt-4 border-y border-zinc-800 py-3">
-              <summary className="cursor-pointer text-base font-semibold text-zinc-100">Show raw log</summary>
-              <div className="mt-3 divide-y divide-zinc-800 border-t border-zinc-800">
+            <details className="mt-4 border-y border-zinc-200 py-3">
+              <summary className="cursor-pointer text-base font-semibold text-zinc-950">Show raw log</summary>
+              <div className="mt-3 divide-y divide-zinc-200 border-t border-zinc-200">
                 {orderedLedgerEvents.map((event) => (
                   <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
                     <p className="text-sm font-semibold text-zinc-500">{shortTime(event.at)}</p>
-                    <p className="text-sm font-semibold text-zinc-300">{humanizeLegacyCommandCopy(event.actor)}</p>
+                    <p className="text-sm font-semibold text-zinc-700">{humanizeLegacyCommandCopy(event.actor)}</p>
                     <div>
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{eventTypeLabel(event.type)}</Badge>
-                      <p className="mt-1 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(event.message)}</p>
+                      <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{eventTypeLabel(event.type)}</Badge>
+                      <p className="mt-1 text-sm leading-6 text-zinc-600">{humanizeLegacyCommandCopy(event.message)}</p>
                     </div>
                   </div>
                 ))}
@@ -2482,10 +2470,10 @@ export function CommandWavesConsole() {
           ) : null}
         </details>
 
-        <details id="more-tools" className="scroll-mt-4 border-b border-zinc-900 py-3">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
+        <details id="more-tools" className="scroll-mt-4 border-b border-zinc-200 py-3">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
             <span>Maintainer tools</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">advanced</Badge>
+            <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">advanced</Badge>
           </summary>
           <div className="mt-4 grid gap-4">
             <details id="rules-of-game" className="border-b border-zinc-800 pb-4">
@@ -3605,10 +3593,10 @@ export function CommandWavesConsole() {
           </div>
         </details>
 
-        <details id="reports" className="scroll-mt-4 border-b border-zinc-900 py-3">
-          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
+        <details id="reports" className="scroll-mt-4 border-b border-zinc-200 py-3">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
             <span>Reports and updates</span>
-            <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">optional</Badge>
+            <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">optional</Badge>
           </summary>
           <div className="mt-4 grid gap-5">
             <Panel title="Activity report" eyebrow="Human review">
