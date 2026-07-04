@@ -63,6 +63,7 @@ async function main() {
   }
   for (const label of [
     "Use this like a normal project room",
+    "The project room is the shared record",
     "Project overview",
     "Work and decisions",
     "What needs attention",
@@ -73,6 +74,8 @@ async function main() {
     "Recent signals",
     "Latest log",
     "Who is building",
+    "Activity report:",
+    "not access or merge authority",
     "Project rules",
     "The orchestration agent labels risk",
     "Humans still merge and deploy",

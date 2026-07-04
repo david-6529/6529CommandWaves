@@ -11,8 +11,8 @@ describe("builder roster", () => {
       identity: "david",
       role: "Coordinator",
       activity: "1 proposal, 1 vote, 1 decision, 1 activity event",
-      scoreLabel: "activity 10",
-      authorityNote: "Informational only",
+      scoreLabel: "10 report points",
+      authorityNote: "Report only, not access or merge authority",
       basis: expect.arrayContaining(["Proposal work: 6 report points"]),
       stats: expect.arrayContaining([
         { label: "Proposals", value: "1" },
@@ -29,8 +29,9 @@ describe("builder roster", () => {
     const roster = createBuilderRoster(createContributionReport(demoWave));
     const copy = roster.map((member) => `${member.role} ${member.activity} ${member.authorityNote}`).join(" ");
 
-    expect(copy).toContain("Informational only");
-    expect(copy.toLowerCase()).not.toContain("permission");
+    expect(copy).toContain("Report only");
+    expect(copy).toContain("not access or merge authority");
+    expect(copy.toLowerCase()).not.toContain("grant");
     expect(copy).not.toContain("\u2014");
   });
 
@@ -49,7 +50,7 @@ describe("builder roster", () => {
       role: "Room participant",
       activity: "1 room post",
       scoreLabel: "room activity",
-      authorityNote: "Informational only",
+      authorityNote: "Report only, not access or merge authority",
       detail: "Recent room post: I can review the next small hook change.",
       basis: ["Room posts: 1 report point"],
       stats: [{ label: "Room posts", value: "1" }],

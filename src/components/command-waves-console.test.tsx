@@ -17,10 +17,14 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Project overview");
     expect(text).toContain("A new form of swarm development for the age of AI");
     expect(text).toContain("Use this like a normal project room.");
+    expect(text).toContain("The project room is the shared record");
+    expect(text).toContain("Project Discuss Decide PR Review Log");
     expect(text).toContain("Work and decisions");
     expect(text).toContain("What needs attention");
     expect(text).toContain("Talk to the swarm");
     expect(text).toContain("Who is building");
+    expect(text).toContain("Activity report:");
+    expect(text).toContain("not access or merge authority");
     expect(text).toContain("Project rules");
     expect(text).toContain("Builders use the room to propose, question, and decide.");
   });

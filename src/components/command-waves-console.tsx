@@ -1941,9 +1941,16 @@ export function CommandWavesConsole() {
                 {commandWaveProductCopy.subhead}
               </p>
               <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
-                Use this like a normal project room. The 6529 wave is the shared record, GitHub is the code surface,
+                Use this like a normal project room. The project room is the shared record, GitHub is the code surface,
                 agents help with scope and review, and humans decide what ships.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2" aria-label="Simple workflow">
+                {commandWaveProductCopy.simpleFlow.split(", ").map((item) => (
+                  <span key={item} className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-semibold text-zinc-700">
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
             <nav className="flex flex-wrap gap-2" aria-label="Primary actions">
               <JumpLink href="#wave-room">Chat</JumpLink>
@@ -2248,9 +2255,14 @@ export function CommandWavesConsole() {
                         </div>
                       ))}
                     </dl>
-                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-zinc-500">
-                      {member.activity}. {member.authorityNote}.
+                    <p className="mt-3 text-sm leading-6 text-zinc-500">
+                      {member.activity}. Activity report: {member.scoreLabel}. {member.authorityNote}.
                     </p>
+                    {member.basis.length ? (
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-500">
+                        Basis: {member.basis.slice(0, 2).join(", ")}.
+                      </p>
+                    ) : null}
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
                         Message

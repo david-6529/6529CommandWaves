@@ -78,7 +78,7 @@ function scoreLabelFor(contributor: ContributionContributor) {
     contributor.decisions === 0 &&
     contributor.ledgerEvents === 0;
 
-  return onlyRoomActivity ? "room activity" : `activity ${contributor.score}`;
+  return onlyRoomActivity ? "room activity" : `${contributor.score} report points`;
 }
 
 function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
@@ -111,7 +111,7 @@ export function createBuilderRoster(
       role: roleFor(contributor),
       activity: activityFor(contributor),
       scoreLabel: scoreLabelFor(contributor),
-      authorityNote: "Informational only",
+      authorityNote: "Report only, not access or merge authority",
       detail: detailFor(contributor),
       basis: contributor.scoreBasis.slice(0, 3),
       stats: statsFor(contributor),
