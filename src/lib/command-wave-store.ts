@@ -1,5 +1,6 @@
 import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "./configured-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
+import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./command-wave-seed";
 import { demoWave } from "./demo-wave";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
@@ -50,6 +51,10 @@ const parkedCommandKinds: CommandKind[] = ["run_script", "deploy", "spend_money"
 
 function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
+}
+
+function initialCommandWave() {
+  return applyInitialCommandWaveProject(cloneDemoWave());
 }
 
 function isStaleBuiltInHookDemo(wave: CommandWave) {
@@ -210,8 +215,11 @@ async function store() {
   if (!globalStore.__commandWaveStore || globalStore.__commandWaveStore.persistencePath !== persistencePath) {
     const persisted = await loadPersistedCommandWave();
     const migrated = migrateLegacyDemoWave(persisted);
-    const baseWave = migrated ?? cloneDemoWave();
-    const wave = withCurrentHookRoomCopy(withFirstPhaseRules(baseWave));
+    const baseWave = migrated ?? initialCommandWave();
+    const seededWave = migrated && hasInitialCommandWaveProject() && isBuiltInHookProject(migrated)
+      ? applyInitialCommandWaveProject(migrated)
+      : baseWave;
+    const wave = withCurrentHookRoomCopy(withFirstPhaseRules(seededWave));
 
     if (persisted && wave !== persisted) {
       await savePersistedCommandWave(wave);
@@ -305,7 +313,7 @@ export async function replaceCommandWave(wave: CommandWave) {
 }
 
 export async function resetCommandWave() {
-  const wave = cloneDemoWave();
+  const wave = initialCommandWave();
 
   return replaceCommandWave(wave);
 }

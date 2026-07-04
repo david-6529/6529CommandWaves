@@ -222,6 +222,9 @@ NEXT_PUBLIC_APP_URL=https://your-app.example
 COMMAND_WAVE_STORE=postgres
 DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
+COMMAND_WAVE_INITIAL_NAME="6529 Hook"
+COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-room
+COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 COMMAND_WAVE_REPO_ADAPTER=github
@@ -230,12 +233,14 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
-`ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR
-checks the public wave state. The ready launch audit requires durable storage and the GitHub PR adapter so the public
-workflow can survive restarts and record draft PRs predictably.
+`COMMAND_WAVE_INITIAL_WAVE_URL` and `COMMAND_WAVE_INITIAL_REPO_URL` seed a clean first project for fresh/default state
+or local reset. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL`
+gives guardian PR checks the public wave state. The ready launch audit requires durable storage and the GitHub PR adapter
+so the public workflow can survive restarts and record draft PRs predictably.
 
-The local demo still reports launch gaps until `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode,
-GitHub PR adapter, guardian state, setup validation, and the required guardian check are configured.
+The local demo still reports launch gaps until the first hook room and repo are reachable, `ADMIN_API_KEY`,
+`NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode, GitHub PR adapter, guardian state, setup validation, and the
+required guardian check are configured.
 
 ## Durable Storage
 
@@ -422,7 +427,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 ## Next Production Steps
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
-2. Wire live 6529 setup, proposal, vote, and human-posted result update flows.
+2. Set the initial hook wave and repo, then run the remote launch audit until setup is reachable.
 3. Finish controlled GitHub branch, commit, PR comment, and CI-state operations.
 4. Add controlled Codex execution using [docs/agent-harness-plan.md](docs/agent-harness-plan.md).
 5. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.

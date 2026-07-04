@@ -16,10 +16,16 @@ import type { CommandKind } from "./command-waves";
 describe("Command wave store", () => {
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
   const previousRepoAdapter = process.env.COMMAND_WAVE_REPO_ADAPTER;
+  const previousInitialName = process.env.COMMAND_WAVE_INITIAL_NAME;
+  const previousInitialWaveUrl = process.env.COMMAND_WAVE_INITIAL_WAVE_URL;
+  const previousInitialRepoUrl = process.env.COMMAND_WAVE_INITIAL_REPO_URL;
 
   beforeEach(async () => {
     process.env.COMMAND_WAVE_STORE = "memory";
     process.env.COMMAND_WAVE_REPO_ADAPTER = "local";
+    delete process.env.COMMAND_WAVE_INITIAL_NAME;
+    delete process.env.COMMAND_WAVE_INITIAL_WAVE_URL;
+    delete process.env.COMMAND_WAVE_INITIAL_REPO_URL;
     clearCommandWaveStoreForTests();
     await resetCommandWave();
   });
@@ -37,6 +43,24 @@ describe("Command wave store", () => {
       delete process.env.COMMAND_WAVE_REPO_ADAPTER;
     } else {
       process.env.COMMAND_WAVE_REPO_ADAPTER = previousRepoAdapter;
+    }
+
+    if (previousInitialName === undefined) {
+      delete process.env.COMMAND_WAVE_INITIAL_NAME;
+    } else {
+      process.env.COMMAND_WAVE_INITIAL_NAME = previousInitialName;
+    }
+
+    if (previousInitialWaveUrl === undefined) {
+      delete process.env.COMMAND_WAVE_INITIAL_WAVE_URL;
+    } else {
+      process.env.COMMAND_WAVE_INITIAL_WAVE_URL = previousInitialWaveUrl;
+    }
+
+    if (previousInitialRepoUrl === undefined) {
+      delete process.env.COMMAND_WAVE_INITIAL_REPO_URL;
+    } else {
+      process.env.COMMAND_WAVE_INITIAL_REPO_URL = previousInitialRepoUrl;
     }
   });
 
@@ -65,6 +89,43 @@ describe("Command wave store", () => {
       actor: "Setup",
       type: "rules_defined",
     });
+  });
+
+  it("uses environment setup as a clean initial hook project", async () => {
+    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-room";
+    process.env.COMMAND_WAVE_INITIAL_REPO_URL = "https://github.com/6529-Collections/real-hook";
+    clearCommandWaveStoreForTests();
+
+    const wave = await resetCommandWave();
+
+    expect(wave).toMatchObject({
+      waveUrl: "https://6529.io/waves/real-hook-room",
+      repoUrl: "https://github.com/6529-Collections/real-hook",
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+    });
+    expect(wave.ledger[0]).toMatchObject({
+      actor: "Setup",
+      type: "wave_created",
+      message: "Created the first hook project from environment setup.",
+    });
+  });
+
+  it("does not replace custom setup with environment setup", async () => {
+    await updateCommandWaveSetup({
+      waveUrl: "https://6529.io/waves/custom-room",
+      repoUrl: "https://github.com/6529-Collections/custom-hook",
+    });
+
+    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-room";
+    process.env.COMMAND_WAVE_INITIAL_REPO_URL = "https://github.com/6529-Collections/real-hook";
+
+    const wave = await getCommandWave();
+
+    expect(wave.waveUrl).toBe("https://6529.io/waves/custom-room");
+    expect(wave.repoUrl).toBe("https://github.com/6529-Collections/custom-hook");
   });
 
   it("saves participation notes without claiming live gate authority", async () => {

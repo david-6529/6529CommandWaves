@@ -12,10 +12,14 @@ import { deletePersistedCommandWave, getCommandWaveStoreMode, savePersistedComma
 
 describe("command wave persistence", () => {
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
+  const previousInitialWaveUrl = process.env.COMMAND_WAVE_INITIAL_WAVE_URL;
+  const previousInitialRepoUrl = process.env.COMMAND_WAVE_INITIAL_REPO_URL;
   const storeFile = ".data/command-wave-test.json";
 
   beforeEach(async () => {
     process.env.COMMAND_WAVE_STORE = "file";
+    delete process.env.COMMAND_WAVE_INITIAL_WAVE_URL;
+    delete process.env.COMMAND_WAVE_INITIAL_REPO_URL;
     clearCommandWaveStoreForTests();
     await deletePersistedCommandWave();
   });
@@ -30,6 +34,17 @@ describe("command wave persistence", () => {
       process.env.COMMAND_WAVE_STORE = previousStoreMode;
     }
 
+    if (previousInitialWaveUrl === undefined) {
+      delete process.env.COMMAND_WAVE_INITIAL_WAVE_URL;
+    } else {
+      process.env.COMMAND_WAVE_INITIAL_WAVE_URL = previousInitialWaveUrl;
+    }
+
+    if (previousInitialRepoUrl === undefined) {
+      delete process.env.COMMAND_WAVE_INITIAL_REPO_URL;
+    } else {
+      process.env.COMMAND_WAVE_INITIAL_REPO_URL = previousInitialRepoUrl;
+    }
   });
 
   it("persists command wave mutations and reloads them after memory is cleared", async () => {
@@ -180,6 +195,27 @@ describe("command wave persistence", () => {
       actor: "Decision",
       message: "Room approved custom PR #99.",
     });
+  });
+
+  it("does not replace a persisted custom project with environment setup", async () => {
+    await replaceCommandWave({
+      ...demoWave,
+      waveUrl: "https://6529.io/waves/custom-room",
+      repoUrl: "https://github.com/6529-Collections/custom-hook",
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+    });
+
+    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-room";
+    process.env.COMMAND_WAVE_INITIAL_REPO_URL = "https://github.com/6529-Collections/real-hook";
+    clearCommandWaveStoreForTests();
+
+    const wave = await getCommandWave();
+
+    expect(wave.waveUrl).toBe("https://6529.io/waves/custom-room");
+    expect(wave.repoUrl).toBe("https://github.com/6529-Collections/custom-hook");
   });
 
   it("refreshes old complete hook demo records that lack deterministic evidence", async () => {
