@@ -21,6 +21,11 @@ export type ContributionRoomPost = {
 
 export type ContributionReport = {
   mode: "informational";
+  method: {
+    id: "visible_activity_v0";
+    label: string;
+    authority: string;
+  };
   generatedAt: string;
   summary: string;
   coverage: {
@@ -171,6 +176,12 @@ const coverage = {
   ],
 };
 
+const reportMethod: ContributionReport["method"] = {
+  id: "visible_activity_v0",
+  label: "Visible activity report",
+  authority: "Informational only",
+};
+
 export function createContributionReport(
   wave: CommandWave,
   options: {
@@ -259,6 +270,7 @@ export function createContributionReport(
 
   return {
     mode: "informational",
+    method: reportMethod,
     generatedAt: options.generatedAt ?? latestReportTimestamp(wave, includedRoomPosts),
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
@@ -303,6 +315,7 @@ export function createContributionReportDraft(
     "6529 hook contribution report",
     "",
     `Generated: ${report.generatedAt}`,
+    `Method: ${report.method.label} (${report.method.id}), ${report.method.authority}.`,
     report.summary,
     "",
     "Records:",

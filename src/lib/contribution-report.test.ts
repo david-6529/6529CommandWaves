@@ -10,6 +10,11 @@ describe("contribution report", () => {
 
     expect(report).toMatchObject({
       mode: "informational",
+      method: {
+        id: "visible_activity_v0",
+        label: "Visible activity report",
+        authority: "Informational only",
+      },
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
@@ -101,6 +106,7 @@ describe("contribution report", () => {
 
     expect(draft).toContain("6529 hook contribution report");
     expect(draft).toContain("Generated: 2026-06-21T12:00:00.000Z");
+    expect(draft).toContain("Method: Visible activity report (visible_activity_v0), Informational only.");
     expect(draft).toContain("Records:");
     expect(draft).toContain("- 1 GitHub PR link");
     expect(draft).toContain("Coverage included:");

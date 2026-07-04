@@ -64,10 +64,11 @@ async function main() {
   }
   for (const label of [
     "Project",
-    "Work loop",
+    "Project overview",
+    "Current step",
     "Upcoming and discussed",
     "Decision",
-    "Chat",
+    "Chat with the swarm",
     "Room snapshot",
     "Refresh room",
     "Latest log",
@@ -75,6 +76,8 @@ async function main() {
     "Safety checks",
     "Copy draft",
     "Builder profiles",
+    "Report method",
+    "Visible activity report",
     "Rules of the game",
     "orchestration agent",
     "reviewer agent",
