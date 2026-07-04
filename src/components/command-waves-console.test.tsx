@@ -20,11 +20,12 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Decentralized Coding");
     expect(text).toContain("Project overview");
     expect(text).toContain("A new form of swarm development for the age of AI");
-    expect(text).toContain("Use this like a normal project room.");
-    expect(text).toContain("The project room is the shared record");
+    expect(text).toContain("6529 Hook: one public room, one repo, one reviewed change at a time.");
+    expect(text).toContain("Discuss the work, decide in the room, build the PR, review it, and log the result.");
     expect(text).toContain("Project Discuss Decide PR Review Log");
     expect(text).toContain("Work and decisions");
     expect(text).toContain("What needs attention");
+    expect(text).toContain("Queue");
     expect(text).toContain("Talk to the swarm");
     expect(text).toContain("Who is building");
     expect(text).toContain("Activity report:");
@@ -38,8 +39,10 @@ describe("CommandWavesConsole", () => {
 
     expect(text).not.toContain("Build the 6529 hook together");
     expect(text).not.toContain("Public hook build");
+    expect(text).not.toContain("Use this like a normal project room");
     expect(text).not.toContain("Project details");
     expect(text).not.toContain("All member activity");
+    expect(text).not.toContain("Upcoming or being discussed");
     expect(text).not.toContain("\u2014");
   });
 

@@ -1106,7 +1106,9 @@ export function CommandWavesConsole() {
       }),
     [prompt, proposer, title, wave],
   );
-  const visibleWorkFeedItems = roomFeed.slice(0, 2);
+  const visibleWorkFeedItems = roomFeed
+    .filter((item) => !["current-proposal", "next-proposal", "draft-decision"].includes(item.id))
+    .slice(0, 2);
   const visibleBuilderProfiles = builderRoster.slice(0, 4);
   const visibleRoomSnapshotDrops = primaryProjectContextPreview
     ? [...primaryProjectContextPreview.sampleDrops].slice(-3).reverse()
@@ -1279,10 +1281,10 @@ export function CommandWavesConsole() {
               ? "Follow the next open step for this hook change."
               : "Choose one small hook change the room can discuss.";
   const projectOverviewItems = [
-    ["Room", primaryHookProject?.waveLabel ?? "No room"],
-    ["Repo", primaryHookProject?.repoLabel ?? "No repo"],
-    ["Access", participationAccess.label],
-    ["Status", currentBuildStatusLabel],
+    { label: "Room", value: primaryHookProject?.waveLabel ?? "No room", href: primaryHookProject?.waveUrl ?? wave.waveUrl },
+    { label: "Repo", value: primaryHookProject?.repoLabel ?? "No repo", href: primaryHookProject?.repoUrl ?? repoUrl },
+    { label: "Access", value: participationAccess.label, href: null },
+    { label: "Status", value: currentBuildStatusLabel, href: null },
   ];
   const ruleHighlights = [
     "Builders use the room to propose, question, and decide.",
@@ -1941,8 +1943,8 @@ export function CommandWavesConsole() {
                 {commandWaveProductCopy.subhead}
               </p>
               <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
-                Use this like a normal project room. The project room is the shared record, GitHub is the code surface,
-                agents help with scope and review, and humans decide what ships.
+                {commandWaveProductCopy.projectContext} Discuss the work, decide in the room, build the PR, review it, and
+                log the result.
               </p>
               <div className="mt-4 flex flex-wrap gap-2" aria-label="Simple workflow">
                 {commandWaveProductCopy.simpleFlow.split(", ").map((item) => (
@@ -1957,16 +1959,22 @@ export function CommandWavesConsole() {
               <Button type="button" onClick={openSuggestSection}>
                 Suggest work
               </Button>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
-              {repoUrl ? <LinkButton href={repoUrl}>Open repo</LinkButton> : null}
             </nav>
           </div>
 
           <dl className="mt-6 grid gap-0 border-y border-zinc-200 sm:grid-cols-2 lg:grid-cols-4">
-            {projectOverviewItems.map(([label, value]) => (
-              <div key={label} className="border-b border-zinc-200 py-4 sm:px-4 lg:border-b-0 lg:border-r lg:last:border-r-0">
-                <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
-                <dd className="mt-1 break-words text-lg font-semibold leading-7 text-zinc-950">{value}</dd>
+            {projectOverviewItems.map((item) => (
+              <div key={item.label} className="border-b border-zinc-200 py-4 sm:px-4 lg:border-b-0 lg:border-r lg:last:border-r-0">
+                <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</dt>
+                <dd className="mt-1 break-words text-lg font-semibold leading-7 text-zinc-950">
+                  {item.href ? (
+                    <a className="hover:text-blue-700" href={item.href} target="_blank" rel="noreferrer">
+                      {item.value}
+                    </a>
+                  ) : (
+                    item.value
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
@@ -2010,33 +2018,37 @@ export function CommandWavesConsole() {
 
             <div className="mt-5 border-t border-zinc-200 pt-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Upcoming or being discussed</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Queue</p>
                 <Button type="button" variant="secondary" onClick={openSuggestSection}>
                   Add work
                 </Button>
               </div>
-              <div className="mt-3 divide-y divide-zinc-200">
-                {visibleWorkFeedItems.map((item) => (
-                  <div key={item.id} className="py-3 first:pt-0 last:pb-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
-                      <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{item.status}</Badge>
+              {visibleWorkFeedItems.length ? (
+                <div className="mt-3 divide-y divide-zinc-200">
+                  {visibleWorkFeedItems.map((item) => (
+                    <div key={item.id} className="py-3 first:pt-0 last:pb-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
+                        <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{item.status}</Badge>
+                      </div>
+                      <p className="mt-1 text-base font-semibold leading-6 text-zinc-950">{humanizeLegacyCommandCopy(item.title)}</p>
+                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-600">{humanizeLegacyCommandCopy(item.body)}</p>
+                      {item.href ? (
+                        <a
+                          className="mt-2 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-600"
+                          href={item.href}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {item.hrefLabel ?? "Open"}
+                        </a>
+                      ) : null}
                     </div>
-                    <p className="mt-1 text-base font-semibold leading-6 text-zinc-950">{humanizeLegacyCommandCopy(item.title)}</p>
-                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-600">{humanizeLegacyCommandCopy(item.body)}</p>
-                    {item.href ? (
-                      <a
-                        className="mt-2 inline-flex text-sm font-semibold text-blue-700 hover:text-blue-600"
-                        href={item.href}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {item.hrefLabel ?? "Open"}
-                      </a>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm leading-6 text-zinc-600">Nothing else is waiting. Add one small hook change when the room is ready.</p>
+              )}
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 border-t border-zinc-200 pt-4">

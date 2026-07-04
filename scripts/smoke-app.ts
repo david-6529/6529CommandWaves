@@ -62,13 +62,13 @@ async function main() {
     assertIncludes("Home page", html, flowStep);
   }
   for (const label of [
-    "Use this like a normal project room",
-    "The project room is the shared record",
+    commandWaveProductCopy.projectContext,
+    "Discuss the work, decide in the room",
     "Project overview",
     "Work and decisions",
     "What needs attention",
     "Current work",
-    "Upcoming or being discussed",
+    "Queue",
     "Talk to the swarm",
     "Latest from the room",
     "Recent signals",
