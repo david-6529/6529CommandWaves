@@ -24,6 +24,11 @@ describe("first phase launch snapshot", () => {
       repoUrl: demoWave.repoUrl,
     });
     expect(snapshot.setupCheckMode).toBe("shape");
+    expect(snapshot.productContract).toMatchObject({
+      name: "Decentralized Coding",
+      workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
+      publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
+    });
     expect(snapshot.authorityBoundary).toMatchObject({
       phase: "first_public_hook_build",
       socialSourceOfTruth: "6529 wave",

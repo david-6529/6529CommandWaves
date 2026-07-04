@@ -1,4 +1,9 @@
-import { commandWaveStateUrlFromEnv, phaseOneAuthorityBoundary, type CommandWaveStateSnapshot } from "./command-wave-state";
+import {
+  commandWaveStateUrlFromEnv,
+  phaseOneAuthorityBoundary,
+  phaseOneProductContract,
+  type CommandWaveStateSnapshot,
+} from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
@@ -16,6 +21,7 @@ export type FirstPhaseLaunchSnapshot = {
     repoUrl: string;
   };
   setupCheckMode: "shape" | "remote";
+  productContract: CommandWaveStateSnapshot["productContract"];
   authorityBoundary: CommandWaveStateSnapshot["authorityBoundary"];
   verificationTargets: {
     setupProofUrl: string;
@@ -85,6 +91,7 @@ export async function createFirstPhaseLaunchSnapshot(
       repoUrl: wave.repoUrl,
     },
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
+    productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
     verificationTargets: {
       setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),

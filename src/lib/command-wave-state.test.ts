@@ -13,6 +13,12 @@ describe("command wave state snapshot", () => {
       version: "command-wave-state-v0.1",
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: demoWave,
+      productContract: {
+        name: "Decentralized Coding",
+        purpose: "Coordinate one public hook change from room discussion to reviewed PR.",
+        workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
+        publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
+      },
       authorityBoundary: {
         phase: "first_public_hook_build",
         socialSourceOfTruth: "6529 wave",
@@ -43,6 +49,7 @@ describe("command wave state snapshot", () => {
       },
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
+    expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
     expect(snapshot.authorityBoundary.agentLimits.join(" ")).toContain("Reviewer checks are evidence");
   });

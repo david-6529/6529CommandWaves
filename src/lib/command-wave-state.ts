@@ -8,6 +8,7 @@ export type CommandWaveStateSnapshot = {
   generatedAt: string;
   wave: CommandWave;
   waveStateHash: string;
+  productContract: PhaseOneProductContract;
   authorityBoundary: {
     phase: "first_public_hook_build";
     socialSourceOfTruth: "6529 wave";
@@ -24,6 +25,26 @@ export type CommandWaveStateSnapshot = {
     envVar: "COMMAND_WAVE_STATE_URL";
     expectedPayload: "command-wave-state-v0.1 snapshot";
   };
+};
+
+export type PhaseOneProductContract = {
+  name: "Decentralized Coding";
+  purpose: string;
+  workflow: string[];
+  publicSurfaces: string[];
+  firstPhaseLimits: string[];
+};
+
+export const phaseOneProductContract: PhaseOneProductContract = {
+  name: "Decentralized Coding",
+  purpose: "Coordinate one public hook change from room discussion to reviewed PR.",
+  workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
+  publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
+  firstPhaseLimits: [
+    "Start with one 6529 hook project.",
+    "No auto merges, deploys, payments, or live REP or TDH authority in this app.",
+    "Contribution reports are evidence for humans, not authority.",
+  ],
 };
 
 export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBoundary"] = {
@@ -56,6 +77,7 @@ export function createCommandWaveStateSnapshot(
     generatedAt,
     wave,
     waveStateHash: hashValue(wave),
+    productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
     reports: {
       contribution: createContributionReport(wave, { generatedAt }),

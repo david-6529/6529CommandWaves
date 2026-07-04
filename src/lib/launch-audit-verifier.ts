@@ -70,12 +70,32 @@ function authorityBoundaryReady(value: unknown) {
   );
 }
 
+function productContractReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+
+  return Boolean(
+    record &&
+      asString(record.name) === "Decentralized Coding" &&
+      asString(record.purpose) === "Coordinate one public hook change from room discussion to reviewed PR." &&
+      stringArrayIncludes(record.workflow, "Choose project") &&
+      stringArrayIncludes(record.workflow, "Discuss work") &&
+      stringArrayIncludes(record.workflow, "Record decision") &&
+      stringArrayIncludes(record.workflow, "Build PR") &&
+      stringArrayIncludes(record.workflow, "Review") &&
+      stringArrayIncludes(record.workflow, "Log result") &&
+      stringArrayIncludes(record.publicSurfaces, "6529 wave discussion") &&
+      stringArrayIncludes(record.publicSurfaces, "GitHub PR record") &&
+      stringArrayIncludes(record.publicSurfaces, "Command Waves audit log"),
+  );
+}
+
 export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificationResult {
   const snapshot = unwrapSnapshot(payload);
   const launchAudit = isRecord(snapshot?.launchAudit) ? snapshot.launchAudit : null;
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
   const setupCheckMode = asString(snapshot?.setupCheckMode);
+  const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
   const blockers = collectItemSummaries(launchAudit?.blockers);
@@ -99,6 +119,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       setupCheckMode === "remote"
         ? "Remote wave and repo setup checks ran."
         : "Launch audit must be generated with remote setup checks.",
+    ),
+    check(
+      "product_contract",
+      hasProductContract ? "pass" : "fail",
+      hasProductContract
+        ? "Phase 1 product contract is published."
+        : "Launch audit must publish the simple project, discussion, decision, PR, review, and log flow.",
     ),
     check(
       "authority_boundary",

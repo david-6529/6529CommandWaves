@@ -62,6 +62,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
+      status: "pass",
+    });
     expect(result.nextAction?.title).toBe("Start the first public loop");
   });
 
@@ -114,6 +117,25 @@ describe("launch audit verifier", () => {
       status: "fail",
       message:
         "Launch audit must publish who controls merges, deploys, payments, governance changes, and blocked app actions.",
+    });
+  });
+
+  it("fails when the product contract is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      productContract: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish the simple project, discussion, decision, PR, review, and log flow.",
     });
   });
 
