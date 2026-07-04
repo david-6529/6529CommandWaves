@@ -95,7 +95,8 @@ const proposalRules: Array<{
   {
     label: "upgradeability",
     risk: "critical",
-    pattern: /\b(upgradeable|upgradeability|proxy|uups|transparentupgradeableproxy|delegatecall|initializer|implementation slot|diamond)\b/i,
+    pattern:
+      /\b(upgradeable|upgradeability|proxy|uups|transparentupgradeableproxy|beaconproxy|upgradeablebeacon|proxyadmin|clones?\.clone|minimal proxy|delegatecall|functiondelegatecall|initializer|implementation slot|diamond)\b/i,
     value: "upgradeability pattern",
     reason: "The first hook phase defaults to immutable contracts unless an exception is explicitly approved.",
     defaultBlocked: true,

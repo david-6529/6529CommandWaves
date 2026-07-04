@@ -45,6 +45,26 @@ describe("hook diff policy", () => {
     );
   });
 
+  it("detects common proxy and upgrade-control patch patterns", () => {
+    const signals = findHookPatchSignals([
+      {
+        path: "contracts/HookFactory.sol",
+        patch: [
+          "@@",
+          "+import {BeaconProxy} from \"openzeppelin/proxy/beacon/BeaconProxy.sol\";",
+          "+import {ProxyAdmin} from \"openzeppelin/proxy/transparent/ProxyAdmin.sol\";",
+          "+import {UpgradeableBeacon} from \"openzeppelin/proxy/beacon/UpgradeableBeacon.sol\";",
+          "+import {Clones} from \"openzeppelin/proxy/Clones.sol\";",
+          "+address clone = Clones.clone(implementation);",
+          "+Address.functionDelegateCall(target, data);",
+        ].join("\n"),
+      },
+    ]);
+
+    expect(signals).toContainEqual(expect.objectContaining({ label: "upgradeability_pattern", risk: "critical" }));
+    expect(signals).toContainEqual(expect.objectContaining({ label: "delegatecall", risk: "critical" }));
+  });
+
   it("keeps delegatecall and destructive opcodes blocked by default", () => {
     const signals = findHookPatchSignals([
       {

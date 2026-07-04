@@ -26,7 +26,7 @@ import {
 import { evaluateHookParameterPolicy, type HookParameterPolicyCheck } from "../safety/hook-parameter-policy";
 import { toolPolicyForProposal, type ToolPermission } from "../safety/tool-policy";
 
-export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.4" as const;
+export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.5" as const;
 
 export type CommandPrManifest = {
   version: "command-wave-pr-v0.1";

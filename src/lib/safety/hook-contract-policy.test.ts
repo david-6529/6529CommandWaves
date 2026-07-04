@@ -61,4 +61,15 @@ describe("hook contract policy", () => {
       }),
     ).toBe(true);
   });
+
+  it("detects common proxy and upgrade-control proposal language", () => {
+    const signals = findHookContractSignals({
+      proposalText:
+        "Use BeaconProxy with ProxyAdmin, UpgradeableBeacon, Clones.clone, minimal proxy behavior, and functionDelegateCall.",
+    });
+
+    expect(signals).toContainEqual(
+      expect.objectContaining({ label: "upgradeability", risk: "critical", defaultBlocked: true }),
+    );
+  });
 });

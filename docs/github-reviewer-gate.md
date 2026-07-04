@@ -107,7 +107,8 @@ checks:
 - deployment scripts, broadcast output, and chain config: high risk
 - hook parameter, fee, bound, limit, and config changes: high risk
 - governance, owner, role, timelock, Safe, threshold, quorum, and TDH control changes: critical risk
-- proxy, UUPS, diamond, initializer, delegatecall, and upgradeability patterns: critical risk and blocked by default
+- proxy, UUPS, beacon proxy, ProxyAdmin, clone proxy, diamond, initializer, delegatecall, and upgradeability patterns:
+  critical risk and blocked by default
 - added Solidity patch content is scanned for upgradeability, delegatecall, deployment, governance, and parameter writes when GitHub provides file patches
 
 The first phase defaults to immutable contracts. Upgradeability requires the approved command text to include an explicit

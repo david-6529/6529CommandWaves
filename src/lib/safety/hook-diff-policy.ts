@@ -33,14 +33,14 @@ const patchRules: Array<{
     label: "upgradeability_pattern",
     risk: "critical",
     pattern:
-      /\b(UUPSUpgradeable|TransparentUpgradeableProxy|ERC1967|Initializable|initializer|reinitializer|upgradeTo(?:AndCall)?|_authorizeUpgrade|proxiableUUID)\b/i,
+      /\b(UUPSUpgradeable|TransparentUpgradeableProxy|BeaconProxy|UpgradeableBeacon|ProxyAdmin|ERC1967|Initializable|initializer|reinitializer|upgradeTo(?:AndCall)?|_authorizeUpgrade|proxiableUUID|Clones\.clone(?:Deterministic)?|minimal proxy|implementation slot)\b/i,
     reason: "Added Solidity code contains an upgradeability pattern.",
     defaultBlocked: true,
   },
   {
     label: "delegatecall",
     risk: "critical",
-    pattern: /\bdelegatecall\s*\(/i,
+    pattern: /\b(?:delegatecall|functionDelegateCall)\s*\(/i,
     reason: "Added Solidity code contains delegatecall.",
     defaultBlocked: true,
   },

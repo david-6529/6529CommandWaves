@@ -39,7 +39,7 @@ describe("setup proof", () => {
       governance: {
         rulesVersion: demoWave.rules.version,
         manifestSchemaVersion: "command-wave-pr-v0.1",
-        reviewerGateVersion: "command-wave-reviewer-gate-v0.4",
+        reviewerGateVersion: "command-wave-reviewer-gate-v0.5",
       },
     });
     expect(proof.setupHash).toHaveLength(64);
