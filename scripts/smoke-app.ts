@@ -58,10 +58,20 @@ async function main() {
 
   assertIncludes("Home page", html, commandWaveProductCopy.headline);
   assertIncludes("Home page", html, commandWaveProductCopy.subhead);
+  assertIncludes("Home page", html, commandWaveProductCopy.projectContext);
   for (const flowStep of commandWaveProductCopy.simpleFlow.split(", ")) {
     assertIncludes("Home page", html, flowStep);
   }
-  for (const label of ["Current task", "Next", "Chat", "Suggest work", "Hooks", "History", "Members", "Maintainer tools"]) {
+  for (const label of [
+    "Project",
+    "Upcoming and discussed",
+    "Decision",
+    "Chat",
+    "Builder profiles",
+    "Project rules",
+    "Suggest work",
+    "Maintainer tools",
+  ]) {
     assertIncludes("Home page", html, label);
   }
   assertNoEmDash("Home page", html);

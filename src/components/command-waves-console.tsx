@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timeline";
-import { createHookProgress, type HookProgressStatus } from "@/lib/hook-progress";
 import { createBuilderRoster } from "@/lib/builder-roster";
 import { createBuilderWaveChatDraft } from "@/lib/builder-wave-chat-draft";
 import { createBuilderWaveDecisionDraft } from "@/lib/builder-wave-decision-draft";
@@ -144,8 +143,6 @@ const buildRoomRules = [
   "Important changes need a visible decision before a PR is built.",
   "The reviewer agent checks the PR before humans merge.",
 ];
-const roomRuleSummary =
-  "Talk first. Important code waits for approval. Humans review and merge.";
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
@@ -558,7 +555,7 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
 }
 
-function progressStatusClass(status: BuildTimelineStatus | HookProgressStatus) {
+function progressStatusClass(status: BuildTimelineStatus) {
   if (status === "done") {
     return statusClass("complete");
   }
@@ -1112,6 +1109,8 @@ export function CommandWavesConsole() {
       }),
     [prompt, proposer, title, wave],
   );
+  const visibleWorkFeedItems = roomFeed.slice(0, 3);
+  const visibleBuilderProfiles = builderRoster.slice(0, 4);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -1229,7 +1228,6 @@ export function CommandWavesConsole() {
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
-  const roomStatusItems = useMemo(() => createHookProgress(wave, title), [title, wave]);
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
@@ -1950,18 +1948,42 @@ export function CommandWavesConsole() {
       <div className="mx-auto flex max-w-4xl flex-col gap-3 px-4 py-6 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-900 pb-5">
           <div className="flex flex-col gap-4">
-            <div className="max-w-3xl">
-              <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
-                {commandWaveProductCopy.headline}
-              </h1>
-              <p className="mt-2 max-w-2xl text-lg leading-7 text-zinc-300">{commandWaveProductCopy.subhead}</p>
-              <div className="mt-4 flex flex-wrap gap-2" aria-label="Build flow">
-                {commandWaveProductCopy.simpleFlow.split(", ").map((item) => (
-                  <span key={item} className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm font-semibold text-zinc-300">
-                    {item}
-                  </span>
-                ))}
+            <div className="grid gap-5 lg:grid-cols-[1fr_18rem] lg:items-end">
+              <div className="max-w-3xl">
+                <h1 className="text-3xl font-semibold tracking-normal text-zinc-50 sm:text-4xl">
+                  {commandWaveProductCopy.headline}
+                </h1>
+                <p className="mt-2 max-w-2xl text-lg leading-7 text-zinc-300">{commandWaveProductCopy.subhead}</p>
+                <p className="mt-3 max-w-2xl text-base leading-7 text-zinc-500">{commandWaveProductCopy.projectContext}</p>
               </div>
+
+              <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-3">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project</p>
+                <p className="mt-1 text-xl font-semibold text-zinc-50">{primaryHookProject?.name ?? wave.name}</p>
+                <p className="mt-1 text-sm leading-6 text-zinc-500">{primaryHookProject?.currentFocus ?? currentFocusTitle}</p>
+              </div>
+            </div>
+
+            <dl className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["Room", primaryHookProject?.waveLabel ?? "No room"],
+                ["Repo", primaryHookProject?.repoLabel ?? "No repo"],
+                ["Access", participationAccess.label],
+                ["Review", primaryHookProject?.reviewStatusLabel ?? "not reviewed"],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-md border border-zinc-800 bg-black p-3">
+                  <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</dt>
+                  <dd className="mt-1 break-words text-sm font-semibold text-zinc-100">{value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="flex flex-wrap gap-2" aria-label="Build flow">
+              {commandWaveProductCopy.simpleFlow.split(", ").map((item) => (
+                <span key={item} className="rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm font-semibold text-zinc-300">
+                  {item}
+                </span>
+              ))}
             </div>
 
             <nav className="flex flex-wrap gap-2" aria-label="Room actions">
@@ -1981,18 +2003,50 @@ export function CommandWavesConsole() {
         <section id="workspace" className="grid items-start gap-4 lg:grid-cols-[0.95fr_1.05fr]">
           <section id="current-build" className="order-1 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 lg:order-1">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current task</p>
-                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">{currentFocusTitle}</h2>
-                <p className="mt-2 line-clamp-2 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Work</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Upcoming and discussed</h2>
               </div>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
 
+            <div className="mt-4 border-t border-zinc-800 pt-4">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current focus</p>
+              <h3 className="mt-1 text-xl font-semibold text-zinc-50">{currentFocusTitle}</h3>
+              <p className="mt-2 line-clamp-3 text-base leading-7 text-zinc-400">{currentFocusDescription}</p>
+            </div>
+
             <div className="mt-4 rounded-md border border-zinc-800 bg-black p-3">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
-              <p className="mt-1 text-lg font-semibold text-zinc-50">{roomNeedLabel}</p>
-              <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{roomNeedDetail}</p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
+                <Badge className={activePollNeedsWaveDecision || activePollCanVote ? riskClass("medium") : statusClass("complete")}>
+                  {roomNeedLabel}
+                </Badge>
+              </div>
+              <p className="mt-2 text-base leading-7 text-zinc-300">{roomNeedDetail}</p>
+            </div>
+
+            <div className="mt-4 grid gap-3">
+              {visibleWorkFeedItems.map((item) => (
+                <div key={item.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{item.status}</Badge>
+                  </div>
+                  <p className="mt-1 text-base font-semibold leading-6 text-zinc-100">{humanizeLegacyCommandCopy(item.title)}</p>
+                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
+                  {item.href ? (
+                    <a
+                      className="mt-2 inline-flex text-sm font-semibold text-cyan-300 hover:text-cyan-200"
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {item.hrefLabel ?? "Open"}
+                    </a>
+                  ) : null}
+                </div>
+              ))}
             </div>
 
             <div className="mt-4 border-t border-zinc-800 pt-4">
@@ -2094,38 +2148,6 @@ export function CommandWavesConsole() {
                 </div>
               )}
             </div>
-
-            <details className="mt-4 border-t border-zinc-800 pt-3">
-              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-400">
-                <span>Rules</span>
-                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{participationAccess.label}</Badge>
-              </summary>
-              <div className="mt-3 grid gap-3">
-                <p className="text-sm leading-6 text-zinc-400">{currentFocusDescription}</p>
-                <dl className="grid gap-2 sm:grid-cols-4">
-                  {roomStatusItems.map((item) => (
-                    <div key={item.id} className="border-t border-zinc-800 pt-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <dt className="text-sm font-semibold text-zinc-300">{item.label}</dt>
-                        <Badge className={progressStatusClass(item.status)}>{item.status}</Badge>
-                      </div>
-                    </div>
-                  ))}
-                </dl>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="border-t border-zinc-800 pt-2">
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">
-                      {participationGateNotes[0] ?? "Participation gate is not set yet."}
-                    </p>
-                  </div>
-                  <div className="border-t border-zinc-800 pt-2">
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rule</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-400">{roomRuleSummary}</p>
-                  </div>
-                </div>
-              </div>
-            </details>
           </section>
 
           <section id="wave-room" className="order-2 scroll-mt-4 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4 lg:order-2">
@@ -2276,6 +2298,85 @@ export function CommandWavesConsole() {
           </section>
         </section>
 
+        <section id="members-and-rules" className="grid gap-4 border-t border-zinc-900 pt-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <section className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Builder profiles</h2>
+              </div>
+              <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{builderRoster.length}</Badge>
+            </div>
+            <div className="mt-4 grid gap-3">
+              {visibleBuilderProfiles.length ? (
+                visibleBuilderProfiles.map((member) => (
+                  <div key={member.identity} className="rounded-md border border-zinc-800 bg-black p-3">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-lg font-semibold text-zinc-50">{member.identity}</h3>
+                          <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-zinc-400">{member.detail}</p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-500">{member.activity}</p>
+                      </div>
+                      <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
+                        Message
+                      </Button>
+                      <LinkButton href={memberProfileUrl(member.identity)}>6529 profile</LinkButton>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-zinc-500">{member.authorityNote}. Scores do not grant permissions.</p>
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-md border border-zinc-800 bg-black p-3">
+                  <p className="text-base font-semibold text-zinc-100">No visible members yet</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">Builders appear here after room posts, proposals, votes, or reviews.</p>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
+              <h2 className="mt-1 text-2xl font-semibold text-zinc-50">Project rules</h2>
+            </div>
+            <div className="mt-4 grid gap-3">
+              <div className="rounded-md border border-zinc-800 bg-black p-3">
+                <p className="text-sm font-semibold text-zinc-100">How work moves</p>
+                <ol className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+                  {buildRoomRules.map((rule, index) => (
+                    <li key={rule} className="grid grid-cols-[1.5rem_1fr] gap-2">
+                      <span className="font-semibold text-cyan-300">{index + 1}</span>
+                      <span>{rule}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <div className="rounded-md border border-zinc-800 bg-black p-3">
+                <p className="text-sm font-semibold text-zinc-100">Who can play</p>
+                <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+                  {participationGateNotes.slice(0, 3).map((gate) => (
+                    <li key={gate}>- {gate}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-md border border-zinc-800 bg-black p-3">
+                <p className="text-sm font-semibold text-zinc-100">Guardrails</p>
+                <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
+                  {hookGuardrails.slice(0, 4).map((guardrail) => (
+                    <li key={guardrail}>- {guardrail}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+        </section>
+
         <details
           id="start-building"
           ref={suggestRef}
@@ -2404,7 +2505,7 @@ export function CommandWavesConsole() {
           onToggle={(event) => setHookDetailsOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
-            <span>Hooks</span>
+            <span>Project details</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">
               {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
             </Badge>
@@ -2491,7 +2592,7 @@ export function CommandWavesConsole() {
           onToggle={(event) => setBuildersOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-300">
-            <span>Members</span>
+            <span>All member activity</span>
             <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">{builderRoster.length}</Badge>
           </summary>
           {selectedMember ? (
