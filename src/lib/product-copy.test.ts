@@ -3,8 +3,8 @@ import { commandWaveProductCopy } from "./product-copy";
 
 describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
-    expect(commandWaveProductCopy.headline).toBe("Build the 6529 hook together");
-    expect(commandWaveProductCopy.subhead).toBe("Coordinate one small hook change from room discussion to reviewed PR.");
+    expect(commandWaveProductCopy.headline).toBe("Decentralized Coding");
+    expect(commandWaveProductCopy.subhead).toBe("A new form of swarm development for the age of AI");
     expect(commandWaveProductCopy.positioning).toBe("One change at a time.");
     expect(commandWaveProductCopy.simpleFlow).toBe("Discuss, Decide, PR, Review");
   });
@@ -23,12 +23,10 @@ describe("Command Waves product copy", () => {
     expect(firstScreenCopy.toLowerCase()).not.toContain("live rep");
   });
 
-  it("keeps the first hook ahead of the later reusable protocol", () => {
-    expect(commandWaveProductCopy.headline).toBe("Build the 6529 hook together");
-    expect(commandWaveProductCopy.headline.toLowerCase()).toContain("6529 hook");
-    expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("discussion");
-    expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("pr");
-    expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("review");
+  it("keeps the product framing broad without marketplace claims", () => {
+    expect(commandWaveProductCopy.headline).toBe("Decentralized Coding");
+    expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("swarm development");
+    expect(commandWaveProductCopy.subhead.toLowerCase()).toContain("ai");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("marketplace");
     expect(commandWaveProductCopy.positioning.toLowerCase()).not.toContain("swarm platform");
   });

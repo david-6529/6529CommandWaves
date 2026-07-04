@@ -7,7 +7,9 @@ describe("6529 discussion join draft", () => {
 
     expect(draft).toContain("I would like to help with this hook.");
     expect(draft).toContain("Handle: david.");
+    expect(draft).toContain("access is reviewed manually");
     expect(draft).toContain("discussion, review, tests, or a small PR");
+    expect(draft).toContain("visible 6529 decision before PR work starts");
     expect(draft).toContain("What should I take next?");
     expect(draft).not.toContain("\u2014");
   });
