@@ -13,12 +13,24 @@ describe("command wave state snapshot", () => {
       version: "command-wave-state-v0.1",
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: demoWave,
+      reports: {
+        contribution: {
+          mode: "informational",
+          method: {
+            id: "visible_activity_v0",
+            label: "Visible activity report",
+            authority: "Informational only",
+          },
+          generatedAt: "2026-06-21T12:00:00.000Z",
+        },
+      },
       guardian: {
         envVar: "COMMAND_WAVE_STATE_URL",
         expectedPayload: "command-wave-state-v0.1 snapshot",
       },
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
+    expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
   });
 
   it("builds the public state URL from env", () => {

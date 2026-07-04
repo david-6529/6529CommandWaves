@@ -231,7 +231,7 @@ export function createContributionReport(
   }
 
   for (const event of wave.ledger) {
-    if (["Setup", "Rule Engine", "AI Worker", "Agent", "Reviewer", "Wave Poll"].includes(event.actor)) {
+    if (["Setup", "Rule Engine", "AI Worker", "Agent", "Reviewer", "Wave Poll", "Decision"].includes(event.actor)) {
       continue;
     }
 

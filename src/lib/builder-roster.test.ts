@@ -22,6 +22,7 @@ describe("builder roster", () => {
       ]),
     });
     expect(roster.some((member) => member.identity === "gpebbles" && member.role === "Voter")).toBe(true);
+    expect(roster.some((member) => member.identity === "Decision")).toBe(false);
   });
 
   it("keeps member activity separate from permissions", () => {

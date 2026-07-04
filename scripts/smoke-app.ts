@@ -105,6 +105,8 @@ async function main() {
   const statePayload = await fetchJson("/api/command-wave/state");
 
   assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
+  assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
+  assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
   assertNoEmDash("State response", JSON.stringify(statePayload));
 
   const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");

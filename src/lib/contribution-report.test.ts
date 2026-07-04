@@ -49,6 +49,7 @@ describe("contribution report", () => {
     });
     expect(report.contributors[0].rationale).toContain("Recorded 6529 decision receipt");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
+    expect(report.contributors.some((contributor) => contributor.identity === "Decision")).toBe(false);
   });
 
   it("defaults generatedAt to the newest ledger event", () => {

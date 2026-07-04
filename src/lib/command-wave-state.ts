@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { hasProductionValue } from "./env-placeholders";
 import { hashValue } from "./run-manifest";
 
@@ -7,6 +8,9 @@ export type CommandWaveStateSnapshot = {
   generatedAt: string;
   wave: CommandWave;
   waveStateHash: string;
+  reports: {
+    contribution: ContributionReport;
+  };
   guardian: {
     envVar: "COMMAND_WAVE_STATE_URL";
     expectedPayload: "command-wave-state-v0.1 snapshot";
@@ -17,11 +21,16 @@ export function createCommandWaveStateSnapshot(
   wave: CommandWave,
   options: { generatedAt?: string } = {},
 ): CommandWaveStateSnapshot {
+  const generatedAt = options.generatedAt ?? new Date().toISOString();
+
   return {
     version: "command-wave-state-v0.1",
-    generatedAt: options.generatedAt ?? new Date().toISOString(),
+    generatedAt,
     wave,
     waveStateHash: hashValue(wave),
+    reports: {
+      contribution: createContributionReport(wave, { generatedAt }),
+    },
     guardian: {
       envVar: "COMMAND_WAVE_STATE_URL",
       expectedPayload: "command-wave-state-v0.1 snapshot",
