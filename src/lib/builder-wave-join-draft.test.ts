@@ -7,6 +7,7 @@ describe("6529 discussion join draft", () => {
 
     expect(draft).toContain("I would like to help with this hook.");
     expect(draft).toContain("Handle: david.");
+    expect(draft).toContain("Access notes: Manual builder review for phase 1; REP or TDH gates are planned, not enforced here.");
     expect(draft).toContain("access is reviewed manually");
     expect(draft).toContain("discussion, review, tests, or a small PR");
     expect(draft).toContain("visible 6529 decision before PR work starts");
@@ -18,6 +19,14 @@ describe("6529 discussion join draft", () => {
     const draft = createBuilderWaveJoinDraft("");
 
     expect(draft).toContain("Handle: not set yet.");
+    expect(draft).not.toContain("\u2014");
+  });
+
+  it("normalizes custom holder access notes as manual notes", () => {
+    const draft = createBuilderWaveJoinDraft("sam", ["REP 10000", "Answer hook cap question"]);
+
+    expect(draft).toContain("REP 10000 (manual note only, not enforced by this app)");
+    expect(draft).toContain("Answer hook cap question");
     expect(draft).not.toContain("\u2014");
   });
 });

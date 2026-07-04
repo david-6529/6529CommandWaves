@@ -15,9 +15,11 @@ function clean(value: string, fallback: string) {
 export function createBuilderWaveQuickPosts({
   handle,
   title,
+  gates,
 }: {
   handle: string;
   title: string;
+  gates?: unknown;
 }): BuilderWaveQuickPost[] {
   const changeTitle = clean(title, "the next hook change");
 
@@ -25,7 +27,7 @@ export function createBuilderWaveQuickPosts({
     {
       id: "join",
       label: "Join",
-      message: createBuilderWaveJoinDraft(handle),
+      message: createBuilderWaveJoinDraft(handle, gates),
     },
     {
       id: "question",

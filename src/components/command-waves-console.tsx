@@ -1176,8 +1176,8 @@ export function CommandWavesConsole() {
   const hasRoomMessage = Boolean(waveRoomMessage.trim());
   const canPostRoomMessage = Boolean(hasRoomMessage && roomPostTargetUrl);
   const builderWaveQuickPosts = useMemo(
-    () => createBuilderWaveQuickPosts({ handle: proposer, title: currentFocusTitle }),
-    [currentFocusTitle, proposer],
+    () => createBuilderWaveQuickPosts({ handle: proposer, title: currentFocusTitle, gates: wave.gates }),
+    [currentFocusTitle, proposer, wave.gates],
   );
   const builderWaveProposalDraft = useMemo(
     () =>
@@ -1744,7 +1744,7 @@ export function CommandWavesConsole() {
   }
 
   function prepareJoinRequest() {
-    setWaveRoomMessage(createBuilderWaveJoinDraft(proposer));
+    setWaveRoomMessage(createBuilderWaveJoinDraft(proposer, wave.gates));
     setWaveRoomNotice("Join message ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });

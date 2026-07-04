@@ -6,10 +6,12 @@ describe("builder wave quick posts", () => {
     const posts = createBuilderWaveQuickPosts({
       handle: " david ",
       title: " Add fee cap tests ",
+      gates: ["Manual review", "REP 10000"],
     });
 
     expect(posts.map((post) => post.label)).toEqual(["Join", "Ask", "Idea", "Review"]);
     expect(posts[0].message).toContain("Handle: david.");
+    expect(posts[0].message).toContain("Access notes: Manual review; REP 10000 (manual note only");
     expect(posts[1].message).toContain("What needs a decision before anyone opens a PR for Add fee cap tests");
     expect(posts[2].message).toContain("Idea for the room");
     expect(posts[3].message).toContain("review the next PR for Add fee cap tests");
