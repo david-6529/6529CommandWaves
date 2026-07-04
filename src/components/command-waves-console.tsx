@@ -151,9 +151,17 @@ const buildRoomRules = [
 ];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
-  ["ADMIN_API_KEY", "Protects setup, proposal, vote, run, review, and reset actions."],
-  ["6529_MOCK_MODE=false", "Uses live 6529 reads instead of local mock data."],
+  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public 6529 hook room."],
+  ["COMMAND_WAVE_INITIAL_REPO_URL", "Reachable GitHub hook repo."],
+  ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
+  ["DATABASE_URL", "Production Postgres connection."],
+  ["ADMIN_API_KEY", "Protects setup and mutation routes."],
+  ["6529_MOCK_MODE=false", "Use live 6529 reads."],
+  ["COMMAND_WAVE_REPO_ADAPTER=github", "Open draft PR records through GitHub."],
+  ["COMMAND_WAVE_GITHUB_TOKEN", "GitHub token with repo access."],
   ["COMMAND_WAVE_STATE_URL", "Gives guardian PR checks the public room state."],
+  ["COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK", "Name of the required guardian status check."],
+  ["GitHub required check", "Make the guardian check required in branch protection or rulesets."],
 ];
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",

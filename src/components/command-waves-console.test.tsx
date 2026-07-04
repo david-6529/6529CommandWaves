@@ -61,4 +61,21 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain("advanced-dark-surface");
     expect(html).toContain("bg-zinc-950");
   });
+
+  it("shows the full public launch setup checklist in maintainer tools", () => {
+    const text = renderedConsoleText();
+
+    expect(text).toContain("Public launch setup");
+    expect(text).toContain("COMMAND_WAVE_INITIAL_WAVE_URL");
+    expect(text).toContain("COMMAND_WAVE_INITIAL_REPO_URL");
+    expect(text).toContain("COMMAND_WAVE_STORE=postgres");
+    expect(text).toContain("DATABASE_URL");
+    expect(text).toContain("ADMIN_API_KEY");
+    expect(text).toContain("6529_MOCK_MODE=false");
+    expect(text).toContain("COMMAND_WAVE_REPO_ADAPTER=github");
+    expect(text).toContain("COMMAND_WAVE_GITHUB_TOKEN");
+    expect(text).toContain("COMMAND_WAVE_STATE_URL");
+    expect(text).toContain("COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK");
+    expect(text).toContain("GitHub required check");
+  });
 });
