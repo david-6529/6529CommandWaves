@@ -78,13 +78,14 @@ COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-room
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
+COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK="Command Waves Guardian"
 COMMAND_WAVE_REPO_ADAPTER=github
 COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
 1. Pick the builder room and GitHub repo.
 2. Open Maintainer tools, run Launch readiness, and use the launch check to expose setup blockers.
-3. Confirm the hook repo has `CONTRIBUTING.md` and a PR template with Command Waves manifest markers.
+3. Confirm the hook repo has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, and the required guardian check.
 4. Copy the room launch brief from setup.
 5. Post the brief with the room, repo link, participation notes, and hook scope.
 6. Copy the participation guide and share it where new contributors will see it.
@@ -95,17 +96,18 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 11. Copy the Codex work packet and use it in a prepared branch.
 12. Run the agent only inside that approved packet.
 13. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
-14. Open a draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
-15. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-16. Humans merge only after review passes.
-17. Use the contribution report and fee plan as evidence for any separate payout vote.
-18. Review the room update draft and share it manually in the builder room.
-19. Keep the launch packet with the PR so later contributors can audit the loop.
-20. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
+14. Make `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` required in GitHub branch protection or rulesets.
+15. Open a draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
+16. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+17. Humans merge only after review passes.
+18. Use the contribution report and fee plan as evidence for any separate payout vote.
+19. Review the room update draft and share it manually in the builder room.
+20. Keep the launch packet with the PR so later contributors can audit the loop.
+21. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
 
 The launch check focuses on the first public loop. A ready launch audit now requires the deployed app URL, first hook room
-and repo seed, admin key, durable storage, live 6529 mode, GitHub PR adapter, and guardian wave-state URL. Failed checks
-block broad participation.
+and repo seed, admin key, durable storage, live 6529 mode, GitHub PR adapter, guardian wave-state URL, and required
+guardian check. Failed checks block broad participation.
 
 ## Success Criteria
 
