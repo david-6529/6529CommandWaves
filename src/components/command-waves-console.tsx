@@ -1111,6 +1111,10 @@ export function CommandWavesConsole() {
   );
   const visibleWorkFeedItems = roomFeed.slice(0, 3);
   const visibleBuilderProfiles = builderRoster.slice(0, 4);
+  const visibleRoomSnapshotDrops = primaryProjectContextPreview
+    ? [...primaryProjectContextPreview.sampleDrops].slice(-3).reverse()
+    : [];
+  const visibleRoomSnapshotFallback = roomFeed.slice(0, 2);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -2227,30 +2231,36 @@ export function CommandWavesConsole() {
               </details>
             </div>
 
-            <details className="mt-4 border-t border-zinc-800 pt-3">
-              <summary className="flex cursor-pointer items-center justify-between gap-3 text-sm font-semibold text-zinc-400">
-                <span>Activity</span>
-                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
-                  {hasRecentDiscussionPosts ? "room post" : "local log"}
-                </Badge>
-              </summary>
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm leading-6 text-zinc-500">A short snapshot of what the room is discussing.</p>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isBusy || !primaryHookProject?.waveUrl}
-                  onClick={() =>
-                    void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
-                  }
-                >
-                  {apiBusy === "context" ? "Loading" : "Refresh"}
-                </Button>
+            <section className="mt-4 border-t border-zinc-800 pt-3" aria-label="Room snapshot">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-semibold text-zinc-100">Room snapshot</h3>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">
+                    {hasRecentDiscussionPosts
+                      ? "Latest room posts pulled into this workspace."
+                      : "Local project activity until room posts load."}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+                    {hasRecentDiscussionPosts ? `${visibleRoomSnapshotDrops.length} posts` : "local log"}
+                  </Badge>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isBusy || !primaryHookProject?.waveUrl}
+                    onClick={() =>
+                      void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)
+                    }
+                  >
+                    {apiBusy === "context" ? "Loading" : "Refresh room"}
+                  </Button>
+                </div>
               </div>
-              {hasRecentDiscussionPosts && primaryProjectContextPreview ? (
-                <div className="mt-3 grid gap-3">
-                  {primaryProjectContextPreview.sampleDrops.slice(-1).map((drop) => (
-                    <div key={drop.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
+              {hasRecentDiscussionPosts ? (
+                <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+                  {visibleRoomSnapshotDrops.map((drop) => (
+                    <div key={drop.id} className="py-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold text-zinc-300">{drop.author}</p>
                         {drop.url ? (
@@ -2269,9 +2279,9 @@ export function CommandWavesConsole() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-3 grid gap-3">
-                  {roomFeed.slice(0, 1).map((item) => (
-                    <div key={item.id} className="border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
+                <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
+                  {visibleRoomSnapshotFallback.map((item) => (
+                    <div key={item.id} className="py-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
                         <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{item.status}</Badge>
@@ -2294,7 +2304,7 @@ export function CommandWavesConsole() {
                   ))}
                 </div>
               )}
-            </details>
+            </section>
           </section>
         </section>
 

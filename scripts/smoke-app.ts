@@ -67,6 +67,8 @@ async function main() {
     "Upcoming and discussed",
     "Decision",
     "Chat",
+    "Room snapshot",
+    "Refresh room",
     "Builder profiles",
     "Rules of the game",
     "orchestration agent",
