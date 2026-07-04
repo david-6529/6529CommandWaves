@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
+import { hashValue } from "./run-manifest";
 
 const launchEnv = {
   NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
@@ -37,6 +38,13 @@ describe("first phase launch snapshot", () => {
       humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
     });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
+    expect(snapshot.stateEvidence).toEqual({
+      waveStateHash: hashValue(demoWave),
+      rulesHash: hashValue(demoWave.rules),
+      proposalCount: demoWave.proposals.length,
+      reviewCount: demoWave.reviews.length,
+      ledgerEventCount: demoWave.ledger.length,
+    });
     expect(snapshot.reports.contribution).toMatchObject({
       mode: "informational",
       generatedAt: "2026-06-20T13:00:00.000Z",

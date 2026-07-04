@@ -30,6 +30,10 @@ function asString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function asNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
 function check(id: string, status: LaunchAuditVerificationCheck["status"], message: string): LaunchAuditVerificationCheck {
   return { id, status, message };
 }
@@ -74,6 +78,10 @@ function stringArrayContains(value: unknown, expected: string) {
   return Array.isArray(value) && value.some((item) => typeof item === "string" && item.includes(expected));
 }
 
+function isSha256Hash(value: unknown) {
+  return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
+}
+
 function authorityBoundaryReady(value: unknown) {
   const record = isRecord(value) ? value : null;
 
@@ -89,6 +97,28 @@ function authorityBoundaryReady(value: unknown) {
       stringArrayIncludes(record.appDoesNot, "Auto-merge PRs") &&
       stringArrayIncludes(record.appDoesNot, "Deploy contracts") &&
       stringArrayIncludes(record.appDoesNot, "Move funds"),
+  );
+}
+
+function stateEvidenceReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const proposalCount = asNumber(record?.proposalCount);
+  const reviewCount = asNumber(record?.reviewCount);
+  const ledgerEventCount = asNumber(record?.ledgerEventCount);
+
+  return Boolean(
+    record &&
+      isSha256Hash(record.waveStateHash) &&
+      isSha256Hash(record.rulesHash) &&
+      Number.isInteger(proposalCount) &&
+      Number.isInteger(reviewCount) &&
+      Number.isInteger(ledgerEventCount) &&
+      proposalCount !== null &&
+      proposalCount >= 0 &&
+      reviewCount !== null &&
+      reviewCount >= 0 &&
+      ledgerEventCount !== null &&
+      ledgerEventCount >= 0,
   );
 }
 
@@ -148,6 +178,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
+  const hasStateEvidence = stateEvidenceReady(snapshot?.stateEvidence);
   const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
   const hasContributionReport = contributionReportReady(reports?.contribution);
   const hasDeveloperFeePlan = developerFeePlanReady(reports?.developerFee);
@@ -188,6 +219,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasAuthorityBoundary
         ? "Phase 1 authority boundary is published."
         : "Launch audit must publish who controls merges, deploys, payments, governance changes, and blocked app actions.",
+    ),
+    check(
+      "state_evidence",
+      hasStateEvidence ? "pass" : "fail",
+      hasStateEvidence
+        ? "Launch audit is tied to hashed wave state evidence."
+        : "Launch audit must publish wave state hash, rules hash, and record counts.",
     ),
     check(
       "contribution_report",

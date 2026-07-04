@@ -71,6 +71,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
       status: "pass",
     });
@@ -155,6 +158,46 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish the simple project, discussion, decision, PR, review, and log flow.",
+    });
+  });
+
+  it("fails when state evidence is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      stateEvidence: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish wave state hash, rules hash, and record counts.",
+    });
+  });
+
+  it("fails when state evidence is malformed", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      stateEvidence: {
+        ...snapshot.stateEvidence,
+        waveStateHash: "not-a-hash",
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
+      status: "fail",
     });
   });
 

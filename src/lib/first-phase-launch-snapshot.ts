@@ -10,6 +10,7 @@ import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-p
 import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createPhaseChecklist } from "./phase-checklist";
+import { hashValue } from "./run-manifest";
 import { validateCommandWaveSetup, type SetupValidation } from "./setup-validation";
 import { getReadinessChecks, getReadinessSummary, type ReadinessCheck } from "./system/readiness";
 
@@ -25,6 +26,13 @@ export type FirstPhaseLaunchSnapshot = {
   setupCheckMode: "shape" | "remote";
   productContract: CommandWaveStateSnapshot["productContract"];
   authorityBoundary: CommandWaveStateSnapshot["authorityBoundary"];
+  stateEvidence: {
+    waveStateHash: string;
+    rulesHash: string;
+    proposalCount: number;
+    reviewCount: number;
+    ledgerEventCount: number;
+  };
   verificationTargets: {
     setupProofUrl: string;
     commandWaveStateUrl: string;
@@ -101,6 +109,13 @@ export async function createFirstPhaseLaunchSnapshot(
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
+    stateEvidence: {
+      waveStateHash: hashValue(wave),
+      rulesHash: hashValue(wave.rules),
+      proposalCount: wave.proposals.length,
+      reviewCount: wave.reviews.length,
+      ledgerEventCount: wave.ledger.length,
+    },
     verificationTargets: {
       setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
       commandWaveStateUrl,
