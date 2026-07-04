@@ -25,6 +25,10 @@ function assertNoEmDash(label: string, value: string) {
   assert(!value.includes("\u2014"), `${label} contains an em dash.`);
 }
 
+function assertIncludes(label: string, value: string, expected: string) {
+  assert(value.includes(expected), `${label} did not include ${expected}.`);
+}
+
 async function fetchText(path: string) {
   return fetchTextWithTimeout(appUrl(path), {
     headers: {
@@ -52,8 +56,14 @@ function objectValue(value: JsonObject, key: string) {
 async function main() {
   const html = await fetchText("/");
 
-  assert(html.includes(commandWaveProductCopy.headline), "Home page did not include the product headline.");
-  assert(html.includes(commandWaveProductCopy.subhead), "Home page did not include the product subhead.");
+  assertIncludes("Home page", html, commandWaveProductCopy.headline);
+  assertIncludes("Home page", html, commandWaveProductCopy.subhead);
+  for (const flowStep of commandWaveProductCopy.simpleFlow.split(", ")) {
+    assertIncludes("Home page", html, flowStep);
+  }
+  for (const label of ["Current task", "Next", "Chat", "Suggest work", "Hooks", "History", "Members", "Maintainer tools"]) {
+    assertIncludes("Home page", html, label);
+  }
   assertNoEmDash("Home page", html);
 
   const readiness = await fetchJson("/api/readiness");
@@ -68,6 +78,23 @@ async function main() {
 
   assert(typeof audit === "object" && audit !== null && !Array.isArray(audit), "Launch audit response is missing audit.");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
+
+  const statePayload = await fetchJson("/api/command-wave/state");
+
+  assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
+  assertNoEmDash("State response", JSON.stringify(statePayload));
+
+  const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");
+  const proof = objectValue(setupProofPayload, "proof");
+
+  assert(
+    typeof proof === "object" &&
+      proof !== null &&
+      !Array.isArray(proof) &&
+      objectValue(proof as JsonObject, "version") === "command-wave-setup-v0.1",
+    "Setup proof endpoint returned the wrong version.",
+  );
+  assertNoEmDash("Setup proof response", JSON.stringify(setupProofPayload));
 
   console.log(`App smoke check passed for ${baseUrl}.`);
 }
