@@ -52,6 +52,12 @@ function hasFailures(checks: SetupCheck[]) {
   return checks.some((item) => item.status === "fail");
 }
 
+function unreachableRepoMessage(error: unknown) {
+  const detail = error instanceof Error ? error.message : "Could not read this GitHub repo.";
+
+  return `Pick an existing public GitHub repo or configure token access. ${detail}`;
+}
+
 export function setupValidationNotice(validation: Pick<SetupValidation, "checks">) {
   const failCount = validation.checks.filter((item) => item.status === "fail").length;
   const warnCount = validation.checks.filter((item) => item.status === "warn").length;
@@ -180,7 +186,7 @@ export async function validateCommandWaveSetup(
           "repo_reachable",
           "Repo reachable",
           "fail",
-          error instanceof Error ? error.message : "Could not read this GitHub repo.",
+          unreachableRepoMessage(error),
         ),
       );
     }

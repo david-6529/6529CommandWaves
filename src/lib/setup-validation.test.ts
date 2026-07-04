@@ -151,4 +151,30 @@ describe("setup validation", () => {
       }),
     );
   });
+
+  it("explains unreachable repos as an operator setup action", async () => {
+    const validation = await validateCommandWaveSetup(
+      {
+        waveUrl: "mock-command-wave",
+        repoUrl: "6529-Collections/6529-hook",
+      },
+      {
+        checkRepoRemote: true,
+        githubApi: {
+          apiBaseUrl: "https://api.example.test",
+          fetchImpl: async () => new Response("not found", { status: 404, statusText: "Not Found" }),
+        },
+      },
+    );
+
+    expect(validation.canSave).toBe(false);
+    expect(validation.checks).toContainEqual(
+      expect.objectContaining({
+        id: "repo_reachable",
+        status: "fail",
+        message:
+          "Pick an existing public GitHub repo or configure token access. Could not fetch https://api.example.test/repos/6529-Collections/6529-hook: 404 Not Found",
+      }),
+    );
+  });
 });
