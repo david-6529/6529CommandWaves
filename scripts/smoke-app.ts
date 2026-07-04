@@ -83,6 +83,8 @@ async function main() {
     "Humans still merge and deploy",
     "Hook guardrails",
     "Suggest work",
+    "Start in the room so builders can shape the idea.",
+    "Use GitHub PRs for code changes.",
     "Work type",
     "Safety checks",
     "Copy draft",

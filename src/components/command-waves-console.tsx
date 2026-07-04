@@ -128,6 +128,13 @@ const proposalTypeOptions: ProposalTypeOption[] = [
     limitsPlaceholder: "Name what should stay out of scope.",
   },
 ];
+const proposalFlowSteps = [
+  ["Discuss", "Start in the room so builders can shape the idea."],
+  ["Decide", "Record a visible decision for important hook work."],
+  ["Save", "Save the scoped proposal once the room can see it."],
+  ["Build", "Use GitHub PRs for code changes."],
+  ["Review", "Check the PR against the approved scope and rules."],
+];
 
 const hookGuardrails = [
   "Hook contracts stay immutable by default.",
@@ -2349,6 +2356,16 @@ export function CommandWavesConsole() {
         >
           <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-950">Suggest work</summary>
           <div className="mt-4 max-w-4xl">
+            <div className="grid gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-5">
+              {proposalFlowSteps.map(([label, detail], index) => (
+                <div key={label} className="border-t border-zinc-200 pt-2 first:border-t-0 first:pt-0 sm:border-l sm:border-t-0 sm:pl-3 sm:pt-0 sm:first:border-l-0 sm:first:pl-0">
+                  <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">
+                    {index + 1}. {label}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-700">{detail}</p>
+                </div>
+              ))}
+            </div>
             <div className="mt-4 grid gap-3">
               <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
                 <div>

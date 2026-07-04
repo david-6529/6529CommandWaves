@@ -34,6 +34,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Builders use the room to propose, question, and decide.");
+    expect(text).toContain("Start in the room so builders can shape the idea.");
+    expect(text).toContain("Use GitHub PRs for code changes.");
   });
 
   it("does not bring back removed homepage clutter or old positioning copy", () => {
