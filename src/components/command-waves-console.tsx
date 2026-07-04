@@ -2423,7 +2423,7 @@ export function CommandWavesConsole() {
             <div className="mt-4 grid gap-3">
               <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
                 <div>
-                  <p className="mb-2 text-base font-semibold text-zinc-200">Type</p>
+                  <p className="mb-2 text-base font-semibold text-zinc-200">Work type</p>
                   <div className="flex flex-wrap gap-2">
                     {proposalTypeOptions.map((option) => {
                       const selected = option.kind === kind;
@@ -2446,7 +2446,7 @@ export function CommandWavesConsole() {
                     })}
                   </div>
                 </div>
-                <Field label="Handle">
+                <Field label="Your handle">
                   <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
                 </Field>
               </div>
@@ -2482,10 +2482,10 @@ export function CommandWavesConsole() {
                 disabled={!wave.waveUrl}
                 onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
               >
-                Copy and open
+                Discuss in room
               </Button>
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
-                Copy only
+                Copy draft
               </Button>
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Saving" : "Save proposal"}
@@ -2493,13 +2493,13 @@ export function CommandWavesConsole() {
               <JumpLink href="#wave-room">Chat</JumpLink>
             </div>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
-              Post to the room first. Save it here only after the room can see it.
+              Discuss it in the room first. Save only when the proposal is visible there.
             </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-300">{apiError}</p> : null}
             <details className="mt-4 border-y border-zinc-800 py-3" open={hookProposalPreflightBlocked ? true : undefined}>
               <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-3 text-base font-semibold text-zinc-100">
-                <span>Checks</span>
+                <span>Safety checks</span>
                 <span className="flex flex-wrap gap-2">
                   <Badge className={riskClass(classifiedRisk)}>{classifiedRisk} risk</Badge>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
@@ -2517,13 +2517,13 @@ export function CommandWavesConsole() {
                   <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-100">Hook rules</p>
+                  <p className="text-base font-semibold text-zinc-100">Hook guardrails</p>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
                     {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
                   </Badge>
                 </div>
                 <div className="py-3">
-                  <p className="text-base font-semibold text-zinc-100">Status</p>
+                  <p className="text-base font-semibold text-zinc-100">Result</p>
                   <p className="mt-1 text-base leading-7 text-zinc-400">{simplePreflightMessage}</p>
                 </div>
               </div>
