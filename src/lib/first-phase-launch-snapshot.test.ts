@@ -24,6 +24,13 @@ describe("first phase launch snapshot", () => {
       repoUrl: demoWave.repoUrl,
     });
     expect(snapshot.setupCheckMode).toBe("shape");
+    expect(snapshot.authorityBoundary).toMatchObject({
+      phase: "first_public_hook_build",
+      socialSourceOfTruth: "6529 wave",
+      codeSurface: "GitHub PR",
+      humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
+    });
+    expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
     expect(snapshot.verificationTargets).toEqual({
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",

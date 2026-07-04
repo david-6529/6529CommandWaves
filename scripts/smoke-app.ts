@@ -58,31 +58,31 @@ async function main() {
 
   assertIncludes("Home page", html, commandWaveProductCopy.headline);
   assertIncludes("Home page", html, commandWaveProductCopy.subhead);
-  assertIncludes("Home page", html, commandWaveProductCopy.projectContext);
   for (const flowStep of commandWaveProductCopy.simpleFlow.split(", ")) {
     assertIncludes("Home page", html, flowStep);
   }
   for (const label of [
-    "Project",
-    "Project overview",
-    "Current step",
+    "A public workspace where builders discuss one hook",
+    "Work board",
+    "What is happening now",
+    "Current focus",
+    "Decision needed",
     "Upcoming and discussed",
-    "Decision",
-    "Chat with the swarm",
+    "Talk to the swarm",
     "Room snapshot",
-    "Refresh room",
+    "Latest visible discussion",
     "Latest log",
+    "Who is in the swarm",
+    "How this works",
+    "The orchestration agent labels risk",
+    "Humans still merge and deploy",
+    "Hook guardrails",
+    "Suggest work",
     "Work type",
     "Safety checks",
     "Copy draft",
-    "Builder profiles",
     "Report method",
     "Visible activity report",
-    "Rules of the game",
-    "orchestration agent",
-    "reviewer agent",
-    "humans merge",
-    "Suggest work",
     "Maintainer tools",
   ]) {
     assertIncludes("Home page", html, label);
@@ -100,6 +100,8 @@ async function main() {
   const audit = objectValue(launchPayload, "audit");
 
   assert(typeof audit === "object" && audit !== null && !Array.isArray(audit), "Launch audit response is missing audit.");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "authorityBoundary");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Auto-merge PRs");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
 
   const statePayload = await fetchJson("/api/command-wave/state");

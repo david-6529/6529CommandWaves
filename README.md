@@ -178,7 +178,7 @@ Audit and launch:
 - Launch checklist with setup, readiness, flow checklist, and launch next-action records.
 - Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
 - Public setup proof, command-wave state, and launch audit endpoints.
-- Public command-wave state publishes the phase 1 authority boundary for agents, reviewers, and third-party auditors.
+- Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public command-wave state includes the informational contribution report method and notes.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The local demo separates current work status from launch readiness. Launch readiness still fails until production env,
@@ -396,7 +396,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
-- `GET /api/command-wave/launch/audit`: public first-loop launch audit. Add `?remote=1` to run remote wave and repo setup checks.
+- `GET /api/command-wave/launch/audit`: public first-loop launch audit with authority boundary. Add `?remote=1` to run remote wave and repo setup checks.
 - `GET /api/command-wave`: return the current local command wave.
 - `PUT /api/command-wave`: disabled in phase 1. Use scoped setup, proposal, vote, decision, run, and review routes.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.

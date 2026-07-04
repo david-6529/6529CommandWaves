@@ -57,6 +57,9 @@ describe("launch audit verifier", () => {
       projectName: demoWave.name,
       blockers: [],
     });
+    expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
+      status: "pass",
+    });
     expect(result.nextAction?.title).toBe("Start the first public loop");
   });
 
@@ -90,6 +93,26 @@ describe("launch audit verifier", () => {
     );
     expect(result.openItems.length).toBeGreaterThan(0);
     expect(result.nextAction?.title).toBe("Set ADMIN_API_KEY");
+  });
+
+  it("fails when the authority boundary is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      authorityBoundary: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
+      status: "fail",
+      message:
+        "Launch audit must publish who controls merges, deploys, payments, governance changes, and blocked app actions.",
+    });
   });
 
   it("fails an invalid payload without throwing", () => {

@@ -48,12 +48,35 @@ function collectItemSummaries(value: unknown) {
   return Array.isArray(value) ? value.map(itemSummary) : [];
 }
 
+function stringArrayIncludes(value: unknown, expected: string) {
+  return Array.isArray(value) && value.some((item) => item === expected);
+}
+
+function authorityBoundaryReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+
+  return Boolean(
+    record &&
+      asString(record.phase) === "first_public_hook_build" &&
+      asString(record.socialSourceOfTruth) === "6529 wave" &&
+      asString(record.codeSurface) === "GitHub PR" &&
+      stringArrayIncludes(record.humansControl, "Merges") &&
+      stringArrayIncludes(record.humansControl, "Deploys") &&
+      stringArrayIncludes(record.humansControl, "Payments") &&
+      stringArrayIncludes(record.humansControl, "Governance changes") &&
+      stringArrayIncludes(record.appDoesNot, "Auto-merge PRs") &&
+      stringArrayIncludes(record.appDoesNot, "Deploy contracts") &&
+      stringArrayIncludes(record.appDoesNot, "Move funds"),
+  );
+}
+
 export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificationResult {
   const snapshot = unwrapSnapshot(payload);
   const launchAudit = isRecord(snapshot?.launchAudit) ? snapshot.launchAudit : null;
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
   const setupCheckMode = asString(snapshot?.setupCheckMode);
+  const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
   const blockers = collectItemSummaries(launchAudit?.blockers);
   const openItems = collectItemSummaries(launchAudit?.openItems);
@@ -76,6 +99,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       setupCheckMode === "remote"
         ? "Remote wave and repo setup checks ran."
         : "Launch audit must be generated with remote setup checks.",
+    ),
+    check(
+      "authority_boundary",
+      hasAuthorityBoundary ? "pass" : "fail",
+      hasAuthorityBoundary
+        ? "Phase 1 authority boundary is published."
+        : "Launch audit must publish who controls merges, deploys, payments, governance changes, and blocked app actions.",
     ),
     check(
       "blockers",
