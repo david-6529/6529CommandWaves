@@ -5,9 +5,11 @@ describe("Command Waves product copy", () => {
   it("keeps the primary product message simple and user-facing", () => {
     expect(commandWaveProductCopy.headline).toBe("Decentralized Coding");
     expect(commandWaveProductCopy.subhead).toBe("A new form of swarm development for the age of AI");
-    expect(commandWaveProductCopy.projectContext).toBe("6529 Hook room: one public wave and one GitHub repo.");
+    expect(commandWaveProductCopy.projectContext).toBe(
+      "6529 Hook: one public room, one repo, one reviewed change at a time.",
+    );
     expect(commandWaveProductCopy.positioning).toBe("One change at a time.");
-    expect(commandWaveProductCopy.simpleFlow).toBe("Discuss, Decide, PR, Review");
+    expect(commandWaveProductCopy.simpleFlow).toBe("Project, Discuss, Decide, PR, Review, Log");
   });
 
   it("keeps unsafe authority claims out of the first-screen explanation", () => {
