@@ -71,6 +71,12 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
+      status: "pass",
+    });
+    expect(result.checks.find((item) => item.id === "developer_fee_plan")).toMatchObject({
+      status: "pass",
+    });
     expect(result.nextAction?.title).toBe("Start the first public loop");
     expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });
@@ -149,6 +155,50 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish the simple project, discussion, decision, PR, review, and log flow.",
+    });
+  });
+
+  it("fails when contribution reporting is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      reports: {
+        ...snapshot.reports,
+        contribution: undefined,
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish contribution scoring as informational evidence, not authority.",
+    });
+  });
+
+  it("fails when developer fee boundaries are missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      reports: {
+        ...snapshot.reports,
+        developerFee: undefined,
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "developer_fee_plan")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish manual fee boundaries and block automatic payouts.",
     });
   });
 

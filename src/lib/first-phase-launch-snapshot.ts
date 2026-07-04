@@ -5,6 +5,8 @@ import {
   type CommandWaveStateSnapshot,
 } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
+import { createContributionReport, type ContributionReport } from "./contribution-report";
+import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createPhaseChecklist } from "./phase-checklist";
@@ -29,6 +31,10 @@ export type FirstPhaseLaunchSnapshot = {
     launchAuditUrl: string;
   };
   setupValidation: SetupValidation;
+  reports: {
+    contribution: ContributionReport;
+    developerFee: DeveloperFeePlan;
+  };
   readiness: {
     summary: ReturnType<typeof getReadinessSummary>;
     checks: ReadinessCheck[];
@@ -58,6 +64,7 @@ export async function createFirstPhaseLaunchSnapshot(
   options: FirstPhaseLaunchSnapshotOptions = {},
 ): Promise<FirstPhaseLaunchSnapshot> {
   const env = options.env ?? process.env;
+  const generatedAt = options.generatedAt ?? new Date().toISOString();
   const setupValidation =
     options.setupValidation ??
     (await validateCommandWaveSetup(
@@ -80,10 +87,11 @@ export async function createFirstPhaseLaunchSnapshot(
   });
   const commandWaveStateUrl = commandWaveStateUrlFromEnv(env) ?? appRouteUrl("/api/command-wave/state", env);
   const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
+  const contributionReport = createContributionReport(wave, { generatedAt });
 
   return {
     version: "command-wave-launch-audit-v0.1",
-    generatedAt: options.generatedAt ?? new Date().toISOString(),
+    generatedAt,
     project: {
       id: wave.id,
       name: wave.name,
@@ -99,6 +107,10 @@ export async function createFirstPhaseLaunchSnapshot(
       launchAuditUrl: appRouteUrl(launchAuditPath, env),
     },
     setupValidation,
+    reports: {
+      contribution: contributionReport,
+      developerFee: createDeveloperFeePlan(wave, contributionReport),
+    },
     readiness: {
       summary: getReadinessSummary(readinessChecks),
       checks: readinessChecks,

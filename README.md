@@ -181,6 +181,7 @@ Audit and launch:
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public command-wave state includes the informational contribution report method and notes.
+- Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The local demo separates current work status from launch readiness. Launch readiness still fails until production env,
   durable storage, live 6529 mode, GitHub PR adapter, guardian state, and required checks are configured.

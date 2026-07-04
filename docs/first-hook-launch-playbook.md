@@ -109,6 +109,9 @@ The launch check focuses on the first public loop. A ready launch audit now requ
 and repo seed, admin key, durable storage, live 6529 mode, GitHub PR adapter, guardian wave-state URL, and required
 guardian check. Failed checks block broad participation.
 
+The launch audit also publishes contribution and developer fee records as informational evidence. It does not approve
+payments, choose recipients, grant access, or create merge authority.
+
 ## Success Criteria
 
 - New contributors understand where to propose work.

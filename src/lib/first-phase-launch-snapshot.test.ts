@@ -37,6 +37,20 @@ describe("first phase launch snapshot", () => {
       humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
     });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
+    expect(snapshot.reports.contribution).toMatchObject({
+      mode: "informational",
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      method: {
+        id: "visible_activity_v0",
+        authority: "Informational only",
+      },
+    });
+    expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
+    expect(snapshot.reports.developerFee).toMatchObject({
+      mode: "manual_review",
+    });
+    expect(snapshot.reports.developerFee.requiredDecisions).toContain("Wave approves the fee budget before any payment.");
+    expect(snapshot.reports.developerFee.blockedActions).toContain("No automatic payouts.");
     expect(snapshot.verificationTargets).toEqual({
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",

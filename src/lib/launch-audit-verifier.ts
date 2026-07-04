@@ -70,6 +70,10 @@ function stringArrayIncludes(value: unknown, expected: string) {
   return Array.isArray(value) && value.some((item) => item === expected);
 }
 
+function stringArrayContains(value: unknown, expected: string) {
+  return Array.isArray(value) && value.some((item) => typeof item === "string" && item.includes(expected));
+}
+
 function authorityBoundaryReady(value: unknown) {
   const record = isRecord(value) ? value : null;
 
@@ -85,6 +89,35 @@ function authorityBoundaryReady(value: unknown) {
       stringArrayIncludes(record.appDoesNot, "Auto-merge PRs") &&
       stringArrayIncludes(record.appDoesNot, "Deploy contracts") &&
       stringArrayIncludes(record.appDoesNot, "Move funds"),
+  );
+}
+
+function contributionReportReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const method = isRecord(record?.method) ? record.method : null;
+
+  return Boolean(
+    record &&
+      asString(record.mode) === "informational" &&
+      asString(method?.id) === "visible_activity_v0" &&
+      asString(method?.authority) === "Informational only" &&
+      Array.isArray(record.contributors) &&
+      stringArrayContains(record.scoringRubric, "report points") &&
+      stringArrayContains(record.notes, "not a permission system"),
+  );
+}
+
+function developerFeePlanReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+
+  return Boolean(
+    record &&
+      asString(record.mode) === "manual_review" &&
+      stringArrayIncludes(record.requiredDecisions, "Wave approves the fee budget before any payment.") &&
+      stringArrayIncludes(record.requiredDecisions, "Payments happen outside this app in the first phase.") &&
+      stringArrayIncludes(record.blockedActions, "No automatic payouts.") &&
+      stringArrayIncludes(record.blockedActions, "No wallet keys or treasury controls.") &&
+      stringArrayIncludes(record.blockedActions, "No score-to-payment conversion without a separate vote."),
   );
 }
 
@@ -115,6 +148,9 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
+  const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
+  const hasContributionReport = contributionReportReady(reports?.contribution);
+  const hasDeveloperFeePlan = developerFeePlanReady(reports?.developerFee);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
   const blockers = collectItemSummaries(launchAudit?.blockers);
   const openItemRecords = collectChecklistItems(launchAudit?.openItems);
@@ -152,6 +188,20 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasAuthorityBoundary
         ? "Phase 1 authority boundary is published."
         : "Launch audit must publish who controls merges, deploys, payments, governance changes, and blocked app actions.",
+    ),
+    check(
+      "contribution_report",
+      hasContributionReport ? "pass" : "fail",
+      hasContributionReport
+        ? "Contribution report is published as informational evidence."
+        : "Launch audit must publish contribution scoring as informational evidence, not authority.",
+    ),
+    check(
+      "developer_fee_plan",
+      hasDeveloperFeePlan ? "pass" : "fail",
+      hasDeveloperFeePlan
+        ? "Developer fee plan is manual and requires a separate decision."
+        : "Launch audit must publish manual fee boundaries and block automatic payouts.",
     ),
     check(
       "blockers",
