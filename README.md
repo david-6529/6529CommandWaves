@@ -365,7 +365,7 @@ LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=
 ```
 
 If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
-`$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit`. Set `LAUNCH_AUDIT_REMOTE=1` to verify the remote setup check path.
+`$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit?remote=1`. Set `LAUNCH_AUDIT_REMOTE=0` only for local shape checks.
 
 The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
 `LAUNCH_AUDIT_PATH`.
@@ -376,7 +376,7 @@ Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed
 LOCAL_APP_URL=http://localhost:5001
 SMOKE_BASE_URL=$LOCAL_APP_URL npm run smoke:app
 SETUP_PROOF_URL=$LOCAL_APP_URL/api/command-wave/setup/proof npm run setup:verify
-LAUNCH_AUDIT_URL=$LOCAL_APP_URL/api/command-wave/launch/audit npm run launch:audit
+NEXT_PUBLIC_APP_URL=$LOCAL_APP_URL npm run launch:audit
 ```
 
 The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero until production
