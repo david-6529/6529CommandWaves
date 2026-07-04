@@ -2288,6 +2288,7 @@ export function CommandWavesConsole() {
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="break-words text-lg font-semibold text-zinc-50">{member.identity}</h3>
                           <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{member.role}</Badge>
+                          <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{member.scoreLabel}</Badge>
                         </div>
                         <p className="mt-2 text-sm leading-6 text-zinc-400">{member.detail}</p>
                       </div>

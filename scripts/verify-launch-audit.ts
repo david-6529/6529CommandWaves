@@ -15,19 +15,35 @@ async function readJsonUrl<T>(url: string): Promise<T> {
   });
 }
 
+function normalizeBaseUrl(value: string) {
+  return value.trim().replace(/\/+$/, "");
+}
+
+function launchAuditUrlFromAppUrl() {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  if (!appUrl) {
+    return null;
+  }
+
+  const suffix = process.env.LAUNCH_AUDIT_REMOTE === "1" ? "?remote=1" : "";
+
+  return `${normalizeBaseUrl(appUrl)}/api/command-wave/launch/audit${suffix}`;
+}
+
 async function loadLaunchAuditPayload() {
   const auditPath = process.env.LAUNCH_AUDIT_PATH;
-  const auditUrl = process.env.LAUNCH_AUDIT_URL;
+  const auditUrl = process.env.LAUNCH_AUDIT_URL?.trim() || launchAuditUrlFromAppUrl();
 
   if (auditPath?.trim()) {
     return readJsonFile<unknown>(resolve(auditPath));
   }
 
-  if (auditUrl?.trim()) {
+  if (auditUrl) {
     return readJsonUrl<unknown>(auditUrl);
   }
 
-  throw new Error("LAUNCH_AUDIT_PATH or LAUNCH_AUDIT_URL is required.");
+  throw new Error("Set LAUNCH_AUDIT_PATH, LAUNCH_AUDIT_URL, or NEXT_PUBLIC_APP_URL before running launch audit verification.");
 }
 
 function writeResult(path: string | undefined, value: unknown) {

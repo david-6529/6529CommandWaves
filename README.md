@@ -34,7 +34,7 @@ What exists now:
 
 - A Next app product surface focused on building the 6529 hook together.
 - One active hook project with a public 6529 room and a code repo.
-- A simplified room-first UI with a project overview, work-loop status, current hook change, chat composer, room snapshot,
+- A simplified room-first UI with a project overview, current step, current hook change, chat composer, room snapshot,
   latest log, member profiles, rules of the game, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for room posts, join requests, decisions, review requests, project updates, launch packets, Codex work
@@ -155,7 +155,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 
 Default workspace:
 
-- Project overview with work-loop status, room, repo, access, review, and first public launch links.
+- Project overview with current step, room, repo, access, and first public launch links.
 - Current hook task, visible decision need, PR status, latest log, and next action.
 - Links to the room, code repo, current PR, and reviewed work.
 - Builder message composer with direct room posting when configured, a visible room snapshot, and copyable discussion draft.
@@ -179,7 +179,7 @@ Audit and launch:
 - Remote launch checks can be run from the maintainer drawer to refresh setup and readiness blockers.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
-- The local demo separates work-loop status from launch readiness. Launch readiness still fails until production env,
+- The local demo separates current work status from launch readiness. Launch readiness still fails until production env,
   durable storage, live 6529 mode, GitHub PR adapter, guardian state, and required checks are configured.
 
 Maintainer setup:
@@ -361,6 +361,9 @@ Verify the first-loop launch audit:
 ```bash
 LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=1' npm run launch:audit
 ```
+
+If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
+`$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit`. Set `LAUNCH_AUDIT_REMOTE=1` to verify the remote setup check path.
 
 The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
 `LAUNCH_AUDIT_PATH`.
