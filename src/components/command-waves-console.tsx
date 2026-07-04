@@ -2241,6 +2241,9 @@ export function CommandWavesConsole() {
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-950">Who is building</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+                  Profiles summarize visible room and repo activity for this hook.
+                </p>
               </div>
             </div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -2259,21 +2262,27 @@ export function CommandWavesConsole() {
                         <p className="mt-2 text-base leading-7 text-zinc-700">{member.detail}</p>
                       </div>
                     </div>
-                    <dl className="mt-4 grid grid-cols-3 gap-2">
+                    <dl className="mt-4 grid grid-cols-3 gap-2 border-y border-zinc-200 py-3">
                       {member.stats.slice(0, 3).map((stat) => (
-                        <div key={`${member.identity}-${stat.label}`} className="border-t border-zinc-200 pt-2">
+                        <div key={`${member.identity}-${stat.label}`}>
                           <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{stat.label}</dt>
                           <dd className="mt-1 text-sm font-semibold text-zinc-950">{stat.value}</dd>
                         </div>
                       ))}
                     </dl>
-                    <p className="mt-3 text-sm leading-6 text-zinc-500">
-                      {member.activity}. Activity report: {member.scoreLabel}. {member.authorityNote}.
-                    </p>
+                    <div className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-3">
+                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Contribution signal</p>
+                      <p className="mt-1 text-base font-semibold text-zinc-950">{member.scoreLabel}</p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-600">{member.activity}</p>
+                    </div>
                     {member.basis.length ? (
-                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-500">
-                        Basis: {member.basis.slice(0, 2).join(", ")}.
-                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {member.basis.slice(0, 2).map((basis) => (
+                          <Badge key={`${member.identity}-${basis}`} className="border-zinc-200 bg-white text-zinc-600">
+                            {basis}
+                          </Badge>
+                        ))}
+                      </div>
                     ) : null}
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
@@ -2313,6 +2322,12 @@ export function CommandWavesConsole() {
               <Button type="button" variant="secondary" className="mt-3" onClick={prepareJoinRequest}>
                 Draft join message
               </Button>
+            </div>
+            <div className="mt-5 border-t border-zinc-200 pt-4">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Activity reports</p>
+              <p className="mt-2 text-sm leading-6 text-zinc-600">
+                Report points summarize visible work only. They do not grant access, payouts, or merge rights.
+              </p>
             </div>
             <div className="mt-5 border-t border-zinc-200 pt-4">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Hook guardrails</p>

@@ -28,9 +28,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Queue");
     expect(text).toContain("Talk to the swarm");
     expect(text).toContain("Who is building");
-    expect(text).toContain("Activity report:");
-    expect(text).toContain("not access or merge authority");
+    expect(text).toContain("Profiles summarize visible room and repo activity for this hook.");
+    expect(text).toContain("Contribution signal");
     expect(text).toContain("Project rules");
+    expect(text).toContain("Report points summarize visible work only.");
+    expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Builders use the room to propose, question, and decide.");
   });
 
@@ -42,6 +44,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Use this like a normal project room");
     expect(text).not.toContain("Project details");
     expect(text).not.toContain("All member activity");
+    expect(text).not.toContain("Activity report:");
+    expect(text).not.toContain("not access or merge authority");
     expect(text).not.toContain("Upcoming or being discussed");
     expect(text).not.toContain("\u2014");
   });

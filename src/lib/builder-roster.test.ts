@@ -12,7 +12,6 @@ describe("builder roster", () => {
       role: "Coordinator",
       activity: "1 proposal, 1 vote, 1 decision, 1 activity event",
       scoreLabel: "10 report points",
-      authorityNote: "Report only, not access or merge authority",
       basis: expect.arrayContaining(["Proposal work: 6 report points"]),
       stats: expect.arrayContaining([
         { label: "Proposals", value: "1" },
@@ -25,13 +24,14 @@ describe("builder roster", () => {
     expect(roster.some((member) => member.identity === "Decision")).toBe(false);
   });
 
-  it("keeps member activity separate from permissions", () => {
+  it("exposes activity signals without permission language", () => {
     const roster = createBuilderRoster(createContributionReport(demoWave));
-    const copy = roster.map((member) => `${member.role} ${member.activity} ${member.authorityNote}`).join(" ");
+    const copy = roster.map((member) => `${member.role} ${member.activity} ${member.scoreLabel}`).join(" ");
 
-    expect(copy).toContain("Report only");
-    expect(copy).toContain("not access or merge authority");
+    expect(copy).toContain("report points");
+    expect(copy.toLowerCase()).not.toContain("access");
     expect(copy.toLowerCase()).not.toContain("grant");
+    expect(copy.toLowerCase()).not.toContain("merge");
     expect(copy).not.toContain("\u2014");
   });
 
@@ -50,7 +50,6 @@ describe("builder roster", () => {
       role: "Room participant",
       activity: "1 room post",
       scoreLabel: "room activity",
-      authorityNote: "Report only, not access or merge authority",
       detail: "Recent room post: I can review the next small hook change.",
       basis: ["Room posts: 1 report point"],
       stats: [{ label: "Room posts", value: "1" }],

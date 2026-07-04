@@ -10,7 +10,6 @@ export type BuilderRosterMember = {
   role: string;
   activity: string;
   scoreLabel: string;
-  authorityNote: string;
   detail: string;
   basis: string[];
   stats: BuilderRosterStat[];
@@ -111,7 +110,6 @@ export function createBuilderRoster(
       role: roleFor(contributor),
       activity: activityFor(contributor),
       scoreLabel: scoreLabelFor(contributor),
-      authorityNote: "Report only, not access or merge authority",
       detail: detailFor(contributor),
       basis: contributor.scoreBasis.slice(0, 3),
       stats: statsFor(contributor),
