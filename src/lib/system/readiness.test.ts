@@ -28,12 +28,16 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 1, warn: 6, fail: 1 });
+    expect(summary).toEqual({ pass: 1, warn: 7, fail: 1 });
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.some((check) => check.id === "cron_secret")).toBe(false);
     expect(checks.some((check) => check.id === "rate_limit_salt")).toBe(false);
     expect(checks.find((check) => check.id === "database")).toMatchObject({
       status: "warn",
+    });
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
+      status: "warn",
+      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before public launch.",
     });
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
       status: "fail",
@@ -55,12 +59,14 @@ describe("readiness checks", () => {
       NEXT_PUBLIC_APP_URL: "https://command-waves.6529.io",
       DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
       ADMIN_API_KEY: "strong-admin-key-for-launch",
+      COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/6529-hook-builder",
+      COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/6529-Collections/6529-hook",
       "6529_MOCK_MODE": "false",
       NODE_ENV: "production",
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 6, warn: 1, fail: 1 });
+    expect(summary).toEqual({ pass: 7, warn: 1, fail: 1 });
     expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",
@@ -70,6 +76,33 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "guardian_mode")).toMatchObject({
       status: "pass",
       message: "Repo-local guardian mode is configured at MVP strength. External GitHub App is a later hardening step.",
+    });
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
+      status: "pass",
+      message: "First hook room and repo seed are configured.",
+    });
+  });
+
+  it("fails missing first hook project seed in production mode", () => {
+    const checks = getReadinessChecks({
+      NODE_ENV: "production",
+    });
+
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
+      status: "fail",
+      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before public launch.",
+    });
+  });
+
+  it("fails invalid first hook project seed values", () => {
+    const checks = getReadinessChecks({
+      COMMAND_WAVE_INITIAL_WAVE_URL: "../bad wave",
+      COMMAND_WAVE_INITIAL_REPO_URL: "not github",
+    });
+
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
+      status: "fail",
+      message: "Use a valid 6529 wave and GitHub repo for the first hook project.",
     });
   });
 
@@ -103,6 +136,8 @@ describe("readiness checks", () => {
       NEXT_PUBLIC_APP_URL: "https://your-app.example",
       DATABASE_URL: "postgresql://user:password@host:5432/command_waves",
       ADMIN_API_KEY: "replace-with-a-strong-random-key",
+      COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/your-hook-room",
+      COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
       COMMAND_WAVE_REPO_ADAPTER: "github",
       COMMAND_WAVE_GITHUB_TOKEN: "replace-with-github-token",
       COMMAND_WAVE_STATE_URL: "https://your-app.example/api/command-wave/state",
@@ -124,6 +159,10 @@ describe("readiness checks", () => {
       status: "fail",
       message: "Replace placeholder ADMIN_API_KEY with a strong random key before public launch.",
     });
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
+      status: "fail",
+      message: "Replace placeholder first hook room and repo values before public launch.",
+    });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "fail",
       message: "Replace placeholder GitHub token before enabling GitHub PR creation.",
@@ -140,6 +179,7 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "app_url")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "database")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({ status: "fail" });
   });

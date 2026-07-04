@@ -1,5 +1,6 @@
 import { commandWaveStateUrlFromEnv } from "../command-wave-state";
 import { hasEnvValue, hasProductionValue, isPlaceholderValue, isProductionEnv } from "../env-placeholders";
+import { validateSetupShape } from "../setup-validation";
 
 export type ReadinessCheck = {
   id: string;
@@ -129,6 +130,56 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
   };
 }
 
+function initialHookProjectCheck(env: Record<string, string | undefined>): ReadinessCheck {
+  const waveUrl = env.COMMAND_WAVE_INITIAL_WAVE_URL?.trim() ?? "";
+  const repoUrl = env.COMMAND_WAVE_INITIAL_REPO_URL?.trim() ?? "";
+  const hasWaveUrl = hasEnvValue(waveUrl);
+  const hasRepoUrl = hasEnvValue(repoUrl);
+  const production = isProductionEnv(env);
+
+  if (!hasWaveUrl || !hasRepoUrl) {
+    return {
+      id: "initial_hook_project",
+      label: "First hook project",
+      status: production ? "fail" : "warn",
+      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before public launch.",
+    };
+  }
+
+  if (production && (isPlaceholderValue(waveUrl) || isPlaceholderValue(repoUrl))) {
+    return {
+      id: "initial_hook_project",
+      label: "First hook project",
+      status: "fail",
+      message: "Replace placeholder first hook room and repo values before public launch.",
+    };
+  }
+
+  let validShape = false;
+
+  try {
+    validShape = validateSetupShape({ waveUrl, repoUrl }).canSave;
+  } catch {
+    validShape = false;
+  }
+
+  if (!validShape) {
+    return {
+      id: "initial_hook_project",
+      label: "First hook project",
+      status: "fail",
+      message: "Use a valid 6529 wave and GitHub repo for the first hook project.",
+    };
+  }
+
+  return {
+    id: "initial_hook_project",
+    label: "First hook project",
+    status: "pass",
+    message: "First hook room and repo seed are configured.",
+  };
+}
+
 function databaseCheck(env: Record<string, string | undefined>): ReadinessCheck {
   if (!hasEnvValue(env.DATABASE_URL)) {
     return {
@@ -210,6 +261,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
 
   return [
     appUrlCheck(appUrl, env),
+    initialHookProjectCheck(env),
     databaseCheck(env),
     {
       id: "command_wave_store",

@@ -234,9 +234,10 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
 `COMMAND_WAVE_INITIAL_WAVE_URL` and `COMMAND_WAVE_INITIAL_REPO_URL` seed a clean first project for fresh/default state
-or local reset. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL`
-gives guardian PR checks the public wave state. The ready launch audit requires durable storage and the GitHub PR adapter
-so the public workflow can survive restarts and record draft PRs predictably.
+or local reset. Launch readiness fails production placeholder or invalid first-hook values. `ADMIN_API_KEY` protects setup,
+proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
+The ready launch audit requires durable storage and the GitHub PR adapter so the public workflow can survive restarts and
+record draft PRs predictably.
 
 The local demo still reports launch gaps until the first hook room and repo are reachable, `ADMIN_API_KEY`,
 `NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode, GitHub PR adapter, guardian state, setup validation, and the

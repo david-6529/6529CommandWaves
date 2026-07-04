@@ -13,6 +13,7 @@ export function isPlaceholderValue(value: string | undefined) {
     normalized &&
       (normalized.includes("replace-with") ||
         normalized.includes("your-app.example") ||
+        normalized.includes("your-") ||
         normalized.includes("user:password@host") ||
         normalized === "postgresql://example" ||
         normalized === "token" ||

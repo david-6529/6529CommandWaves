@@ -9,6 +9,8 @@ const productionReadyChecks = getReadinessChecks({
   NEXT_PUBLIC_APP_URL: "https://command-waves.6529.io",
   DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
   ADMIN_API_KEY: "strong-admin-key-for-launch",
+  COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/6529-hook-builder",
+  COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/6529-Collections/6529-hook",
   "6529_MOCK_MODE": "false",
   NODE_ENV: "production",
   COMMAND_WAVE_STORE: "postgres",
@@ -109,6 +111,12 @@ describe("first phase launch audit", () => {
     expect(audit.items).toContainEqual(
       expect.objectContaining({
         id: "setup_repo_file_contributing_md",
+        status: "ready",
+      }),
+    );
+    expect(audit.items).toContainEqual(
+      expect.objectContaining({
+        id: "readiness_initial_hook_project",
         status: "ready",
       }),
     );
@@ -273,6 +281,10 @@ describe("first phase launch audit", () => {
     expect(audit.status).toBe("needs_setup");
     expect(audit.blockers).toEqual([]);
     expect(audit.openItems).toEqual([
+      expect.objectContaining({
+        id: "readiness_initial_hook_project",
+        status: "needed",
+      }),
       expect.objectContaining({
         id: "readiness_database",
         status: "needed",
