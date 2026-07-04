@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const textFilePattern =
@@ -9,7 +9,7 @@ function projectTextFiles() {
   return execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], { encoding: "utf8" })
     .split("\n")
     .map((path) => path.trim())
-    .filter((path) => path && textFilePattern.test(path));
+    .filter((path) => path && textFilePattern.test(path) && existsSync(path));
 }
 
 function emDashMatches(path: string) {
