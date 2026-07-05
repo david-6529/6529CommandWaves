@@ -2054,21 +2054,33 @@ export function CommandWavesConsole() {
 
         <section id="workspace" className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
           <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current work</p>
+              <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+            </div>
+            <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-950">{humanizeLegacyCommandCopy(currentFocusTitle)}</h2>
+            <p className="mt-2 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
+            <div className="mt-5 grid gap-4 border-t border-zinc-200 pt-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current focus</p>
-                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Work</h2>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
+                <p className="mt-1 text-base leading-7 text-zinc-600">Confirm scope in chat before saving a proposal.</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code repo</p>
+                {projectRepoHref ? (
+                  <a
+                    className="mt-1 inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
+                    href={projectRepoHref}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open repo
+                  </a>
+                ) : (
+                  <p className="mt-1 text-base leading-7 text-zinc-600">Repo not set yet.</p>
+                )}
               </div>
             </div>
-
-            <article className="mt-5 border-y border-zinc-200 py-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Being discussed</p>
-                <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
-              </div>
-              <h3 className="mt-3 text-2xl font-semibold leading-8 text-zinc-950">{humanizeLegacyCommandCopy(currentFocusTitle)}</h3>
-              <p className="mt-2 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
-            </article>
           </section>
 
           <section id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
@@ -2197,44 +2209,36 @@ export function CommandWavesConsole() {
           </section>
         </section>
 
-        <section id="members-and-rules" className="grid gap-6 border-t border-zinc-200 pt-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section id="members-and-rules" className="border-t border-zinc-200 pt-6">
           <section className="min-w-0">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Builders</h2>
-                <p className="mt-2 max-w-2xl text-base leading-7 text-zinc-600">
-                  Profiles show visible activity in chat and GitHub. They are context for humans, not permissions.
+                <p className="mt-2 text-base leading-7 text-zinc-600">
+                  Profiles show visible chat, PR, and review activity. They are context for humans, not permissions.
                 </p>
               </div>
             </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className="mt-5 grid gap-3 lg:grid-cols-3">
               {visibleBuilderProfiles.length ? (
                 visibleBuilderProfiles.map((member) => (
                   <article key={member.identity} className="rounded-lg border border-zinc-200 bg-white p-4">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-lg font-semibold text-zinc-800">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-base font-semibold text-zinc-800">
                         {member.identity.slice(0, 2).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="break-words text-2xl font-semibold text-zinc-950">{member.identity}</h3>
+                          <h3 className="break-words text-xl font-semibold text-zinc-950">{member.identity}</h3>
                           <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{member.role}</Badge>
                         </div>
-                        <p className="mt-2 text-base leading-7 text-zinc-600">{member.detail}</p>
+                        <p className="mt-2 text-sm leading-6 text-zinc-600">{member.detail}</p>
                       </div>
                     </div>
-                    <dl className="mt-4 grid grid-cols-3 gap-2 border-y border-zinc-200 py-3">
-                      {member.stats.slice(0, 3).map((stat) => (
-                        <div key={`${member.identity}-${stat.label}`}>
-                          <dt className="text-xs font-semibold uppercase tracking-normal text-zinc-500">{stat.label}</dt>
-                          <dd className="mt-1 text-sm font-semibold text-zinc-950">{stat.value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                    <div className="mt-3">
+                    <div className="mt-4 border-y border-zinc-200 py-3">
                       <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Visible contribution</p>
-                      <p className="mt-1 text-lg font-semibold text-zinc-950">{member.scoreLabel}</p>
+                      <p className="mt-1 text-base font-semibold text-zinc-950">{member.scoreLabel}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-600">{member.activity}</p>
                     </div>
                     {member.basis.length ? (
@@ -2263,38 +2267,42 @@ export function CommandWavesConsole() {
             </div>
           </section>
 
-          <section className="min-w-0 rounded-lg border border-zinc-200 p-5">
-            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reference</p>
-            <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Build details</h2>
+          <details id="build-reference" className="mt-6 border-b border-zinc-200 py-3">
+            <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
+              <span>Build reference</span>
+              <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">optional</Badge>
+            </summary>
             <p className="mt-3 text-base leading-7 text-zinc-600">
-              The top Rules accordion is the plain-English source. These notes keep access, reports, and code checks visible.
+              The top Rules accordion is the plain-English source. This drawer keeps access, reports, and code checks available without making them the default view.
             </p>
-            <div className="mt-5 border-t border-zinc-200 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Access notes</p>
-              <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-600">
-                {participationGateNotes.slice(0, 2).map((note) => (
-                  <li key={note}>- {note}</li>
-                ))}
-              </ul>
-              <Button type="button" variant="secondary" className="mt-3" onClick={prepareJoinRequest}>
-                Draft access request
-              </Button>
+            <div className="mt-4 grid gap-4 lg:grid-cols-3">
+              <section className="border-t border-zinc-200 pt-4 lg:border-t-0 lg:pt-0">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
+                <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-600">
+                  {participationGateNotes.slice(0, 2).map((note) => (
+                    <li key={note}>- {note}</li>
+                  ))}
+                </ul>
+                <Button type="button" variant="secondary" className="mt-3" onClick={prepareJoinRequest}>
+                  Draft access request
+                </Button>
+              </section>
+              <section className="border-t border-zinc-200 pt-4 lg:border-t-0 lg:pt-0">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reports</p>
+                <p className="mt-2 text-base leading-7 text-zinc-600">
+                  Report points summarize visible work only. They do not grant access, payouts, or merge rights.
+                </p>
+              </section>
+              <section className="border-t border-zinc-200 pt-4 lg:border-t-0 lg:pt-0">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code checks</p>
+                <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-600">
+                  {hookGuardrails.slice(0, 3).map((guardrail) => (
+                    <li key={guardrail}>- {guardrail}</li>
+                  ))}
+                </ul>
+              </section>
             </div>
-            <div className="mt-5 border-t border-zinc-200 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reports</p>
-              <p className="mt-2 text-base leading-7 text-zinc-600">
-                Report points summarize visible work only. They do not grant access, payouts, or merge rights.
-              </p>
-            </div>
-            <div className="mt-5 border-t border-zinc-200 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code guardrails</p>
-              <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-600">
-                {hookGuardrails.slice(0, 3).map((guardrail) => (
-                  <li key={guardrail}>- {guardrail}</li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          </details>
         </section>
 
         <details

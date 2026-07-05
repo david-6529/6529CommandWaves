@@ -36,17 +36,19 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
     expect(text).toContain("Use Request access in chat.");
-    expect(text).toContain("Current focus");
-    expect(text).toContain("Work");
-    expect(text).toContain("Being discussed");
+    expect(text).toContain("Current work");
+    expect(text).toContain("Decision");
+    expect(text).toContain("Confirm scope in chat before saving a proposal.");
+    expect(text).toContain("Code repo");
     expect(text).toContain("Chat with builders");
     expect(text).toContain("Discuss PR");
     expect(text).toContain("Save work item");
     expect(text).toContain("Builders");
-    expect(text).toContain("Profiles show visible activity in chat and GitHub.");
+    expect(text).toContain("Profiles show visible chat, PR, and review activity.");
     expect(text).toContain("Visible contribution");
-    expect(text).toContain("Build details");
+    expect(text).toContain("Build reference");
     expect(text).toContain("The top Rules accordion is the plain-English source.");
+    expect(text).toContain("without making them the default view");
     expect(text).toContain("The group records a project decision before approved PR work starts.");
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
@@ -76,6 +78,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Gate");
     expect(text).not.toContain("gate unset");
     expect(text).not.toContain("Participation gate is not set yet.");
+    expect(text).not.toContain("Build details");
   });
 
   it("keeps optional advanced drawers on the dark app surface", () => {
