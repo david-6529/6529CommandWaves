@@ -168,6 +168,10 @@ async function main() {
   }
   assertJsonObject("Launch audit reports", reports);
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectSnapshot");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "hookSafety");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Hook contracts are immutable by default");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "bound-focused tests");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "delegatecall");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "currentWork");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "nextStep");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "latestChanges");
@@ -190,6 +194,10 @@ async function main() {
   assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
   assert(objectValue(statePayload, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Launch audit state hash does not match public state hash.");
   assertIncludes("State response", JSON.stringify(statePayload), "projectSnapshot");
+  assertIncludes("State response", JSON.stringify(statePayload), "hookSafety");
+  assertIncludes("State response", JSON.stringify(statePayload), "Hook contracts are immutable by default");
+  assertIncludes("State response", JSON.stringify(statePayload), "bound-focused tests");
+  assertIncludes("State response", JSON.stringify(statePayload), "delegatecall");
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
   assertIncludes("State response", JSON.stringify(statePayload), "nextStep");
   assertIncludes("State response", JSON.stringify(statePayload), "latestChanges");

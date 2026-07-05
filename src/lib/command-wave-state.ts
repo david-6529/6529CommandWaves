@@ -4,6 +4,7 @@ import { createContributionReport, type ContributionReport } from "./contributio
 import { hasProductionValue } from "./env-placeholders";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { commandWaveProductCopy } from "./product-copy";
+import { publicHookSafety, type PublicHookSafety } from "./public-hook-safety";
 import { createPublicProjectSnapshot, type PublicProjectSnapshot } from "./public-project-snapshot";
 import { hashValue } from "./run-manifest";
 
@@ -13,6 +14,7 @@ export type CommandWaveStateSnapshot = {
   wave: CommandWave;
   waveStateHash: string;
   projectSnapshot: PublicProjectSnapshot;
+  hookSafety: PublicHookSafety;
   access: ReturnType<typeof createParticipationAccessSnapshot>;
   productContract: PhaseOneProductContract;
   authorityBoundary: {
@@ -89,6 +91,7 @@ export function createCommandWaveStateSnapshot(
     wave,
     waveStateHash: hashValue(wave),
     projectSnapshot: createPublicProjectSnapshot(wave),
+    hookSafety: publicHookSafety,
     access: createParticipationAccessSnapshot(wave.gates),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,

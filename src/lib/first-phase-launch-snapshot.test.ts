@@ -38,6 +38,12 @@ describe("first phase launch snapshot", () => {
         detail: "Set a valid project chat and real GitHub repo.",
       },
     });
+    expect(snapshot.hookSafety).toMatchObject({
+      immutableDefault: true,
+      summary: "Hook contracts are immutable by default. Parameter changes need explicit caps and bound-focused tests.",
+    });
+    expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("explicit cap");
+    expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("Deploy scripts");
     expect(snapshot.access).toMatchObject({
       label: "manual review",
       summary: "Ask in chat to join. Access is reviewed manually for now.",

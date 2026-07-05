@@ -90,6 +90,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "project_snapshot")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "hook_safety")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "pass",
     });
@@ -296,6 +299,25 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "project_snapshot")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish current work, decision, repo state, next step, and recent changes.",
+    });
+  });
+
+  it("fails when the public hook safety contract is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      hookSafety: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "hook_safety")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish immutable-hook, bounded-parameter, and blocked-action guardrails.",
     });
   });
 

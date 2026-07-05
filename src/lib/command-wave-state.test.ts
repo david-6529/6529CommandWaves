@@ -24,6 +24,10 @@ describe("command wave state snapshot", () => {
           label: "Choose project",
         },
       },
+      hookSafety: {
+        immutableDefault: true,
+        summary: "Hook contracts are immutable by default. Parameter changes need explicit caps and bound-focused tests.",
+      },
       access: {
         label: "manual review",
         summary: "Ask in chat to join. Access is reviewed manually for now.",
@@ -78,6 +82,8 @@ describe("command wave state snapshot", () => {
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
     expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("review recorded");
+    expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
+    expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("delegatecall");
     expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");

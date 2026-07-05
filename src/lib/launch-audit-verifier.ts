@@ -171,6 +171,23 @@ function projectSnapshotReady(value: unknown) {
   );
 }
 
+function hookSafetyReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+
+  return Boolean(
+    record &&
+      record.immutableDefault === true &&
+      asString(record.summary)?.includes("immutable by default") &&
+      stringArrayContains(record.parameterPolicy, "explicit cap") &&
+      stringArrayContains(record.parameterPolicy, "bound-focused tests") &&
+      stringArrayContains(record.blockedInPhaseOne, "Upgradeable") &&
+      stringArrayContains(record.blockedInPhaseOne, "delegatecall") &&
+      stringArrayContains(record.blockedInPhaseOne, "Deploy scripts") &&
+      stringArrayContains(record.reviewEvidence, "rules hash") &&
+      stringArrayContains(record.reviewEvidence, "wave state hash"),
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -256,7 +273,7 @@ function productContractReady(value: unknown) {
   const record = isRecord(value) ? value : null;
 
   return Boolean(
-      record &&
+    record &&
       asString(record.name) === commandWaveProductCopy.headline &&
       asString(record.purpose) === commandWaveProductCopy.subhead &&
       stringArrayIncludes(record.workflow, "Choose project") &&
@@ -278,6 +295,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const hasProjectSnapshot = projectSnapshotReady(snapshot?.projectSnapshot);
+  const hasHookSafety = hookSafetyReady(snapshot?.hookSafety);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const hasAccessSummary = accessSnapshotReady(snapshot?.access);
@@ -325,6 +343,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasProjectSnapshot
         ? "Current project snapshot is published."
         : "Launch audit must publish current work, decision, repo state, next step, and recent changes.",
+    ),
+    check(
+      "hook_safety",
+      hasHookSafety ? "pass" : "fail",
+      hasHookSafety
+        ? "Immutable hook safety contract is published."
+        : "Launch audit must publish immutable-hook, bounded-parameter, and blocked-action guardrails.",
     ),
     check(
       "authority_boundary",
