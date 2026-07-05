@@ -180,6 +180,7 @@ Audit and launch:
 - Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
+- Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
 - Public command-wave state includes the informational contribution report method and notes.
 - Public launch audit includes the hashed wave state and rules it checked.
 - Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.

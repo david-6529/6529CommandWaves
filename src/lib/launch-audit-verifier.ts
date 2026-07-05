@@ -16,6 +16,7 @@ export type LaunchAuditVerificationResult = {
     title: string;
     detail: string;
   } | null;
+  statusDraft: string | null;
   blockers: string[];
   openItems: string[];
   operatorChecklist: string[];
@@ -122,6 +123,20 @@ function stateEvidenceReady(value: unknown) {
   );
 }
 
+function statusDraftReady(value: unknown) {
+  const draft = asString(value);
+
+  return Boolean(
+    draft &&
+      draft.includes("6529 hook launch status") &&
+      draft.includes("Status:") &&
+      draft.includes("Operator checklist:") &&
+      draft.includes("Verification:") &&
+      draft.includes("Guardrails:") &&
+      draft.includes("does not approve work or move funds"),
+  );
+}
+
 function contributionReportReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const method = isRecord(record?.method) ? record.method : null;
@@ -179,6 +194,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const hasStateEvidence = stateEvidenceReady(snapshot?.stateEvidence);
+  const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
   const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
   const hasContributionReport = contributionReportReady(reports?.contribution);
   const hasDeveloperFeePlan = developerFeePlanReady(reports?.developerFee);
@@ -228,6 +244,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
         : "Launch audit must publish wave state hash, rules hash, and record counts.",
     ),
     check(
+      "status_draft",
+      hasStatusDraft ? "pass" : "fail",
+      hasStatusDraft
+        ? "Human-readable launch status draft is published."
+        : "Launch audit must publish a human-readable launch status draft with guardrails and verification links.",
+    ),
+    check(
       "contribution_report",
       hasContributionReport ? "pass" : "fail",
       hasContributionReport
@@ -258,7 +281,8 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
           title: asString(nextAction.title) ?? "Check launch state",
           detail: asString(nextAction.detail) ?? "Open the launch audit for details.",
         }
-      : null,
+        : null,
+    statusDraft: asString(snapshot?.statusDraft),
     blockers,
     openItems,
     operatorChecklist: launchAudit ? launchOperatorChecklistLines(openItemRecords) : [],

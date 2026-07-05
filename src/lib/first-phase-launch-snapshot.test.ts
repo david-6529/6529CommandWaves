@@ -64,6 +64,13 @@ describe("first phase launch snapshot", () => {
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
+    expect(snapshot.statusDraft).toContain("6529 hook launch status");
+    expect(snapshot.statusDraft).toContain("Status: checks needed");
+    expect(snapshot.statusDraft).toContain("Next action: Run launch setup check");
+    expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");
+    expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
+    expect(snapshot.statusDraft).toContain("- Launch audit: https://command-waves.example.com/api/command-wave/launch/audit");
+    expect(snapshot.statusDraft).toContain("does not approve work or move funds");
     expect(snapshot.phaseChecklist.every((item) => item.status === "done")).toBe(true);
     expect(snapshot.launchAudit.nextAction).toMatchObject({
       itemId: "setup_remote_check",

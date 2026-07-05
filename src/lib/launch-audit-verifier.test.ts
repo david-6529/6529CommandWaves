@@ -74,6 +74,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
       status: "pass",
     });
@@ -81,6 +84,8 @@ describe("launch audit verifier", () => {
       status: "pass",
     });
     expect(result.nextAction?.title).toBe("Start the first public loop");
+    expect(result.statusDraft).toContain("6529 hook launch status");
+    expect(result.statusDraft).toContain("Status: ready");
     expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });
 
@@ -197,6 +202,43 @@ describe("launch audit verifier", () => {
 
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
+      status: "fail",
+    });
+  });
+
+  it("fails when the human-readable status draft is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      statusDraft: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish a human-readable launch status draft with guardrails and verification links.",
+    });
+  });
+
+  it("fails when the status draft omits guardrails", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      statusDraft: "6529 hook launch status\nStatus: ready\nOperator checklist:\nVerification:",
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
       status: "fail",
     });
   });

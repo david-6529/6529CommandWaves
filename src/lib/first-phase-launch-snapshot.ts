@@ -9,6 +9,7 @@ import { createContributionReport, type ContributionReport } from "./contributio
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
+import { createLaunchStatusDraft } from "./launch-status-draft";
 import { createPhaseChecklist } from "./phase-checklist";
 import { hashValue } from "./run-manifest";
 import { validateCommandWaveSetup, type SetupValidation } from "./setup-validation";
@@ -39,6 +40,7 @@ export type FirstPhaseLaunchSnapshot = {
     launchAuditUrl: string;
   };
   setupValidation: SetupValidation;
+  statusDraft: string;
   reports: {
     contribution: ContributionReport;
     developerFee: DeveloperFeePlan;
@@ -95,6 +97,11 @@ export async function createFirstPhaseLaunchSnapshot(
   });
   const commandWaveStateUrl = commandWaveStateUrlFromEnv(env) ?? appRouteUrl("/api/command-wave/state", env);
   const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
+  const verificationTargets = {
+    setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
+    commandWaveStateUrl,
+    launchAuditUrl: appRouteUrl(launchAuditPath, env),
+  };
   const contributionReport = createContributionReport(wave, { generatedAt });
 
   return {
@@ -116,12 +123,13 @@ export async function createFirstPhaseLaunchSnapshot(
       reviewCount: wave.reviews.length,
       ledgerEventCount: wave.ledger.length,
     },
-    verificationTargets: {
-      setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
-      commandWaveStateUrl,
-      launchAuditUrl: appRouteUrl(launchAuditPath, env),
-    },
+    verificationTargets,
     setupValidation,
+    statusDraft: createLaunchStatusDraft({
+      wave,
+      audit: launchAudit,
+      verificationTargets,
+    }),
     reports: {
       contribution: contributionReport,
       developerFee: createDeveloperFeePlan(wave, contributionReport),
