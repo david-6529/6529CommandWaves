@@ -41,8 +41,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Confirm scope in chat before saving a proposal.");
     expect(text).toContain("Code repo");
     expect(text).toContain("Chat with builders");
+    expect(text).toContain("The same box starts the work.");
     expect(text).toContain("Discuss PR");
-    expect(text).toContain("Save work item");
+    expect(text).toContain("Add to discussion");
+    expect(text).toContain("Post to chat");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
     expect(text).toContain("Visible contribution");

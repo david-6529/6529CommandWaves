@@ -2089,7 +2089,7 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project chat</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Chat with builders</h2>
                 <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">
-                  Ask a question, suggest a change, review an idea, or call out risk. This is where work starts.
+                  Ask a question, suggest a change, review an idea, or paste a PR. The same box starts the work.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -2118,19 +2118,19 @@ export function CommandWavesConsole() {
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
                   type="button"
-                  variant={canPostRoomMessage ? "primary" : "secondary"}
-                  disabled={isBusy || !canPostRoomMessage}
-                  onClick={() => void postBuilderWaveChatDraft()}
+                  variant={canSaveChatWorkItem ? "primary" : "secondary"}
+                  disabled={!canSaveChatWorkItem}
+                  onClick={() => void saveChatWorkItem()}
                 >
-                  {apiBusy === "roomPost" ? "Posting" : "Post message"}
+                  {apiBusy === "proposal" ? "Adding" : "Add to discussion"}
                 </Button>
                 <Button
                   type="button"
                   variant="secondary"
-                  disabled={!canSaveChatWorkItem}
-                  onClick={() => void saveChatWorkItem()}
+                  disabled={isBusy || !canPostRoomMessage}
+                  onClick={() => void postBuilderWaveChatDraft()}
                 >
-                  {apiBusy === "proposal" ? "Saving" : "Save work item"}
+                  {apiBusy === "roomPost" ? "Posting" : "Post to chat"}
                 </Button>
                 <Button
                   type="button"
