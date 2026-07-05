@@ -78,6 +78,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "access_summary")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",
     });
@@ -181,6 +184,25 @@ describe("launch audit verifier", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
       status: "fail",
+    });
+  });
+
+  it("fails when the public access summary is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      access: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "access_summary")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish who can join and how access works.",
     });
   });
 

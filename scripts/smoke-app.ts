@@ -168,6 +168,7 @@ async function main() {
   }
   assertJsonObject("Launch audit reports", reports);
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "productContract");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Ask in chat to join. Access is reviewed manually for now.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Discuss in chat");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "authorityBoundary");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "accessStatus");
@@ -182,6 +183,7 @@ async function main() {
   assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
   assert(objectValue(statePayload, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Launch audit state hash does not match public state hash.");
   assertIncludes("State response", JSON.stringify(statePayload), "productContract");
+  assertIncludes("State response", JSON.stringify(statePayload), "Ask in chat to join. Access is reviewed manually for now.");
   assertIncludes("State response", JSON.stringify(statePayload), "Discuss in chat");
   assertIncludes("State response", JSON.stringify(statePayload), "accessStatus");
   assert(!JSON.stringify(statePayload).includes("gateStatus"), "State response still includes gateStatus.");

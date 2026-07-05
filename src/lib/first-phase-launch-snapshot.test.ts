@@ -25,6 +25,11 @@ describe("first phase launch snapshot", () => {
       repoUrl: demoWave.repoUrl,
     });
     expect(snapshot.setupCheckMode).toBe("shape");
+    expect(snapshot.access).toMatchObject({
+      label: "manual review",
+      summary: "Ask in chat to join. Access is reviewed manually for now.",
+      notes: ["Manual builder review for phase 1", "REP or TDH access checks are planned, not enforced here"],
+    });
     expect(snapshot.productContract).toMatchObject({
       name: "Decentralized Coding: Beta",
       purpose: "A simple way for people and agents to build in public",

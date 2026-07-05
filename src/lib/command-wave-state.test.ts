@@ -13,6 +13,10 @@ describe("command wave state snapshot", () => {
       version: "command-wave-state-v0.1",
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: demoWave,
+      access: {
+        label: "manual review",
+        summary: "Ask in chat to join. Access is reviewed manually for now.",
+      },
       productContract: {
         name: "Decentralized Coding: Beta",
         purpose: "A simple way for people and agents to build in public",
@@ -62,6 +66,7 @@ describe("command wave state snapshot", () => {
       },
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
+    expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
     expect(snapshot.authorityBoundary.agentLimits.join(" ")).toContain("Reviewer checks are evidence");

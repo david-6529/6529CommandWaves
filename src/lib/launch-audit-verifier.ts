@@ -110,6 +110,18 @@ function authorityBoundaryReady(value: unknown) {
   );
 }
 
+function accessSnapshotReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+
+  return Boolean(
+    record &&
+      asString(record.label) &&
+      asString(record.summary) &&
+      Array.isArray(record.notes) &&
+      record.notes.every((item) => typeof item === "string" && item.trim().length > 0),
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -218,6 +230,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
+  const hasAccessSummary = accessSnapshotReady(snapshot?.access);
   const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
   const hasStateEvidence = Boolean(stateEvidence);
   const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
@@ -261,6 +274,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasAuthorityBoundary
         ? "Phase 1 authority boundary is published."
         : "Launch audit must publish who controls merges, deploys, payments, governance changes, and blocked app actions.",
+    ),
+    check(
+      "access_summary",
+      hasAccessSummary ? "pass" : "fail",
+      hasAccessSummary
+        ? "Human-readable access summary is published."
+        : "Launch audit must publish who can join and how access works.",
     ),
     check(
       "state_evidence",

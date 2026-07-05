@@ -11,6 +11,7 @@ import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-p
 import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createLaunchStatusDraft } from "./launch-status-draft";
+import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
 import { hashValue } from "./run-manifest";
 import { validateCommandWaveSetup, type SetupValidation } from "./setup-validation";
@@ -26,6 +27,7 @@ export type FirstPhaseLaunchSnapshot = {
     repoUrl: string;
   };
   setupCheckMode: "shape" | "remote";
+  access: CommandWaveStateSnapshot["access"];
   productContract: CommandWaveStateSnapshot["productContract"];
   authorityBoundary: CommandWaveStateSnapshot["authorityBoundary"];
   agents: CommandWaveStateSnapshot["agents"];
@@ -116,6 +118,7 @@ export async function createFirstPhaseLaunchSnapshot(
       repoUrl: wave.repoUrl,
     },
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
+    access: createParticipationAccessSnapshot(wave.gates),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
     agents: {

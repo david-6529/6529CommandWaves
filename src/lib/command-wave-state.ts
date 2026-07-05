@@ -2,6 +2,7 @@ import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity }
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { hasProductionValue } from "./env-placeholders";
+import { createParticipationAccessSnapshot } from "./participation-gates";
 import { commandWaveProductCopy } from "./product-copy";
 import { hashValue } from "./run-manifest";
 
@@ -10,6 +11,7 @@ export type CommandWaveStateSnapshot = {
   generatedAt: string;
   wave: CommandWave;
   waveStateHash: string;
+  access: ReturnType<typeof createParticipationAccessSnapshot>;
   productContract: PhaseOneProductContract;
   authorityBoundary: {
     phase: "first_public_hook_build";
@@ -84,6 +86,7 @@ export function createCommandWaveStateSnapshot(
     generatedAt,
     wave,
     waveStateHash: hashValue(wave),
+    access: createParticipationAccessSnapshot(wave.gates),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
     agents: {
