@@ -18,7 +18,7 @@ export type CommandWaveStateSnapshot = {
     humansControl: string[];
     appDoesNot: string[];
     agentLimits: string[];
-    gateStatus: string;
+    accessStatus: string;
   };
   agents: {
     orchestrator: typeof orchestratorAgentIdentity;
@@ -70,7 +70,7 @@ export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBound
     "Reviewer checks are evidence for humans before merge.",
     "Commands touching deployment, governance, payments, upgradeability, or uncapped parameters are blocked or require explicit review.",
   ],
-  gateStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
+  accessStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
 };
 
 export function createCommandWaveStateSnapshot(

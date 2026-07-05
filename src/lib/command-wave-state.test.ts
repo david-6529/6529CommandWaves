@@ -30,7 +30,7 @@ describe("command wave state snapshot", () => {
           "Move funds",
           "Grant reputation, token weight, payouts, permissions, or merge rights from contribution scores",
         ],
-        gateStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
+        accessStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
       },
       agents: {
         orchestrator: {
@@ -65,6 +65,7 @@ describe("command wave state snapshot", () => {
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
     expect(snapshot.authorityBoundary.agentLimits.join(" ")).toContain("Reviewer checks are evidence");
+    expect(snapshot.authorityBoundary).not.toHaveProperty("gateStatus");
   });
 
   it("builds the public state URL from env", () => {

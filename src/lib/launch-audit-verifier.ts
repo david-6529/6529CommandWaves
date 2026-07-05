@@ -104,7 +104,9 @@ function authorityBoundaryReady(value: unknown) {
       stringArrayIncludes(record.humansControl, "Governance changes") &&
       stringArrayIncludes(record.appDoesNot, "Auto-merge PRs") &&
       stringArrayIncludes(record.appDoesNot, "Deploy contracts") &&
-      stringArrayIncludes(record.appDoesNot, "Move funds"),
+      stringArrayIncludes(record.appDoesNot, "Move funds") &&
+      asString(record.accessStatus) ===
+        "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
   );
 }
 

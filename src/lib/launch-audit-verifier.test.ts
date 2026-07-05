@@ -164,6 +164,26 @@ describe("launch audit verifier", () => {
     });
   });
 
+  it("fails when the authority boundary omits access status", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const authorityBoundary: Record<string, unknown> = { ...snapshot.authorityBoundary };
+    delete authorityBoundary.accessStatus;
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      authorityBoundary,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
+      status: "fail",
+    });
+  });
+
   it("fails when the product contract is missing", async () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",

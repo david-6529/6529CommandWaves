@@ -170,6 +170,8 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "productContract");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Discuss in chat");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "authorityBoundary");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "accessStatus");
+  assert(!JSON.stringify(launchPayload).includes("gateStatus"), "Launch audit response still includes gateStatus.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Auto-merge PRs");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Visible activity report");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
@@ -181,6 +183,8 @@ async function main() {
   assert(objectValue(statePayload, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Launch audit state hash does not match public state hash.");
   assertIncludes("State response", JSON.stringify(statePayload), "productContract");
   assertIncludes("State response", JSON.stringify(statePayload), "Discuss in chat");
+  assertIncludes("State response", JSON.stringify(statePayload), "accessStatus");
+  assert(!JSON.stringify(statePayload).includes("gateStatus"), "State response still includes gateStatus.");
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
   assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
   assertIncludes("State response", JSON.stringify(statePayload), "humansControl");

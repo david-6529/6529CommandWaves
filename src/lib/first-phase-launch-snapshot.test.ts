@@ -36,7 +36,9 @@ describe("first phase launch snapshot", () => {
       socialSourceOfTruth: "project chat",
       codeSurface: "GitHub PR",
       humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
+      accessStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
     });
+    expect(snapshot.authorityBoundary).not.toHaveProperty("gateStatus");
     expect(snapshot.agents).toMatchObject({
       orchestrator: {
         handle: "daemon",
