@@ -53,6 +53,19 @@ function objectValue(value: JsonObject, key: string) {
   return value[key];
 }
 
+function assertJsonObject(label: string, value: unknown): asserts value is JsonObject {
+  assert(typeof value === "object" && value !== null && !Array.isArray(value), `${label} is missing or is not a JSON object.`);
+}
+
+function assertString(label: string, value: unknown): asserts value is string {
+  assert(typeof value === "string" && value.trim().length > 0, `${label} is missing or is not a string.`);
+}
+
+function assertSha256(label: string, value: unknown): asserts value is string {
+  assertString(label, value);
+  assert(/^[a-f0-9]{64}$/.test(value), `${label} is not a SHA-256 hash.`);
+}
+
 async function main() {
   const html = await fetchText("/");
 
@@ -102,16 +115,33 @@ async function main() {
   const launchPayload = await fetchJson("/api/command-wave/launch/audit");
   const audit = objectValue(launchPayload, "audit");
 
-  assert(typeof audit === "object" && audit !== null && !Array.isArray(audit), "Launch audit response is missing audit.");
+  assertJsonObject("Launch audit response audit", audit);
+  assert(objectValue(audit, "version") === "command-wave-launch-audit-v0.1", "Launch audit returned the wrong version.");
+
+  const stateEvidence = objectValue(audit, "stateEvidence");
+  const statusDraft = objectValue(audit, "statusDraft");
+  const reports = objectValue(audit, "reports");
+
+  assertJsonObject("Launch audit state evidence", stateEvidence);
+  assertSha256("Launch audit wave state hash", objectValue(stateEvidence, "waveStateHash"));
+  assertSha256("Launch audit rules hash", objectValue(stateEvidence, "rulesHash"));
+  assertString("Launch audit status draft", statusDraft);
+  for (const label of ["6529 hook launch status", "Operator checklist:", "Verification:", "Guardrails:"]) {
+    assertIncludes("Launch audit status draft", statusDraft, label);
+  }
+  assertJsonObject("Launch audit reports", reports);
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "productContract");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Discuss work");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "authorityBoundary");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Auto-merge PRs");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Visible activity report");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
 
   const statePayload = await fetchJson("/api/command-wave/state");
 
   assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
+  assert(objectValue(statePayload, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Launch audit state hash does not match public state hash.");
   assertIncludes("State response", JSON.stringify(statePayload), "productContract");
   assertIncludes("State response", JSON.stringify(statePayload), "Discuss work");
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
