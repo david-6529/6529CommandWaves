@@ -38,7 +38,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("How are PRs approved?");
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
-    expect(text).toContain("Use Request access in chat.");
+    expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Next work");
     expect(text).toContain("Decision");
     expect(text).toContain("Confirm scope in chat before saving a proposal.");

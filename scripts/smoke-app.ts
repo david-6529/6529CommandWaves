@@ -94,7 +94,7 @@ async function main() {
     "How are PRs approved?",
     "Who merges?",
     "Everything starts in chat.",
-    "Use Request access in chat.",
+    "Connect wallet if you want, then use Request access in chat.",
     "Next work",
     "Confirm scope in chat before saving a proposal.",
     "Code repo",

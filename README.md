@@ -34,6 +34,7 @@ What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
 - One active hook project with project chat and a code repo.
+- A top-right wallet connection control that can add a connected address to the access request draft.
 - A simplified chat-first UI with a project overview, current hook change, chat composer, latest posts, builder profiles,
   project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
@@ -54,7 +55,8 @@ What remains manual or MVP-only:
 
 - Chat posting works when a 6529 bot wallet is configured. Without bot credentials, the app drafts text for a human to
   post manually.
-- Reputation, token, holder, allowlist, and QnA requirements are advisory notes until live wallet/session/score checks are wired.
+- Wallet connection is identity context for access drafts. Reputation, token, holder, allowlist, and QnA requirements are
+  advisory notes until live wallet/session/score checks are wired.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation.
 - The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,

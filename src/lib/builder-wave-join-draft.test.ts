@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { createBuilderWaveJoinDraft } from "./builder-wave-join-draft";
 
-describe("build room join draft", () => {
+describe("project access draft", () => {
   it("creates a short join request with the builder handle", () => {
     const draft = createBuilderWaveJoinDraft(" david ");
 
     expect(draft).toContain("I would like to help with this hook.");
     expect(draft).toContain("Handle: david.");
+    expect(draft).not.toContain("Wallet:");
     expect(draft).toContain("Access notes: Manual builder review for phase 1; REP or TDH access checks are planned, not enforced here.");
     expect(draft).toContain("access is reviewed manually");
     expect(draft).toContain("discussion, review, tests, or a small PR");
@@ -19,6 +20,16 @@ describe("build room join draft", () => {
     const draft = createBuilderWaveJoinDraft("");
 
     expect(draft).toContain("Handle: not set yet.");
+    expect(draft).not.toContain("\u2014");
+  });
+
+  it("includes a connected wallet when provided", () => {
+    const draft = createBuilderWaveJoinDraft("sam", [], {
+      walletAddress: " 0x1234567890abcdef1234567890abcdef12345678 ",
+    });
+
+    expect(draft).toContain("Wallet: 0x1234567890abcdef1234567890abcdef12345678.");
+    expect(draft).toContain("access is reviewed manually");
     expect(draft).not.toContain("\u2014");
   });
 

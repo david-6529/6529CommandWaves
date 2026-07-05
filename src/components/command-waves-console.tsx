@@ -1322,7 +1322,7 @@ export function CommandWavesConsole() {
   const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
-    ["How do I join?", "Use Request access in chat. A maintainer reviews it for this pilot."],
+    ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
     ["How does work start?", "Post in chat. Good ideas become small work items the group can discuss."],
     [
       "How are PRs approved?",
@@ -1814,7 +1814,7 @@ export function CommandWavesConsole() {
 
   function prepareJoinRequest() {
     setDiscussionTabId("general");
-    setWaveRoomMessage(createBuilderWaveJoinDraft(proposer, wave.gates));
+    setWaveRoomMessage(createBuilderWaveJoinDraft(proposer, wave.gates, { walletAddress }));
     setWaveRoomNotice("Access request ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1841,7 +1841,7 @@ export function CommandWavesConsole() {
       }
 
       setWalletAddress(address);
-      setWalletNotice("Wallet connected. Project access is still manually reviewed.");
+      setWalletNotice("Wallet connected. Use Request access to include it in the draft.");
     } catch {
       setWalletNotice("Wallet connection was cancelled.");
     }
