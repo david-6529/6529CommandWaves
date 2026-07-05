@@ -45,8 +45,8 @@ export type PhaseOneProductContract = {
 export const phaseOneProductContract: PhaseOneProductContract = {
   name: commandWaveProductCopy.headline,
   purpose: commandWaveProductCopy.subhead,
-  workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-  publicSurfaces: ["Project chat discussion", "GitHub PR record", "Build audit log"],
+  workflow: ["Choose project", "Discuss in chat", "Record decision", "Build PR", "Review", "Log result"],
+  publicSurfaces: ["Project chat", "GitHub repo once configured", "Build audit log"],
   firstPhaseLimits: [
     "Start with one public project.",
     "No auto merges, deploys, payments, or live token-weighted authority in this app.",

@@ -28,8 +28,8 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.productContract).toMatchObject({
       name: "Decentralized Coding: Beta",
       purpose: "A simple way for people and agents to build in public",
-      workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-      publicSurfaces: ["Project chat discussion", "GitHub PR record", "Build audit log"],
+      workflow: ["Choose project", "Discuss in chat", "Record decision", "Build PR", "Review", "Log result"],
+      publicSurfaces: ["Project chat", "GitHub repo once configured", "Build audit log"],
     });
     expect(snapshot.authorityBoundary).toMatchObject({
       phase: "first_public_hook_build",

@@ -197,13 +197,13 @@ function productContractReady(value: unknown) {
       asString(record.name) === commandWaveProductCopy.headline &&
       asString(record.purpose) === commandWaveProductCopy.subhead &&
       stringArrayIncludes(record.workflow, "Choose project") &&
-      stringArrayIncludes(record.workflow, "Discuss work") &&
+      stringArrayIncludes(record.workflow, "Discuss in chat") &&
       stringArrayIncludes(record.workflow, "Record decision") &&
       stringArrayIncludes(record.workflow, "Build PR") &&
       stringArrayIncludes(record.workflow, "Review") &&
       stringArrayIncludes(record.workflow, "Log result") &&
-      stringArrayIncludes(record.publicSurfaces, "Project chat discussion") &&
-      stringArrayIncludes(record.publicSurfaces, "GitHub PR record") &&
+      stringArrayIncludes(record.publicSurfaces, "Project chat") &&
+      stringArrayIncludes(record.publicSurfaces, "GitHub repo once configured") &&
       stringArrayIncludes(record.publicSurfaces, "Build audit log"),
   );
 }

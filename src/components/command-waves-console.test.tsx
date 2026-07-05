@@ -25,7 +25,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon managed");
-    expect(text).toContain("This pilot coordinates the design of a 6529 AMM hook through group chat");
+    expect(text).toContain("GitHub PRs once a real repo is connected");
     expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("daemon, a 6529 account, keeps this summary");
     expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
@@ -66,7 +66,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Start in chat so builders can shape the idea.");
     expect(text).toContain("Save the scoped work once builders can see it.");
-    expect(text).toContain("Use GitHub PRs for code changes.");
+    expect(text).toContain("Use GitHub PRs once the repo is connected.");
     expect(text).toContain("Scope work");
     expect(text).toContain("Save scoped work");
     expect(text).toContain("Project log");

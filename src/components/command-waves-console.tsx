@@ -135,7 +135,7 @@ const proposalFlowSteps = [
   ["Discuss", "Start in chat so builders can shape the idea."],
   ["Decide", "Record a visible decision for important hook work."],
   ["Record", "Save the scoped work once builders can see it."],
-  ["Build", "Use GitHub PRs for code changes."],
+  ["Build", "Use GitHub PRs once the repo is connected."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
 const discussionTabs = [
@@ -2108,12 +2108,12 @@ export function CommandWavesConsole() {
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} managed</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-600">
-                This pilot coordinates the design of a 6529 AMM hook through group chat, scoped decisions, GitHub PRs,
-                and reviewer checks. {currentFocusLabel}: {humanizeLegacyCommandCopy(currentFocusTitle)}.
+                This pilot coordinates the design of a 6529 AMM hook through group chat, scoped decisions, reviewer
+                checks, and GitHub PRs once a real repo is connected. {currentFocusLabel}: {humanizeLegacyCommandCopy(currentFocusTitle)}.
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-600">
                 {orchestratorAgentIdentity.handle}, a {orchestratorAgentIdentity.accountType}, keeps this summary and
-                changelog current as discussion and PRs change. {reviewAgentIdentity.description}{" "}
+                changelog current as chat, decisions, and repo activity change. {reviewAgentIdentity.description}{" "}
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
                     Open the code repo

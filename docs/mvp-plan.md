@@ -2,35 +2,35 @@
 
 ## Product Definition
 
-A Command Wave is a hook room where a public 6529 room governs scoped work in a GitHub repo.
+A Command Wave is a project workspace where public chat governs scoped work in a GitHub repo.
 
-For the first public phase, the product helps the community build a 6529 hook together. Participation gates define who can play. People and agents propose commands in plain English. Orchestration rules decide whether a command can run now, needs a visible decision, or must stay blocked. Approved commands can run through a controlled agent adapter. Reviewer CI checks the result before humans merge, and the activity is logged so the room can see what happened.
+For the first public phase, the product helps the community build a 6529 hook together. Access notes explain who can join. People and agents propose work in plain English. The daemon account summarizes chat, classifies risk, keeps scope small, and routes important work to a visible decision. Approved work can move into a controlled PR flow. Reviewer checks stay as a placeholder until the production reviewer service is wired, and humans stay in charge of merge, deploy, payment, and governance decisions.
 
-The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused 6529 Hook room so anyone can see the access notes, room activity, GitHub repo, current code review state, and next action.
+The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused project workspace so anyone can see the access notes, chat activity, repo setup status, current code review state, and next action.
 
-6529 remains the live conversation and decision layer. The app should act as a snapshot and project dashboard: recent room context, approved commands, risk classifications, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
+6529 remains the live conversation and decision layer for this pilot. The app should act as a snapshot and project dashboard: recent chat context, approved work, risk classifications, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
 Maintainer setup, guardrails, and readiness checks should stay available without leading the public project experience.
-The proposal path should ask for the change, limits, and success criteria first. Command type, proposer identity, and budget settings can stay available as advanced controls.
+The proposal path should ask for the change, limits, and success criteria first. Work type, proposer identity, and budget settings can stay available as advanced controls.
 
 The simplest product view is:
 
 ```text
-Access -> Room -> PR -> Review
+Access -> Chat -> Decision -> PR -> Review
 ```
 
 ## Roles
 
-- **Builders:** pass or receive the participation gate, propose ideas or code, vote when rules require it, and inspect results.
-- **Orchestration agent:** acts as the hook expert, summarizes wave input, classifies risk, applies rules, and prepares scoped PR commands.
+- **Builders:** request access, propose ideas or code, vote when rules require it, and inspect results.
+- **Orchestration agent:** the 6529 account `daemon`, acts as the hook expert, summarizes chat input, classifies risk, applies rules, and prepares scoped PR work.
 - **Agent worker:** helps with approved PR work through a constrained Codex packet and GitHub draft PR flow.
-- **Reviewer agent:** checks the PR against the approved command, vote, rules, architecture, security, and expected artifacts before humans merge.
+- **Reviewer agent:** placeholder for now. The production reviewer should check the PR against the approved work, decision, rules, architecture, security, and expected artifacts before humans merge.
 
-Implementation names can evolve later. The user-facing MVP should lead with access, room, proposal, decision, PR, and review.
+Implementation names can evolve later. The user-facing MVP should lead with access, chat, proposal, decision, PR, and review.
 
 ## Core Objects
 
 - **CommandWave:** project workspace tied to a 6529 wave and optionally a GitHub repo.
-- **Gates:** participation notes for REP, TDH, allowlists, QnA, or manual admission. They are advisory until live enforcement is wired.
+- **Access notes:** participation notes for REP, TDH, allowlists, QnA, or manual admission. They are advisory until live enforcement is wired.
 - **Rules:** versioned policy for command types, risk, quorum, thresholds, expiry, allowed tools, and blocked actions.
 - **Proposal:** a requested command with prompt, spec, risk, proposer, budget, and status.
 - **Poll:** yes/no vote with quorum and yes threshold.
@@ -70,10 +70,10 @@ Later phases can add stricter approval paths for parked command kinds after the 
 
 ## First Real Demo
 
-1. A public 6529 room is linked to the 6529 hook smart contract repo.
+1. A public project chat is linked to the 6529 hook smart contract repo.
 2. A member proposes: "Draft the non-upgradeable hook scaffold with fee parameters capped at 100 bps and tests."
 3. The orchestration rules classify it as `open_pr`, high risk, vote required.
-4. The room decision approves the scoped work.
+4. The project decision approves the scoped work.
 5. The operator records the decision URL as a manual approval receipt.
 6. The agent opens a PR with a Command Waves manifest.
 7. The GitHub reviewer gate checks the PR manifest, vote or receipt status, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.

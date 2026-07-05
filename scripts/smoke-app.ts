@@ -86,7 +86,7 @@ async function main() {
     "Connect wallet",
     "Project summary",
     "daemon managed",
-    "This pilot coordinates the design of a 6529 AMM hook through group chat",
+    "GitHub PRs once a real repo is connected",
     "Draft the non-upgradeable hook scaffold",
     "daemon, a 6529 account, keeps this summary",
     "Review agent is a placeholder until the production reviewer service is wired.",
@@ -128,7 +128,7 @@ async function main() {
     "Code checks",
     "Start in chat so builders can shape the idea.",
     "Save the scoped work once builders can see it.",
-    "Use GitHub PRs for code changes.",
+    "Use GitHub PRs once the repo is connected.",
     "Work type",
     "Safety checks",
     "Scope work",
@@ -168,7 +168,7 @@ async function main() {
   }
   assertJsonObject("Launch audit reports", reports);
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "productContract");
-  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Discuss work");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Discuss in chat");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "authorityBoundary");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Auto-merge PRs");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Visible activity report");
@@ -180,7 +180,7 @@ async function main() {
   assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
   assert(objectValue(statePayload, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Launch audit state hash does not match public state hash.");
   assertIncludes("State response", JSON.stringify(statePayload), "productContract");
-  assertIncludes("State response", JSON.stringify(statePayload), "Discuss work");
+  assertIncludes("State response", JSON.stringify(statePayload), "Discuss in chat");
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
   assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
   assertIncludes("State response", JSON.stringify(statePayload), "humansControl");
