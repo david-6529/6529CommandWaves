@@ -32,6 +32,19 @@ describe("command wave state snapshot", () => {
         ],
         gateStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
       },
+      agents: {
+        orchestrator: {
+          handle: "daemon",
+          accountType: "6529 account",
+          status: "active",
+        },
+        reviewer: {
+          status: "placeholder",
+        },
+        githubRepo: {
+          status: "placeholder",
+        },
+      },
       reports: {
         contribution: {
           mode: "informational",

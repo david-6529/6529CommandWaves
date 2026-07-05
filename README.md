@@ -33,8 +33,10 @@ protocol.
 What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
-- One active hook project with project chat and a code repo.
+- One active hook project with project chat and a placeholder code repo until the first repo is configured.
 - A top-right wallet connection control that can add a connected address to the access request draft.
+- Orchestrator identity set to the 6529 account `daemon`.
+- Review agent and GitHub repo are explicit placeholders until the production reviewer service and first repo are configured.
 - A simplified chat-first UI with a project overview, current hook change, chat composer, latest posts, builder profiles,
   project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
@@ -59,6 +61,7 @@ What remains manual or MVP-only:
   advisory notes until live wallet/session/score checks are wired.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation.
+- The GitHub repo is a placeholder in the default project state and must be replaced before PR work can run.
 - The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
   deploy, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
@@ -158,7 +161,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 Default workspace:
 
 - Project overview with chat, repo, access, and current status.
-- Current hook task, visible decision need, recent PR evidence, latest log, and next action.
+- Current hook task, saved discussion items, visible decision need, recent PR evidence, latest log, and next action.
 - Links to project chat, code repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct chat posting when configured, recent posts, and copyable discussion draft.
 - Folded proposal form for one PR-sized hook change with a Discuss, Decide, Save, Build, Review flow strip.

@@ -14,8 +14,8 @@ describe("setup proof", () => {
         id: "6529-hook-builder",
       },
       github: {
-        owner: "6529-Collections",
-        repo: "6529-hook",
+        owner: "your-org",
+        repo: "your-hook-repo",
         protectedBranch: "main",
         requiredReviewerCheck: "Command Waves Guardian",
       },

@@ -24,7 +24,9 @@ import {
 import { createContributionReport, createContributionReportDraft } from "@/lib/contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
+import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "@/lib/agent-identities";
 import { commandWaveProductCopy } from "@/lib/product-copy";
+import { isPlaceholderValue } from "@/lib/env-placeholders";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
 import {
   createFirstPhaseLaunchAudit,
@@ -1043,6 +1045,7 @@ export function CommandWavesConsole() {
   const readyForNextHookChange = activeReview?.status === "pass";
   const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
   const visibleSupportProposals = supportProposals.slice(0, 3);
+  const discussionQueueItems = phaseWork.supportProposals.slice(0, 2);
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
   const activeSupportProposal = activeProposal && !activeProposalIsPr ? activeProposal : null;
   const activeSupportProposalLabel = activeSupportProposal
@@ -1320,13 +1323,14 @@ export function CommandWavesConsole() {
         : "Check readiness"
       : "Open launch controls";
   const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
+  const projectRepoIsPlaceholder = isPlaceholderValue(projectRepoHref);
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
     ["How does work start?", "Post in chat. Good ideas become small work items the group can discuss."],
     [
       "How are PRs approved?",
-      "The group records a project decision before approved PR work starts. The reviewer checks the PR against that scope.",
+      "The group records a project decision before approved PR work starts. Review agent approval is a placeholder until wired.",
     ],
     ["Who merges?", "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work."],
   ];
@@ -2081,22 +2085,21 @@ export function CommandWavesConsole() {
             <details className="rounded-lg border border-zinc-200 p-4" open>
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
                 <span>Project summary</span>
-                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">orchestrator managed</Badge>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} managed</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-600">
                 This pilot coordinates the design of a 6529 AMM hook through group chat, scoped decisions, GitHub PRs,
                 and reviewer checks. {currentFocusLabel}: {humanizeLegacyCommandCopy(currentFocusTitle)}.
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-600">
-                The orchestrator keeps this summary and changelog current as discussion, PRs, and reviews change.
-                Builders can discuss ideas here, submit pull requests, and use reviewer output to keep humans in charge
-                of what gets merged.{" "}
-                {projectRepoHref ? (
+                {orchestratorAgentIdentity.handle}, a {orchestratorAgentIdentity.accountType}, keeps this summary and
+                changelog current as discussion and PRs change. {reviewAgentIdentity.description}{" "}
+                {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
                     Open the code repo
                   </a>
                 ) : (
-                  "The code repo is not set yet."
+                  githubRepoPlaceholder.description
                 )}
               </p>
             </details>
@@ -2125,7 +2128,7 @@ export function CommandWavesConsole() {
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{topChangelogItems.length} updates</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-600">
-                Latest orchestrator log from discussion, PR, and review activity.
+                Latest daemon log from discussion, PR, and review activity.
               </p>
               <div className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
                 {topChangelogItems.length ? (
@@ -2161,7 +2164,7 @@ export function CommandWavesConsole() {
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code repo</p>
-                {projectRepoHref ? (
+                {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a
                     className="mt-1 inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
                     href={projectRepoHref}
@@ -2170,11 +2173,34 @@ export function CommandWavesConsole() {
                   >
                     Open repo
                   </a>
+                ) : projectRepoIsPlaceholder ? (
+                  <p className="mt-1 text-base leading-7 text-zinc-600">Placeholder repo</p>
                 ) : (
                   <p className="mt-1 text-base leading-7 text-zinc-600">Repo not set yet.</p>
                 )}
               </div>
             </div>
+            {discussionQueueItems.length ? (
+              <div className="mt-5 border-t border-zinc-200 pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Discussion queue</p>
+                  <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">
+                    {countLabel(phaseWork.supportProposals.length, "item")}
+                  </Badge>
+                </div>
+                <div className="mt-3 grid gap-3">
+                  {discussionQueueItems.map((proposal) => (
+                    <div key={proposal.id} className="grid gap-1 border-t border-zinc-200 pt-3 first:border-t-0 first:pt-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-base font-semibold text-zinc-950">{humanizeLegacyCommandCopy(proposal.title)}</p>
+                        <Badge className={statusClass(proposal.status)}>{proposal.status.replaceAll("_", " ")}</Badge>
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-6 text-zinc-600">{humanizeLegacyCommandCopy(proposal.prompt)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </section>
 
           <details id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5" open>
@@ -2788,7 +2814,7 @@ export function CommandWavesConsole() {
                         </div>
                       </dl>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
+                        {project.repoUrl && !isPlaceholderValue(project.repoUrl) ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
                         {project.latestPrUrl ? <LinkButton href={project.latestPrUrl}>Open PR</LinkButton> : null}
                       </div>
                     </div>

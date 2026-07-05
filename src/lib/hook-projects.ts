@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { isPlaceholderValue } from "./env-placeholders";
 import { ledgerEventsByRecency } from "./ledger";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "./phase-next-action";
@@ -54,6 +55,11 @@ function waveLabel(waveUrl: string) {
 
 function repoLabel(repoUrl: string) {
   const trimmed = repoUrl.trim();
+
+  if (isPlaceholderValue(trimmed)) {
+    return "Placeholder repo";
+  }
+
   const httpsMatch = trimmed.match(/^https?:\/\/github\.com\/([^/\s]+\/[^/\s?#]+)(?:[?#].*)?$/);
   const sshMatch = trimmed.match(/^git@github\.com:([^/\s]+\/[^/\s]+?)(?:\.git)?$/);
 
@@ -61,6 +67,10 @@ function repoLabel(repoUrl: string) {
 }
 
 function findPullRequestUrl(wave: CommandWave) {
+  if (isPlaceholderValue(wave.repoUrl)) {
+    return null;
+  }
+
   return (
     wave.executions
       .flatMap((execution) => execution.artifacts)
@@ -217,7 +227,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const phaseWork = selectPhaseWork(wave);
     const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
-    const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim());
+    const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim() && !isPlaceholderValue(wave.repoUrl));
     const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
 
     return {

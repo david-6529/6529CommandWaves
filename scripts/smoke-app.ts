@@ -29,6 +29,10 @@ function assertIncludes(label: string, value: string, expected: string) {
   assert(value.includes(expected), `${label} did not include ${expected}.`);
 }
 
+function normalizeHydrationMarkers(value: string) {
+  return value.replace(/<!--(?:[^-]|-(?!->))*-->/g, "");
+}
+
 async function fetchText(path: string) {
   return fetchTextWithTimeout(appUrl(path), {
     headers: {
@@ -68,8 +72,9 @@ function assertSha256(label: string, value: unknown): asserts value is string {
 
 async function main() {
   const html = await fetchText("/");
+  const renderedHtml = normalizeHydrationMarkers(html);
 
-  assertIncludes("Home page", html, commandWaveProductCopy.headline);
+  assertIncludes("Home page", renderedHtml, commandWaveProductCopy.headline);
   for (const label of [
     "dark-app",
     "bg-zinc-950",
@@ -80,12 +85,12 @@ async function main() {
     "Access is manual for now.",
     "Connect wallet",
     "Project summary",
-    "orchestrator managed",
+    "daemon managed",
     "This pilot coordinates the design of a 6529 AMM hook through group chat",
     "Add fee cap tests",
-    "The orchestrator keeps this summary and changelog current",
-    "Builders can discuss ideas here, submit pull requests",
-    "Open the code repo",
+    "daemon, a 6529 account, keeps this summary",
+    "Review agent is a placeholder until the production reviewer service is wired.",
+    "GitHub repo is a placeholder until the first hook repo is configured.",
     "Changelog",
     "Rules",
     "Who can join?",
@@ -98,6 +103,7 @@ async function main() {
     "Next work",
     "Confirm scope in chat before saving a proposal.",
     "Code repo",
+    "Placeholder repo",
     "Project discussion",
     "General",
     "Build",
@@ -130,9 +136,9 @@ async function main() {
     "Visible activity report",
     "Maintainer tools",
   ]) {
-    assertIncludes("Home page", html, label);
+    assertIncludes("Home page", renderedHtml, label);
   }
-  assertNoEmDash("Home page", html);
+  assertNoEmDash("Home page", renderedHtml);
 
   const readiness = await fetchJson("/api/readiness");
   const readinessChecks = objectValue(readiness, "checks");

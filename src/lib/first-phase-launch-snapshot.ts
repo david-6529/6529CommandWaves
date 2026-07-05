@@ -4,6 +4,7 @@ import {
   phaseOneProductContract,
   type CommandWaveStateSnapshot,
 } from "./command-wave-state";
+import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
@@ -27,6 +28,7 @@ export type FirstPhaseLaunchSnapshot = {
   setupCheckMode: "shape" | "remote";
   productContract: CommandWaveStateSnapshot["productContract"];
   authorityBoundary: CommandWaveStateSnapshot["authorityBoundary"];
+  agents: CommandWaveStateSnapshot["agents"];
   stateEvidence: {
     waveStateHash: string;
     rulesHash: string;
@@ -116,6 +118,11 @@ export async function createFirstPhaseLaunchSnapshot(
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
+    agents: {
+      orchestrator: orchestratorAgentIdentity,
+      reviewer: reviewAgentIdentity,
+      githubRepo: githubRepoPlaceholder,
+    },
     stateEvidence: {
       waveStateHash: hashValue(wave),
       rulesHash: hashValue(wave.rules),

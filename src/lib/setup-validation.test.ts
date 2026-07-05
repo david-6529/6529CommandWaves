@@ -41,6 +41,22 @@ describe("setup validation", () => {
     expect(validation.canSave).toBe(true);
   });
 
+  it("fails GitHub repo placeholders before PR work can run", () => {
+    const validation = validateSetupShape({
+      waveUrl: "mock-command-wave",
+      repoUrl: "https://github.com/your-org/your-hook-repo",
+    });
+
+    expect(validation.canSave).toBe(false);
+    expect(validation.canRunCode).toBe(false);
+    expect(validation.checks).toContainEqual({
+      id: "repo_placeholder",
+      label: "GitHub repo placeholder",
+      status: "fail",
+      message: "Replace the GitHub repo placeholder before saving setup or running PR work.",
+    });
+  });
+
   it("fails invalid setup values", () => {
     const validation = validateSetupShape({
       waveUrl: "",

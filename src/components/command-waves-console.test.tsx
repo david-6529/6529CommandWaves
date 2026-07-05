@@ -24,12 +24,12 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Access is manual for now.");
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
-    expect(text).toContain("orchestrator managed");
+    expect(text).toContain("daemon managed");
     expect(text).toContain("This pilot coordinates the design of a 6529 AMM hook through group chat");
     expect(text).toContain("Next work: Add fee cap tests.");
-    expect(text).toContain("The orchestrator keeps this summary and changelog current");
-    expect(text).toContain("Builders can discuss ideas here, submit pull requests");
-    expect(text).toContain("Open the code repo");
+    expect(text).toContain("daemon, a 6529 account, keeps this summary");
+    expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
+    expect(text).toContain("GitHub repo is a placeholder until the first hook repo is configured.");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
     expect(text).toContain("Who can join?");
@@ -43,6 +43,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Decision");
     expect(text).toContain("Confirm scope in chat before saving a proposal.");
     expect(text).toContain("Code repo");
+    expect(text).toContain("Placeholder repo");
     expect(text).toContain("Project discussion");
     expect(text).toContain("General");
     expect(text).toContain("Build");
@@ -92,6 +93,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("gate unset");
     expect(text).not.toContain("Participation gate is not set yet.");
     expect(text).not.toContain("Build details");
+    expect(text).not.toContain("orchestrator managed");
   });
 
   it("keeps optional advanced drawers on the dark app surface", () => {

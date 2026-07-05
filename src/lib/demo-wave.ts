@@ -53,7 +53,7 @@ const preExecutionWave: CommandWave = {
   id: "cw-6529-hook-builder",
   name: "6529 Hook",
   waveUrl: "https://6529.io/waves/6529-hook-builder",
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: "https://github.com/your-org/your-hook-repo",
   gates: [...defaultParticipationGates],
   rules: defaultRules,
   proposals: [reviewingProposal],

@@ -1,5 +1,6 @@
 import { getWave, normalizeWaveId } from "./6529/client";
 import { is6529MockMode } from "./6529/mock";
+import { isPlaceholderValue } from "./env-placeholders";
 import {
   getGitHubRepoMetadata,
   getGitHubRepoRequiredFiles,
@@ -106,6 +107,17 @@ export function validateSetupShape(input: SetupValidationInput): SetupValidation
       ? check("repo_format", "GitHub repo", "pass", `Using ${repo.owner}/${repo.repo}.`)
       : check("repo_format", "GitHub repo", "fail", "Use a GitHub URL or owner/repo shorthand."),
   );
+
+  if (repo && isPlaceholderValue(repoText)) {
+    checks.push(
+      check(
+        "repo_placeholder",
+        "GitHub repo placeholder",
+        "fail",
+        "Replace the GitHub repo placeholder before saving setup or running PR work.",
+      ),
+    );
+  }
 
   return {
     waveId: waveId || null,

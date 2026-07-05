@@ -10,11 +10,11 @@ describe("active hook projects", () => {
       expect.objectContaining({
         id: demoWave.id,
         name: "Hook Build",
-        status: "active",
+        status: "setup",
         waveUrl: demoWave.waveUrl,
         repoUrl: demoWave.repoUrl,
         waveLabel: "6529-hook-builder",
-        repoLabel: "6529-Collections/6529-hook",
+        repoLabel: "Placeholder repo",
         currentFocus: demoWave.proposals[0].title,
         participation: "Follow project chat, draft replies for manual posting, and track code work.",
         waveRole: "Where builders talk, propose, decide, and share updates.",
@@ -33,7 +33,7 @@ describe("active hook projects", () => {
         nextActionDetail: "The approved hook work has a PR, review, project update, and launch packet.",
         waveStatus: "Project decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
-        latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
+        latestPrUrl: null,
         reviewStatusLabel: "review passed",
         evidenceLabel: "1 proposal, 1 run, 1 review",
       }),
@@ -179,7 +179,7 @@ describe("active hook projects", () => {
     expect(projects[0]).toMatchObject({
       id: demoWave.id,
       waveLabel: "6529-hook-builder",
-      repoLabel: "6529-Collections/6529-hook",
+      repoLabel: "Placeholder repo",
     });
     expect(projects[1]).toMatchObject({
       id: "cw-community-hook",

@@ -1,3 +1,4 @@
+import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { hasProductionValue } from "./env-placeholders";
@@ -18,6 +19,11 @@ export type CommandWaveStateSnapshot = {
     appDoesNot: string[];
     agentLimits: string[];
     gateStatus: string;
+  };
+  agents: {
+    orchestrator: typeof orchestratorAgentIdentity;
+    reviewer: typeof reviewAgentIdentity;
+    githubRepo: typeof githubRepoPlaceholder;
   };
   reports: {
     contribution: ContributionReport;
@@ -80,6 +86,11 @@ export function createCommandWaveStateSnapshot(
     waveStateHash: hashValue(wave),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
+    agents: {
+      orchestrator: orchestratorAgentIdentity,
+      reviewer: reviewAgentIdentity,
+      githubRepo: githubRepoPlaceholder,
+    },
     reports: {
       contribution: createContributionReport(wave, { generatedAt }),
     },

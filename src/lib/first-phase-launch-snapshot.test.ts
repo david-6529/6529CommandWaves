@@ -37,6 +37,19 @@ describe("first phase launch snapshot", () => {
       codeSurface: "GitHub PR",
       humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
     });
+    expect(snapshot.agents).toMatchObject({
+      orchestrator: {
+        handle: "daemon",
+        accountType: "6529 account",
+        status: "active",
+      },
+      reviewer: {
+        status: "placeholder",
+      },
+      githubRepo: {
+        status: "placeholder",
+      },
+    });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
     expect(snapshot.stateEvidence).toEqual({
       waveStateHash: hashValue(demoWave),
@@ -65,16 +78,17 @@ describe("first phase launch snapshot", () => {
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
     expect(snapshot.statusDraft).toContain("Project launch status");
-    expect(snapshot.statusDraft).toContain("Status: checks needed");
-    expect(snapshot.statusDraft).toContain("Next action: Run launch setup check");
+    expect(snapshot.statusDraft).toContain("Status: blocked");
+    expect(snapshot.statusDraft).toContain("Next action: Fix setup");
+    expect(snapshot.statusDraft).toContain("Replace the GitHub repo placeholder before saving setup or running PR work.");
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");
     expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
     expect(snapshot.statusDraft).toContain("- Launch audit: https://command-waves.example.com/api/command-wave/launch/audit");
     expect(snapshot.statusDraft).toContain("does not approve work or move funds");
     expect(snapshot.phaseChecklist.every((item) => item.status === "done")).toBe(true);
     expect(snapshot.launchAudit.nextAction).toMatchObject({
-      itemId: "setup_remote_check",
-      title: "Run launch setup check",
+      itemId: "setup_project_check",
+      title: "Fix setup",
     });
   });
 
@@ -87,7 +101,11 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.readiness.summary.fail).toBe(0);
     expect(snapshot.readiness.checks.map((check) => check.id)).toContain("admin_api_key");
     expect(snapshot.readiness.checks.map((check) => check.id)).toContain("6529_mode");
-    expect(snapshot.setupValidation.checks.map((check) => check.id)).toEqual(["wave_format", "repo_format"]);
+    expect(snapshot.setupValidation.checks.map((check) => check.id)).toEqual([
+      "wave_format",
+      "repo_format",
+      "repo_placeholder",
+    ]);
   });
 
   it("marks the snapshot as remote when remote setup checks are requested", async () => {

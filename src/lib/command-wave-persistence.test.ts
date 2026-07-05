@@ -92,7 +92,7 @@ describe("command wave persistence", () => {
     expect(await getCommandWave()).toMatchObject({
       id: "cw-6529-hook-builder",
       waveUrl: "https://6529.io/waves/6529-hook-builder",
-      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      repoUrl: demoWave.repoUrl,
     });
   });
 

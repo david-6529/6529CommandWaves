@@ -69,11 +69,21 @@ describe("Command wave store", () => {
 
     await replaceCommandWave({
       ...wave,
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
       proposals: wave.proposals.map((proposal) =>
         proposal.id === "cmd-001" ? { ...proposal, status: "approved" as const } : proposal,
       ),
       executions: [],
       reviews: [],
+    });
+  }
+
+  async function configureRealRepo() {
+    const wave = await getCommandWave();
+
+    await replaceCommandWave({
+      ...wave,
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
     });
   }
 
@@ -432,6 +442,8 @@ describe("Command wave store", () => {
   });
 
   it("requires a project decision receipt before PR execution", async () => {
+    await configureRealRepo();
+
     await submitCommandProposal({
       title: "Open a PR",
       proposer: "tester",

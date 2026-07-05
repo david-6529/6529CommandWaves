@@ -19,7 +19,7 @@ describe("build timeline", () => {
       href: "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
       hrefLabel: "Open decision",
     });
-    expect(timeline[2].href).toBe("https://github.com/6529-Collections/6529-hook/pull/12");
+    expect(timeline[2].href).toBe(`${demoWave.repoUrl}/pull/12`);
     expect(timeline[2]).toMatchObject({
       title: "PR recorded",
       detail: "Approved PR record is ready for review.",

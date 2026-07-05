@@ -111,7 +111,7 @@ function isBuiltInHookProject(wave: CommandWave) {
   return (
     wave.id === demoWave.id &&
     wave.waveUrl.includes("/waves/6529-hook-builder") &&
-    wave.repoUrl.includes("/6529-hook")
+    (wave.repoUrl.includes("/6529-hook") || wave.repoUrl.includes("/your-hook-repo"))
   );
 }
 

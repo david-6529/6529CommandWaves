@@ -9,7 +9,7 @@ describe("participation guide draft", () => {
     expect(draft).toContain("Project participation guide");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
-    expect(draft).toContain("Contributor rules: https://github.com/6529-Collections/6529-hook/blob/main/CONTRIBUTING.md");
+    expect(draft).toContain(`Contributor rules: ${demoWave.repoUrl}/blob/main/CONTRIBUTING.md`);
     expect(draft).toContain("Participation notes:");
     expect(draft).toContain("Builder loop:");
     expect(draft).toContain("Orchestration rules classify risk");
