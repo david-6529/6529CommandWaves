@@ -3,9 +3,9 @@ import { firstPhaseScopeInventory } from "./phase-scope";
 
 describe("first phase scope inventory", () => {
   it("keeps the launch focused on one hook room and one hook repo", () => {
-    expect(firstPhaseScopeInventory.useNow).toContain("One 6529 hook room and one GitHub hook repo.");
-    expect(firstPhaseScopeInventory.useNow).toContain("6529 hook project snapshot with room, code, PR, and review state.");
-    expect(firstPhaseScopeInventory.useNow).toContain("Manual 6529 decision receipts before PR work runs.");
+    expect(firstPhaseScopeInventory.useNow).toContain("One public build room and one GitHub repo.");
+    expect(firstPhaseScopeInventory.useNow).toContain("Project snapshot with room, code, PR, and review state.");
+    expect(firstPhaseScopeInventory.useNow).toContain("Manual room decision receipts before PR work runs.");
     expect(firstPhaseScopeInventory.parkLater).toContain("Broad swarm marketplace flows or external agent endpoints.");
     expect(firstPhaseScopeInventory.parkLater).toContain("Upgradeable hook contracts by default.");
   });
@@ -15,10 +15,10 @@ describe("first phase scope inventory", () => {
     const parkLater = firstPhaseScopeInventory.parkLater.join(" ").toLowerCase();
 
     expect(useNow).not.toContain("automatic payout");
-    expect(useNow).not.toContain("live rep");
-    expect(useNow).not.toContain("live tdh");
-    expect(parkLater).toContain("live rep");
-    expect(parkLater).toContain("tdh");
+    expect(useNow).not.toContain("live reputation");
+    expect(useNow).not.toContain("live token");
+    expect(parkLater).toContain("live reputation");
+    expect(parkLater).toContain("token");
     expect(parkLater).toContain("automatic payouts");
   });
 

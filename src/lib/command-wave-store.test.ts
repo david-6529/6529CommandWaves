@@ -189,7 +189,7 @@ describe("Command wave store", () => {
     });
     expect(voted.polls[0].votes.map((vote) => vote.voterIdentity)).toEqual(["carol", "bob", "alice"]);
     expect(voted.ledger[0].message).toBe(
-      "cmd-002 local vote passed. Record the 6529 decision receipt before work can run.",
+      "cmd-002 local vote passed. Record the room decision receipt before work can run.",
     );
   });
 
@@ -258,7 +258,7 @@ describe("Command wave store", () => {
     );
   });
 
-  it("records a manual 6529 decision receipt as approval evidence", async () => {
+  it("records a manual room decision receipt as approval evidence", async () => {
     await submitCommandProposal({
       title: "Open a PR",
       proposer: "tester",
@@ -289,7 +289,7 @@ describe("Command wave store", () => {
         recordedBy: "david",
       },
     });
-    expect(approved.ledger[0].message).toBe("Recorded 6529 decision receipt for cmd-002.");
+    expect(approved.ledger[0].message).toBe("Recorded room decision receipt for cmd-002.");
   });
 
   it("rejects decision receipt URLs from another wave", async () => {
@@ -312,7 +312,7 @@ describe("Command wave store", () => {
         reference: "https://6529.io/waves/other-command-wave/drops/drop-approval-002",
         recordedBy: "david",
       }),
-    ).rejects.toThrow("6529 decision URL must match the configured discussion.");
+    ).rejects.toThrow("Room decision URL must match the configured discussion.");
   });
 
   it("rejects malformed decision receipt URLs", async () => {
@@ -331,7 +331,7 @@ describe("Command wave store", () => {
         reference: "https://[invalid",
         recordedBy: "david",
       }),
-    ).rejects.toThrow("6529 decision URL is not valid.");
+    ).rejects.toThrow("Room decision URL is not valid.");
   });
 
   it("requires a decision URL for PR command receipts", async () => {
@@ -350,7 +350,7 @@ describe("Command wave store", () => {
         reference: "drop-approval-002",
         recordedBy: "david",
       }),
-    ).rejects.toThrow("6529 decision URL is required for PR work.");
+    ).rejects.toThrow("Room decision URL is required for PR work.");
   });
 
   it("allows drop id receipts for support decisions", async () => {
@@ -431,7 +431,7 @@ describe("Command wave store", () => {
     await expect(recordVote({ proposalId: "cmd-002", voterIdentity: "dave", vote: "yes" })).rejects.toThrow("Poll is not open.");
   });
 
-  it("requires a 6529 decision receipt before PR execution", async () => {
+  it("requires a room decision receipt before PR execution", async () => {
     await submitCommandProposal({
       title: "Open a PR",
       proposer: "tester",
@@ -446,7 +446,7 @@ describe("Command wave store", () => {
     await recordVote({ proposalId: "cmd-002", voterIdentity: "carol", vote: "yes" });
 
     await expect(executeProposal({ proposalId: "cmd-002" })).rejects.toThrow(
-      "Record the 6529 decision receipt before building PR work.",
+      "Record the room decision receipt before building PR work.",
     );
 
     await recordDecisionReceipt({

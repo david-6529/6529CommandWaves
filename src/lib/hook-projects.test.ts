@@ -3,13 +3,13 @@ import { demoWave } from "./demo-wave";
 import { createActiveHookProjects } from "./hook-projects";
 
 describe("active hook projects", () => {
-  it("lists the 6529 hook with its builder wave and repo", () => {
+  it("lists the hook build with its room and repo", () => {
     const projects = createActiveHookProjects(demoWave);
 
     expect(projects).toEqual([
       expect.objectContaining({
         id: demoWave.id,
-        name: "6529 Hook",
+        name: "Hook Build",
         status: "active",
         waveUrl: demoWave.waveUrl,
         repoUrl: demoWave.repoUrl,

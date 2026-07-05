@@ -5,13 +5,13 @@ export function createBuilderWaveChatDraft(wave: CommandWave, nextAction: PhaseN
   const body = message.trim() || "[Write your message here.]";
 
   return [
-    "6529 hook message",
+    "Build room message",
     "",
     body,
     "",
     `Current hook change: ${nextAction.title}`,
     `- Status: ${nextAction.detail}`,
     `- Repo: ${wave.repoUrl}`,
-    `- 6529 discussion: ${wave.waveUrl}`,
+    `- Project room: ${wave.waveUrl}`,
   ].join("\n");
 }

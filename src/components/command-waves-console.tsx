@@ -79,7 +79,7 @@ const firstPhaseProposalKinds = firstPhaseProposalKindValues
   .filter((item): item is CommandKindOption => Boolean(item));
 const defaultProposalTitle = "Add fee cap tests";
 const defaultProposalRequest =
-  "Add tests that prove the 6529 hook fee parameter cannot exceed 100 bps and that zero fee still works.";
+  "Add tests that prove the hook fee parameter cannot exceed 100 bps and that zero fee still works.";
 const defaultProposalLimits =
   "Test-only PR for the current hook contract. Keep the hook immutable. No deploy scripts, payments, owner changes, role changes, proxy, or delegatecall. Include bound-focused tests for the 100 bps max fee.";
 const proposalTypeOptions: ProposalTypeOption[] = [
@@ -151,7 +151,7 @@ const buildRoomRules = [
 ];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
-  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public 6529 hook room."],
+  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public build room."],
   ["COMMAND_WAVE_INITIAL_REPO_URL", "Reachable GitHub hook repo."],
   ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
   ["DATABASE_URL", "Production Postgres connection."],
@@ -1002,7 +1002,7 @@ export function CommandWavesConsole() {
   const activePrHasWaveDecision = Boolean(
     activeProposalIsPr && pollApprovalPassedForWave(activePoll ?? null, wave.waveUrl, { requireUrl: true }),
   );
-  const decisionReferencePlaceholder = activeProposalIsPr ? "6529 decision URL" : "6529 decision URL or drop id";
+  const decisionReferencePlaceholder = activeProposalIsPr ? "Room decision URL" : "Room decision URL or drop id";
   const activePollNeedsWaveDecision = Boolean(
     activePoll?.status === "passed" && (!activePoll.decision || activeDecisionReferenceCheck?.ok === false),
   );
@@ -1010,9 +1010,9 @@ export function CommandWavesConsole() {
   const activePollCanVote = activePoll?.status === "open";
   const showDecisionRecorder = Boolean(activePoll && activePollNeedsWaveDecision);
   const activePollTitle = activePollNeedsWaveDecision
-    ? "6529 decision needed"
+    ? "Room decision needed"
     : activePollDecisionRecorded
-      ? "6529 decision recorded"
+      ? "Room decision recorded"
       : activePoll?.status === "failed"
         ? "Vote failed"
         : activePoll?.status === "passed"
@@ -1020,9 +1020,9 @@ export function CommandWavesConsole() {
         : "Vote open";
   const decisionTitle = activePoll ? activePollTitle : simpleDecisionRoute;
   const activePollDetail = activePollNeedsWaveDecision
-    ? "Local vote passed. Record the 6529 decision receipt before work runs."
+    ? "Local vote passed. Record the room decision before work runs."
     : activePollDecisionRecorded
-      ? `6529 decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
+      ? `Room decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
       : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
@@ -1055,8 +1055,8 @@ export function CommandWavesConsole() {
               : "border-zinc-700 bg-zinc-900 text-zinc-400";
   const currentFocusTitle =
     readyForNextHookChange
-      ? title.trim() || "Pick the next hook change"
-      : activeProposal?.title ?? "Pick the next hook change";
+      ? title.trim() || "Pick the next change"
+      : activeProposal?.title ?? "Pick the next change";
   const currentFocusDescription =
     readyForNextHookChange
       ? "Bring this draft to the room before saving it as a proposal."
@@ -1284,43 +1284,37 @@ export function CommandWavesConsole() {
     : activePollCanVote
       ? "Ask the room for a visible decision before code work starts."
       : showDecisionRecorder
-        ? "Record the 6529 decision URL so the PR has a source of truth."
+        ? "Record the room decision URL so the PR has a source of truth."
         : showBuildAction
           ? activePrHasWaveDecision
             ? "Use the approved packet and attach the PR record."
-            : "Record the 6529 decision URL before PR work starts."
+            : "Record the room decision URL before PR work starts."
           : canRunReview
             ? "Check the PR against the approved proposal and room rules."
             : activeSupportProposal
               ? `${activeSupportProposalLabel} is recorded. Use the room to discuss it or propose the next code change.`
-            : activeProposal
-              ? "Follow the next open step for this hook change."
-              : "Choose one small hook change the room can discuss.";
+              : activeProposal
+                ? "Follow the next open step for this change."
+                : "Choose one small change the room can discuss.";
   const decisionStateClass = activePollNeedsWaveDecision || activePollCanVote ? riskClass("medium") : statusClass("complete");
   const latestLedgerEvent = orderedLedgerEvents[0] ?? null;
-  const projectOverviewItems = [
+  const projectSummaryItems = [
     {
-      label: "Room",
-      value: primaryHookProject?.waveLabel ?? "No room set",
-      detail: "Where builders talk and decide",
+      label: "Discussion room",
+      value: Boolean(primaryHookProject?.waveUrl || wave.waveUrl) ? "Build room" : "No room set",
+      detail: "Where builders talk and make decisions.",
       href: primaryHookProject?.waveUrl ?? wave.waveUrl,
     },
     {
-      label: "Repo",
-      value: primaryHookProject?.repoLabel ?? "No repo set",
-      detail: "Where reviewed PRs land",
+      label: "Code repo",
+      value: Boolean(primaryHookProject?.repoUrl || repoUrl) ? "Hook repo" : "No repo set",
+      detail: "Where reviewed pull requests land.",
       href: primaryHookProject?.repoUrl ?? repoUrl,
     },
     {
-      label: "Access",
+      label: "Who can contribute",
       value: participationAccess.label,
-      detail: "Who can drive work",
-      href: null,
-    },
-    {
-      label: "Now",
-      value: currentBuildStatusLabel,
-      detail: currentFocusTitle,
+      detail: "Access is reviewed manually for this phase.",
       href: null,
     },
   ];
@@ -1354,9 +1348,9 @@ export function CommandWavesConsole() {
   const ruleHighlights = [
     ["Gate", participationGateNotes[0] ?? "Participation gate is set by project maintainers."],
     ["Discuss", "Ideas, questions, and scope changes start in the room."],
-    ["Decide", "Important or risky hook changes need a visible room decision."],
+    ["Decide", "Important or risky changes need a visible room decision."],
     ["Build", "Code moves through GitHub PRs and reviewer checks."],
-    ["Control", "Humans merge, deploy, pay, and change governance."],
+    ["Control", "Humans merge, deploy, pay, and change project rules."],
   ];
 
   useEffect(() => {
@@ -1957,7 +1951,7 @@ export function CommandWavesConsole() {
             recordedBy: proposer,
           }),
         }, accessKey),
-      "6529 decision receipt recorded.",
+      "Room decision recorded.",
     );
   }
 
@@ -2000,36 +1994,43 @@ export function CommandWavesConsole() {
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="max-w-4xl">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{commandWaveProductCopy.headline}</p>
-              <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">{wave.name}</h1>
+              <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
+                Pilot: 6529 AMM hook
+              </h1>
               <p className="mt-3 max-w-3xl text-xl leading-8 text-zinc-700">
-                A public build room for the 6529 hook. Builders discuss scope, record decisions, open PRs, and run reviewer checks before humans merge.
+                A shared room for people and agents to turn discussion into reviewed pull requests. Pick one change, decide in public, review the code, then move to the next change.
               </p>
             </div>
             <nav className="flex flex-wrap gap-2" aria-label="Primary actions">
-              <JumpLink href="#wave-room">Chat</JumpLink>
-              <Button type="button" onClick={openSuggestSection}>
-                Suggest work
-              </Button>
+              <JumpLink href="#wave-room">Discuss work</JumpLink>
+              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
             </nav>
           </div>
 
-          <dl className="mt-6 grid border-y border-zinc-200 sm:grid-cols-2 lg:grid-cols-4">
-            {projectOverviewItems.map((item) => (
-              <div key={item.label} className="border-b border-zinc-200 py-4 sm:px-4 lg:border-b-0 lg:border-r lg:last:border-r-0">
-                <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</dt>
-                <dd className="mt-1 break-words text-lg font-semibold leading-7 text-zinc-950">
-                  {item.href ? (
-                    <a className="hover:text-blue-700" href={item.href} target="_blank" rel="noreferrer">
-                      {item.value}
-                    </a>
-                  ) : (
-                    item.value
-                  )}
-                </dd>
-                <dd className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-500">{item.detail}</dd>
-              </div>
-            ))}
-          </dl>
+          <section className="mt-6 rounded-lg border border-zinc-200 p-5" aria-label="Project overview">
+            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project</p>
+            <h2 className="mt-2 text-2xl font-semibold leading-8 text-zinc-950">Build one hook in public</h2>
+            <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-600">
+              Builders discuss the work in the room. Decisions are recorded there. Reviewed pull requests land in the repo. This app keeps the current work, rules, and review trail in one place.
+            </p>
+            <dl className="mt-5 grid gap-3 md:grid-cols-3">
+              {projectSummaryItems.map((item) => (
+                <div key={item.label} className="border-t border-zinc-200 pt-3">
+                  <dt className="text-sm font-semibold text-zinc-500">{item.label}</dt>
+                  <dd className="mt-1 break-words text-base font-semibold leading-6 text-zinc-950">
+                    {item.href ? (
+                      <a className="hover:text-blue-700" href={item.href} target="_blank" rel="noreferrer">
+                        {item.value}
+                      </a>
+                    ) : (
+                      item.value
+                    )}
+                  </dd>
+                  <dd className="mt-1 text-sm leading-6 text-zinc-500">{item.detail}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
         </header>
 
         <section id="workspace" className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
@@ -2039,9 +2040,7 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Upcoming or being discussed</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Work</h2>
               </div>
-              <Button type="button" variant="secondary" onClick={openSuggestSection}>
-                Add work
-              </Button>
+              <JumpLink href="#wave-room">Discuss work</JumpLink>
             </div>
 
             <div className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
@@ -2104,9 +2103,7 @@ export function CommandWavesConsole() {
 
             <div className="mt-5 flex flex-wrap gap-2 border-t border-zinc-200 pt-4">
               {!activeProposal ? (
-                <Button type="button" onClick={openSuggestSection}>
-                  Suggest work
-                </Button>
+                <JumpLink href="#wave-room">Discuss work</JumpLink>
               ) : activePollCanVote ? (
                 <>
                   <Button type="button" onClick={() => void copyBuilderWaveDecisionDraft()}>
@@ -2145,9 +2142,7 @@ export function CommandWavesConsole() {
                   </Button>
                 </>
               ) : (
-                <Button type="button" onClick={openSuggestSection}>
-                  Suggest work
-                </Button>
+                <JumpLink href="#wave-room">Discuss work</JumpLink>
               )}
             </div>
             {decisionDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
@@ -2160,9 +2155,11 @@ export function CommandWavesConsole() {
           <section id="wave-room" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Swarm chat</p>
-                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Talk in the build room</h2>
-                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">Use plain English. Ask, propose, review, or call out risk.</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Room discussion</p>
+                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Discuss work</h2>
+                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">
+                  Ask a question, suggest a change, review an idea, or call out risk. This is where work starts.
+                </p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
@@ -2324,7 +2321,7 @@ export function CommandWavesConsole() {
                       <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
                         Message
                       </Button>
-                      <LinkButton href={memberProfileUrl(member.identity)}>6529 profile</LinkButton>
+                      <LinkButton href={memberProfileUrl(member.identity)}>Profile</LinkButton>
                     </div>
                   </article>
                 ))
@@ -2366,7 +2363,7 @@ export function CommandWavesConsole() {
               </p>
             </div>
             <div className="mt-5 border-t border-zinc-200 pt-4">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Hook guardrails</p>
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code guardrails</p>
               <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-600">
                 {hookGuardrails.slice(0, 3).map((guardrail) => (
                   <li key={guardrail}>- {guardrail}</li>
@@ -2383,7 +2380,7 @@ export function CommandWavesConsole() {
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-950">Suggest work</summary>
+          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-950">Proposal draft</summary>
           <div className="mt-4 max-w-4xl">
             <div className="grid gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-5">
               {proposalFlowSteps.map(([label, detail], index) => (
@@ -2465,7 +2462,7 @@ export function CommandWavesConsole() {
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
-              <JumpLink href="#wave-room">Chat</JumpLink>
+              <JumpLink href="#wave-room">Discuss work</JumpLink>
             </div>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
               Discuss it in the room first. Save only when the proposal is visible there.
@@ -2492,7 +2489,7 @@ export function CommandWavesConsole() {
                   <Badge className={statusClass(selectedRule.mode)}>{simpleDecisionRoute}</Badge>
                 </div>
                 <div className="flex items-center justify-between gap-3 py-3">
-                  <p className="text-base font-semibold text-zinc-950">Hook guardrails</p>
+                  <p className="text-base font-semibold text-zinc-950">Code guardrails</p>
                   <Badge className={hookProposalPreflightRequired ? checkStatusClass(hookProposalPreflight.status) : statusClass("complete")}>
                     {hookProposalPreflightRequired ? hookProposalPreflight.statusLabel : "ready"}
                   </Badge>
@@ -2845,7 +2842,7 @@ export function CommandWavesConsole() {
               <p className="text-sm leading-6 text-zinc-400">
                 Set the first hook room and code repo. More hook rooms can use the same shape later.
               </p>
-              <Field label="6529 room">
+              <Field label="Project room">
                 <Input
                   value={waveUrl}
                   onChange={(event) => {
@@ -2931,7 +2928,7 @@ export function CommandWavesConsole() {
                   onChange={(event) => setGateNotes(event.target.value)}
                 />
                 <p className="mt-2 text-xs leading-5 text-zinc-500">
-                  One note per line. REP, TDH, holder, allowlist, and QnA notes are advisory until live enforcement is wired.
+                  One note per line. Reputation, token, holder, allowlist, and QnA notes are advisory until live enforcement is wired.
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {wave.gates.map((gate) => (
@@ -3236,7 +3233,7 @@ export function CommandWavesConsole() {
                 </div>
               </div>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <p className="text-sm font-semibold text-zinc-100">Hook guardrails</p>
+                <p className="text-sm font-semibold text-zinc-100">Code guardrails</p>
                 <ul className="mt-2 grid gap-2 text-sm leading-6 text-zinc-400">
                   {hookGuardrails.map((guardrail) => (
                     <li key={guardrail}>- {guardrail}</li>
@@ -3471,7 +3468,7 @@ export function CommandWavesConsole() {
                         <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
                           <p className="mt-1 text-xs text-zinc-500">
-                            Optional demo tally only. The 6529 room decision is the approval source.
+                            Optional demo tally only. The room decision is the approval source.
                           </p>
                         ) : null}
                       </div>
@@ -3517,7 +3514,7 @@ export function CommandWavesConsole() {
                     {activePoll.decision ? (
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-100">6529 decision receipt</p>
+                          <p className="text-sm font-semibold text-zinc-100">Room decision receipt</p>
                           <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{activePoll.decision.source}</Badge>
                         </div>
                         <p className="mt-2 text-xs leading-5 text-zinc-500">{activePoll.decision.summary}</p>
@@ -3556,7 +3553,7 @@ export function CommandWavesConsole() {
                       </div>
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      App tally only. PR work needs the room decision URL. This does not add live REP, TDH, or weighted voting.
+                      App tally only. PR work needs the room decision URL. This does not add live reputation, token weight, or weighted voting.
                     </p>
                   </div>
                 ) : (
@@ -3574,7 +3571,7 @@ export function CommandWavesConsole() {
                         : activeProposalIsPr
                           ? activePrHasWaveDecision
                             ? "Ready to build the approved PR."
-                            : "Record the 6529 decision receipt before the PR build step."
+                            : "Record the room decision receipt before the PR build step."
                           : "Only code PR work uses the build step in phase 1."}
                     </p>
                     {activeExecution?.artifacts.length ? (
@@ -3689,7 +3686,7 @@ export function CommandWavesConsole() {
                 <div>
               <p className="text-sm leading-6 text-zinc-400">{contributionReport.summary}</p>
               <p className="mt-2 text-xs leading-5 text-zinc-500">
-                AI-readable activity evidence for humans to review. It does not grant REP, TDH, payouts, permissions, or merge rights.
+                AI-readable activity evidence for humans to review. It does not grant reputation, token weight, payouts, permissions, or merge rights.
               </p>
               <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
                 <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Report method</p>

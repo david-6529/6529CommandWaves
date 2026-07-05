@@ -17,6 +17,13 @@ export type LaunchAuditVerificationResult = {
     detail: string;
   } | null;
   statusDraft: string | null;
+  stateEvidence: {
+    waveStateHash: string;
+    rulesHash: string;
+    proposalCount: number;
+    reviewCount: number;
+    ledgerEventCount: number;
+  } | null;
   blockers: string[];
   openItems: string[];
   operatorChecklist: string[];
@@ -89,7 +96,7 @@ function authorityBoundaryReady(value: unknown) {
   return Boolean(
     record &&
       asString(record.phase) === "first_public_hook_build" &&
-      asString(record.socialSourceOfTruth) === "6529 wave" &&
+      asString(record.socialSourceOfTruth) === "project room" &&
       asString(record.codeSurface) === "GitHub PR" &&
       stringArrayIncludes(record.humansControl, "Merges") &&
       stringArrayIncludes(record.humansControl, "Deploys") &&
@@ -123,12 +130,28 @@ function stateEvidenceReady(value: unknown) {
   );
 }
 
+function collectStateEvidence(value: unknown): LaunchAuditVerificationResult["stateEvidence"] {
+  if (!stateEvidenceReady(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return {
+    waveStateHash: record.waveStateHash as string,
+    rulesHash: record.rulesHash as string,
+    proposalCount: record.proposalCount as number,
+    reviewCount: record.reviewCount as number,
+    ledgerEventCount: record.ledgerEventCount as number,
+  };
+}
+
 function statusDraftReady(value: unknown) {
   const draft = asString(value);
 
   return Boolean(
     draft &&
-      draft.includes("6529 hook launch status") &&
+      draft.includes("Build room launch status") &&
       draft.includes("Status:") &&
       draft.includes("Operator checklist:") &&
       draft.includes("Verification:") &&
@@ -158,7 +181,7 @@ function developerFeePlanReady(value: unknown) {
   return Boolean(
     record &&
       asString(record.mode) === "manual_review" &&
-      stringArrayIncludes(record.requiredDecisions, "Wave approves the fee budget before any payment.") &&
+      stringArrayIncludes(record.requiredDecisions, "The room approves the fee budget before any payment.") &&
       stringArrayIncludes(record.requiredDecisions, "Payments happen outside this app in the first phase.") &&
       stringArrayIncludes(record.blockedActions, "No automatic payouts.") &&
       stringArrayIncludes(record.blockedActions, "No wallet keys or treasury controls.") &&
@@ -179,9 +202,9 @@ function productContractReady(value: unknown) {
       stringArrayIncludes(record.workflow, "Build PR") &&
       stringArrayIncludes(record.workflow, "Review") &&
       stringArrayIncludes(record.workflow, "Log result") &&
-      stringArrayIncludes(record.publicSurfaces, "6529 wave discussion") &&
+      stringArrayIncludes(record.publicSurfaces, "Project room discussion") &&
       stringArrayIncludes(record.publicSurfaces, "GitHub PR record") &&
-      stringArrayIncludes(record.publicSurfaces, "Command Waves audit log"),
+      stringArrayIncludes(record.publicSurfaces, "Build audit log"),
   );
 }
 
@@ -193,7 +216,8 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
-  const hasStateEvidence = stateEvidenceReady(snapshot?.stateEvidence);
+  const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
+  const hasStateEvidence = Boolean(stateEvidence);
   const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
   const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
   const hasContributionReport = contributionReportReady(reports?.contribution);
@@ -283,6 +307,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
         }
         : null,
     statusDraft: asString(snapshot?.statusDraft),
+    stateEvidence,
     blockers,
     openItems,
     operatorChecklist: launchAudit ? launchOperatorChecklistLines(openItemRecords) : [],

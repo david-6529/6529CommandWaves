@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createBuilderWaveJoinDraft } from "./builder-wave-join-draft";
 
-describe("6529 discussion join draft", () => {
+describe("build room join draft", () => {
   it("creates a short join request with the builder handle", () => {
     const draft = createBuilderWaveJoinDraft(" david ");
 
@@ -10,7 +10,7 @@ describe("6529 discussion join draft", () => {
     expect(draft).toContain("Access notes: Manual builder review for phase 1; REP or TDH gates are planned, not enforced here.");
     expect(draft).toContain("access is reviewed manually");
     expect(draft).toContain("discussion, review, tests, or a small PR");
-    expect(draft).toContain("visible 6529 decision before PR work starts");
+    expect(draft).toContain("visible room decision before PR work starts");
     expect(draft).toContain("What should I take next?");
     expect(draft).not.toContain("\u2014");
   });

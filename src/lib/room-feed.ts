@@ -40,8 +40,8 @@ function decisionFeedItem(poll: PollState | null): RoomFeedItem | null {
     return {
       id: "decision",
       label: "Decision",
-      title: "6529 decision recorded",
-      body: `The 6529 decision recorded ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+      title: "Room decision recorded",
+      body: `The room decision recorded ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       status: `${poll.yesVotes} yes, ${poll.noVotes} no`,
       href: poll.decision.url,
       hrefLabel: "Open decision",

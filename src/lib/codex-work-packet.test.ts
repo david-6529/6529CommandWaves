@@ -29,7 +29,7 @@ describe("Codex work packet", () => {
     expect(packet.text).not.toContain("\u2014");
   });
 
-  it("requires a 6529 decision receipt for PR work packets", () => {
+  it("requires a room decision receipt for PR work packets", () => {
     const proposal = {
       ...demoWave.proposals[0],
       status: "approved" as const,
@@ -45,7 +45,7 @@ describe("Codex work packet", () => {
         proposal,
         poll,
       }),
-    ).toThrow("Record the 6529 decision receipt before creating a Codex work packet.");
+    ).toThrow("Record the room decision receipt before creating a Codex work packet.");
   });
 
   it("only creates packets for PR commands", () => {
@@ -61,7 +61,7 @@ describe("Codex work packet", () => {
     ).toThrow("Codex work packets are only available for PR commands.");
   });
 
-  it("requires a 6529 discussion URL for PR work packet receipts", () => {
+  it("requires a room decision URL for PR work packet receipts", () => {
     const proposal = {
       ...demoWave.proposals[0],
       status: "approved" as const,
@@ -81,6 +81,6 @@ describe("Codex work packet", () => {
         proposal,
         poll,
       }),
-    ).toThrow("Record the 6529 decision receipt before creating a Codex work packet.");
+    ).toThrow("Record the room decision receipt before creating a Codex work packet.");
   });
 });

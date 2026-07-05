@@ -92,7 +92,7 @@ describe("Command Waves rule engine", () => {
     expect(evaluatePoll(passed)).toMatchObject({ quorumMet: true, thresholdMet: true, passed: true });
   });
 
-  it("treats a recorded 6529 decision receipt as manual approval evidence", () => {
+  it("treats a recorded room decision receipt as manual approval evidence", () => {
     const receipt = createWaveDecisionReceipt({
       proposalId: "cmd-test",
       reference: "https://6529.io/waves/hook-builder/drops/drop-123",
@@ -159,7 +159,7 @@ describe("Command Waves rule engine", () => {
       }),
     ).toEqual({
       ok: false,
-      message: "6529 decision URL is required for PR work.",
+      message: "Room decision URL is required for PR work.",
     });
     expect(
       validateWaveDecisionReference({
@@ -168,7 +168,7 @@ describe("Command Waves rule engine", () => {
       }),
     ).toEqual({
       ok: false,
-      message: "6529 decision URL must match the configured discussion.",
+      message: "Room decision URL must match the configured discussion.",
     });
     expect(
       validateWaveDecisionReference({
@@ -177,7 +177,7 @@ describe("Command Waves rule engine", () => {
       }),
     ).toEqual({
       ok: false,
-      message: "6529 decision URL must be a 6529 wave drop.",
+      message: "Room decision URL must be a valid 6529 drop URL.",
     });
     expect(
       validateWaveDecisionReference({
@@ -186,7 +186,7 @@ describe("Command Waves rule engine", () => {
       }),
     ).toEqual({
       ok: false,
-      message: "6529 decision URL must include a drop id.",
+      message: "Room decision URL must include a drop id.",
     });
   });
 });

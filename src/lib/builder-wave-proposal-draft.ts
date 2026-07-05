@@ -97,7 +97,7 @@ export function createBuilderWaveProposalDraft({
     "",
     `Change: ${cleanLine(title, "Untitled hook work")}`,
     `Proposer: ${cleanLine(proposer, "unknown")}`,
-    `Discussion: ${wave.waveUrl}`,
+    `Project room: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     "",
     requestHeading(kind),

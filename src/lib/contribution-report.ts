@@ -142,7 +142,7 @@ function evidenceSummary(wave: CommandWave, roomPostCount: number) {
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
-    ...(decisionCount ? [countLabel(decisionCount, "6529 decision receipt")] : []),
+    ...(decisionCount ? [countLabel(decisionCount, "room decision receipt")] : []),
     ...(roomPostCount ? [countLabel(roomPostCount, "room post")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
@@ -156,7 +156,7 @@ const scoringRubric = [
   "Complete proposal: 6 report points.",
   "Reviewing proposal: 4 report points.",
   "Other proposal: 3 report points.",
-  "6529 decision receipt: 2 report points.",
+  "Room decision receipt: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
   "Room post pulled into app: 1 report point.",
 ];
@@ -164,15 +164,15 @@ const scoringRubric = [
 const coverage = {
   included: [
     "Work proposals stored by this app.",
-    "Votes and recorded 6529 decision receipts stored by this app.",
+    "Votes and recorded room decision receipts stored by this app.",
     "Room posts pulled into this app.",
     "Recorded GitHub PR links and Guardian review proof.",
     "Attributed activity log events stored by this app.",
   ],
   notIncluded: [
-    "Live wave posts that have not been pulled into app state.",
+    "Live room posts that have not been pulled into app state.",
     "GitHub commits, comments, reviews, and merges that are not attached to a recorded PR.",
-    "Manual payments, REP, TDH, off-app agreements, or private coordination.",
+    "Manual payments, reputation, token weight, off-app agreements, or private coordination.",
   ],
 };
 
@@ -217,7 +217,7 @@ export function createContributionReport(
       contributor.decisions += 1;
       contributor.score += 2;
       addScoreBasis(contributor, "Decision receipts", 2);
-      addRationale(contributor, "Recorded 6529 decision receipt");
+      addRationale(contributor, "Recorded room decision receipt");
     }
 
     for (const vote of poll.votes ?? []) {
@@ -281,7 +281,7 @@ export function createContributionReport(
     contributors: sorted,
     notes: [
       "Report scores are an AI-readable activity report, not a permission system.",
-      "REP, TDH, payouts, and merge rights must use separate human-approved rules.",
+      "Reputation, token weight, payouts, and merge rights must use separate human-approved rules.",
       "The report only uses proposal, vote, decision, room post, PR, review, and ledger records currently stored or previewed by this app.",
       "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
     ],
@@ -312,7 +312,7 @@ export function createContributionReportDraft(
     : ["- No visible contributors yet."];
 
   return [
-    "6529 hook contribution report",
+    "Build room contribution report",
     "",
     `Generated: ${report.generatedAt}`,
     `Method: ${report.method.label} (${report.method.id}), ${report.method.authority}.`,

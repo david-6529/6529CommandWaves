@@ -19,14 +19,14 @@ export function createParticipationGuideDraft(wave: CommandWave) {
     ? [
         "",
         "Manual QnA prompt:",
-        "Answer in the 6529 discussion: what is one hook parameter that must be capped, and what test proves the cap?",
+        "Answer in the room: what is one hook parameter that must be capped, and what test proves the cap?",
       ]
     : [];
 
   return [
-    "6529 hook participation guide",
+    "Build room participation guide",
     "",
-    `6529 discussion: ${wave.waveUrl}`,
+    `Project room: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     ...(rulesLine ? [rulesLine] : []),
     "",
@@ -35,20 +35,20 @@ export function createParticipationGuideDraft(wave: CommandWave) {
     ...qnaPrompt,
     "",
     "Builder loop:",
-    "1. Builders share ideas or code in the 6529 discussion.",
+    "1. Builders share ideas or code in the room.",
     "2. Orchestration rules classify risk and shape one scoped PR proposal.",
-    "3. Important changes need a visible 6529 decision before PR work starts.",
+    "3. Important changes need a visible room decision before PR work starts.",
     "4. Reviewer CI checks the PR before humans merge.",
     "",
     "How to join:",
-    "1. Read the latest project snapshot and 6529 discussion context.",
+    "1. Read the latest project snapshot and room context.",
     "2. Ask questions or answer any manual QnA prompt in the discussion.",
     "3. Propose one PR-sized hook change with limits and tests.",
-    "4. Wait for a 6529 decision URL before PR work starts.",
+    "4. Wait for a room decision URL before PR work starts.",
     "5. Open draft PRs with the repo template and Command Waves manifest.",
     "",
     "Guardrails:",
-    "- REP, TDH, holder, allowlist, and QnA notes are advisory until live enforcement is wired.",
+    "- Reputation, token, holder, allowlist, and QnA notes are advisory until live enforcement is wired.",
     "- Contribution report scores are informational, not permissions or payments.",
     "- Humans keep merge, deploy, payment, and governance authority.",
   ].join("\n");

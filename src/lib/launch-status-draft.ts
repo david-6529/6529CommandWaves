@@ -56,7 +56,7 @@ const checklistByItemId: Record<string, string[]> = {
   flow_build: ["Attach the PR record or Codex work packet for the approved change."],
   flow_review: ["Run reviewer checks against the PR before human merge decisions."],
   flow_log: ["Post the reviewed result back to the project room."],
-  flow_wave_decision_receipt: ["Record the 6529 decision URL for the approved PR work."],
+  flow_wave_decision_receipt: ["Record the room decision URL for the approved PR work."],
   flow_participation_notes: ["Keep participation notes advisory until live gating is implemented."],
   flow_audit_packet: ["Prepare the launch packet with PR, review, contribution, and fee records."],
 };
@@ -91,9 +91,9 @@ export function createLaunchStatusDraft({
   verificationTargets: LaunchStatusVerificationTargets;
 }) {
   return [
-    "6529 hook launch status",
+    "Build room launch status",
     "",
-    `6529 discussion: ${wave.waveUrl}`,
+    `Project room: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     `Status: ${audit.statusLabel}`,
     audit.summary,

@@ -18,7 +18,7 @@ describe("wave update draft", () => {
       },
     });
 
-    expect(draft).toContain("6529 hook update");
+    expect(draft).toContain("Build room update");
     expect(draft).toContain(`Work: ${proposal.id} - ${proposal.title}`);
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
     expect(draft).toContain("receipt https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval.");
@@ -57,7 +57,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Review: waiting for a PR record.");
   });
 
-  it("keeps local vote approval waiting for a 6529 decision receipt", () => {
+  it("keeps local vote approval waiting for a room decision receipt", () => {
     const draft = createWaveUpdateDraft({
       wave: demoWave,
       proposal: {

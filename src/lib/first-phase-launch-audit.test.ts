@@ -391,7 +391,7 @@ describe("first phase launch audit", () => {
     expect(audit.openItems.map((item) => item.label)).toContain("Choose project");
   });
 
-  it("requires a 6529 decision receipt before the first loop", () => {
+  it("requires a room decision receipt before the first loop", () => {
     const wave = {
       ...demoWave,
       polls: [{ ...demoWave.polls[0], decision: null }],
@@ -407,12 +407,12 @@ describe("first phase launch audit", () => {
     expect(audit.nextAction).toMatchObject({
       status: "needs_setup",
       itemId: "flow_wave_decision_receipt",
-      title: "Record the 6529 decision URL",
+      title: "Record the room decision URL",
     });
     expect(audit.openItems).toContainEqual(
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
-        label: "6529 decision receipt",
+        label: "Room decision receipt",
         status: "needed",
       }),
     );
@@ -449,7 +449,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
         status: "blocked",
-        detail: "6529 decision URL must match the configured discussion.",
+        detail: "Room decision URL must match the configured discussion.",
       }),
     );
   });
@@ -485,7 +485,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
         status: "blocked",
-        detail: "6529 decision URL is required for PR work.",
+        detail: "Room decision URL is required for PR work.",
       }),
     );
   });
@@ -563,7 +563,7 @@ describe("first phase launch audit", () => {
         label: "Participation notes",
         status: "blocked",
         detail:
-          "Participation notes must be advisory until live REP, TDH, holder, allowlist, or QnA enforcement is wired.",
+          "Participation notes must be advisory until live reputation, token, holder, allowlist, or QnA enforcement is wired.",
       }),
     );
   });

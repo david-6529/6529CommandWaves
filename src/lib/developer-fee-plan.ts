@@ -27,7 +27,7 @@ export function createDeveloperFeePlan(wave: CommandWave, contributionReport: Co
       "Human review notes from the room.",
     ],
     requiredDecisions: [
-      "Wave approves the fee budget before any payment.",
+      "The room approves the fee budget before any payment.",
       "Humans choose recipients, amounts, token, and payment method.",
       "Payments happen outside this app in the first phase.",
     ],
@@ -50,9 +50,9 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
     : ["- No visible contributors yet."];
 
   return [
-    "6529 hook developer fee plan",
+    "Build room developer fee plan",
     "",
-    `6529 discussion: ${wave.waveUrl}`,
+    `Project room: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     plan.summary,
     "",
@@ -68,6 +68,6 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
     "Blocked in this app:",
     ...plan.blockedActions.map((item) => `- ${item}`),
     "",
-    "Note: this draft does not move funds, choose recipients, set amounts, grant REP or TDH, or create payment authority.",
+    "Note: this draft does not move funds, choose recipients, set amounts, grant reputation or token weight, or create payment authority.",
   ].join("\n");
 }

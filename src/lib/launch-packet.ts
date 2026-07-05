@@ -145,12 +145,12 @@ function decisionLines(poll: PollState | null) {
   const voteLine = `- Vote: ${poll.status}, ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;
 
   if (!poll.decision) {
-    return [voteLine, "- 6529 decision receipt: not recorded yet."];
+    return [voteLine, "- Room decision receipt: not recorded yet."];
   }
 
   return [
     voteLine,
-    `- 6529 decision receipt: ${poll.decision.summary}`,
+    `- Room decision receipt: ${poll.decision.summary}`,
     `- Receipt source: ${poll.decision.source}`,
     `- Receipt reference: ${poll.decision.url ?? poll.decision.dropId ?? "recorded"}`,
   ];
@@ -288,13 +288,13 @@ export function createLaunchPacket({
   const contributionReport = createContributionReport(wave, { generatedAt, limit: 6 });
   const developerFeePlan = createDeveloperFeePlan(wave, contributionReport);
   const text = [
-    "# 6529 hook launch packet",
+    "# Build room launch packet",
     "",
     "Status: human-reviewed draft",
     `Generated: ${generatedAt}`,
     "",
     "## Project",
-    `- Wave: ${wave.waveUrl}`,
+    `- Project room: ${wave.waveUrl}`,
     `- Repo: ${wave.repoUrl}`,
     `- Rules: ${wave.rules.version}`,
     `- Participation notes (advisory): ${wave.gates.join(", ") || "none recorded"}`,
@@ -325,7 +325,7 @@ export function createLaunchPacket({
     "",
     "## Authority Limits",
     "- Humans keep merge, deploy, payment, and governance authority.",
-    "- This packet does not grant REP, TDH, payouts, permissions, or merge rights.",
+    "- This packet does not grant reputation, token weight, payouts, permissions, or merge rights.",
     "- The hook is immutable by default. Parameter changes need explicit caps and bound-focused tests.",
     "- No automatic posting, merging, deploying, spending, or payouts.",
     "",

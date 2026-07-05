@@ -97,16 +97,16 @@ function summaryFor(status: FirstPhaseLaunchAuditStatus) {
 const launchActionCopyByItemId: Record<string, string> = {
   flow_project: "Set hook room and code repo",
   flow_proposal: "Propose one PR-sized hook change",
-  flow_decision: "Record the 6529 decision",
+  flow_decision: "Record the room decision",
   flow_build: "Build the approved PR",
   flow_review: "Review the PR result",
   flow_log: "Share the result back to the room",
-  flow_wave_decision_receipt: "Record the 6529 decision URL",
+  flow_wave_decision_receipt: "Record the room decision URL",
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Prepare the launch packet",
   setup_not_checked: "Run launch setup check",
   setup_remote_check: "Run launch setup check",
-  setup_wave_reachable: "Pick reachable 6529 room",
+  setup_wave_reachable: "Pick reachable project room",
   setup_repo_reachable: "Pick reachable code repo",
   setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
@@ -153,7 +153,7 @@ function createNextAction({
       statusLabel,
       itemId: null,
       title: "Start the first public loop",
-      detail: "Post the launch brief, invite contributors, and keep each PR tied to a 6529 decision.",
+      detail: "Post the launch brief, invite contributors, and keep each PR tied to a room decision.",
     };
   }
 
@@ -215,7 +215,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         : "setup_project_check";
     const failureLabel =
       firstFailure?.id === "wave_reachable"
-        ? "6529 wave"
+        ? "Project room"
         : firstFailure?.id === "repo_reachable"
           ? "GitHub repo"
           : "Setup check";
@@ -225,7 +225,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: failureId,
         label: failureLabel,
         status: "blocked",
-        detail: firstFailure?.message ?? "Fix the 6529 wave and GitHub repo before inviting contributors.",
+        detail: firstFailure?.message ?? "Fix the project room and GitHub repo before inviting contributors.",
         source: "setup",
       },
     ];
@@ -282,7 +282,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
       return [
         {
           id: "flow_wave_decision_receipt",
-          label: "6529 decision receipt",
+          label: "Room decision receipt",
           status: "blocked",
           detail: referenceCheck.message,
           source: "flow",
@@ -293,7 +293,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
     return [
       {
         id: "flow_wave_decision_receipt",
-        label: "6529 decision receipt",
+        label: "Room decision receipt",
         status: "ready",
         detail: `Decision record exists for ${proposal.id}.`,
         source: "flow",
@@ -304,9 +304,9 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   return [
     {
       id: "flow_wave_decision_receipt",
-      label: "6529 decision receipt",
+      label: "Room decision receipt",
       status: "needed",
-      detail: "Record the 6529 decision URL before the PR work is launch-ready.",
+      detail: "Record the room decision URL before the PR work is launch-ready.",
       source: "flow",
     },
   ];
@@ -330,7 +330,7 @@ function participationNotesItem(wave: CommandWave | null | undefined): FirstPhas
         label: "Participation notes",
         status: "blocked",
         detail:
-          "Participation notes must be advisory until live REP, TDH, holder, allowlist, or QnA enforcement is wired.",
+          "Participation notes must be advisory until live reputation, token, holder, allowlist, or QnA enforcement is wired.",
         source: "flow",
       },
     ];

@@ -26,14 +26,14 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.setupCheckMode).toBe("shape");
     expect(snapshot.productContract).toMatchObject({
-      name: "Decentralized Coding",
-      purpose: "A new form of swarm development for the age of AI",
+      name: "Decentralized Coding: Beta",
+      purpose: "A simple way for people and agents to build in public",
       workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-      publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
+      publicSurfaces: ["Project room discussion", "GitHub PR record", "Build audit log"],
     });
     expect(snapshot.authorityBoundary).toMatchObject({
       phase: "first_public_hook_build",
-      socialSourceOfTruth: "6529 wave",
+      socialSourceOfTruth: "project room",
       codeSurface: "GitHub PR",
       humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
     });
@@ -57,14 +57,14 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.reports.developerFee).toMatchObject({
       mode: "manual_review",
     });
-    expect(snapshot.reports.developerFee.requiredDecisions).toContain("Wave approves the fee budget before any payment.");
+    expect(snapshot.reports.developerFee.requiredDecisions).toContain("The room approves the fee budget before any payment.");
     expect(snapshot.reports.developerFee.blockedActions).toContain("No automatic payouts.");
     expect(snapshot.verificationTargets).toEqual({
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
-    expect(snapshot.statusDraft).toContain("6529 hook launch status");
+    expect(snapshot.statusDraft).toContain("Build room launch status");
     expect(snapshot.statusDraft).toContain("Status: checks needed");
     expect(snapshot.statusDraft).toContain("Next action: Run launch setup check");
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");

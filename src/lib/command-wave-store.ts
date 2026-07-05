@@ -481,7 +481,7 @@ export async function recordVote(input: unknown) {
       actor: voterIdentity,
       type: passed ? "poll_passed" : "rule_check",
       message: passed
-        ? `${proposal.id} local vote passed. Record the 6529 decision receipt before work can run.`
+        ? `${proposal.id} local vote passed. Record the room decision receipt before work can run.`
         : `Recorded ${vote} vote from ${voterIdentity} for ${proposal.id}.`,
     },
   );
@@ -504,7 +504,7 @@ export async function recordDecisionReceipt(input: unknown) {
   }
 
   if (!reference) {
-    throw Object.assign(new Error("6529 decision URL or drop id is required."), { status: 400 });
+    throw Object.assign(new Error("Room decision URL or drop id is required."), { status: 400 });
   }
 
   const referenceCheck = validateWaveDecisionReference({
@@ -535,7 +535,7 @@ export async function recordDecisionReceipt(input: unknown) {
     {
       actor: recordedBy,
       type: "poll_passed",
-      message: `Recorded 6529 decision receipt for ${proposal.id}.`,
+      message: `Recorded room decision receipt for ${proposal.id}.`,
     },
   );
 
@@ -560,7 +560,7 @@ export async function executeProposal(input: unknown) {
 
   if (!pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     if (proposal.status === "approved" || poll?.status === "passed") {
-      throw Object.assign(new Error("Record the 6529 decision receipt before building PR work."), { status: 409 });
+      throw Object.assign(new Error("Record the room decision receipt before building PR work."), { status: 409 });
     }
 
     throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });

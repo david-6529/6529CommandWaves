@@ -65,7 +65,7 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
         ? "Decision needs attention."
         : decisionDone
           ? "Decision receipt recorded."
-          : "Record the 6529 decision.",
+          : "Record the room decision.",
     },
     {
       id: "build",

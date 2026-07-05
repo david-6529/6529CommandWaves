@@ -45,7 +45,7 @@ export function createCodexWorkPacket({
   }
 
   if (proposal.kind === "open_pr" && !pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
-    throw Object.assign(new Error("Record the 6529 decision receipt before creating a Codex work packet."), {
+    throw Object.assign(new Error("Record the room decision receipt before creating a Codex work packet."), {
       status: 409,
     });
   }
@@ -63,7 +63,7 @@ export function createCodexWorkPacket({
     "Command Waves Codex work packet",
     "",
     "Mode: manual Codex handoff",
-    `Wave: ${wave.waveUrl}`,
+    `Project room: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     `Proposal: ${proposal.id} - ${proposal.title}`,
     `Base branch: ${baseBranch}`,

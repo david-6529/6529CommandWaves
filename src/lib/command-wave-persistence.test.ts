@@ -126,7 +126,7 @@ describe("command wave persistence", () => {
 
     expect(wave.executions[0]?.summary).toBe(demoWave.executions[0]?.summary);
     expect(wave.proposals[0]?.status).toBe("complete");
-    expect(wave.ledger[0]?.message).toBe("Created the 6529 hook project and attached the 6529 room and code repo.");
+    expect(wave.ledger[0]?.message).toBe("Created the hook build and attached the project room and code repo.");
   });
 
   it("normalizes old hook-room copy without replacing custom activity", async () => {

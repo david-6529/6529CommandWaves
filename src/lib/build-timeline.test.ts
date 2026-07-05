@@ -14,7 +14,7 @@ describe("build timeline", () => {
       ["Next", "current"],
     ]);
     expect(timeline[1]).toMatchObject({
-      title: "6529 decision recorded",
+      title: "Room decision recorded",
       detail: "5 yes, 1 no.",
       href: "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
       hrefLabel: "Open decision",

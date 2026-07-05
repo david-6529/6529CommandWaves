@@ -71,7 +71,7 @@ describe("phase next action", () => {
       status: "action",
       stepLabel: "Decide",
       title: "Get the room decision",
-      detail: "Ask the room to decide, then record the 6529 decision URL before work runs.",
+      detail: "Ask the room to decide, then record the room decision URL before work runs.",
     });
   });
 

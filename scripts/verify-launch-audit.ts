@@ -67,6 +67,15 @@ async function main() {
     console.log(result.statusDraft);
   }
 
+  if (result.stateEvidence) {
+    console.log("State evidence:");
+    console.log(`Wave state hash: ${result.stateEvidence.waveStateHash}`);
+    console.log(`Rules hash: ${result.stateEvidence.rulesHash}`);
+    console.log(
+      `Records: ${result.stateEvidence.proposalCount} proposals, ${result.stateEvidence.reviewCount} reviews, ${result.stateEvidence.ledgerEventCount} ledger events.`,
+    );
+  }
+
   for (const item of result.checks) {
     console.log(`${item.status.toUpperCase()} ${item.id}: ${item.message}`);
   }

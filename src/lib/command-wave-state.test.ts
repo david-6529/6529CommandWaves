@@ -14,23 +14,23 @@ describe("command wave state snapshot", () => {
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: demoWave,
       productContract: {
-        name: "Decentralized Coding",
-        purpose: "A new form of swarm development for the age of AI",
+        name: "Decentralized Coding: Beta",
+        purpose: "A simple way for people and agents to build in public",
         workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-        publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
+        publicSurfaces: ["Project room discussion", "GitHub PR record", "Build audit log"],
       },
       authorityBoundary: {
         phase: "first_public_hook_build",
-        socialSourceOfTruth: "6529 wave",
+        socialSourceOfTruth: "project room",
         codeSurface: "GitHub PR",
         humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
         appDoesNot: [
           "Auto-merge PRs",
           "Deploy contracts",
           "Move funds",
-          "Grant REP, TDH, payouts, permissions, or merge rights from contribution scores",
+          "Grant reputation, token weight, payouts, permissions, or merge rights from contribution scores",
         ],
-        gateStatus: "REP, TDH, holder, allowlist, and QnA gates are advisory until wired and verified.",
+        gateStatus: "Reputation, token, holder, allowlist, and QnA gates are advisory until wired and verified.",
       },
       reports: {
         contribution: {

@@ -107,9 +107,9 @@ export function createWaveUpdateDraft({
   const verification = verificationLine(verificationTargets);
 
   return [
-    "6529 hook update",
+    "Build room update",
     "",
-    `Wave: ${wave.waveUrl}`,
+    `Project room: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     proposal ? `Work: ${proposal.id} - ${proposal.title}` : "Work: none selected yet.",
     proposal ? `Status: ${proposal.status}` : "Status: setup",

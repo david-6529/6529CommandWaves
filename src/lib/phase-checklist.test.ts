@@ -49,7 +49,7 @@ describe("phase checklist", () => {
     });
   });
 
-  it("waits for a 6529 decision receipt after local votes pass", () => {
+  it("waits for a room decision receipt after local votes pass", () => {
     const checklist = createPhaseChecklist({
       ...demoWave,
       proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
@@ -61,7 +61,7 @@ describe("phase checklist", () => {
 
     expect(checklist.find((item) => item.id === "decision")).toMatchObject({
       status: "active",
-      detail: "Vote passed locally. Record the 6529 decision URL.",
+      detail: "Vote passed locally. Record the room decision URL.",
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",
@@ -89,7 +89,7 @@ describe("phase checklist", () => {
 
     expect(checklist.find((item) => item.id === "decision")).toMatchObject({
       status: "active",
-      detail: "6529 decision URL is required for PR work.",
+      detail: "Room decision URL is required for PR work.",
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",

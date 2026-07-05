@@ -12,7 +12,7 @@ export type CommandWaveStateSnapshot = {
   productContract: PhaseOneProductContract;
   authorityBoundary: {
     phase: "first_public_hook_build";
-    socialSourceOfTruth: "6529 wave";
+    socialSourceOfTruth: "project room";
     codeSurface: "GitHub PR";
     humansControl: string[];
     appDoesNot: string[];
@@ -29,7 +29,7 @@ export type CommandWaveStateSnapshot = {
 };
 
 export type PhaseOneProductContract = {
-  name: "Decentralized Coding";
+  name: typeof commandWaveProductCopy.headline;
   purpose: string;
   workflow: string[];
   publicSurfaces: string[];
@@ -40,31 +40,31 @@ export const phaseOneProductContract: PhaseOneProductContract = {
   name: commandWaveProductCopy.headline,
   purpose: commandWaveProductCopy.subhead,
   workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-  publicSurfaces: ["6529 wave discussion", "GitHub PR record", "Command Waves audit log"],
+  publicSurfaces: ["Project room discussion", "GitHub PR record", "Build audit log"],
   firstPhaseLimits: [
-    "Start with one 6529 hook project.",
-    "No auto merges, deploys, payments, or live REP or TDH authority in this app.",
+    "Start with one public project.",
+    "No auto merges, deploys, payments, or live token-weighted authority in this app.",
     "Contribution reports are evidence for humans, not authority.",
   ],
 };
 
 export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBoundary"] = {
   phase: "first_public_hook_build",
-  socialSourceOfTruth: "6529 wave",
+  socialSourceOfTruth: "project room",
   codeSurface: "GitHub PR",
   humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
   appDoesNot: [
     "Auto-merge PRs",
     "Deploy contracts",
     "Move funds",
-    "Grant REP, TDH, payouts, permissions, or merge rights from contribution scores",
+    "Grant reputation, token weight, payouts, permissions, or merge rights from contribution scores",
   ],
   agentLimits: [
     "Agents prepare drafts, packets, PR records, and review evidence.",
     "Reviewer checks are evidence for humans before merge.",
     "Commands touching deployment, governance, payments, upgradeability, or uncapped parameters are blocked or require explicit review.",
   ],
-  gateStatus: "REP, TDH, holder, allowlist, and QnA gates are advisory until wired and verified.",
+  gateStatus: "Reputation, token, holder, allowlist, and QnA gates are advisory until wired and verified.",
 };
 
 export function createCommandWaveStateSnapshot(

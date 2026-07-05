@@ -73,30 +73,34 @@ async function main() {
   for (const label of [
     "dark-app",
     "bg-zinc-950",
-    "6529 Hook",
-    "A public build room for the 6529 hook.",
-    "Builders discuss scope, record decisions, open PRs, and run reviewer checks before humans merge.",
+    "Decentralized Coding: Beta",
+    "Pilot: 6529 AMM hook",
+    "A shared room for people and agents to turn discussion into reviewed pull requests.",
+    "Build one hook in public",
+    "Builders discuss the work in the room.",
+    "Discussion room",
+    "Code repo",
+    "Who can contribute",
     "Upcoming or being discussed",
     "Work",
     "Queue",
-    "Swarm chat",
-    "Talk in the build room",
+    "Room discussion",
+    "Discuss work",
     "Room signals",
     "Latest activity",
     "Builders",
     "Profiles show visible activity in this room and repo.",
     "Visible contribution",
     "Rules of the build",
-    "Important or risky hook changes need a visible room decision.",
+    "Important or risky changes need a visible room decision.",
     "Report points summarize visible work only.",
     "They do not grant access, payouts, or merge rights.",
-    "Hook guardrails",
-    "Suggest work",
+    "Code guardrails",
     "Start in the room so builders can shape the idea.",
     "Use GitHub PRs for code changes.",
     "Work type",
     "Safety checks",
-    "Copy draft",
+    "Proposal draft",
     "Report method",
     "Visible activity report",
     "Maintainer tools",
@@ -126,7 +130,7 @@ async function main() {
   assertSha256("Launch audit wave state hash", objectValue(stateEvidence, "waveStateHash"));
   assertSha256("Launch audit rules hash", objectValue(stateEvidence, "rulesHash"));
   assertString("Launch audit status draft", statusDraft);
-  for (const label of ["6529 hook launch status", "Operator checklist:", "Verification:", "Guardrails:"]) {
+  for (const label of ["Build room launch status", "Operator checklist:", "Verification:", "Guardrails:"]) {
     assertIncludes("Launch audit status draft", statusDraft, label);
   }
   assertJsonObject("Launch audit reports", reports);

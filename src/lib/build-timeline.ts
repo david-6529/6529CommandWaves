@@ -75,7 +75,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     return {
       id: "decision",
       label: "Decision",
-      title: "6529 decision recorded",
+      title: "Room decision recorded",
       detail: `${poll.yesVotes} yes, ${poll.noVotes} no.`,
       status: "done",
       href: poll.decision.url,
@@ -87,7 +87,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     return {
       id: "decision",
       label: "Decision",
-      title: "Record the 6529 decision",
+      title: "Record the room decision",
       detail: "Add the decision URL before PR work starts.",
       status: "current",
       href: wave.waveUrl,
@@ -99,7 +99,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     id: "decision",
     label: "Decision",
     title: "Ask the room to decide",
-    detail: "Code work waits for a visible 6529 decision.",
+    detail: "Code work waits for a visible room decision.",
     status: "current",
     href: wave.waveUrl,
     hrefLabel: "Open room",

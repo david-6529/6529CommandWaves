@@ -35,7 +35,7 @@ export type ActiveHookProject = {
 
 function hookName(wave: CommandWave) {
   if (/6529[-\s]?hook/i.test(`${wave.name} ${wave.repoUrl}`)) {
-    return "6529 Hook";
+    return "Hook Build";
   }
 
   return wave.name.replace(/\b(builder|wave|command)\b/gi, "").replace(/\s+/g, " ").trim() || "Hook project";
@@ -82,7 +82,7 @@ function waveStatus(wave: CommandWave) {
   }
 
   if (poll?.status === "passed") {
-    return "Vote passed locally. Add the 6529 decision URL.";
+    return "Vote passed locally. Add the room decision URL.";
   }
 
   if (poll) {

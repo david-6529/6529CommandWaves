@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { verifyLaunchAuditPayload } from "./launch-audit-verifier";
+import { hashValue } from "./run-manifest";
 import type { SetupValidation } from "./setup-validation";
 
 const readySetupValidation: SetupValidation = {
@@ -84,8 +85,15 @@ describe("launch audit verifier", () => {
       status: "pass",
     });
     expect(result.nextAction?.title).toBe("Start the first public loop");
-    expect(result.statusDraft).toContain("6529 hook launch status");
+    expect(result.statusDraft).toContain("Build room launch status");
     expect(result.statusDraft).toContain("Status: ready");
+    expect(result.stateEvidence).toEqual({
+      waveStateHash: hashValue(demoWave),
+      rulesHash: hashValue(demoWave.rules),
+      proposalCount: demoWave.proposals.length,
+      reviewCount: demoWave.reviews.length,
+      ledgerEventCount: demoWave.ledger.length,
+    });
     expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });
 
@@ -179,6 +187,7 @@ describe("launch audit verifier", () => {
     });
 
     expect(result.status).toBe("fail");
+    expect(result.stateEvidence).toBeNull();
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish wave state hash, rules hash, and record counts.",
@@ -201,6 +210,7 @@ describe("launch audit verifier", () => {
     });
 
     expect(result.status).toBe("fail");
+    expect(result.stateEvidence).toBeNull();
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "fail",
     });
@@ -234,7 +244,7 @@ describe("launch audit verifier", () => {
     });
     const result = verifyLaunchAuditPayload({
       ...snapshot,
-      statusDraft: "6529 hook launch status\nStatus: ready\nOperator checklist:\nVerification:",
+      statusDraft: "Build room launch status\nStatus: ready\nOperator checklist:\nVerification:",
     });
 
     expect(result.status).toBe("fail");
@@ -292,6 +302,7 @@ describe("launch audit verifier", () => {
 
     expect(result.status).toBe("fail");
     expect(result.launchStatus).toBe("unknown");
+    expect(result.stateEvidence).toBeNull();
     expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "payload_shape")).toMatchObject({
       status: "fail",

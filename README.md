@@ -1,11 +1,11 @@
-# Decentralized Coding
+# Decentralized Coding: Beta
 
 ## Short Version
 
-This is a simple shared workspace for building the 6529 hook in public through one project room and one GitHub repo.
+This is a simple shared workspace for building an open source project in public through one room and one GitHub repo.
 
-The first public phase connects one 6529 room to one smart contract repo. Builders talk in the room, turn one idea into a
-small proposal, record the 6529 decision, build a draft PR, review it, and share the result back with a clear log.
+The first public phase is a hook build. Builders talk in the room, turn one idea into a small proposal, record the room
+decision, build a draft PR, review it, and share the result back with a clear log.
 
 The same loop can become reusable infrastructure for public open source work later. For now, the product stays focused on
 one successful hook build.
@@ -27,13 +27,14 @@ The simple product shape is:
 
 ## Current Status
 
-This repo is an MVP prototype for one public hook-building room. The app is a standalone 6529 Hook project site first. It
-is designed so the same pattern can become a broader public builder protocol after the first loop works.
+This repo is an MVP prototype for one public hook-building room. The pilot is the 6529 AMM hook, with 6529 as the first
+room integration. It is designed so the same pattern can become a broader public builder protocol after the first loop
+works.
 
 What exists now:
 
-- A Next app product surface called Decentralized Coding, focused on building the 6529 hook together.
-- One active hook project with a public 6529 room and a code repo.
+- A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
+- One active hook project with a public room and a code repo.
 - A simplified room-first UI with a project overview, current hook change, chat composer, room snapshot, latest log,
   builder profiles, project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
@@ -54,8 +55,8 @@ What remains manual or MVP-only:
 
 - Room posting works when a 6529 bot wallet is configured. Without bot credentials, the app drafts text and opens the
   room for a human to post manually.
-- REP, TDH, holder, allowlist, and QnA gates are advisory notes until live wallet/session/score checks are wired.
-- Local votes are app records. PR work requires a manually recorded 6529 decision URL before code work starts.
+- Reputation, token, holder, allowlist, and QnA gates are advisory notes until live wallet/session/score checks are wired.
+- Local votes are app records. PR work requires a manually recorded room decision URL before code work starts.
 - Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation.
 - The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
   deploy, or spend funds.
@@ -66,9 +67,9 @@ What remains manual or MVP-only:
 
 What we are working on next:
 
-1. Pick the first real public 6529 room and hook repo.
+1. Pick the first real public build room and hook repo.
 2. Configure launch env, durable storage, and the required guardian check.
-3. Finish the first public loop: discussion, scoped proposal, 6529 decision, PR record, reviewer proof, and share-back.
+3. Finish the first public loop: discussion, scoped proposal, room decision, PR record, reviewer proof, and share-back.
 4. Wire live wallet/session gate checks when the manual gate process is proven.
 5. Expand contribution analysis after the workflow is useful and understandable.
 
@@ -91,9 +92,9 @@ The app makes the important answers visible:
 
 The first public phase:
 
-1. Choose one public 6529 room.
-2. Connect one GitHub smart contract repo for the 6529 hook.
-3. Record participation gates such as REP, TDH, allowlists, or QnA as advisory until live enforcement is wired.
+1. Choose one public build room.
+2. Connect one GitHub smart contract repo for the hook.
+3. Record participation gates such as reputation, token, allowlists, or QnA as advisory until live enforcement is wired.
 4. Propose hook work in plain English with clear limits.
 5. Let orchestration rules classify risk and require votes for important changes.
 6. Let an agent help produce a PR when allowed.
@@ -108,7 +109,7 @@ Contributor rules for the first hook phase are in [CONTRIBUTING.md](CONTRIBUTING
 
 ## Trust Boundary
 
-The first public phase is a governed hook-building workflow controlled by one public 6529 room.
+The first public phase is a governed hook-building workflow controlled by one public build room.
 
 Current trust controls:
 
@@ -121,12 +122,12 @@ Current trust controls:
 - Guardian/reviewer/setup-proof code changes are treated as critical-risk diffs.
 
 The most important production hardening step is moving from the repo-local GitHub Action to an external GitHub App. The app
-should own the required check, read the 6529 wave state, replay the same deterministic verifier, and publish the same proof
+should own the required check, read the public room state, replay the same deterministic verifier, and publish the same proof
 artifacts. Until then, the MVP is useful and auditable, but not the strongest possible trust boundary.
 
 First launch tasks:
 
-1. Pick the first real 6529 room and hook repo, then publish the launch playbook.
+1. Pick the first real build room and hook repo, then publish the launch playbook.
 2. Set `COMMAND_WAVE_STATE_URL` to the deployed `/api/command-wave/state` endpoint before making the guardian a required PR check.
 
 Hardening tasks after the first public loop:
@@ -141,7 +142,7 @@ See [docs/6529arena-lessons.md](docs/6529arena-lessons.md) for the full transfer
 
 Short version:
 
-- Keep 6529 waves as the social/source-of-truth surface.
+- Keep the public room as the social source of truth.
 - Use the app as the control panel for setup, rules, jobs, and audit views.
 - Reputation can route work, but permissions are the real security boundary.
 - Agents request actions; the app decides what is allowed.
@@ -160,7 +161,7 @@ Default workspace:
 - Links to the room, code repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct room posting when configured, a visible room snapshot, and copyable discussion draft.
 - Folded proposal form for one PR-sized hook change with a Discuss, Decide, Save, Build, Review flow strip.
-- Builder profiles with 6529 profile links, visible room and repo activity, and informational contribution signals.
+- Builder profiles with profile links, visible room and repo activity, and informational contribution signals.
 - Project rules next to the builder profiles: who can join, activity-report boundaries, and hook guardrails.
 
 Safety and review:
@@ -226,7 +227,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.example
 COMMAND_WAVE_STORE=postgres
 DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
-COMMAND_WAVE_INITIAL_NAME="6529 Hook"
+COMMAND_WAVE_INITIAL_NAME="Hook Build"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-room
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
@@ -380,7 +381,7 @@ If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
 `$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit?remote=1`. Set `LAUNCH_AUDIT_REMOTE=0` only for local shape checks.
 
 The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
-`LAUNCH_AUDIT_PATH`. The verifier prints the status draft, blockers, open items, and an operator checklist.
+`LAUNCH_AUDIT_PATH`. The verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
 
 Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed by Next:
 
@@ -415,8 +416,8 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `DELETE /api/command-wave`: reset the local demo.
 - `POST /api/command-wave/proposals`: submit a work proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
-- `POST /api/command-wave/decision`: record a manual 6529 decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from the room.
-- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded 6529 decision receipt.
+- `POST /api/command-wave/decision`: record a manual room decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from the room.
+- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded room decision receipt.
 - `POST /api/command-wave/execute`: run the local agent adapter.
 - `POST /api/command-wave/review`: run the local reviewer adapter.
 

@@ -51,7 +51,7 @@ function routeForPoll(wave: CommandWave, proposal: CommandProposal, poll: PollSt
   }
 
   if (poll.status === "passed") {
-    return `${route}, record the 6529 decision URL`;
+    return `${route}, record the room decision URL`;
   }
 
   if (poll.status === "failed") {
