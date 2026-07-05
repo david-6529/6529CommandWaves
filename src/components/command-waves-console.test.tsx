@@ -19,12 +19,15 @@ describe("CommandWavesConsole", () => {
 
     expect(text).toContain("Decentralized Coding: Beta");
     expect(text).toContain("Pilot: 6529 AMM hook");
-    expect(text).toContain("A shared workspace for people and agents to turn discussion into reviewed pull requests.");
-    expect(text).toContain("Build one hook in public");
-    expect(text).toContain("Builders discuss work here.");
+    expect(text).toContain("Build one hook in public through chat, decisions, pull requests, and review.");
+    expect(text).toContain("Project summary");
+    expect(text).toContain("orchestrator managed");
+    expect(text).toContain("Group discussion sets the work.");
+    expect(text).toContain("Builders can submit PRs to the repo and discuss scope, risks, and review in chat.");
+    expect(text).toContain("Changelog");
     expect(text).toContain("Project chat");
     expect(text).toContain("Code repo");
-    expect(text).toContain("Who can contribute");
+    expect(text).toContain("Access");
     expect(text).toContain("Current focus");
     expect(text).toContain("Work");
     expect(text).toContain("Being discussed");

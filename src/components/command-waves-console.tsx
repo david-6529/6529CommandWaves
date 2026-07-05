@@ -1253,6 +1253,7 @@ export function CommandWavesConsole() {
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
   const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
+  const topChangelogItems = orderedLedgerEvents.slice(0, 3);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
   const launchNextActionItemId = launchAudit.nextAction.itemId ?? "";
@@ -1273,6 +1274,12 @@ export function CommandWavesConsole() {
       : "Open launch controls";
   const projectSummaryItems = [
     {
+      label: "Current work",
+      value: currentFocusTitle,
+      detail: currentBuildStatusLabel,
+      href: null,
+    },
+    {
       label: "Project chat",
       value: "In this app",
       detail: "Ask questions, suggest work, and record decisions.",
@@ -1285,9 +1292,9 @@ export function CommandWavesConsole() {
       href: primaryHookProject?.repoUrl ?? repoUrl,
     },
     {
-      label: "Who can contribute",
+      label: "Access",
       value: participationAccess.label,
-      detail: "Access is reviewed manually for this phase.",
+      detail: "Reviewed manually for this phase.",
       href: null,
     },
   ];
@@ -1978,15 +1985,15 @@ export function CommandWavesConsole() {
   return (
     <main className="dark-app min-h-screen bg-zinc-950 text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
-        <header className="border-b border-zinc-200 pb-6">
+        <header className="border-b border-zinc-200 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div className="max-w-4xl">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{commandWaveProductCopy.headline}</p>
-              <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
+              <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950">
                 Pilot: 6529 AMM hook
               </h1>
-              <p className="mt-3 max-w-3xl text-xl leading-8 text-zinc-700">
-                A shared workspace for people and agents to turn discussion into reviewed pull requests. Pick one change, decide in public, review the code, then move to the next change.
+              <p className="mt-2 max-w-3xl text-lg leading-7 text-zinc-700">
+                Build one hook in public through chat, decisions, pull requests, and review.
               </p>
             </div>
             <nav className="flex flex-wrap gap-2" aria-label="Primary actions">
@@ -1994,29 +2001,62 @@ export function CommandWavesConsole() {
             </nav>
           </div>
 
-          <section className="mt-6 rounded-lg border border-zinc-200 p-5" aria-label="Project overview">
-            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project</p>
-            <h2 className="mt-2 text-2xl font-semibold leading-8 text-zinc-950">Build one hook in public</h2>
-            <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-600">
-              Builders discuss work here. Decisions are recorded here. Reviewed pull requests land in GitHub. This app keeps the current work, rules, and review trail in one place.
-            </p>
-            <dl className="mt-5 grid gap-3 md:grid-cols-3">
-              {projectSummaryItems.map((item) => (
-                <div key={item.label} className="border-t border-zinc-200 pt-3">
-                  <dt className="text-sm font-semibold text-zinc-500">{item.label}</dt>
-                  <dd className="mt-1 break-words text-base font-semibold leading-6 text-zinc-950">
-                    {item.href ? (
-                      <a className="hover:text-blue-700" href={item.href} target="_blank" rel="noreferrer">
-                        {item.value}
-                      </a>
-                    ) : (
-                      item.value
-                    )}
-                  </dd>
-                  <dd className="mt-1 text-sm leading-6 text-zinc-500">{item.detail}</dd>
-                </div>
-              ))}
-            </dl>
+          <section className="mt-5 grid gap-3 border-t border-zinc-200 pt-4 lg:grid-cols-2" aria-label="Project context">
+            <details className="rounded-lg border border-zinc-200 p-4" open>
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
+                <span>Project summary</span>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">orchestrator managed</Badge>
+              </summary>
+              <p className="mt-3 text-base leading-7 text-zinc-600">
+                Group discussion sets the work. The orchestrator agent keeps this summary current as work items,
+                decisions, PRs, and reviews change.
+              </p>
+              <p className="mt-2 text-base leading-7 text-zinc-600">
+                Builders can submit PRs to the repo and discuss scope, risks, and review in chat.
+              </p>
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                {projectSummaryItems.map((item) => (
+                  <div key={item.label} className="border-t border-zinc-200 pt-3">
+                    <dt className="text-sm font-semibold text-zinc-500">{item.label}</dt>
+                    <dd className="mt-1 break-words text-base font-semibold leading-6 text-zinc-950">
+                      {item.href ? (
+                        <a className="hover:text-blue-700" href={item.href} target="_blank" rel="noreferrer">
+                          {humanizeLegacyCommandCopy(item.value)}
+                        </a>
+                      ) : (
+                        humanizeLegacyCommandCopy(item.value)
+                      )}
+                    </dd>
+                    <dd className="mt-1 text-sm leading-6 text-zinc-500">{humanizeLegacyCommandCopy(item.detail)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+
+            <details className="rounded-lg border border-zinc-200 p-4" open>
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
+                <span>Changelog</span>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{topChangelogItems.length} updates</Badge>
+              </summary>
+              <p className="mt-3 text-base leading-7 text-zinc-600">
+                Latest orchestrator log from discussion, PR, and review activity.
+              </p>
+              <div className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
+                {topChangelogItems.length ? (
+                  topChangelogItems.map((event) => (
+                    <div key={event.id} className="py-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{eventTypeLabel(event.type)}</p>
+                        <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{shortTime(event.at)}</Badge>
+                      </div>
+                      <p className="mt-1 text-base leading-7 text-zinc-700">{humanizeLegacyCommandCopy(event.message)}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="py-3 text-base leading-7 text-zinc-600">No changes recorded yet.</p>
+                )}
+              </div>
+            </details>
           </section>
         </header>
 

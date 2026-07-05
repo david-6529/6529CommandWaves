@@ -189,7 +189,7 @@ describe("Command wave store", () => {
     });
     expect(voted.polls[0].votes.map((vote) => vote.voterIdentity)).toEqual(["carol", "bob", "alice"]);
     expect(voted.ledger[0].message).toBe(
-      "cmd-002 local vote passed. Record the room decision receipt before work can run.",
+      "cmd-002 local vote passed. Record the project decision receipt before work can run.",
     );
   });
 
@@ -289,7 +289,7 @@ describe("Command wave store", () => {
         recordedBy: "david",
       },
     });
-    expect(approved.ledger[0].message).toBe("Recorded room decision receipt for cmd-002.");
+    expect(approved.ledger[0].message).toBe("Recorded project decision receipt for cmd-002.");
   });
 
   it("rejects decision receipt URLs from another wave", async () => {

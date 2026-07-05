@@ -5,7 +5,7 @@ describe("legacy command copy", () => {
   it("maps old internal role language to current user-facing terms", () => {
     expect(humanizeLegacyCommandCopy("Genesis Agent updated setup.")).toBe("Setup updated setup.");
     expect(humanizeLegacyCommandCopy("Orchestrator Agent executed through orchestrator execution.")).toBe(
-      "Agent executed through agent run.",
+      "Orchestrator executed through orchestrator run.",
     );
     expect(humanizeLegacyCommandCopy("Guardian review passed by Guardian Agent.")).toBe("Review passed by Reviewer.");
     expect(humanizeLegacyCommandCopy("Local agent mock opened a PR.")).toBe("Agent adapter opened a PR.");
@@ -14,14 +14,14 @@ describe("legacy command copy", () => {
 
   it("maps old hook builder product language to the current project framing", () => {
     expect(humanizeLegacyCommandCopy("Created 6529 Hook Builder and attached the builder wave plus GitHub repo.")).toBe(
-      "Created Hook Build and attached the project room and code repo.",
+      "Created Hook Build and attached the project chat and code repo.",
     );
-    expect(humanizeLegacyCommandCopy("Builder wave approved cmd-001.")).toBe("Room approved cmd-001.");
+    expect(humanizeLegacyCommandCopy("Builder wave approved cmd-001.")).toBe("Project chat approved cmd-001.");
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder 6529 decision receipt.")).toBe(
-      "Decision recorded a room decision receipt.",
+      "Decision recorded a project decision receipt.",
     );
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder wave decision receipt.")).toBe(
-      "Decision recorded a room decision receipt.",
+      "Decision recorded a project decision receipt.",
     );
   });
 });
