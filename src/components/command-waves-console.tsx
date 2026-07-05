@@ -109,29 +109,29 @@ const proposalTypeOptions: ProposalTypeOption[] = [
     kind: "post_to_wave",
     label: "Update",
     title: "Share current hook status",
-    request: "Summarize the current hook change, decision status, PR status, and next move for the room.",
+    request: "Summarize the current hook change, decision status, PR status, and next step for the project.",
     limits: "Post manually. Do not claim a merge, deploy, payment, live REP gate, or final decision unless it is recorded.",
     requestLabel: "Update",
     limitsLabel: "Posting limits",
-    requestPlaceholder: "Describe the room update to draft.",
+    requestPlaceholder: "Describe the project update to draft.",
     limitsPlaceholder: "Name claims to include or avoid.",
   },
   {
     kind: "read_context",
     label: "Context",
     title: "Read latest hook context",
-    request: "Read the latest room activity and repo state, then summarize what changed and what needs attention.",
+    request: "Read the latest project activity and repo state, then summarize what changed and what needs attention.",
     limits: "Read only. Do not write posts, open PRs, run scripts, deploy, spend funds, or change rules.",
     requestLabel: "Context request",
     limitsLabel: "Read limits",
-    requestPlaceholder: "Ask what context the room needs.",
+    requestPlaceholder: "Ask what context builders need.",
     limitsPlaceholder: "Name what should stay out of scope.",
   },
 ];
 const proposalFlowSteps = [
-  ["Discuss", "Start in the room so builders can shape the idea."],
+  ["Discuss", "Start in chat so builders can shape the idea."],
   ["Decide", "Record a visible decision for important hook work."],
-  ["Save", "Save the scoped proposal once the room can see it."],
+  ["Save", "Save the scoped proposal once builders can see it."],
   ["Build", "Use GitHub PRs for code changes."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
@@ -144,14 +144,14 @@ const hookGuardrails = [
 ];
 const buildRoomRules = [
   "Access is reviewed before someone can change the project.",
-  "Ideas and proposals start in the room.",
+  "Ideas and proposals start in chat.",
   "The orchestration agent labels risk and keeps scope small.",
-  "Important changes need a visible room decision before PR work.",
+  "Important changes need a visible project decision before PR work.",
   "The reviewer agent checks each PR before humans merge.",
 ];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
-  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public build room."],
+  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public project source."],
   ["COMMAND_WAVE_INITIAL_REPO_URL", "Reachable GitHub hook repo."],
   ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
   ["DATABASE_URL", "Production Postgres connection."],
@@ -159,7 +159,7 @@ const publicLaunchSetupItems = [
   ["6529_MOCK_MODE=false", "Use live 6529 reads."],
   ["COMMAND_WAVE_REPO_ADAPTER=github", "Open draft PR records through GitHub."],
   ["COMMAND_WAVE_GITHUB_TOKEN", "GitHub token with repo access."],
-  ["COMMAND_WAVE_STATE_URL", "Gives guardian PR checks the public room state."],
+  ["COMMAND_WAVE_STATE_URL", "Gives guardian PR checks the public project state."],
   ["COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK", "Name of the required guardian status check."],
   ["GitHub required check", "Make the guardian check required in branch protection or rulesets."],
 ];
@@ -397,10 +397,10 @@ async function requestRoomPost(waveUrl: string, content: string, accessKey?: str
       content,
     }),
   });
-  const payload = await readApiJson<RoomPostResponse>(response, "Room post failed.");
+  const payload = await readApiJson<RoomPostResponse>(response, "Post failed.");
 
   if (!response.ok || !payload.post) {
-    throw new Error(formatApiError(payload, "Room post failed."));
+    throw new Error(formatApiError(payload, "Post failed."));
   }
 
   return payload.post;
@@ -420,10 +420,10 @@ function postCountLabel(count: number) {
 
 async function requestWaveSearch(query: string) {
   const response = await fetchWithClientTimeout(`/api/6529/waves/search?q=${encodeURIComponent(query)}&limit=6`);
-  const payload = await readApiJson<WaveSearchResponse>(response, "Room search failed.");
+  const payload = await readApiJson<WaveSearchResponse>(response, "Source search failed.");
 
   if (!response.ok || !payload.results) {
-    throw new Error(formatApiError(payload, "Room search failed."));
+    throw new Error(formatApiError(payload, "Source search failed."));
   }
 
   return payload.results;
@@ -1002,7 +1002,7 @@ export function CommandWavesConsole() {
   const activePrHasWaveDecision = Boolean(
     activeProposalIsPr && pollApprovalPassedForWave(activePoll ?? null, wave.waveUrl, { requireUrl: true }),
   );
-  const decisionReferencePlaceholder = activeProposalIsPr ? "Room decision URL" : "Room decision URL or drop id";
+  const decisionReferencePlaceholder = activeProposalIsPr ? "Decision link" : "Decision link or post id";
   const activePollNeedsWaveDecision = Boolean(
     activePoll?.status === "passed" && (!activePoll.decision || activeDecisionReferenceCheck?.ok === false),
   );
@@ -1010,24 +1010,24 @@ export function CommandWavesConsole() {
   const activePollCanVote = activePoll?.status === "open";
   const showDecisionRecorder = Boolean(activePoll && activePollNeedsWaveDecision);
   const activePollTitle = activePollNeedsWaveDecision
-    ? "Room decision needed"
+    ? "Project decision needed"
     : activePollDecisionRecorded
-      ? "Room decision recorded"
+      ? "Project decision recorded"
       : activePoll?.status === "failed"
         ? "Vote failed"
         : activePoll?.status === "passed"
         ? "Vote passed"
         : "Vote open";
-  const decisionTitle = activePoll ? activePollTitle : simpleDecisionRoute;
+  const decisionTitle = readyForNextHookChange ? "No decision yet" : activePoll ? activePollTitle : simpleDecisionRoute;
   const activePollDetail = activePollNeedsWaveDecision
-    ? "Local vote passed. Record the room decision before work runs."
+    ? "Local vote passed. Record the project decision before work runs."
     : activePollDecisionRecorded
-      ? `Room decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
+      ? `Project decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
       : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentBuildStatusLabel = readyForNextHookChange
-    ? "needs room input"
+    ? "needs discussion"
     : activeExecution
       ? "PR logged"
       : activePollDecisionRecorded
@@ -1059,7 +1059,7 @@ export function CommandWavesConsole() {
       : activeProposal?.title ?? "Pick the next change";
   const currentFocusDescription =
     readyForNextHookChange
-      ? "Bring this draft to the room before saving it as a proposal."
+      ? "Bring this draft to chat before saving it as a proposal."
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
@@ -1122,9 +1122,6 @@ export function CommandWavesConsole() {
       }),
     [prompt, proposer, title, wave],
   );
-  const visibleWorkFeedItems = roomFeed
-    .filter((item) => !["current-proposal", "next-proposal", "draft-decision"].includes(item.id))
-    .slice(0, 2);
   const visibleBuilderProfiles = builderRoster.slice(0, 4);
   const visibleRoomSnapshotDrops = primaryProjectContextPreview
     ? [...primaryProjectContextPreview.sampleDrops].slice(-3).reverse()
@@ -1263,7 +1260,7 @@ export function CommandWavesConsole() {
         : "Check readiness"
       : "Open launch controls";
   const roomNeedLabel = readyForNextHookChange
-    ? "Room input"
+    ? "Needs discussion"
     : activePollCanVote
       ? "Decision needed"
       : showDecisionRecorder
@@ -1282,28 +1279,28 @@ export function CommandWavesConsole() {
   const roomNeedDetail = readyForNextHookChange
     ? "Get feedback on scope, then save the proposal."
     : activePollCanVote
-      ? "Ask the room for a visible decision before code work starts."
+      ? "Ask builders for a visible decision before code work starts."
       : showDecisionRecorder
-        ? "Record the room decision URL so the PR has a source of truth."
+        ? "Record the decision link so the PR has a source of truth."
         : showBuildAction
           ? activePrHasWaveDecision
             ? "Use the approved packet and attach the PR record."
-            : "Record the room decision URL before PR work starts."
+            : "Record the decision link before PR work starts."
           : canRunReview
-            ? "Check the PR against the approved proposal and room rules."
+            ? "Check the PR against the approved proposal and project rules."
             : activeSupportProposal
-              ? `${activeSupportProposalLabel} is recorded. Use the room to discuss it or propose the next code change.`
+              ? `${activeSupportProposalLabel} is recorded. Use chat to discuss it or propose the next code change.`
               : activeProposal
                 ? "Follow the next open step for this change."
-                : "Choose one small change the room can discuss.";
+                : "Choose one small change builders can discuss.";
   const decisionStateClass = activePollNeedsWaveDecision || activePollCanVote ? riskClass("medium") : statusClass("complete");
   const latestLedgerEvent = orderedLedgerEvents[0] ?? null;
   const projectSummaryItems = [
     {
-      label: "Discussion room",
-      value: Boolean(primaryHookProject?.waveUrl || wave.waveUrl) ? "Build room" : "No room set",
-      detail: "Where builders talk and make decisions.",
-      href: primaryHookProject?.waveUrl ?? wave.waveUrl,
+      label: "Project chat",
+      value: "In this app",
+      detail: "Ask questions, suggest work, and record decisions.",
+      href: null,
     },
     {
       label: "Code repo",
@@ -1318,37 +1315,10 @@ export function CommandWavesConsole() {
       href: null,
     },
   ];
-  const workFocusItems = [
-    {
-      label: "Current",
-      title: currentFocusTitle,
-      detail: currentFocusDescription,
-      status: currentBuildStatusLabel,
-      className: currentBuildStatusClass,
-    },
-    {
-      label: "Next",
-      title: phaseNextAction.title,
-      detail: phaseNextAction.detail,
-      status: phaseNextAction.statusLabel,
-      className: nextActionStatusClass(phaseNextAction.status),
-    },
-    ...(latestLedgerEvent
-      ? [
-          {
-            label: "Latest log",
-            title: eventTypeLabel(latestLedgerEvent.type),
-            detail: humanizeLegacyCommandCopy(latestLedgerEvent.message),
-            status: shortTime(latestLedgerEvent.at),
-            className: "border-zinc-700 bg-zinc-900 text-zinc-300",
-          },
-        ]
-      : []),
-  ];
   const ruleHighlights = [
     ["Gate", participationGateNotes[0] ?? "Participation gate is set by project maintainers."],
-    ["Discuss", "Ideas, questions, and scope changes start in the room."],
-    ["Decide", "Important or risky changes need a visible room decision."],
+    ["Discuss", "Ideas, questions, and scope changes start in chat."],
+    ["Decide", "Important or risky changes need a visible project decision."],
     ["Build", "Code moves through GitHub PRs and reviewer checks."],
     ["Control", "Humans merge, deploy, pay, and change project rules."],
   ];
@@ -1486,7 +1456,7 @@ export function CommandWavesConsole() {
       } else {
         setSetupContextPreview(preview);
       }
-      setApiNotice(`Room posts loaded: ${postCountLabel(preview.dropCount)}.`);
+      setApiNotice(`Project posts loaded: ${postCountLabel(preview.dropCount)}.`);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Context preview failed.");
     } finally {
@@ -1509,9 +1479,9 @@ export function CommandWavesConsole() {
       const results = await requestWaveSearch(query);
 
       setWaveSearchResults(results);
-      setApiNotice(results.length ? `Found ${results.length} room option${results.length === 1 ? "" : "s"}.` : "No rooms found.");
+      setApiNotice(results.length ? `Found ${results.length} source option${results.length === 1 ? "" : "s"}.` : "No sources found.");
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : "Room search failed.");
+      setApiError(error instanceof Error ? error.message : "Source search failed.");
     } finally {
       setApiBusy(null);
     }
@@ -1639,10 +1609,10 @@ export function CommandWavesConsole() {
     try {
       await navigator.clipboard.writeText(waveUpdateDraftRef.current?.value ?? waveUpdateDraft);
       setCopyNotice("Draft copied.");
-      setApiNotice("Room update copied.");
+      setApiNotice("Project update copied.");
     } catch {
       setCopyNotice("Copy failed. Select the draft text and copy it manually.");
-      setApiNotice("Copy failed. Select the room update draft and copy it manually.");
+      setApiNotice("Copy failed. Select the project update draft and copy it manually.");
     }
   }
 
@@ -1693,8 +1663,8 @@ export function CommandWavesConsole() {
       if (openDiscussion && wave.waveUrl) {
         setWaveRoomNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
-            ? "Message copied. Opened room."
-            : "Message copied. Open the room manually.",
+            ? "Message copied for posting."
+            : "Message copied. Open the source manually.",
         );
         return;
       }
@@ -1713,7 +1683,7 @@ export function CommandWavesConsole() {
     }
 
     if (!roomPostTargetUrl) {
-      setWaveRoomNotice("Choose a room before posting.");
+      setWaveRoomNotice("Project chat is not connected yet.");
       return;
     }
 
@@ -1743,12 +1713,12 @@ export function CommandWavesConsole() {
       setWaveRoomMessage("");
       setRoomPostUrl(post.url ?? "");
       setWaveRoomNotice(
-        `${post.mode === "mock" ? "Posted to the mock room." : "Posted to the room."}${
-          roomPreviewRefreshed ? " Room preview refreshed." : ""
+        `${post.mode === "mock" ? "Posted to mock chat." : "Posted to project chat."}${
+          roomPreviewRefreshed ? " Chat preview refreshed." : ""
         }`,
       );
     } catch (error) {
-      setWaveRoomNotice(error instanceof Error ? error.message : "Room post failed.");
+      setWaveRoomNotice(error instanceof Error ? error.message : "Post failed.");
     } finally {
       setApiBusy(null);
     }
@@ -1764,7 +1734,7 @@ export function CommandWavesConsole() {
     setWaveRoomMessage(`@${identity} `);
     setWaveRoomNotice("Message draft ready.");
     window.requestAnimationFrame(() => {
-      document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -1785,9 +1755,9 @@ export function CommandWavesConsole() {
 
   function prepareJoinRequest() {
     setWaveRoomMessage(createBuilderWaveJoinDraft(proposer, wave.gates));
-    setWaveRoomNotice("Join message ready.");
+    setWaveRoomNotice("Access request ready.");
     window.requestAnimationFrame(() => {
-      document.getElementById("wave-room")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -1799,8 +1769,8 @@ export function CommandWavesConsole() {
       if (openDiscussion && wave.waveUrl) {
         setProposalDraftNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
-            ? "Proposal copied. Opened room."
-            : "Proposal copied. Open the room manually.",
+            ? "Proposal copied for discussion."
+            : "Proposal copied. Open the source manually.",
         );
         return;
       }
@@ -1951,7 +1921,7 @@ export function CommandWavesConsole() {
             recordedBy: proposer,
           }),
         }, accessKey),
-      "Room decision recorded.",
+      "Decision recorded.",
     );
   }
 
@@ -1998,12 +1968,11 @@ export function CommandWavesConsole() {
                 Pilot: 6529 AMM hook
               </h1>
               <p className="mt-3 max-w-3xl text-xl leading-8 text-zinc-700">
-                A shared room for people and agents to turn discussion into reviewed pull requests. Pick one change, decide in public, review the code, then move to the next change.
+                A shared workspace for people and agents to turn discussion into reviewed pull requests. Pick one change, decide in public, review the code, then move to the next change.
               </p>
             </div>
             <nav className="flex flex-wrap gap-2" aria-label="Primary actions">
-              <JumpLink href="#wave-room">Discuss work</JumpLink>
-              {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+              {primaryHookProject?.repoUrl || repoUrl ? <LinkButton href={primaryHookProject?.repoUrl ?? repoUrl}>Open repo</LinkButton> : null}
             </nav>
           </div>
 
@@ -2011,7 +1980,7 @@ export function CommandWavesConsole() {
             <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project</p>
             <h2 className="mt-2 text-2xl font-semibold leading-8 text-zinc-950">Build one hook in public</h2>
             <p className="mt-2 max-w-3xl text-base leading-7 text-zinc-600">
-              Builders discuss the work in the room. Decisions are recorded there. Reviewed pull requests land in the repo. This app keeps the current work, rules, and review trail in one place.
+              Builders discuss work here. Decisions are recorded here. Reviewed pull requests land in GitHub. This app keeps the current work, rules, and review trail in one place.
             </p>
             <dl className="mt-5 grid gap-3 md:grid-cols-3">
               {projectSummaryItems.map((item) => (
@@ -2040,76 +2009,59 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Upcoming or being discussed</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Work</h2>
               </div>
-              <JumpLink href="#wave-room">Discuss work</JumpLink>
             </div>
 
             <div className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
-              {workFocusItems.map((item) => (
-                <article key={item.label} className="py-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{item.label}</p>
-                    <Badge className={item.className}>{item.status}</Badge>
+              <article className="py-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Being discussed</p>
+                  <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+                </div>
+                <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{humanizeLegacyCommandCopy(currentFocusTitle)}</h3>
+                <p className="mt-1 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
+              </article>
+
+              <article className="py-4" aria-label="Decision status">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
+                  <Badge className={decisionStateClass}>{roomNeedLabel}</Badge>
+                </div>
+                <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{decisionTitle}</h3>
+                <p className="mt-1 text-base leading-7 text-zinc-600">{roomNeedDetail}</p>
+                {showDecisionRecorder ? (
+                  <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
+                    <Input
+                      value={decisionReference}
+                      placeholder={decisionReferencePlaceholder}
+                      onChange={(event) => setDecisionReference(event.target.value)}
+                    />
+                    <Button type="button" variant="secondary" disabled={isBusy || !decisionReference.trim()} onClick={recordWaveDecision}>
+                      {apiBusy === "decision" ? "Recording" : "Record decision"}
+                    </Button>
                   </div>
-                  <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{humanizeLegacyCommandCopy(item.title)}</h3>
-                  <p className="mt-1 line-clamp-2 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(item.detail)}</p>
+                ) : null}
+              </article>
+
+              {latestLedgerEvent ? (
+                <article className="py-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest activity</p>
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{shortTime(latestLedgerEvent.at)}</Badge>
+                  </div>
+                  <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{eventTypeLabel(latestLedgerEvent.type)}</h3>
+                  <p className="mt-1 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(latestLedgerEvent.message)}</p>
                 </article>
-              ))}
-            </div>
-
-            <section className="mt-5 rounded-lg border border-zinc-200 bg-zinc-50 p-4" aria-label="Decision needed">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
-                <Badge className={decisionStateClass}>{roomNeedLabel}</Badge>
-              </div>
-              <p className="mt-2 text-lg font-semibold leading-7 text-zinc-950">{decisionTitle}</p>
-              <p className="mt-1 text-base leading-7 text-zinc-600">{roomNeedDetail}</p>
-              {showDecisionRecorder ? (
-                <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-                  <Input
-                    value={decisionReference}
-                    placeholder={decisionReferencePlaceholder}
-                    onChange={(event) => setDecisionReference(event.target.value)}
-                  />
-                  <Button type="button" variant="secondary" disabled={isBusy || !decisionReference.trim()} onClick={recordWaveDecision}>
-                    {apiBusy === "decision" ? "Recording" : "Record decision"}
-                  </Button>
-                </div>
               ) : null}
-            </section>
-
-            <section className="mt-5" aria-label="Work queue">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-xl font-semibold text-zinc-950">Queue</h3>
-                <Button type="button" variant="secondary" onClick={openActivitySection}>
-                  History
-                </Button>
-              </div>
-              {visibleWorkFeedItems.length ? (
-                <div className="mt-3 divide-y divide-zinc-200 border-y border-zinc-200">
-                  {visibleWorkFeedItems.map((item) => (
-                    <div key={item.id} className="py-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
-                        <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{item.status}</Badge>
-                      </div>
-                      <p className="mt-1 text-base font-semibold leading-6 text-zinc-950">{humanizeLegacyCommandCopy(item.title)}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-base leading-7 text-zinc-600">Nothing else is waiting. Add one small hook change when the room is ready.</p>
-              )}
-            </section>
+            </div>
 
             <div className="mt-5 flex flex-wrap gap-2 border-t border-zinc-200 pt-4">
               {!activeProposal ? (
-                <JumpLink href="#wave-room">Discuss work</JumpLink>
+                <JumpLink href="#project-chat">Open chat</JumpLink>
               ) : activePollCanVote ? (
                 <>
                   <Button type="button" onClick={() => void copyBuilderWaveDecisionDraft()}>
                     Copy decision request
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
                 </>
               ) : showBuildAction ? (
                 <>
@@ -2135,14 +2087,14 @@ export function CommandWavesConsole() {
               ) : readyForNextHookChange ? (
                 <>
                   <Button type="button" disabled={!wave.waveUrl} onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}>
-                    Discuss in room
+                    Discuss in chat
                   </Button>
                   <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                     {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                   </Button>
                 </>
               ) : (
-                <JumpLink href="#wave-room">Discuss work</JumpLink>
+                <JumpLink href="#project-chat">Open chat</JumpLink>
               )}
             </div>
             {decisionDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
@@ -2152,19 +2104,18 @@ export function CommandWavesConsole() {
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-600">{apiError}</p> : null}
           </section>
 
-          <section id="wave-room" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
+          <section id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Room discussion</p>
-                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Discuss work</h2>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project chat</p>
+                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Chat with builders</h2>
                 <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">
                   Ask a question, suggest a change, review an idea, or call out risk. This is where work starts.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
-                  Join
+                  Request access
                 </Button>
               </div>
             </div>
@@ -2189,15 +2140,15 @@ export function CommandWavesConsole() {
                   disabled={isBusy || !canPostRoomMessage}
                   onClick={() => void postBuilderWaveChatDraft()}
                 >
-                  {apiBusy === "roomPost" ? "Posting" : "Post to room"}
+                  {apiBusy === "roomPost" ? "Posting" : "Post message"}
                 </Button>
                 <Button
                   type="button"
                   variant="secondary"
-                  disabled={!hasRoomMessage || !wave.waveUrl}
-                  onClick={() => void copyBuilderWaveChatDraft({ openDiscussion: true })}
+                  disabled={!hasRoomMessage}
+                  onClick={() => void copyBuilderWaveChatDraft()}
                 >
-                  Copy and open
+                  Copy draft
                 </Button>
                 <Button type="button" variant="secondary" disabled={!hasRoomMessage} onClick={resetBuilderWaveChatDraft}>
                   Clear
@@ -2216,10 +2167,10 @@ export function CommandWavesConsole() {
               ) : null}
             </div>
 
-            <section className="mt-5 border-t border-zinc-200 pt-4" aria-label="Room snapshot">
+            <section className="mt-5 border-t border-zinc-200 pt-4" aria-label="Project chat snapshot">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Room signals</p>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest posts</p>
                   <h3 className="mt-1 text-lg font-semibold text-zinc-950">Latest activity</h3>
                 </div>
                 <Button
@@ -2275,7 +2226,7 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Builders</h2>
                 <p className="mt-2 max-w-2xl text-base leading-7 text-zinc-600">
-                  Profiles show visible activity in this room and repo. They are context for humans, not permissions.
+                  Profiles show visible activity in chat and GitHub. They are context for humans, not permissions.
                 </p>
               </div>
             </div>
@@ -2328,7 +2279,7 @@ export function CommandWavesConsole() {
               ) : (
                 <div className="rounded-lg border border-zinc-200 bg-white p-4 md:col-span-2">
                   <p className="text-base font-semibold text-zinc-950">No visible members yet</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-500">Builders appear here after room posts, proposals, votes, or reviews.</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">Builders appear here after chat posts, proposals, votes, or reviews.</p>
                 </div>
               )}
             </div>
@@ -2353,7 +2304,7 @@ export function CommandWavesConsole() {
                 ))}
               </ul>
               <Button type="button" variant="secondary" className="mt-3" onClick={prepareJoinRequest}>
-                Draft join message
+                Draft access request
               </Button>
             </div>
             <div className="mt-5 border-t border-zinc-200 pt-4">
@@ -2454,7 +2405,7 @@ export function CommandWavesConsole() {
                 disabled={!wave.waveUrl}
                 onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}
               >
-                Discuss in room
+                Discuss in chat
               </Button>
               <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                 Copy draft
@@ -2462,10 +2413,10 @@ export function CommandWavesConsole() {
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
                 {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
-              <JumpLink href="#wave-room">Discuss work</JumpLink>
+              <JumpLink href="#project-chat">Open chat</JumpLink>
             </div>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
-              Discuss it in the room first. Save only when the proposal is visible there.
+              Discuss it in chat first. Save only when the proposal is visible there.
             </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-600">{apiError}</p> : null}
@@ -2560,7 +2511,7 @@ export function CommandWavesConsole() {
           <div className="advanced-dark-surface mt-4 grid gap-4 rounded-lg border border-zinc-800 bg-zinc-950 p-4">
             <details id="rules-of-game" className="border-b border-zinc-800 pb-4">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-                <span>Room rules</span>
+                <span>Project rules</span>
                 <Badge className="border-zinc-700 bg-zinc-950 text-zinc-300">reference</Badge>
               </summary>
           <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_1fr]">
@@ -2588,7 +2539,7 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
                   Copy guide
                 </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
               </div>
               {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
             </div>
@@ -2603,7 +2554,7 @@ export function CommandWavesConsole() {
             </Badge>
           </summary>
           <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
-            Hook room, code repo, access notes, and the next code step.
+            Hook project source, code repo, access notes, and the next code step.
           </p>
           <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
@@ -2616,7 +2567,7 @@ export function CommandWavesConsole() {
                       <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
                       <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge className="border-zinc-700 bg-black text-zinc-300">room {project.waveLabel}</Badge>
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">source {project.waveLabel}</Badge>
                         <Badge className="border-zinc-700 bg-black text-zinc-300">code {project.repoLabel}</Badge>
                       </div>
                     </div>
@@ -2641,7 +2592,7 @@ export function CommandWavesConsole() {
 
                   <div className="mt-3 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
                     <div className="border-t border-zinc-800 pt-3">
-                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Room activity</p>
+                      <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Project activity</p>
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
                       <div className="mt-3 border-t border-zinc-800 pt-3">
@@ -2653,7 +2604,7 @@ export function CommandWavesConsole() {
                         </ul>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open room</LinkButton> : null}
+                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open source</LinkButton> : null}
                         <Button
                           type="button"
                           variant="secondary"
@@ -2662,7 +2613,7 @@ export function CommandWavesConsole() {
                         >
                           {apiBusy === "context" ? "Loading" : "Read latest posts"}
                         </Button>
-                        <JumpLink href="#wave-room">Message room</JumpLink>
+                        <JumpLink href="#project-chat">Message builders</JumpLink>
                       </div>
                       {contextPreview ? (
                         <div className="mt-3 border-t border-zinc-800 pt-3">
@@ -2697,7 +2648,7 @@ export function CommandWavesConsole() {
                         </div>
                       ) : (
                         <p className="mt-3 text-xs leading-5 text-zinc-500">
-                          Preview the room to read the latest posts here.
+                          Preview the source to read the latest posts here.
                         </p>
                       )}
                     </div>
@@ -2840,9 +2791,9 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Set the first hook room and code repo. More hook rooms can use the same shape later.
+                Set the first hook source and code repo. More hook projects can use the same shape later.
               </p>
-              <Field label="Project room">
+              <Field label="Project source">
                 <Input
                   value={waveUrl}
                   onChange={(event) => {
@@ -2852,11 +2803,11 @@ export function CommandWavesConsole() {
                 />
               </Field>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <Field label="Find a room">
+                <Field label="Find a source">
                   <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
                     <Input
                       value={waveSearchQuery}
-                      placeholder="Type a room name"
+                      placeholder="Type a source name"
                       onChange={(event) => setWaveSearchQuery(event.target.value)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter") {
@@ -2945,7 +2896,7 @@ export function CommandWavesConsole() {
                   >
                     Copy participation guide
                   </Button>
-                  <LinkButton href={waveUrl}>Open room</LinkButton>
+                  <LinkButton href={waveUrl}>Open source</LinkButton>
                 </div>
                 {participationGuideNotice ? (
                   <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p>
@@ -2992,7 +2943,7 @@ export function CommandWavesConsole() {
               </div>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
-                  <span>Room launch brief</span>
+                  <span>Project launch brief</span>
                   <Badge className="border-zinc-700 bg-zinc-900 text-zinc-400">copyable</Badge>
                 </summary>
                 <div className="mt-3 grid gap-3">
@@ -3212,7 +3163,7 @@ export function CommandWavesConsole() {
             <Panel title="Build rules" eyebrow={wave.rules.version}>
             <div className="space-y-4">
               <p className="text-sm leading-6 text-zinc-400">
-                Phase 1 accepts reads, drafts, room updates, and PR work. Scripts, deploys, funds, and rule changes stay parked.
+                Phase 1 accepts reads, drafts, project updates, and PR work. Scripts, deploys, funds, and rule changes stay parked.
               </p>
               <div className="grid gap-3 lg:grid-cols-2">
                 <CompactList title="Use now" items={firstPhaseScopeInventory.useNow} />
@@ -3287,7 +3238,7 @@ export function CommandWavesConsole() {
             <Panel title="Proposal review" eyebrow="Optional">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Check the risk path and room draft before adding the proposal.
+                Check the risk path and project draft before adding the proposal.
               </p>
               <Field label="Title">
                 <Input value={title} onChange={(event) => setTitle(event.target.value)} />
@@ -3332,7 +3283,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">No PR opened</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Use this for context, drafts, or room updates. PR work still needs hook preflight.
+                          Use this for context, drafts, or project updates. PR work still needs hook preflight.
                         </p>
                       </div>
                     </div>
@@ -3376,15 +3327,15 @@ export function CommandWavesConsole() {
                 </div>
               </details>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <p className="text-sm font-semibold text-zinc-100">Room brief</p>
+                <p className="text-sm font-semibold text-zinc-100">Project brief</p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Copy this into the room. Save locally only after it matches the room and risk path.
+                  Copy this into chat. Save locally only after it matches the project decision path.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                     Copy proposal
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
                 </div>
                 {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
               </div>
@@ -3441,7 +3392,7 @@ export function CommandWavesConsole() {
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">Support items</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Context, drafts, and room updates stay separate from the PR build target.
+                          Context, drafts, and project updates stay separate from the PR build target.
                         </p>
                       </div>
                       <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{countLabel(supportProposals.length, "item")}</Badge>
@@ -3468,7 +3419,7 @@ export function CommandWavesConsole() {
                         <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
                           <p className="mt-1 text-xs text-zinc-500">
-                            Optional demo tally only. The room decision is the approval source.
+                            Optional demo tally only. The project decision is the approval source.
                           </p>
                         ) : null}
                       </div>
@@ -3500,13 +3451,13 @@ export function CommandWavesConsole() {
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
                         <p className="text-sm font-semibold text-zinc-100">Decision request</p>
                         <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Copy this to ask the room for the actual decision, then record the decision URL.
+                          Copy this to ask builders for the actual decision, then record the decision link.
                         </p>
                         <div className="mt-3 grid gap-2 sm:grid-cols-2">
                           <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
                             Copy request
                           </Button>
-                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
                         </div>
                         {decisionDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{decisionDraftNotice}</p> : null}
                       </div>
@@ -3514,7 +3465,7 @@ export function CommandWavesConsole() {
                     {activePoll.decision ? (
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-100">Room decision receipt</p>
+                          <p className="text-sm font-semibold text-zinc-100">Decision receipt</p>
                           <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{activePoll.decision.source}</Badge>
                         </div>
                         <p className="mt-2 text-xs leading-5 text-zinc-500">{activePoll.decision.summary}</p>
@@ -3553,7 +3504,7 @@ export function CommandWavesConsole() {
                       </div>
                     ) : null}
                     <p className="mt-2 text-xs leading-5 text-zinc-500">
-                      App tally only. PR work needs the room decision URL. This does not add live reputation, token weight, or weighted voting.
+                      App tally only. PR work needs the decision link. This does not add live reputation, token weight, or weighted voting.
                     </p>
                   </div>
                 ) : (
@@ -3571,7 +3522,7 @@ export function CommandWavesConsole() {
                         : activeProposalIsPr
                           ? activePrHasWaveDecision
                             ? "Ready to build the approved PR."
-                            : "Record the room decision receipt before the PR build step."
+                            : "Record the decision receipt before the PR build step."
                           : "Only code PR work uses the build step in phase 1."}
                     </p>
                     {activeExecution?.artifacts.length ? (
@@ -3607,7 +3558,7 @@ export function CommandWavesConsole() {
                         ? activeExecution
                           ? "Logged the PR record only. It does not merge, deploy, or spend funds."
                           : "Manual handoff for a prepared branch. It does not merge, deploy, or spend funds."
-                        : "Use support items for context, drafts, or room updates outside the PR build step."}
+                        : "Use support items for context, drafts, or project updates outside the PR build step."}
                     </p>
                     {codexPacketNotice ? <p className="mt-2 text-xs leading-5 text-cyan-300">{codexPacketNotice}</p> : null}
                   </div>
@@ -3781,7 +3732,7 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={() => void copyDeveloperFeePlanDraft()}>
                   Copy planning draft
                 </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
               </div>
               {developerFeePlanNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{developerFeePlanNotice}</p> : null}
               <Badge className="mt-3 border-amber-700 bg-amber-950/45 text-amber-100">
@@ -3798,17 +3749,17 @@ export function CommandWavesConsole() {
           </div>
 
           <div id="share-back" className="mt-5">
-            <Panel title="Room update draft" eyebrow="Share back">
+            <Panel title="Project update draft" eyebrow="Share back">
             <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
                 <p className="text-sm leading-6 text-zinc-400">
-                  Edit the short update, share it manually in the room, and keep the launch packet with the PR audit trail.
+                  Edit the short update, share it manually, and keep the launch packet with the PR audit trail.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
                     Copy update
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open room</LinkButton> : null}
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
                   <Button type="button" variant="secondary" onClick={resetWaveUpdateDraft}>
                     Reset draft
                   </Button>

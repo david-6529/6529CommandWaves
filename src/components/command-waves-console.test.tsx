@@ -19,26 +19,25 @@ describe("CommandWavesConsole", () => {
 
     expect(text).toContain("Decentralized Coding: Beta");
     expect(text).toContain("Pilot: 6529 AMM hook");
-    expect(text).toContain("A shared room for people and agents to turn discussion into reviewed pull requests.");
+    expect(text).toContain("A shared workspace for people and agents to turn discussion into reviewed pull requests.");
     expect(text).toContain("Build one hook in public");
-    expect(text).toContain("Builders discuss the work in the room.");
-    expect(text).toContain("Discussion room");
+    expect(text).toContain("Builders discuss work here.");
+    expect(text).toContain("Project chat");
     expect(text).toContain("Code repo");
     expect(text).toContain("Who can contribute");
     expect(text).toContain("Upcoming or being discussed");
     expect(text).toContain("Work");
-    expect(text).toContain("Queue");
-    expect(text).toContain("Room discussion");
-    expect(text).toContain("Discuss work");
+    expect(text).toContain("Being discussed");
+    expect(text).toContain("Chat with builders");
     expect(text).toContain("Builders");
-    expect(text).toContain("Profiles show visible activity in this room and repo.");
+    expect(text).toContain("Profiles show visible activity in chat and GitHub.");
     expect(text).toContain("Visible contribution");
     expect(text).toContain("Rules of the build");
     expect(text).toContain("Gate");
-    expect(text).toContain("Important or risky changes need a visible room decision.");
+    expect(text).toContain("Important or risky changes need a visible project decision.");
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
-    expect(text).toContain("Start in the room so builders can shape the idea.");
+    expect(text).toContain("Start in chat so builders can shape the idea.");
     expect(text).toContain("Use GitHub PRs for code changes.");
   });
 
@@ -58,6 +57,9 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Next move");
     expect(text).not.toContain("Swarm chat");
     expect(text).not.toContain("Suggest work");
+    expect(text).not.toContain("A shared room for people and agents");
+    expect(text).not.toContain("Open room");
+    expect(text).not.toContain("Room discussion");
     expect(text).not.toContain("\u2014");
   });
 
