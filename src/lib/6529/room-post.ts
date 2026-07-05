@@ -56,7 +56,7 @@ export async function postRoomMessage(input: RoomPostInput): Promise<RoomPostRes
   const content = text(input.content);
 
   if (!target) {
-    throw Object.assign(new Error("Choose a room before posting."), { status: 400 });
+    throw Object.assign(new Error("Choose project chat before posting."), { status: 400 });
   }
 
   if (!content) {
@@ -64,11 +64,11 @@ export async function postRoomMessage(input: RoomPostInput): Promise<RoomPostRes
   }
 
   if (content.length > 4000) {
-    throw Object.assign(new Error("Keep room messages under 4000 characters."), { status: 400 });
+    throw Object.assign(new Error("Keep chat messages under 4000 characters."), { status: 400 });
   }
 
   if (!postingConfigured()) {
-    throw Object.assign(new Error("Room posting is not configured. Copy and open the room instead."), { status: 409 });
+    throw Object.assign(new Error("Chat posting is not configured. Copy the draft instead."), { status: 409 });
   }
 
   const waveId = normalizeWaveId(target);

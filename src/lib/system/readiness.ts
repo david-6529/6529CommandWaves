@@ -151,7 +151,7 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
       id: "initial_hook_project",
       label: "First hook project",
       status: "fail",
-      message: "Replace placeholder first hook room and repo values before public launch.",
+      message: "Replace placeholder first hook chat and repo values before public launch.",
     };
   }
 
@@ -176,7 +176,7 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
     id: "initial_hook_project",
     label: "First hook project",
     status: "pass",
-    message: "First hook room and repo seed are configured.",
+    message: "First hook chat and repo seed are configured.",
   };
 }
 

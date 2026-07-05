@@ -12,7 +12,7 @@ describe("phase next action", () => {
       statusLabel: "ready",
       stepLabel: "Log",
       title: "Loop complete",
-      detail: "The approved hook work has a PR, review, room update, and launch packet.",
+      detail: "The approved hook work has a PR, review, project update, and launch packet.",
     });
   });
 
@@ -70,8 +70,8 @@ describe("phase next action", () => {
     expect(nextAction).toMatchObject({
       status: "action",
       stepLabel: "Decide",
-      title: "Get the room decision",
-      detail: "Ask the room to decide, then record the room decision URL before work runs.",
+      title: "Get the project decision",
+      detail: "Ask builders to decide, then record the project decision URL before work runs.",
     });
   });
 

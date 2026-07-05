@@ -29,11 +29,11 @@ describe("first phase launch snapshot", () => {
       name: "Decentralized Coding: Beta",
       purpose: "A simple way for people and agents to build in public",
       workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-      publicSurfaces: ["Project room discussion", "GitHub PR record", "Build audit log"],
+      publicSurfaces: ["Project chat discussion", "GitHub PR record", "Build audit log"],
     });
     expect(snapshot.authorityBoundary).toMatchObject({
       phase: "first_public_hook_build",
-      socialSourceOfTruth: "project room",
+      socialSourceOfTruth: "project chat",
       codeSurface: "GitHub PR",
       humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
     });
@@ -57,14 +57,14 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.reports.developerFee).toMatchObject({
       mode: "manual_review",
     });
-    expect(snapshot.reports.developerFee.requiredDecisions).toContain("The room approves the fee budget before any payment.");
+    expect(snapshot.reports.developerFee.requiredDecisions).toContain("Builders approve the fee budget before any payment.");
     expect(snapshot.reports.developerFee.blockedActions).toContain("No automatic payouts.");
     expect(snapshot.verificationTargets).toEqual({
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
-    expect(snapshot.statusDraft).toContain("Build room launch status");
+    expect(snapshot.statusDraft).toContain("Project launch status");
     expect(snapshot.statusDraft).toContain("Status: checks needed");
     expect(snapshot.statusDraft).toContain("Next action: Run launch setup check");
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");

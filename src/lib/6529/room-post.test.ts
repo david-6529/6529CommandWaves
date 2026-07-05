@@ -3,7 +3,7 @@ import { resetMockDropsForTests } from "./mock";
 import { postRoomMessage } from "./room-post";
 import { previewWaveContext } from "./wave-context";
 
-describe("6529 room posting", () => {
+describe("6529 chat posting", () => {
   const previousMockMode = process.env["6529_MOCK_MODE"];
   const previousToken = process.env["6529_BOT_BEARER_TOKEN"];
   const previousWallet = process.env["6529_BOT_WALLET_ADDRESS"];
@@ -66,7 +66,7 @@ describe("6529 room posting", () => {
     expect(preview.dropCount).toBe(4);
     expect(preview.sampleDrops.at(-1)).toMatchObject({
       id: "mock-post-4",
-      author: "room-builder",
+      author: "chat-builder",
       preview: "Fresh room note for the hook builders.",
     });
   });
@@ -82,14 +82,14 @@ describe("6529 room posting", () => {
         content: "Please review this hook idea.",
       }),
     ).rejects.toMatchObject({
-      message: "Room posting is not configured. Copy and open the room instead.",
+      message: "Chat posting is not configured. Copy the draft instead.",
       status: 409,
     });
   });
 
   it("requires a room and message", async () => {
     await expect(postRoomMessage({ content: "hello" })).rejects.toMatchObject({
-      message: "Choose a room before posting.",
+      message: "Choose project chat before posting.",
       status: 400,
     });
     await expect(postRoomMessage({ waveId: "6529-hook-builder", content: "" })).rejects.toMatchObject({
@@ -98,14 +98,14 @@ describe("6529 room posting", () => {
     });
   });
 
-  it("rejects oversized room messages", async () => {
+  it("rejects oversized chat messages", async () => {
     await expect(
       postRoomMessage({
         waveId: "6529-hook-builder",
         content: "x".repeat(4001),
       }),
     ).rejects.toMatchObject({
-      message: "Keep room messages under 4000 characters.",
+      message: "Keep chat messages under 4000 characters.",
       status: 400,
     });
   });

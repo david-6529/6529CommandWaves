@@ -149,7 +149,7 @@ describe("API route validation", () => {
 
     expect(response.status).toBe(400);
     await expect(responsePayload(response)).resolves.toMatchObject({
-      error: "Keep room messages under 4000 characters.",
+      error: "Keep chat messages under 4000 characters.",
     });
   });
 

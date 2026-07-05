@@ -21,9 +21,9 @@ function localTallyLine(poll: PollState | null) {
 
 export function createBuilderWaveDecisionDraft({ wave, proposal, poll }: BuilderWaveDecisionDraftInput) {
   return [
-    "Build room decision request",
+    "Project decision request",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     `Proposal: ${proposal.id} - ${cleanLine(proposal.title)}`,
     `Work type: ${commandKindLabel(proposal.kind)}`,
@@ -36,8 +36,8 @@ export function createBuilderWaveDecisionDraft({ wave, proposal, poll }: Builder
     "",
     localTallyLine(poll),
     "",
-    "Decision needed: approve, reject, or ask for edits in the room.",
-    "If approved, link the room decision URL back into the app before PR work starts.",
+    "Decision needed: approve, reject, or ask for edits in chat.",
+    "If approved, link the project decision URL back into the app before PR work starts.",
     "Guardrails: no deploy, payout, proxy, delegatecall, governance change, or uncapped parameter change in phase 1.",
   ].join("\n");
 }

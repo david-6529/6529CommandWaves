@@ -65,7 +65,7 @@ describe("PR reviewer gate", () => {
     expect(result.checks.find((item) => item.id === "vote")?.status).toBe("fail");
   });
 
-  it("passes a vote-gated command with a manual room decision receipt", () => {
+  it("passes a vote-gated command with a manual project decision receipt", () => {
     const wave = approvedDemoWave();
     const proposal = {
       ...wave.proposals[0],
@@ -105,7 +105,7 @@ describe("PR reviewer gate", () => {
     expect(result.checks.find((item) => item.id === "vote")?.status).toBe("pass");
   });
 
-  it("fails local counted vote approval without a room decision receipt", () => {
+  it("fails local counted vote approval without a project decision receipt", () => {
     const wave = approvedDemoWave();
     const proposal = {
       ...wave.proposals[0],
@@ -139,7 +139,7 @@ describe("PR reviewer gate", () => {
     expect(result.status).toBe("fail");
     expect(voteCheck).toMatchObject({
       status: "fail",
-      message: "Local vote passed. Record a room decision receipt before PR review can pass.",
+      message: "Local vote passed. Record a project decision receipt before PR review can pass.",
     });
   });
 
@@ -188,7 +188,7 @@ describe("PR reviewer gate", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "vote")).toMatchObject({
       status: "fail",
-      message: "Room decision URL must match the configured discussion.",
+      message: "Project decision URL must match the configured discussion.",
     });
   });
 
@@ -238,7 +238,7 @@ describe("PR reviewer gate", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "vote")).toMatchObject({
       status: "fail",
-      message: "Room decision URL is required for PR work.",
+      message: "Project decision URL is required for PR work.",
     });
   });
 

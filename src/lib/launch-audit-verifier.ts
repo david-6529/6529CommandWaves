@@ -96,7 +96,7 @@ function authorityBoundaryReady(value: unknown) {
   return Boolean(
     record &&
       asString(record.phase) === "first_public_hook_build" &&
-      asString(record.socialSourceOfTruth) === "project room" &&
+      asString(record.socialSourceOfTruth) === "project chat" &&
       asString(record.codeSurface) === "GitHub PR" &&
       stringArrayIncludes(record.humansControl, "Merges") &&
       stringArrayIncludes(record.humansControl, "Deploys") &&
@@ -151,7 +151,7 @@ function statusDraftReady(value: unknown) {
 
   return Boolean(
     draft &&
-      draft.includes("Build room launch status") &&
+      draft.includes("Project launch status") &&
       draft.includes("Status:") &&
       draft.includes("Operator checklist:") &&
       draft.includes("Verification:") &&
@@ -181,7 +181,7 @@ function developerFeePlanReady(value: unknown) {
   return Boolean(
     record &&
       asString(record.mode) === "manual_review" &&
-      stringArrayIncludes(record.requiredDecisions, "The room approves the fee budget before any payment.") &&
+      stringArrayIncludes(record.requiredDecisions, "Builders approve the fee budget before any payment.") &&
       stringArrayIncludes(record.requiredDecisions, "Payments happen outside this app in the first phase.") &&
       stringArrayIncludes(record.blockedActions, "No automatic payouts.") &&
       stringArrayIncludes(record.blockedActions, "No wallet keys or treasury controls.") &&
@@ -202,7 +202,7 @@ function productContractReady(value: unknown) {
       stringArrayIncludes(record.workflow, "Build PR") &&
       stringArrayIncludes(record.workflow, "Review") &&
       stringArrayIncludes(record.workflow, "Log result") &&
-      stringArrayIncludes(record.publicSurfaces, "Project room discussion") &&
+      stringArrayIncludes(record.publicSurfaces, "Project chat discussion") &&
       stringArrayIncludes(record.publicSurfaces, "GitHub PR record") &&
       stringArrayIncludes(record.publicSurfaces, "Build audit log"),
   );

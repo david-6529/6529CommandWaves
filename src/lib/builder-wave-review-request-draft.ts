@@ -32,9 +32,9 @@ export function createBuilderWaveReviewRequestDraft({
   execution: ExecutionRecord | null;
 }) {
   return [
-    "Build room review request",
+    "Project review request",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     `Work: ${proposal.id} - ${proposal.title}`,
     `PR: ${prUrl(execution) ?? "not recorded yet"}`,
@@ -50,10 +50,10 @@ export function createBuilderWaveReviewRequestDraft({
     "",
     "Review checklist:",
     "- PR matches the approved work and limits.",
-    "- Command Waves manifest and room decision receipt are present.",
+    "- Command Waves manifest and project decision receipt are present.",
     "- Tests cover capped hook parameters and guardrails.",
     "- No proxy, delegatecall, deploy, payment, or governance change is introduced.",
-    "- Findings should be posted in the PR and summarized back to the room.",
+    "- Findings should be posted in the PR and summarized back to chat.",
     "",
     "Guardrails: this request does not merge, deploy, approve payouts, or change governance.",
   ].join("\n");

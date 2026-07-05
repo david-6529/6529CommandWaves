@@ -95,18 +95,18 @@ function summaryFor(status: FirstPhaseLaunchAuditStatus) {
 }
 
 const launchActionCopyByItemId: Record<string, string> = {
-  flow_project: "Set hook room and code repo",
+  flow_project: "Set project chat and code repo",
   flow_proposal: "Propose one PR-sized hook change",
-  flow_decision: "Record the room decision",
+  flow_decision: "Record the project decision",
   flow_build: "Build the approved PR",
   flow_review: "Review the PR result",
-  flow_log: "Share the result back to the room",
-  flow_wave_decision_receipt: "Record the room decision URL",
+  flow_log: "Share the result back to chat",
+  flow_wave_decision_receipt: "Record the project decision URL",
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Prepare the launch packet",
   setup_not_checked: "Run launch setup check",
   setup_remote_check: "Run launch setup check",
-  setup_wave_reachable: "Pick reachable project room",
+  setup_wave_reachable: "Pick reachable project chat",
   setup_repo_reachable: "Pick reachable code repo",
   setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
@@ -153,7 +153,7 @@ function createNextAction({
       statusLabel,
       itemId: null,
       title: "Start the first public loop",
-      detail: "Post the launch brief, invite contributors, and keep each PR tied to a room decision.",
+      detail: "Post the launch brief, invite contributors, and keep each PR tied to a project decision.",
     };
   }
 
@@ -201,7 +201,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_not_checked",
         label: "Setup check",
         status: "needed",
-        detail: "Verify the wave, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+    detail: "Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
         source: "setup",
       },
     ];
@@ -215,7 +215,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         : "setup_project_check";
     const failureLabel =
       firstFailure?.id === "wave_reachable"
-        ? "Project room"
+        ? "Project chat"
         : firstFailure?.id === "repo_reachable"
           ? "GitHub repo"
           : "Setup check";
@@ -225,7 +225,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: failureId,
         label: failureLabel,
         status: "blocked",
-        detail: firstFailure?.message ?? "Fix the project room and GitHub repo before inviting contributors.",
+        detail: firstFailure?.message ?? "Fix the project chat and GitHub repo before inviting contributors.",
         source: "setup",
       },
     ];
@@ -246,7 +246,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_remote_check",
         label: "Setup check",
         status: "needed",
-        detail: "Run setup check to verify the wave, repo, contributor rules, PR template, and required guardian check.",
+        detail: "Run setup check to verify the project chat, repo, contributor rules, PR template, and required guardian check.",
         source: "setup",
       },
     ];
@@ -282,7 +282,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
       return [
         {
           id: "flow_wave_decision_receipt",
-          label: "Room decision receipt",
+          label: "Project decision receipt",
           status: "blocked",
           detail: referenceCheck.message,
           source: "flow",
@@ -293,7 +293,7 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
     return [
       {
         id: "flow_wave_decision_receipt",
-        label: "Room decision receipt",
+        label: "Project decision receipt",
         status: "ready",
         detail: `Decision record exists for ${proposal.id}.`,
         source: "flow",
@@ -304,9 +304,9 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   return [
     {
       id: "flow_wave_decision_receipt",
-      label: "Room decision receipt",
+      label: "Project decision receipt",
       status: "needed",
-      detail: "Record the room decision URL before the PR work is launch-ready.",
+      detail: "Record the project decision URL before the PR work is launch-ready.",
       source: "flow",
     },
   ];

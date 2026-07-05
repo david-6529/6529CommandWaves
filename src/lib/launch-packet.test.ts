@@ -24,7 +24,7 @@ describe("launch packet", () => {
       proposalId: proposal.id,
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
-    expect(packet.text).toContain("# Build room launch packet");
+    expect(packet.text).toContain("# Project launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("Manual builder review for phase 1");
@@ -34,11 +34,11 @@ describe("launch packet", () => {
     expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision receipt recorded.");
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
-    expect(packet.text).toContain("Room decision receipt:");
+    expect(packet.text).toContain("Project decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("## Contribution Report");
     expect(packet.text).toContain("Complete proposal: 6 report points.");
-    expect(packet.text).toContain("Room decision receipt: 2 report points.");
+    expect(packet.text).toContain("Project decision receipt: 2 report points.");
     expect(packet.text).toContain("david: report score 10");
     expect(packet.text).toContain("Proposal work: 6 report points");
     expect(packet.text).toContain("Decision receipts: 2 report points");
@@ -57,7 +57,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("run-manifest:{");
     expect(packet.text).toContain("No automatic payouts.");
     expect(packet.text).toContain("This packet does not grant reputation, token weight, payouts, permissions, or merge rights.");
-    expect(packet.text).toContain("Post this packet to the room after human review");
+    expect(packet.text).toContain("Post this packet to chat after human review");
     expect(packet.text).not.toContain("automatically posted");
     expect(packet.text).not.toContain("\u2014");
   });
@@ -139,7 +139,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("Participation gate:");
   });
 
-  it("keeps local vote approval waiting for a room decision receipt", () => {
+  it("keeps local vote approval waiting for a project decision receipt", () => {
     const packet = createLaunchPacket({
       wave: demoWave,
       proposal: {
@@ -155,8 +155,8 @@ describe("launch packet", () => {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
-    expect(packet.text).toContain("Room decision receipt: not recorded yet.");
-    expect(packet.text).toContain("Build: waiting for a recorded room decision.");
+    expect(packet.text).toContain("Project decision receipt: not recorded yet.");
+    expect(packet.text).toContain("Build: waiting for a recorded project decision.");
   });
 
   it("defaults generatedAt to the newest ledger event", () => {

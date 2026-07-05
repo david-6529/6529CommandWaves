@@ -16,7 +16,7 @@ describe("active hook projects", () => {
         waveLabel: "6529-hook-builder",
         repoLabel: "6529-Collections/6529-hook",
         currentFocus: demoWave.proposals[0].title,
-        participation: "Follow the room, draft replies for manual posting, and track code work.",
+        participation: "Follow project chat, draft replies for manual posting, and track code work.",
         waveRole: "Where builders talk, propose, decide, and share updates.",
         platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
         gateDetails: [
@@ -30,7 +30,7 @@ describe("active hook projects", () => {
         nextActionStatus: "ready",
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
-        nextActionDetail: "The approved hook work has a PR, review, room update, and launch packet.",
+        nextActionDetail: "The approved hook work has a PR, review, project update, and launch packet.",
         waveStatus: "Project decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
@@ -50,13 +50,13 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       status: "setup",
-      waveLabel: "No room",
+      waveLabel: "No chat",
       repoLabel: "No code repo",
       currentFocus: "Choose the first PR-sized hook change.",
       nextActionStatus: "action",
       nextActionLabel: "next",
       nextActionTitle: "Set the project",
-      nextActionDetail: "Confirm one hook room and one code repo before proposals start.",
+      nextActionDetail: "Confirm one project chat and one code repo before proposals start.",
       waveStatus: "No PR-sized hook change selected yet.",
       gateSnapshotLabel: "manual review",
       gateDetails: [

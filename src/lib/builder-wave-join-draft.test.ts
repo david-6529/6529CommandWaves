@@ -10,7 +10,7 @@ describe("build room join draft", () => {
     expect(draft).toContain("Access notes: Manual builder review for phase 1; REP or TDH access checks are planned, not enforced here.");
     expect(draft).toContain("access is reviewed manually");
     expect(draft).toContain("discussion, review, tests, or a small PR");
-    expect(draft).toContain("visible room decision before PR work starts");
+    expect(draft).toContain("visible project decision before PR work starts");
     expect(draft).toContain("What should I take next?");
     expect(draft).not.toContain("\u2014");
   });

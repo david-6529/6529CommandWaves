@@ -24,10 +24,10 @@ export function createDeveloperFeePlan(wave: CommandWave, contributionReport: Co
       "Approved work and vote record.",
       "Merged or reviewed PR record.",
       "Contribution report rationale.",
-      "Human review notes from the room.",
+      "Human review notes from chat.",
     ],
     requiredDecisions: [
-      "The room approves the fee budget before any payment.",
+      "Builders approve the fee budget before any payment.",
       "Humans choose recipients, amounts, token, and payment method.",
       "Payments happen outside this app in the first phase.",
     ],
@@ -50,9 +50,9 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
     : ["- No visible contributors yet."];
 
   return [
-    "Build room developer fee plan",
+    "Project developer fee plan",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     plan.summary,
     "",

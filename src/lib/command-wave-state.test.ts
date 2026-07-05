@@ -17,11 +17,11 @@ describe("command wave state snapshot", () => {
         name: "Decentralized Coding: Beta",
         purpose: "A simple way for people and agents to build in public",
         workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-        publicSurfaces: ["Project room discussion", "GitHub PR record", "Build audit log"],
+        publicSurfaces: ["Project chat discussion", "GitHub PR record", "Build audit log"],
       },
       authorityBoundary: {
         phase: "first_public_hook_build",
-        socialSourceOfTruth: "project room",
+        socialSourceOfTruth: "project chat",
         codeSurface: "GitHub PR",
         humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
         appDoesNot: [
@@ -30,7 +30,7 @@ describe("command wave state snapshot", () => {
           "Move funds",
           "Grant reputation, token weight, payouts, permissions, or merge rights from contribution scores",
         ],
-        gateStatus: "Reputation, token, holder, allowlist, and QnA gates are advisory until wired and verified.",
+        gateStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
       },
       reports: {
         contribution: {

@@ -49,7 +49,7 @@ function waveLabel(waveUrl: string) {
   const trimmed = waveUrl.trim();
   const match = trimmed.match(/\/waves\/([^/?#\s]+)/);
 
-  return match?.[1] ?? (trimmed || "No room");
+  return match?.[1] ?? (trimmed || "No chat");
 }
 
 function repoLabel(repoUrl: string) {
@@ -160,7 +160,7 @@ function codeStatus(wave: CommandWave) {
   }
 
   if (phaseWork.prProposal) {
-    return "PR change is waiting for room approval.";
+    return "PR change is waiting for project approval.";
   }
 
   return "No PR-sized hook change yet.";
@@ -230,7 +230,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       waveLabel: waveLabel(wave.waveUrl),
       repoLabel: repoLabel(wave.repoUrl),
       currentFocus,
-      participation: "Follow the room, draft replies for manual posting, and track code work.",
+      participation: "Follow project chat, draft replies for manual posting, and track code work.",
       waveRole: "Where builders talk, propose, decide, and share updates.",
       platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
       gateDetails: gateDetails(wave),

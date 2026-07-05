@@ -85,7 +85,7 @@ describe("launch audit verifier", () => {
       status: "pass",
     });
     expect(result.nextAction?.title).toBe("Start the first public loop");
-    expect(result.statusDraft).toContain("Build room launch status");
+    expect(result.statusDraft).toContain("Project launch status");
     expect(result.statusDraft).toContain("Status: ready");
     expect(result.stateEvidence).toEqual({
       waveStateHash: hashValue(demoWave),
@@ -244,7 +244,7 @@ describe("launch audit verifier", () => {
     });
     const result = verifyLaunchAuditPayload({
       ...snapshot,
-      statusDraft: "Build room launch status\nStatus: ready\nOperator checklist:\nVerification:",
+      statusDraft: "Project launch status\nStatus: ready\nOperator checklist:\nVerification:",
     });
 
     expect(result.status).toBe("fail");

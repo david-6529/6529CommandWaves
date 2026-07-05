@@ -19,14 +19,14 @@ export function createParticipationGuideDraft(wave: CommandWave) {
     ? [
         "",
         "Manual QnA prompt:",
-        "Answer in the room: what is one hook parameter that must be capped, and what test proves the cap?",
+        "Answer in chat: what is one hook parameter that must be capped, and what test proves the cap?",
       ]
     : [];
 
   return [
-    "Build room participation guide",
+    "Project participation guide",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     ...(rulesLine ? [rulesLine] : []),
     "",
@@ -35,16 +35,16 @@ export function createParticipationGuideDraft(wave: CommandWave) {
     ...qnaPrompt,
     "",
     "Builder loop:",
-    "1. Builders share ideas or code in the room.",
+    "1. Builders share ideas or code in chat.",
     "2. Orchestration rules classify risk and shape one scoped PR proposal.",
-    "3. Important changes need a visible room decision before PR work starts.",
+    "3. Important changes need a visible project decision before PR work starts.",
     "4. Reviewer CI checks the PR before humans merge.",
     "",
     "How to join:",
-    "1. Read the latest project snapshot and room context.",
+    "1. Read the latest project snapshot and chat context.",
     "2. Ask questions or answer any manual QnA prompt in the discussion.",
     "3. Propose one PR-sized hook change with limits and tests.",
-    "4. Wait for a room decision URL before PR work starts.",
+    "4. Wait for a project decision URL before PR work starts.",
     "5. Open draft PRs with the repo template and Command Waves manifest.",
     "",
     "Guardrails:",

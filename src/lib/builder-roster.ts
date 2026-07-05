@@ -37,7 +37,7 @@ function roleFor(contributor: ContributionContributor) {
   }
 
   if (contributor.roomPosts > 0) {
-    return "Room participant";
+    return "Chat participant";
   }
 
   if (contributor.ledgerEvents > 0) {
@@ -52,7 +52,7 @@ function activityFor(contributor: ContributionContributor) {
     ...(contributor.proposals ? [countLabel(contributor.proposals, "proposal")] : []),
     ...(contributor.votes ? [countLabel(contributor.votes, "vote")] : []),
     ...(contributor.decisions ? [countLabel(contributor.decisions, "decision")] : []),
-    ...(contributor.roomPosts ? [countLabel(contributor.roomPosts, "room post")] : []),
+    ...(contributor.roomPosts ? [countLabel(contributor.roomPosts, "chat post")] : []),
     ...(contributor.ledgerEvents ? [countLabel(contributor.ledgerEvents, "activity event")] : []),
   ];
 
@@ -60,10 +60,10 @@ function activityFor(contributor: ContributionContributor) {
 }
 
 function detailFor(contributor: ContributionContributor) {
-  const roomPostRationale = contributor.rationale.find((item) => item.startsWith("Recent room post: "));
+  const roomPostRationale = contributor.rationale.find((item) => item.startsWith("Recent chat post: "));
 
   if (contributor.roomPosts > 0 && contributor.proposals === 0 && contributor.votes === 0 && contributor.decisions === 0) {
-    return roomPostRationale ?? "Posted in the room";
+    return roomPostRationale ?? "Posted in chat";
   }
 
   return contributor.rationale[0] ?? roomPostRationale ?? "Visible project activity";
@@ -77,7 +77,7 @@ function scoreLabelFor(contributor: ContributionContributor) {
     contributor.decisions === 0 &&
     contributor.ledgerEvents === 0;
 
-  return onlyRoomActivity ? "room activity" : `${contributor.score} report points`;
+  return onlyRoomActivity ? "chat activity" : `${contributor.score} report points`;
 }
 
 function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
@@ -85,7 +85,7 @@ function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
     ["Proposals", contributor.proposals],
     ["Votes", contributor.votes],
     ["Decisions", contributor.decisions],
-    ["Room posts", contributor.roomPosts],
+    ["Chat posts", contributor.roomPosts],
     ["Log", contributor.ledgerEvents],
   ]
     .filter(([, value]) => Number(value) > 0)

@@ -42,7 +42,7 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
 
   if (!proposal || review?.status === "pass") {
     return [
-      discussionStep(nextTitle ? "Shape this draft in the room." : "Pick one small hook change."),
+      discussionStep(nextTitle ? "Shape this draft in chat." : "Pick one small hook change."),
       ...waitingSteps(Boolean(nextTitle)),
     ];
   }
@@ -65,7 +65,7 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
         ? "Decision needs attention."
         : decisionDone
           ? "Decision receipt recorded."
-          : "Record the room decision.",
+          : "Record the project decision.",
     },
     {
       id: "build",

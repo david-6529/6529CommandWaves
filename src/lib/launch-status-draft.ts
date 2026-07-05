@@ -19,16 +19,16 @@ function openItemLines(audit: FirstPhaseLaunchAudit) {
 
 const checklistByItemId: Record<string, string[]> = {
   setup_not_checked: [
-    "Run the setup check against the selected project room and GitHub repo.",
+    "Run the setup check against the selected project chat and GitHub repo.",
     "Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.",
   ],
   setup_remote_check: [
-    "Run the setup check against the selected project room and GitHub repo.",
+    "Run the setup check against the selected project chat and GitHub repo.",
     "Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.",
   ],
-  setup_wave_reachable: ["Pick a reachable 6529 project room before inviting contributors."],
+  setup_wave_reachable: ["Pick a reachable 6529 project chat before inviting contributors."],
   setup_repo_reachable: ["Pick a reachable GitHub repo before inviting contributors."],
-  setup_project_check: ["Fix the setup check failure for the selected project room and repo."],
+  setup_project_check: ["Fix the setup check failure for the selected project chat and repo."],
   setup_repo_required_files: ["Add launch repo files before inviting contributors."],
   setup_repo_file_contributing_md: ["Add CONTRIBUTING.md to the hook repo."],
   setup_repo_file_github_pull_request_template_md: ["Add .github/PULL_REQUEST_TEMPLATE.md to the hook repo."],
@@ -36,7 +36,7 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_not_checked: ["Run launch readiness from the app or /api/command-wave/launch/audit?remote=1."],
   readiness_app_url: ["Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL."],
   readiness_initial_hook_project: [
-    "Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project room.",
+    "Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.",
     "Set COMMAND_WAVE_INITIAL_REPO_URL to the hook GitHub repo.",
   ],
   readiness_database: ["Set DATABASE_URL to production Postgres before durable public audit storage."],
@@ -50,13 +50,13 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_guardian_wave_state: [
     "Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
   ],
-  flow_project: ["Select the first project room and hook GitHub repo."],
+  flow_project: ["Select the first project chat and hook GitHub repo."],
   flow_proposal: ["Create one PR-sized hook proposal before starting the first public loop."],
-  flow_decision: ["Record the room decision before PR work starts."],
+  flow_decision: ["Record the project decision before PR work starts."],
   flow_build: ["Attach the PR record or Codex work packet for the approved change."],
   flow_review: ["Run reviewer checks against the PR before human merge decisions."],
-  flow_log: ["Post the reviewed result back to the project room."],
-  flow_wave_decision_receipt: ["Record the room decision URL for the approved PR work."],
+  flow_log: ["Post the reviewed result back to project chat."],
+  flow_wave_decision_receipt: ["Record the project decision URL for the approved PR work."],
   flow_participation_notes: ["Keep participation notes advisory until live gating is implemented."],
   flow_audit_packet: ["Prepare the launch packet with PR, review, contribution, and fee records."],
 };
@@ -91,9 +91,9 @@ export function createLaunchStatusDraft({
   verificationTargets: LaunchStatusVerificationTargets;
 }) {
   return [
-    "Build room launch status",
+    "Project launch status",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     `Status: ${audit.statusLabel}`,
     audit.summary,

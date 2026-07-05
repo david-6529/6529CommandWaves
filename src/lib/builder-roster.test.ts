@@ -38,21 +38,21 @@ describe("builder roster", () => {
   it("adds recent room authors without turning them into score authority", () => {
     const report = createContributionReport(demoWave, {
       roomPosts: [
-        { author: "room-builder", preview: "I can review the next small hook change." },
-        { author: "david", preview: "I posted an update for the room." },
+        { author: "chat-builder", preview: "I can review the next small hook change." },
+        { author: "david", preview: "I posted an update in chat." },
         { author: "wave-poll", preview: "Decision passed." },
       ],
     });
     const roster = createBuilderRoster(report);
 
-    expect(roster.find((member) => member.identity === "david")?.activity).toContain("1 room post");
-    expect(roster.find((member) => member.identity === "room-builder")).toMatchObject({
-      role: "Room participant",
-      activity: "1 room post",
-      scoreLabel: "room activity",
-      detail: "Recent room post: I can review the next small hook change.",
-      basis: ["Room posts: 1 report point"],
-      stats: [{ label: "Room posts", value: "1" }],
+    expect(roster.find((member) => member.identity === "david")?.activity).toContain("1 chat post");
+    expect(roster.find((member) => member.identity === "chat-builder")).toMatchObject({
+      role: "Chat participant",
+      activity: "1 chat post",
+      scoreLabel: "chat activity",
+      detail: "Recent chat post: I can review the next small hook change.",
+      basis: ["Chat posts: 1 report point"],
+      stats: [{ label: "Chat posts", value: "1" }],
     });
     expect(roster.some((member) => member.identity === "wave-poll")).toBe(false);
   });

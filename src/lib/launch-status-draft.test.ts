@@ -20,16 +20,16 @@ describe("launch status draft", () => {
     });
     const draft = createLaunchStatusDraft({ wave: demoWave, audit, verificationTargets });
 
-    expect(draft).toContain("Build room launch status");
-    expect(draft).toContain(`Project room: ${demoWave.waveUrl}`);
+    expect(draft).toContain("Project launch status");
+    expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain(
-      "- Setup check: Verify the wave, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+      "- Setup check: Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
     );
     expect(draft).toContain("Operator checklist:");
-    expect(draft).toContain("- Run the setup check against the selected project room and GitHub repo.");
+    expect(draft).toContain("- Run the setup check against the selected project chat and GitHub repo.");
     expect(draft).toContain("- Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.");
     expect(draft).toContain("- Run launch readiness from the app or /api/command-wave/launch/audit?remote=1.");
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
@@ -107,7 +107,7 @@ describe("launch status draft", () => {
     expect(draft).toContain("Operator checklist:");
     expect(draft).toContain("- Set a strong ADMIN_API_KEY before public launch.");
     expect(draft).toContain("- Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL.");
-    expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project room.");
+    expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.");
     expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_REPO_URL to the hook GitHub repo.");
     expect(draft).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
     expect(draft).toContain("- Set COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN with repo access.");

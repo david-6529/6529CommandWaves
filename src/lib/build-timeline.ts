@@ -28,7 +28,7 @@ function proposalItem(proposal: CommandProposal | null): BuildTimelineItem {
       id: "proposal",
       label: "Proposal",
       title: "Choose one hook change",
-      detail: "Start with one PR-sized change the room can discuss.",
+      detail: "Start with one PR-sized change builders can discuss in chat.",
       status: "current",
       href: null,
       hrefLabel: null,
@@ -52,7 +52,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
       id: "decision",
       label: "Decision",
       title: "Waiting for a proposal",
-      detail: "A decision starts after the room has a scoped change.",
+      detail: "A decision starts after builders have a scoped change.",
       status: "waiting",
       href: null,
       hrefLabel: null,
@@ -75,7 +75,7 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     return {
       id: "decision",
       label: "Decision",
-      title: "Room decision recorded",
+      title: "Project decision recorded",
       detail: `${poll.yesVotes} yes, ${poll.noVotes} no.`,
       status: "done",
       href: poll.decision.url,
@@ -87,22 +87,22 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     return {
       id: "decision",
       label: "Decision",
-      title: "Record the room decision",
+      title: "Record the project decision",
       detail: "Add the decision URL before PR work starts.",
       status: "current",
       href: wave.waveUrl,
-      hrefLabel: "Open room",
+      hrefLabel: "Open chat",
     };
   }
 
   return {
     id: "decision",
     label: "Decision",
-    title: "Ask the room to decide",
-    detail: "Code work waits for a visible room decision.",
+    title: "Ask builders to decide",
+    detail: "Code work waits for a visible project decision.",
     status: "current",
     href: wave.waveUrl,
-    hrefLabel: "Open room",
+    hrefLabel: "Open chat",
   };
 }
 
@@ -120,7 +120,7 @@ function prItem(
       id: "pr",
       label: "PR",
       title: "Waiting for decision",
-      detail: "The PR starts after approval is recorded in the room.",
+      detail: "The PR starts after approval is recorded.",
       status: "waiting",
       href: null,
       hrefLabel: null,
@@ -216,7 +216,7 @@ function nextItem(review: GuardianReview | null, draftTitle: string): BuildTimel
       id: "next",
       label: "Next",
       title: draftTitle.trim() || "Pick the next hook change",
-      detail: "Bring the next small hook change to the room.",
+      detail: "Bring the next small hook change to chat.",
       status: "current",
       href: null,
       hrefLabel: null,

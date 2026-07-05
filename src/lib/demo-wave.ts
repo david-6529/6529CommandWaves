@@ -37,7 +37,7 @@ const poll: PollState = {
     waveUrl: "https://6529.io/waves/6529-hook-builder",
     recordedBy: "david",
     recordedAt: "2026-06-20T12:40:30.000Z",
-    summary: "Room approved cmd-001 with 5 yes and 1 no.",
+    summary: "Project decision approved cmd-001 with 5 yes and 1 no.",
   }),
   votes: [
     { voterIdentity: "david", vote: "yes", weight: 1, source: "local", at: "2026-06-20T12:10:00.000Z" },
@@ -66,7 +66,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:00:00.000Z",
       actor: "Setup",
       type: "wave_created",
-      message: "Created the hook build and attached the project room and code repo.",
+      message: "Created the hook build and attached project chat and code repo.",
     },
     {
       id: "evt-002",
@@ -87,7 +87,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:40:00.000Z",
       actor: "Decision",
       type: "poll_passed",
-      message: "cmd-001 passed with 5 yes, 1 no, and a room decision receipt.",
+      message: "cmd-001 passed with 5 yes, 1 no, and a project decision receipt.",
     },
   ],
 };

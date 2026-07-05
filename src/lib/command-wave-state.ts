@@ -12,7 +12,7 @@ export type CommandWaveStateSnapshot = {
   productContract: PhaseOneProductContract;
   authorityBoundary: {
     phase: "first_public_hook_build";
-    socialSourceOfTruth: "project room";
+    socialSourceOfTruth: "project chat";
     codeSurface: "GitHub PR";
     humansControl: string[];
     appDoesNot: string[];
@@ -40,7 +40,7 @@ export const phaseOneProductContract: PhaseOneProductContract = {
   name: commandWaveProductCopy.headline,
   purpose: commandWaveProductCopy.subhead,
   workflow: ["Choose project", "Discuss work", "Record decision", "Build PR", "Review", "Log result"],
-  publicSurfaces: ["Project room discussion", "GitHub PR record", "Build audit log"],
+  publicSurfaces: ["Project chat discussion", "GitHub PR record", "Build audit log"],
   firstPhaseLimits: [
     "Start with one public project.",
     "No auto merges, deploys, payments, or live token-weighted authority in this app.",
@@ -50,7 +50,7 @@ export const phaseOneProductContract: PhaseOneProductContract = {
 
 export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBoundary"] = {
   phase: "first_public_hook_build",
-  socialSourceOfTruth: "project room",
+  socialSourceOfTruth: "project chat",
   codeSurface: "GitHub PR",
   humansControl: ["Merges", "Deploys", "Payments", "Governance changes"],
   appDoesNot: [
@@ -64,7 +64,7 @@ export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBound
     "Reviewer checks are evidence for humans before merge.",
     "Commands touching deployment, governance, payments, upgradeability, or uncapped parameters are blocked or require explicit review.",
   ],
-  gateStatus: "Reputation, token, holder, allowlist, and QnA gates are advisory until wired and verified.",
+  gateStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
 };
 
 export function createCommandWaveStateSnapshot(

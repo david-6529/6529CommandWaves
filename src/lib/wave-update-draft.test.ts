@@ -18,7 +18,7 @@ describe("wave update draft", () => {
       },
     });
 
-    expect(draft).toContain("Build room update");
+    expect(draft).toContain("Project build update");
     expect(draft).toContain(`Work: ${proposal.id} - ${proposal.title}`);
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
     expect(draft).toContain("receipt https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval.");
@@ -33,7 +33,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Report scores are informational only.");
     expect(draft).toContain("Developer fee plan:");
     expect(draft).toContain("No automatic payouts.");
-    expect(draft).toContain("post it manually in the room if it matches the work");
+    expect(draft).toContain("post it manually in chat if it matches the work");
     expect(draft).not.toContain("automatically posted");
   });
 
@@ -57,7 +57,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Review: waiting for a PR record.");
   });
 
-  it("keeps local vote approval waiting for a room decision receipt", () => {
+  it("keeps local vote approval waiting for a project decision receipt", () => {
     const draft = createWaveUpdateDraft({
       wave: demoWave,
       proposal: {
@@ -73,6 +73,6 @@ describe("wave update draft", () => {
     });
 
     expect(draft).toContain("Decision: passed with 5 yes, 1 no");
-    expect(draft).toContain("Build: waiting for a recorded room decision.");
+    expect(draft).toContain("Build: waiting for a recorded project decision.");
   });
 });

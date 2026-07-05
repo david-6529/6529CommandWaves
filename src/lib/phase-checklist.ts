@@ -46,7 +46,7 @@ function buildStatus(
     return { status: "active", detail: "Approved work is ready for the PR build step." };
   }
 
-  return { status: "waiting", detail: "Build waits for a recorded room decision." };
+  return { status: "waiting", detail: "Build waits for a recorded project decision." };
 }
 
 function reviewStatus(
@@ -100,7 +100,7 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       id: "project",
       label: "Choose project",
       status: canRunCode ? "done" : "active",
-      detail: canRunCode ? "Hook room and code repo are set." : "Set a valid hook room and code repo.",
+      detail: canRunCode ? "Project chat and code repo are set." : "Set a valid project chat and code repo.",
     },
     {
       id: "proposal",
@@ -127,9 +127,9 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
           ? poll.decision
             ? decisionReferenceCheck?.ok
               ? `Receipt recorded: ${poll.decision.url ?? poll.decision.dropId ?? "wave decision"}.`
-              : (decisionReferenceCheck?.message ?? "Room decision receipt is not valid.")
+              : (decisionReferenceCheck?.message ?? "Project decision receipt is not valid.")
             : poll.status === "passed"
-              ? "Vote passed locally. Record the room decision URL."
+              ? "Vote passed locally. Record the project decision URL."
               : `Vote is ${poll.status}: ${poll.yesVotes} yes, ${poll.noVotes} no.`
           : "No vote required by current rules."
         : "Decision waits for a proposal.",

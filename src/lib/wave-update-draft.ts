@@ -27,7 +27,7 @@ function pollLine(poll: PollState | null) {
 function buildLine(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
     if (poll?.status === "passed" && !poll.decision) {
-      return "Build: waiting for a recorded room decision.";
+      return "Build: waiting for a recorded project decision.";
     }
 
     return "Build: waiting for an approved PR change.";
@@ -107,9 +107,9 @@ export function createWaveUpdateDraft({
   const verification = verificationLine(verificationTargets);
 
   return [
-    "Build room update",
+    "Project build update",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     proposal ? `Work: ${proposal.id} - ${proposal.title}` : "Work: none selected yet.",
     proposal ? `Status: ${proposal.status}` : "Status: setup",
@@ -122,6 +122,6 @@ export function createWaveUpdateDraft({
     "Guardrails: humans keep merge, deploy, payment, and governance authority. The hook is immutable by default with capped parameters only when explicitly approved.",
     contributorLine(wave),
     developerFeeLine(wave),
-    "Next step: review this draft, then post it manually in the room if it matches the work.",
+    "Next step: review this draft, then post it manually in chat if it matches the work.",
   ].join("\n");
 }

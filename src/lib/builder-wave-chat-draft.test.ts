@@ -5,13 +5,13 @@ import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 
 describe("build room chat draft", () => {
-  it("creates a concise message for the project room", () => {
+  it("creates a concise message for the project chat", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
     const draft = createBuilderWaveChatDraft(demoWave, nextAction, "I can review the fee cap tests.");
 
-    expect(draft).toContain("Build room message");
+    expect(draft).toContain("Project chat message");
     expect(draft).toContain("I can review the fee cap tests.");
-    expect(draft).toContain(`Project room: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
     expect(draft).toContain(`Current hook change: ${nextAction.title}`);
     expect(draft).toContain(`Status: ${nextAction.detail}`);

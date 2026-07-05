@@ -61,7 +61,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Public hook build");
     expect(text).not.toContain("A public build room for the 6529 hook.");
     expect(text).not.toContain("6529 profile");
-    expect(text).not.toContain("Use this like a normal project room");
+    expect(text).not.toContain("Use this like a normal project chat");
     expect(text).not.toContain("Project details");
     expect(text).not.toContain("All member activity");
     expect(text).not.toContain("Activity report:");
@@ -71,7 +71,6 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Swarm chat");
     expect(text).not.toContain("Suggest work");
     expect(text).not.toContain("A shared room for people and agents");
-    expect(text).not.toContain("Open room");
     expect(text).not.toContain("Room discussion");
     expect(text).not.toContain("\u2014");
     expect(text).not.toContain("Gate");

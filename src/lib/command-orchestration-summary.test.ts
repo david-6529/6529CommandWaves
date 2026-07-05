@@ -33,7 +33,7 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary.decisionRoute).toBe(
-      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Room decision URL must match the configured discussion.",
+      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Project decision URL must match the configured discussion.",
     );
   });
 
@@ -52,7 +52,7 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary.decisionRoute).toBe(
-      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Room decision URL is required for PR work.",
+      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Project decision URL is required for PR work.",
     );
   });
 

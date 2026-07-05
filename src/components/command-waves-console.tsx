@@ -110,7 +110,7 @@ const proposalTypeOptions: ProposalTypeOption[] = [
     label: "Update",
     title: "Share current hook status",
     request: "Summarize the current hook change, decision status, PR status, and next step for the project.",
-    limits: "Post manually. Do not claim a merge, deploy, payment, live REP gate, or final decision unless it is recorded.",
+    limits: "Post manually. Do not claim a merge, deploy, payment, live REP access check, or final decision unless it is recorded.",
     requestLabel: "Update",
     limitsLabel: "Posting limits",
     requestPlaceholder: "Describe the project update to draft.",

@@ -19,19 +19,19 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
   const rulesLine = contributorRulesLine(wave.repoUrl);
 
   return [
-    "Build room launch brief",
+    "Project launch brief",
     "",
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Code repo: ${wave.repoUrl}`,
     ...(rulesLine ? [rulesLine] : []),
     "",
-    "Goal: coordinate the first public build for a non-upgradeable hook through this room and one smart contract repo.",
+    "Goal: coordinate the first public build for a non-upgradeable hook through project chat and one smart contract repo.",
     "",
     "How to help:",
     "1. Share ideas or questions in chat.",
-    "2. Bring one PR-sized hook change to the room.",
+    "2. Bring one PR-sized hook change to chat.",
     "3. Include clear limits, tests, and any parameter cap.",
-    "4. Wait for a room decision before PR work starts.",
+    "4. Wait for a project decision before PR work starts.",
     "5. Open draft PRs with the repo template and Command Waves manifest.",
     "6. Let reviewer CI check the PR before humans merge.",
     "",
@@ -44,6 +44,6 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "- Contribution report scores are not reputation, token weight, payments, permissions, or merge rights.",
     `- ${participationLine(wave.gates)}`,
     "",
-    "Next step: propose one scoped hook change, then record the room decision URL before using a Codex packet.",
+    "Next step: propose one scoped hook change, then record the project decision URL before using a Codex packet.",
   ].join("\n");
 }

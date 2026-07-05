@@ -24,7 +24,7 @@ function proposalHeading(kind: CommandKind) {
   }
 
   if (kind === "post_to_wave") {
-    return "Hook room update";
+    return "Project update";
   }
 
   if (kind === "read_context") {
@@ -75,7 +75,7 @@ function decisionLine(kind: CommandKind) {
     return "Please approve, reject, or ask for edits before this is shared.";
   }
 
-  return "Please answer, approve, or ask for edits in the room.";
+  return "Please answer, approve, or ask for edits in chat.";
 }
 
 export function createBuilderWaveProposalDraft({
@@ -97,7 +97,7 @@ export function createBuilderWaveProposalDraft({
     "",
     `Change: ${cleanLine(title, "Untitled hook work")}`,
     `Proposer: ${cleanLine(proposer, "unknown")}`,
-    `Project room: ${wave.waveUrl}`,
+    `Project chat: ${wave.waveUrl}`,
     `Repo: ${wave.repoUrl}`,
     "",
     requestHeading(kind),

@@ -11,7 +11,7 @@ export function createBuilderWaveJoinDraft(handle: string, gates?: unknown) {
     `Access notes: ${accessNotes}.`,
     "I understand access is reviewed manually for this first phase.",
     "I can help with discussion, review, tests, or a small PR.",
-    "I will wait for a visible room decision before PR work starts.",
+    "I will wait for a visible project decision before PR work starts.",
     "What should I take next?",
   ].join("\n");
 }

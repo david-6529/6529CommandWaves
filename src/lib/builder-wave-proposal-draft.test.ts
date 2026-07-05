@@ -19,7 +19,7 @@ describe("build room proposal draft", () => {
 
     expect(draft).toContain("Hook change proposal");
     expect(draft).toContain("Change: Draft hook scaffold");
-    expect(draft).toContain(`Project room: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
     expect(draft).toContain("What I want to change:");
     expect(draft).toContain("Limits and tests:");
@@ -53,19 +53,19 @@ describe("build room proposal draft", () => {
     expect(draft).toContain("Answer limits:");
     expect(draft).toContain("No request written yet.");
     expect(draft).toContain("No limits written yet.");
-    expect(draft).toContain("Please answer, approve, or ask for edits in the room.");
+    expect(draft).toContain("Please answer, approve, or ask for edits in chat.");
     expect(draft).toContain("Budget cap: 0 USD");
     expect(draft).toContain("- Draft response, unknown risk, needs review.");
     expect(draft).toContain("- No rule reason recorded.");
   });
 
-  it("uses non-PR decision language for room updates", () => {
+  it("uses non-PR decision language for project updates", () => {
     const draft = createBuilderWaveProposalDraft({
       wave: demoWave,
       title: "Share status",
       proposer: "david",
       kind: "post_to_wave",
-      request: "Draft the room status.",
+      request: "Draft the chat status.",
       limits: "Do not claim approval unless recorded.",
       budgetUsd: "0",
       risk: "low",
@@ -73,7 +73,7 @@ describe("build room proposal draft", () => {
       ruleReason: "Discussion updates are support work.",
     });
 
-    expect(draft).toContain("Hook room update");
+    expect(draft).toContain("Project update");
     expect(draft).toContain("Update needed:");
     expect(draft).toContain("Posting limits:");
     expect(draft).toContain("Please approve, reject, or ask for edits before this is shared.");

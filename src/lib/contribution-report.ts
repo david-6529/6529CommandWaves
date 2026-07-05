@@ -142,8 +142,8 @@ function evidenceSummary(wave: CommandWave, roomPostCount: number) {
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
-    ...(decisionCount ? [countLabel(decisionCount, "room decision receipt")] : []),
-    ...(roomPostCount ? [countLabel(roomPostCount, "room post")] : []),
+    ...(decisionCount ? [countLabel(decisionCount, "project decision receipt")] : []),
+    ...(roomPostCount ? [countLabel(roomPostCount, "chat post")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
     ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
@@ -156,21 +156,21 @@ const scoringRubric = [
   "Complete proposal: 6 report points.",
   "Reviewing proposal: 4 report points.",
   "Other proposal: 3 report points.",
-  "Room decision receipt: 2 report points.",
+  "Project decision receipt: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
-  "Room post pulled into app: 1 report point.",
+  "Chat post pulled into app: 1 report point.",
 ];
 
 const coverage = {
   included: [
     "Work proposals stored by this app.",
-    "Votes and recorded room decision receipts stored by this app.",
-    "Room posts pulled into this app.",
+    "Votes and recorded project decision receipts stored by this app.",
+    "Chat posts pulled into this app.",
     "Recorded GitHub PR links and Guardian review proof.",
     "Attributed activity log events stored by this app.",
   ],
   notIncluded: [
-    "Live room posts that have not been pulled into app state.",
+    "Live chat posts that have not been pulled into app state.",
     "GitHub commits, comments, reviews, and merges that are not attached to a recorded PR.",
     "Manual payments, reputation, token weight, off-app agreements, or private coordination.",
   ],
@@ -217,7 +217,7 @@ export function createContributionReport(
       contributor.decisions += 1;
       contributor.score += 2;
       addScoreBasis(contributor, "Decision receipts", 2);
-      addRationale(contributor, "Recorded room decision receipt");
+      addRationale(contributor, "Recorded project decision receipt");
     }
 
     for (const vote of poll.votes ?? []) {
@@ -254,13 +254,13 @@ export function createContributionReport(
     contributor.score += 1;
     includedRoomPostCount += 1;
     includedRoomPosts.push(post);
-    addScoreBasis(contributor, "Room posts", 1);
-    addRationale(contributor, "Posted in the room");
+    addScoreBasis(contributor, "Chat posts", 1);
+    addRationale(contributor, "Posted in chat");
 
     const preview = roomPostPreview(post.preview);
 
     if (preview) {
-      addRationale(contributor, `Recent room post: ${preview}`);
+      addRationale(contributor, `Recent chat post: ${preview}`);
     }
   }
 
@@ -282,7 +282,7 @@ export function createContributionReport(
     notes: [
       "Report scores are an AI-readable activity report, not a permission system.",
       "Reputation, token weight, payouts, and merge rights must use separate human-approved rules.",
-      "The report only uses proposal, vote, decision, room post, PR, review, and ledger records currently stored or previewed by this app.",
+      "The report only uses proposal, vote, decision, chat post, PR, review, and ledger records currently stored or previewed by this app.",
       "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
     ],
   };
@@ -303,7 +303,7 @@ export function createContributionReportDraft(
           countLabel(contributor.proposals, "proposal"),
           countLabel(contributor.votes, "vote"),
           countLabel(contributor.decisions, "decision"),
-          countLabel(contributor.roomPosts, "room post"),
+          countLabel(contributor.roomPosts, "chat post"),
           countLabel(contributor.ledgerEvents, "activity log event"),
         ].join(", ");
 
@@ -312,7 +312,7 @@ export function createContributionReportDraft(
     : ["- No visible contributors yet."];
 
   return [
-    "Build room contribution report",
+    "Project contribution report",
     "",
     `Generated: ${report.generatedAt}`,
     `Method: ${report.method.label} (${report.method.id}), ${report.method.authority}.`,

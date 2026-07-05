@@ -295,13 +295,13 @@ export function validateWaveDecisionReference({
   const trimmedReference = reference.trim();
 
   if (!trimmedReference) {
-    return { ok: false, message: "Room decision URL or drop id is required." };
+    return { ok: false, message: "Project decision URL or drop id is required." };
   }
 
   const isUrl = /^https?:\/\//i.test(trimmedReference);
 
   if (!isUrl && requireUrl) {
-    return { ok: false, message: "Room decision URL is required for PR work." };
+    return { ok: false, message: "Project decision URL is required for PR work." };
   }
 
   if (!isUrl) {
@@ -313,26 +313,26 @@ export function validateWaveDecisionReference({
   try {
     url = new URL(trimmedReference);
   } catch {
-    return { ok: false, message: "Room decision URL is not valid." };
+    return { ok: false, message: "Project decision URL is not valid." };
   }
 
   if (!is6529Host(url.hostname)) {
-    return { ok: false, message: "Room decision URL must be a valid 6529 drop URL." };
+    return { ok: false, message: "Project decision URL must be a valid 6529 drop URL." };
   }
 
   if (!dropIdFromUrl(trimmedReference)) {
-    return { ok: false, message: "Room decision URL must include a drop id." };
+    return { ok: false, message: "Project decision URL must include a drop id." };
   }
 
   const expectedWaveId = waveIdFromUrl(waveUrl);
   const receiptWaveId = waveIdFromUrl(url.pathname);
 
   if (!receiptWaveId || receiptWaveId === url.pathname) {
-    return { ok: false, message: "Room decision URL must include the discussion id." };
+    return { ok: false, message: "Project decision URL must include the discussion id." };
   }
 
   if (receiptWaveId !== expectedWaveId) {
-    return { ok: false, message: "Room decision URL must match the configured discussion." };
+    return { ok: false, message: "Project decision URL must match the configured discussion." };
   }
 
   return { ok: true };
@@ -389,6 +389,6 @@ export function createWaveDecisionReceipt({
     url: isUrl ? trimmedReference : null,
     recordedBy: recordedBy.trim() || "manual reviewer",
     recordedAt,
-    summary: summary?.trim() || `Manual room decision receipt for ${proposalId} in ${waveUrl}.`,
+    summary: summary?.trim() || `Manual project decision receipt for ${proposalId} in ${waveUrl}.`,
   };
 }

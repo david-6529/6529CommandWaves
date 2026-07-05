@@ -145,12 +145,12 @@ function decisionLines(poll: PollState | null) {
   const voteLine = `- Vote: ${poll.status}, ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;
 
   if (!poll.decision) {
-    return [voteLine, "- Room decision receipt: not recorded yet."];
+    return [voteLine, "- Project decision receipt: not recorded yet."];
   }
 
   return [
     voteLine,
-    `- Room decision receipt: ${poll.decision.summary}`,
+    `- Project decision receipt: ${poll.decision.summary}`,
     `- Receipt source: ${poll.decision.source}`,
     `- Receipt reference: ${poll.decision.url ?? poll.decision.dropId ?? "recorded"}`,
   ];
@@ -171,7 +171,7 @@ function orchestrationLines(wave: CommandWave, proposal: CommandProposal | null,
 function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
     if (poll?.status === "passed" && !poll.decision) {
-      return ["- Build: waiting for a recorded room decision."];
+      return ["- Build: waiting for a recorded project decision."];
     }
 
     return ["- Build: waiting for an approved PR change."];
@@ -265,7 +265,7 @@ function nextStep(proposal: CommandProposal | null, execution: ExecutionRecord |
     return "Resolve review findings before merge, deploy, payment, or governance decisions.";
   }
 
-  return "Post this packet to the room after human review, then decide any payout separately.";
+  return "Post this packet to chat after human review, then decide any payout separately.";
 }
 
 export function createLaunchPacket({
@@ -288,13 +288,13 @@ export function createLaunchPacket({
   const contributionReport = createContributionReport(wave, { generatedAt, limit: 6 });
   const developerFeePlan = createDeveloperFeePlan(wave, contributionReport);
   const text = [
-    "# Build room launch packet",
+    "# Project launch packet",
     "",
     "Status: human-reviewed draft",
     `Generated: ${generatedAt}`,
     "",
     "## Project",
-    `- Project room: ${wave.waveUrl}`,
+    `- Project chat: ${wave.waveUrl}`,
     `- Repo: ${wave.repoUrl}`,
     `- Rules: ${wave.rules.version}`,
     `- Participation notes (advisory): ${wave.gates.join(", ") || "none recorded"}`,

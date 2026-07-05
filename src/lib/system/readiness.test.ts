@@ -79,7 +79,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "pass",
-      message: "First hook room and repo seed are configured.",
+      message: "First hook chat and repo seed are configured.",
     });
   });
 
@@ -161,7 +161,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
-      message: "Replace placeholder first hook room and repo values before public launch.",
+      message: "Replace placeholder first hook chat and repo values before public launch.",
     });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "fail",

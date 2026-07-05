@@ -5,10 +5,10 @@ export type PhaseScopeInventory = {
 
 export const firstPhaseScopeInventory: PhaseScopeInventory = {
   useNow: [
-    "One public build room and one GitHub repo.",
-    "Project snapshot with room, code, PR, and review state.",
+    "One public project chat and one GitHub repo.",
+    "Project snapshot with chat, code, PR, and review state.",
     "PR-sized hook changes with clear limits and tests.",
-    "Manual room decision receipts before PR work runs.",
+    "Manual project decision receipts before PR work runs.",
     "Codex work packets for prepared branches and draft PRs.",
     "Reviewer checks for manifests, risky files, caps, and hook guardrails.",
     "Contribution and fee records for separate human decisions.",

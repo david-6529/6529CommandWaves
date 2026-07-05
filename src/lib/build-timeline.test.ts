@@ -14,7 +14,7 @@ describe("build timeline", () => {
       ["Next", "current"],
     ]);
     expect(timeline[1]).toMatchObject({
-      title: "Room decision recorded",
+      title: "Project decision recorded",
       detail: "5 yes, 1 no.",
       href: "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
       hrefLabel: "Open decision",
@@ -27,7 +27,7 @@ describe("build timeline", () => {
     expect(timeline[3].detail).toBe("Reviewer checked the PR against the approved hook proposal and rules.");
     expect(timeline[4]).toMatchObject({
       title: "Add fee cap tests",
-      detail: "Bring the next small hook change to the room.",
+      detail: "Bring the next small hook change to chat.",
     });
   });
 

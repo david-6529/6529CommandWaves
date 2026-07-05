@@ -141,7 +141,7 @@ describe("first phase launch audit", () => {
       status: "needs_setup",
       itemId: "setup_not_checked",
       title: "Run launch setup check",
-      detail: "Verify the wave, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+      detail: "Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
     });
   });
 
@@ -391,7 +391,7 @@ describe("first phase launch audit", () => {
     expect(audit.openItems.map((item) => item.label)).toContain("Choose project");
   });
 
-  it("requires a room decision receipt before the first loop", () => {
+  it("requires a project decision receipt before the first loop", () => {
     const wave = {
       ...demoWave,
       polls: [{ ...demoWave.polls[0], decision: null }],
@@ -407,12 +407,12 @@ describe("first phase launch audit", () => {
     expect(audit.nextAction).toMatchObject({
       status: "needs_setup",
       itemId: "flow_wave_decision_receipt",
-      title: "Record the room decision URL",
+      title: "Record the project decision URL",
     });
     expect(audit.openItems).toContainEqual(
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
-        label: "Room decision receipt",
+        label: "Project decision receipt",
         status: "needed",
       }),
     );
@@ -449,7 +449,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
         status: "blocked",
-        detail: "Room decision URL must match the configured discussion.",
+        detail: "Project decision URL must match the configured discussion.",
       }),
     );
   });
@@ -485,7 +485,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_wave_decision_receipt",
         status: "blocked",
-        detail: "Room decision URL is required for PR work.",
+        detail: "Project decision URL is required for PR work.",
       }),
     );
   });

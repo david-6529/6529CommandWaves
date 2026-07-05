@@ -10,13 +10,13 @@ describe("builder wave review request draft", () => {
       execution: demoWave.executions[0],
     });
 
-    expect(draft).toContain("Build room review request");
-    expect(draft).toContain(`Project room: ${demoWave.waveUrl}`);
+    expect(draft).toContain("Project review request");
+    expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
     expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
     expect(draft).toContain(`Work: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
     expect(draft).toContain("PR: https://github.com/6529-Collections/6529-hook/pull/12");
     expect(draft).toContain("Build record:");
-    expect(draft).toContain("- Command Waves manifest and room decision receipt are present.");
+    expect(draft).toContain("- Command Waves manifest and project decision receipt are present.");
     expect(draft).toContain("- No proxy, delegatecall, deploy, payment, or governance change is introduced.");
     expect(draft).toContain("does not merge, deploy, approve payouts, or change governance");
     expect(draft).not.toContain("\u2014");

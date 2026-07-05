@@ -19,15 +19,15 @@ const actionCopyByStep: Record<
 > = {
   project: {
     title: "Set the project",
-    detail: "Confirm one hook room and one code repo before proposals start.",
+    detail: "Confirm one project chat and one code repo before proposals start.",
   },
   proposal: {
     title: "Propose scoped hook work",
     detail: "Write one PR-sized change with limits, tests, and success criteria.",
   },
   decision: {
-    title: "Get the room decision",
-    detail: "Ask the room to decide, then record the room decision URL before work runs.",
+    title: "Get the project decision",
+    detail: "Ask builders to decide, then record the project decision URL before work runs.",
   },
   build: {
     title: "Build the approved PR",
@@ -95,6 +95,6 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
     statusLabel: statusLabel("ready"),
     stepLabel: "Log",
     title: "Loop complete",
-    detail: "The approved hook work has a PR, review, room update, and launch packet.",
+    detail: "The approved hook work has a PR, review, project update, and launch packet.",
   };
 }

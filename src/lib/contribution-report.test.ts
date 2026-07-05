@@ -19,19 +19,19 @@ describe("contribution report", () => {
     });
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
     expect(report.notes.join(" ")).toContain("Reputation, token weight, payouts, and merge rights");
-    expect(report.notes.join(" ")).toContain("room post, PR, review, and ledger records");
+    expect(report.notes.join(" ")).toContain("chat post, PR, review, and ledger records");
     expect(report.coverage.included).toContain("Work proposals stored by this app.");
-    expect(report.coverage.included).toContain("Room posts pulled into this app.");
+    expect(report.coverage.included).toContain("Chat posts pulled into this app.");
     expect(report.coverage.included).toContain("Recorded GitHub PR links and Guardian review proof.");
-    expect(report.coverage.notIncluded).toContain("Live room posts that have not been pulled into app state.");
+    expect(report.coverage.notIncluded).toContain("Live chat posts that have not been pulled into app state.");
     expect(report.coverage.notIncluded).toContain("Manual payments, reputation, token weight, off-app agreements, or private coordination.");
     expect(report.scoringRubric).toEqual([
       "Complete proposal: 6 report points.",
       "Reviewing proposal: 4 report points.",
       "Other proposal: 3 report points.",
-      "Room decision receipt: 2 report points.",
+      "Project decision receipt: 2 report points.",
       "Vote or attributed activity log event: 1 report point.",
-      "Room post pulled into app: 1 report point.",
+      "Chat post pulled into app: 1 report point.",
     ]);
     expect(report.evidence).toContain("1 GitHub PR link");
     expect(report.evidence).toContain("1 Guardian review proof");
@@ -47,7 +47,7 @@ describe("contribution report", () => {
       proposals: 1,
       decisions: 1,
     });
-    expect(report.contributors[0].rationale).toContain("Recorded room decision receipt");
+    expect(report.contributors[0].rationale).toContain("Recorded project decision receipt");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
     expect(report.contributors.some((contributor) => contributor.identity === "Decision")).toBe(false);
   });
@@ -72,11 +72,11 @@ describe("contribution report", () => {
     expect(report.evidence).toEqual(["No app records yet."]);
   });
 
-  it("includes room posts pulled into the app without granting authority", () => {
+  it("includes chat posts pulled into the app without granting authority", () => {
     const report = createContributionReport(demoWave, {
       roomPosts: [
         {
-          author: "room-builder",
+          author: "chat-builder",
           preview: "I can review the next hook PR.",
           createdAt: "2026-06-21T12:00:00.000Z",
         },
@@ -89,10 +89,10 @@ describe("contribution report", () => {
     });
 
     expect(report.generatedAt).toBe("2026-06-21T12:00:00.000Z");
-    expect(report.evidence).toContain("1 room post");
-    expect(report.contributors.find((contributor) => contributor.identity === "room-builder")).toMatchObject({
+    expect(report.evidence).toContain("1 chat post");
+    expect(report.contributors.find((contributor) => contributor.identity === "chat-builder")).toMatchObject({
       score: 1,
-      scoreBasis: ["Room posts: 1 report point"],
+      scoreBasis: ["Chat posts: 1 report point"],
       roomPosts: 1,
     });
     expect(report.contributors.some((contributor) => contributor.identity === "wave-poll")).toBe(false);
@@ -105,16 +105,16 @@ describe("contribution report", () => {
       limit: 2,
     });
 
-    expect(draft).toContain("Build room contribution report");
+    expect(draft).toContain("Project contribution report");
     expect(draft).toContain("Generated: 2026-06-21T12:00:00.000Z");
     expect(draft).toContain("Method: Visible activity report (visible_activity_v0), Informational only.");
     expect(draft).toContain("Records:");
     expect(draft).toContain("- 1 GitHub PR link");
     expect(draft).toContain("Coverage included:");
     expect(draft).toContain("- Work proposals stored by this app.");
-    expect(draft).toContain("- Room posts pulled into this app.");
+    expect(draft).toContain("- Chat posts pulled into this app.");
     expect(draft).toContain("Not included:");
-    expect(draft).toContain("- Live room posts that have not been pulled into app state.");
+    expect(draft).toContain("- Live chat posts that have not been pulled into app state.");
     expect(draft).toContain("Contributors:");
     expect(draft).toContain("- david: report score");
     expect(draft).toContain("Proposal work: 6 report points");
