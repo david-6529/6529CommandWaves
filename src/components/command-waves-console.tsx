@@ -135,6 +135,30 @@ const proposalFlowSteps = [
   ["Build", "Use GitHub PRs for code changes."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
+const discussionTabs = [
+  {
+    id: "general",
+    label: "General",
+    title: "Chat with builders",
+    detail: "Ask a question, suggest a change, or call out risk. The same box starts the work.",
+    placeholder: "Ask a question, suggest work, or share context.",
+  },
+  {
+    id: "build",
+    label: "Build",
+    title: "Scope work",
+    detail: "Turn a promising idea into one small change builders can decide on.",
+    placeholder: "Describe the change builders should discuss or decide on.",
+  },
+  {
+    id: "review",
+    label: "Review",
+    title: "Review PRs",
+    detail: "Paste a PR, test result, or review concern so builders can inspect it together.",
+    placeholder: "Paste a PR link, test result, or review note.",
+  },
+] as const;
+type DiscussionTabId = (typeof discussionTabs)[number]["id"];
 
 const hookGuardrails = [
   "Hook contracts stay immutable by default.",
@@ -920,6 +944,8 @@ export function CommandWavesConsole() {
   const [waveRoomNotice, setWaveRoomNotice] = useState("");
   const [roomPostUrl, setRoomPostUrl] = useState("");
   const [waveRoomMessage, setWaveRoomMessage] = useState("");
+  const [discussionTabId, setDiscussionTabId] = useState<DiscussionTabId>("general");
+  const [walletNotice, setWalletNotice] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
@@ -943,6 +969,7 @@ export function CommandWavesConsole() {
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
+  const selectedDiscussionTab = discussionTabs.find((item) => item.id === discussionTabId) ?? discussionTabs[0];
   const selectedProposalType = proposalTypeOptions.find((item) => item.kind === kind) ?? proposalTypeOptions[0];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const hookProposalPreflight = useMemo(
@@ -1066,6 +1093,7 @@ export function CommandWavesConsole() {
     readyForNextHookChange
       ? title.trim() || "Pick the next change"
       : activeProposal?.title ?? "Pick the next change";
+  const currentFocusLabel = readyForNextHookChange ? "Next work" : "Current work";
   const currentFocusDescription =
     readyForNextHookChange
       ? "Use chat to decide if this is the next change."
@@ -1197,7 +1225,7 @@ export function CommandWavesConsole() {
   const hasRoomMessage = Boolean(waveRoomMessage.trim());
   const canPostRoomMessage = Boolean(hasRoomMessage && roomPostTargetUrl);
   const chatWorkSpec =
-    "Captured from project chat. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.";
+    `Captured from ${selectedDiscussionTab.label.toLowerCase()} project discussion. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.`;
   const canSaveChatWorkItem = Boolean(hasRoomMessage && apiBusy === null);
   const builderWaveProposalDraft = useMemo(
     () =>
@@ -1734,6 +1762,7 @@ export function CommandWavesConsole() {
   }
 
   function messageMember(identity: string) {
+    setDiscussionTabId("general");
     setWaveRoomMessage(`@${identity} `);
     setWaveRoomNotice("Message draft ready.");
     window.requestAnimationFrame(() => {
@@ -1744,6 +1773,7 @@ export function CommandWavesConsole() {
   function preparePrDiscussion() {
     const prReference = activeExecutionPrUrl ?? "PR link";
 
+    setDiscussionTabId("review");
     setWaveRoomMessage(`PR to discuss: ${prReference}\n\nWhat should builders review?`);
     setWaveRoomNotice("PR discussion draft ready.");
   }
@@ -1764,6 +1794,7 @@ export function CommandWavesConsole() {
   }
 
   function prepareJoinRequest() {
+    setDiscussionTabId("general");
     setWaveRoomMessage(createBuilderWaveJoinDraft(proposer, wave.gates));
     setWaveRoomNotice("Access request ready.");
     window.requestAnimationFrame(() => {
@@ -1972,7 +2003,7 @@ export function CommandWavesConsole() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-200 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-5">
-            <div className="w-full">
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{commandWaveProductCopy.headline}</p>
               <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950">
                 Pilot: 6529 AMM hook
@@ -1981,6 +2012,22 @@ export function CommandWavesConsole() {
                 Join a swarm of builders creating a hook together through chat, decisions, pull requests, and reviews.
               </p>
             </div>
+            <section className="min-w-52 rounded-lg border border-zinc-200 p-3" aria-label="Wallet access">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Wallet</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-600">Access is manual for now.</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setWalletNotice("Wallet connection is not wired in this phase. Use Request access in chat.")}
+                >
+                  Connect wallet
+                </Button>
+              </div>
+              {walletNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{walletNotice}</p> : null}
+            </section>
           </div>
 
           <section className="mt-5 space-y-3 border-t border-zinc-200 pt-4" aria-label="Project context">
@@ -1991,7 +2038,7 @@ export function CommandWavesConsole() {
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-600">
                 This pilot coordinates the design of a 6529 AMM hook through group chat, scoped decisions, GitHub PRs,
-                and reviewer checks. Current work: {humanizeLegacyCommandCopy(currentFocusTitle)}.
+                and reviewer checks. {currentFocusLabel}: {humanizeLegacyCommandCopy(currentFocusTitle)}.
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-600">
                 The orchestrator keeps this summary and changelog current as discussion, PRs, and reviews change.
@@ -2055,7 +2102,7 @@ export function CommandWavesConsole() {
         <section id="workspace" className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
           <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current work</p>
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{currentFocusLabel}</p>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
             <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-950">{humanizeLegacyCommandCopy(currentFocusTitle)}</h2>
@@ -2083,14 +2130,17 @@ export function CommandWavesConsole() {
             </div>
           </section>
 
-          <section id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
+          <details id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5" open>
+            <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
+              <span>Project discussion</span>
+              <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{selectedDiscussionTab.label}</Badge>
+            </summary>
+
+            <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project chat</p>
-                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Chat with builders</h2>
-                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">
-                  Ask a question, suggest a change, review an idea, or paste a PR. The same box starts the work.
-                </p>
+                <h2 className="mt-1 text-3xl font-semibold text-zinc-950">{selectedDiscussionTab.title}</h2>
+                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-600">{selectedDiscussionTab.detail}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -2102,12 +2152,35 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
+            <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Project discussion sections">
+              {discussionTabs.map((tab) => {
+                const selected = tab.id === selectedDiscussionTab.id;
+
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={selected}
+                    className={`inline-flex h-10 cursor-pointer items-center justify-center rounded-md border px-4 text-sm font-semibold transition ${
+                      selected
+                        ? "border-zinc-50 bg-zinc-50 text-zinc-950"
+                        : "border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                    }`}
+                    onClick={() => setDiscussionTabId(tab.id)}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <div className="mt-5">
               <Field label="Message">
                 <Textarea
                   rows={4}
                   value={waveRoomMessage}
-                  placeholder="Ask a question, suggest work, or paste a PR link to discuss."
+                  placeholder={selectedDiscussionTab.placeholder}
                   onChange={(event) => {
                     setWaveRoomMessage(event.target.value);
                     setWaveRoomNotice("");
@@ -2206,7 +2279,7 @@ export function CommandWavesConsole() {
                     ))}
               </div>
             </section>
-          </section>
+          </details>
         </section>
 
         <section id="members-and-rules" className="border-t border-zinc-200 pt-6">
