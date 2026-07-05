@@ -884,6 +884,16 @@ function countLabel(count: number, singular: string) {
   return `${count} ${count === 1 ? singular : `${singular}s`}`;
 }
 
+function createChatWorkTitle(message: string) {
+  const normalized = (message.trim().split("\n")[0] ?? "").replace(/\s+/g, " ").trim();
+
+  if (!normalized) {
+    return "New work item";
+  }
+
+  return normalized.length > 72 ? `${normalized.slice(0, 69).trimEnd()}...` : normalized;
+}
+
 export function CommandWavesConsole() {
   const [wave, setWave] = useState<CommandWave>(() => cloneDemoWave());
   const [waveUrl, setWaveUrl] = useState(wave.waveUrl);
@@ -1018,7 +1028,6 @@ export function CommandWavesConsole() {
         : activePoll?.status === "passed"
         ? "Vote passed"
         : "Vote open";
-  const decisionTitle = readyForNextHookChange ? "No decision yet" : activePoll ? activePollTitle : simpleDecisionRoute;
   const activePollDetail = activePollNeedsWaveDecision
     ? "Local vote passed. Record the project decision before work runs."
     : activePollDecisionRecorded
@@ -1059,7 +1068,7 @@ export function CommandWavesConsole() {
       : activeProposal?.title ?? "Pick the next change";
   const currentFocusDescription =
     readyForNextHookChange
-      ? "Bring this draft to chat before saving it as a proposal."
+      ? "Use chat to decide if this is the next change."
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
@@ -1187,6 +1196,9 @@ export function CommandWavesConsole() {
   const roomPostTargetUrl = primaryHookProject?.waveUrl ?? wave.waveUrl;
   const hasRoomMessage = Boolean(waveRoomMessage.trim());
   const canPostRoomMessage = Boolean(hasRoomMessage && roomPostTargetUrl);
+  const chatWorkSpec =
+    "Captured from project chat. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.";
+  const canSaveChatWorkItem = Boolean(hasRoomMessage && apiBusy === null);
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -1259,42 +1271,6 @@ export function CommandWavesConsole() {
         ? "Checking"
         : "Check readiness"
       : "Open launch controls";
-  const roomNeedLabel = readyForNextHookChange
-    ? "Needs discussion"
-    : activePollCanVote
-      ? "Decision needed"
-      : showDecisionRecorder
-        ? "Add decision URL"
-        : showBuildAction
-          ? activePrHasWaveDecision
-            ? "Build PR"
-            : "Decision URL needed"
-          : canRunReview
-            ? "Review PR"
-            : activeSupportProposal
-              ? "Discuss support"
-            : activeProposal
-              ? "Keep moving"
-              : "Pick a change";
-  const roomNeedDetail = readyForNextHookChange
-    ? "Get feedback on scope, then save the proposal."
-    : activePollCanVote
-      ? "Ask builders for a visible decision before code work starts."
-      : showDecisionRecorder
-        ? "Record the decision link so the PR has a source of truth."
-        : showBuildAction
-          ? activePrHasWaveDecision
-            ? "Use the approved packet and attach the PR record."
-            : "Record the decision link before PR work starts."
-          : canRunReview
-            ? "Check the PR against the approved proposal and project rules."
-            : activeSupportProposal
-              ? `${activeSupportProposalLabel} is recorded. Use chat to discuss it or propose the next code change.`
-              : activeProposal
-                ? "Follow the next open step for this change."
-                : "Choose one small change builders can discuss.";
-  const decisionStateClass = activePollNeedsWaveDecision || activePollCanVote ? riskClass("medium") : statusClass("complete");
-  const latestLedgerEvent = orderedLedgerEvents[0] ?? null;
   const projectSummaryItems = [
     {
       label: "Project chat",
@@ -1724,6 +1700,48 @@ export function CommandWavesConsole() {
     }
   }
 
+  async function saveChatWorkItem() {
+    const chatPrompt = waveRoomMessage.trim();
+
+    if (!chatPrompt) {
+      setWaveRoomNotice("Write a message first.");
+      return;
+    }
+
+    const nextTitle = createChatWorkTitle(chatPrompt);
+
+    setApiBusy("proposal");
+    setApiError("");
+    setWaveRoomNotice("");
+
+    try {
+      const nextWave = await requestWave("/api/command-wave/proposals", {
+        method: "POST",
+        body: JSON.stringify({
+          title: nextTitle,
+          proposer,
+          kind: "draft_response",
+          prompt: chatPrompt,
+          spec: chatWorkSpec,
+          budgetUsd: "0",
+        }),
+      }, accessKey);
+
+      applyWave(nextWave);
+      setKind("draft_response");
+      setTitle(nextTitle);
+      setPrompt(chatPrompt);
+      setSpec(chatWorkSpec);
+      setWaveRoomMessage("");
+      setApiNotice("Work item saved from chat.");
+      setWaveRoomNotice("Work item saved.");
+    } catch (error) {
+      setWaveRoomNotice(error instanceof Error ? error.message : "Work item save failed.");
+    } finally {
+      setApiBusy(null);
+    }
+  }
+
   function resetBuilderWaveChatDraft() {
     setWaveRoomMessage("");
     setWaveRoomNotice("Message cleared.");
@@ -2006,102 +2024,19 @@ export function CommandWavesConsole() {
           <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Upcoming or being discussed</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current focus</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Work</h2>
               </div>
             </div>
 
-            <div className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
-              <article className="py-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Being discussed</p>
-                  <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
-                </div>
-                <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{humanizeLegacyCommandCopy(currentFocusTitle)}</h3>
-                <p className="mt-1 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
-              </article>
-
-              <article className="py-4" aria-label="Decision status">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
-                  <Badge className={decisionStateClass}>{roomNeedLabel}</Badge>
-                </div>
-                <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{decisionTitle}</h3>
-                <p className="mt-1 text-base leading-7 text-zinc-600">{roomNeedDetail}</p>
-                {showDecisionRecorder ? (
-                  <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
-                    <Input
-                      value={decisionReference}
-                      placeholder={decisionReferencePlaceholder}
-                      onChange={(event) => setDecisionReference(event.target.value)}
-                    />
-                    <Button type="button" variant="secondary" disabled={isBusy || !decisionReference.trim()} onClick={recordWaveDecision}>
-                      {apiBusy === "decision" ? "Recording" : "Record decision"}
-                    </Button>
-                  </div>
-                ) : null}
-              </article>
-
-              {latestLedgerEvent ? (
-                <article className="py-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest activity</p>
-                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{shortTime(latestLedgerEvent.at)}</Badge>
-                  </div>
-                  <h3 className="mt-2 text-xl font-semibold leading-7 text-zinc-950">{eventTypeLabel(latestLedgerEvent.type)}</h3>
-                  <p className="mt-1 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(latestLedgerEvent.message)}</p>
-                </article>
-              ) : null}
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-2 border-t border-zinc-200 pt-4">
-              {!activeProposal ? (
-                <JumpLink href="#project-chat">Open chat</JumpLink>
-              ) : activePollCanVote ? (
-                <>
-                  <Button type="button" onClick={() => void copyBuilderWaveDecisionDraft()}>
-                    Copy decision request
-                  </Button>
-                </>
-              ) : showBuildAction ? (
-                <>
-                  <Button type="button" disabled={isBusy || !canBuildApprovedPr} onClick={buildApprovedPr}>
-                    {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build PR" : "Decision URL needed"}
-                  </Button>
-                  {canCopyCodexPacket ? (
-                    <Button type="button" variant="secondary" disabled={isBusy} onClick={() => void copyCodexWorkPacket()}>
-                      {apiBusy === "codex" ? "Copying" : "Copy build packet"}
-                    </Button>
-                  ) : null}
-                </>
-              ) : canRunReview ? (
-                <>
-                  <Button type="button" onClick={() => void copyBuilderWaveReviewRequestDraft()}>
-                    Copy review request
-                  </Button>
-                  {activeExecutionPrUrl ? <LinkButton href={activeExecutionPrUrl}>Open PR</LinkButton> : null}
-                  <Button type="button" variant="secondary" disabled={isBusy} onClick={runGuardianReview}>
-                    {apiBusy === "review" ? "Reviewing" : "Run review"}
-                  </Button>
-                </>
-              ) : readyForNextHookChange ? (
-                <>
-                  <Button type="button" disabled={!wave.waveUrl} onClick={() => void copyBuilderWaveProposalDraft({ openDiscussion: true })}>
-                    Discuss in chat
-                  </Button>
-                  <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                    {apiBusy === "proposal" ? "Saving" : "Save proposal"}
-                  </Button>
-                </>
-              ) : (
-                <JumpLink href="#project-chat">Open chat</JumpLink>
-              )}
-            </div>
-            {decisionDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{decisionDraftNotice}</p> : null}
-            {reviewRequestNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{reviewRequestNotice}</p> : null}
-            {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
-            {codexPacketNotice ? <p className="mt-2 text-sm leading-6 text-blue-700">{codexPacketNotice}</p> : null}
-            {apiError ? <p className="mt-2 text-sm leading-6 text-red-600">{apiError}</p> : null}
+            <article className="mt-5 border-y border-zinc-200 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Being discussed</p>
+                <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
+              </div>
+              <h3 className="mt-3 text-2xl font-semibold leading-8 text-zinc-950">{humanizeLegacyCommandCopy(currentFocusTitle)}</h3>
+              <p className="mt-2 text-base leading-7 text-zinc-600">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
+            </article>
           </section>
 
           <section id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-200 p-5">
@@ -2130,7 +2065,7 @@ export function CommandWavesConsole() {
                     setWaveRoomMessage(event.target.value);
                     setWaveRoomNotice("");
                   }}
-                  className="min-h-36 resize-none"
+                  className="min-h-24 resize-none"
                 />
               </Field>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -2141,6 +2076,14 @@ export function CommandWavesConsole() {
                   onClick={() => void postBuilderWaveChatDraft()}
                 >
                   {apiBusy === "roomPost" ? "Posting" : "Post message"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={!canSaveChatWorkItem}
+                  onClick={() => void saveChatWorkItem()}
+                >
+                  {apiBusy === "proposal" ? "Saving" : "Save work item"}
                 </Button>
                 <Button
                   type="button"
