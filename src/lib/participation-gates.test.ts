@@ -40,7 +40,7 @@ describe("participation gates", () => {
 
   it("summarizes manual phase 1 access without claiming live gates", () => {
     expect(summarizeParticipationAccess(defaultParticipationGates)).toBe(
-      "Ask in the room to join. Access is reviewed manually for now.",
+      "Ask in chat to join. Access is reviewed manually for now.",
     );
     expect(summarizeParticipationAccess(["Community builders welcome"])).toBe("Community builders welcome");
   });
@@ -50,7 +50,7 @@ describe("participation gates", () => {
 
     expect(snapshot).toMatchObject({
       label: "manual review",
-      summary: "Ask in the room to join. Access is reviewed manually for now.",
+      summary: "Ask in chat to join. Access is reviewed manually for now.",
     });
     expect(snapshot.summary).not.toMatch(/\b(REP|TDH|QnA)\b/);
     expect(createParticipationAccessSnapshot(["Community builders welcome"])).toMatchObject({

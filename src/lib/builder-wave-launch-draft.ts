@@ -36,7 +36,7 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "6. Let reviewer CI check the PR before humans merge.",
     "",
     "Guardrails:",
-    "- Gates decide who can play, but reputation, token, holder, allowlist, and QnA notes stay advisory until live enforcement is wired.",
+    "- Access explains who can join, but reputation, token, holder, allowlist, and QnA notes stay advisory until live enforcement is wired.",
     "- Orchestration rules classify risk and require votes for important hook changes.",
     "- The hook is immutable by default.",
     "- No proxy, delegatecall, deployment, spending, payouts, or governance changes in phase 1.",

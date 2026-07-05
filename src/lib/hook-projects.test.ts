@@ -21,7 +21,7 @@ describe("active hook projects", () => {
         platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
         gateDetails: [
           "Manual builder review for phase 1",
-          "REP or TDH gates are planned, not enforced here",
+          "REP or TDH access checks are planned, not enforced here",
           "AI contribution report scores are not permissions",
         ],
         gateSnapshotLabel: "manual review",
@@ -31,7 +31,7 @@ describe("active hook projects", () => {
         nextActionLabel: "ready",
         nextActionTitle: "Loop complete",
         nextActionDetail: "The approved hook work has a PR, review, room update, and launch packet.",
-        waveStatus: "Room decision recorded with 5 yes and 1 no.",
+        waveStatus: "Project decision recorded with 5 yes and 1 no.",
         codeStatus: "PR reviewed and logged.",
         latestPrUrl: "https://github.com/6529-Collections/6529-hook/pull/12",
         reviewStatusLabel: "review passed",
@@ -61,7 +61,7 @@ describe("active hook projects", () => {
       gateSnapshotLabel: "manual review",
       gateDetails: [
         "Manual builder review for phase 1",
-        "REP or TDH gates are planned, not enforced here",
+        "REP or TDH access checks are planned, not enforced here",
         "AI contribution report scores are not permissions",
       ],
       orchestrationSnapshotLabel: "needs idea",
@@ -79,7 +79,7 @@ describe("active hook projects", () => {
     });
 
     expect(projects[0]).toMatchObject({
-      waveStatus: "Room decision recorded with 5 yes and 1 no.",
+      waveStatus: "Project decision recorded with 5 yes and 1 no.",
       gateSnapshotLabel: "manual review",
       orchestrationSnapshotLabel: "high approved",
       codeStatus: "Approved PR change is ready to build.",
@@ -116,8 +116,8 @@ describe("active hook projects", () => {
     });
 
     expect(projects[0]).toMatchObject({
-      gateSnapshotLabel: "gate unset",
-      gateDetails: ["Participation gate is not set yet."],
+      gateSnapshotLabel: "access not set",
+      gateDetails: ["Who can join is not set yet."],
       orchestrationSnapshotLabel: "needs idea",
     });
   });

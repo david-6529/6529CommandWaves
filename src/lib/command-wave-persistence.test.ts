@@ -135,7 +135,7 @@ describe("command wave persistence", () => {
       name: "6529 Hook Builder",
       gates: [
         "Builder wave allowlist for phase 1 (manual note only, not enforced by this app)",
-        "REP or TDH gates are planned, not enforced here",
+        "REP or TDH access checks are planned, not enforced here",
         "AI contribution scores are reports, not permissions",
       ],
       proposals: [{ ...demoWave.proposals[0], status: "approved" }],

@@ -14,7 +14,7 @@ describe("builder wave launch draft", () => {
     expect(draft).toContain("Wait for a room decision before PR work starts.");
     expect(draft).toContain("Open draft PRs with the repo template and Command Waves manifest.");
     expect(draft).toContain("Let reviewer CI check the PR before humans merge.");
-    expect(draft).toContain("Gates decide who can play");
+    expect(draft).toContain("Access explains who can join");
     expect(draft).toContain("Orchestration rules classify risk");
     expect(draft).toContain("No proxy, delegatecall, deployment, spending, payouts, or governance changes in phase 1.");
     expect(draft).toContain("Participation notes (advisory):");

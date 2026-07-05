@@ -1,6 +1,6 @@
 export const defaultParticipationGates = [
   "Manual builder review for phase 1",
-  "REP or TDH gates are planned, not enforced here",
+  "REP or TDH access checks are planned, not enforced here",
   "AI contribution report scores are not permissions",
 ] as const;
 
@@ -88,7 +88,7 @@ export function summarizeParticipationAccess(input: unknown) {
   }
 
   if (gates.some((gate) => advisoryPattern.test(gate))) {
-    return "Ask in the room to join. Access is reviewed manually for now.";
+    return "Ask in chat to join. Access is reviewed manually for now.";
   }
 
   return gates[0];
@@ -109,7 +109,7 @@ export function createParticipationAccessSnapshot(input: unknown) {
   if (manual) {
     return {
       label: "manual review",
-      summary: "Ask in the room to join. Access is reviewed manually for now.",
+      summary: "Ask in chat to join. Access is reviewed manually for now.",
       notes: gates.slice(0, 2),
     };
   }

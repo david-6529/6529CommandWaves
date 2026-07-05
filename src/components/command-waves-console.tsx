@@ -1272,38 +1272,16 @@ export function CommandWavesConsole() {
         ? "Checking"
         : "Check readiness"
       : "Open launch controls";
-  const projectSummaryItems = [
-    {
-      label: "Current work",
-      value: currentFocusTitle,
-      detail: currentBuildStatusLabel,
-      href: null,
-    },
-    {
-      label: "Project chat",
-      value: "In this app",
-      detail: "Ask questions, suggest work, and record decisions.",
-      href: null,
-    },
-    {
-      label: "Code repo",
-      value: Boolean(primaryHookProject?.repoUrl || repoUrl) ? "Hook repo" : "No repo set",
-      detail: "Where reviewed pull requests land.",
-      href: primaryHookProject?.repoUrl ?? repoUrl,
-    },
-    {
-      label: "Access",
-      value: participationAccess.label,
-      detail: "Reviewed manually for this phase.",
-      href: null,
-    },
-  ];
-  const ruleHighlights = [
-    ["Gate", participationGateNotes[0] ?? "Participation gate is set by project maintainers."],
-    ["Discuss", "Ideas, questions, and scope changes start in chat."],
-    ["Decide", "Important or risky changes need a visible project decision."],
-    ["Build", "Code moves through GitHub PRs and reviewer checks."],
-    ["Control", "Humans merge, deploy, pay, and change project rules."],
+  const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
+  const projectRuleItems = [
+    ["Who can join?", participationAccess.summary],
+    ["How do I join?", "Use Request access in chat. A maintainer reviews it for this pilot."],
+    ["How does work start?", "Post in chat. Good ideas become small work items the group can discuss."],
+    [
+      "How are PRs approved?",
+      "The group records a project decision before approved PR work starts. The reviewer checks the PR against that scope.",
+    ],
+    ["Who merges?", "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work."],
   ];
 
   useEffect(() => {
@@ -1994,53 +1972,60 @@ export function CommandWavesConsole() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-200 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-5">
-            <div className="max-w-4xl">
+            <div className="w-full">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{commandWaveProductCopy.headline}</p>
               <h1 className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950">
                 Pilot: 6529 AMM hook
               </h1>
-              <p className="mt-2 max-w-3xl text-lg leading-7 text-zinc-700">
-                Build one hook in public through chat, decisions, pull requests, and review.
+              <p className="mt-2 text-lg leading-7 text-zinc-700">
+                Join a swarm of builders creating a hook together through chat, decisions, pull requests, and reviews.
               </p>
             </div>
-            <nav className="flex flex-wrap gap-2" aria-label="Primary actions">
-              {primaryHookProject?.repoUrl || repoUrl ? <LinkButton href={primaryHookProject?.repoUrl ?? repoUrl}>Open repo</LinkButton> : null}
-            </nav>
           </div>
 
-          <section className="mt-5 grid gap-3 border-t border-zinc-200 pt-4 lg:grid-cols-2" aria-label="Project context">
+          <section className="mt-5 space-y-3 border-t border-zinc-200 pt-4" aria-label="Project context">
             <details className="rounded-lg border border-zinc-200 p-4" open>
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
                 <span>Project summary</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">orchestrator managed</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-600">
-                Group discussion sets the work. The orchestrator agent keeps this summary current as work items,
-                decisions, PRs, and reviews change.
+                This pilot coordinates the design of a 6529 AMM hook through group chat, scoped decisions, GitHub PRs,
+                and reviewer checks. Current work: {humanizeLegacyCommandCopy(currentFocusTitle)}.
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-600">
-                Builders can submit PRs to the repo and discuss scope, risks, and review in chat.
+                The orchestrator keeps this summary and changelog current as discussion, PRs, and reviews change.
+                Builders can discuss ideas here, submit pull requests, and use reviewer output to keep humans in charge
+                of what gets merged.{" "}
+                {projectRepoHref ? (
+                  <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
+                    Open the code repo
+                  </a>
+                ) : (
+                  "The code repo is not set yet."
+                )}
               </p>
-              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                {projectSummaryItems.map((item) => (
-                  <div key={item.label} className="border-t border-zinc-200 pt-3">
-                    <dt className="text-sm font-semibold text-zinc-500">{item.label}</dt>
-                    <dd className="mt-1 break-words text-base font-semibold leading-6 text-zinc-950">
-                      {item.href ? (
-                        <a className="hover:text-blue-700" href={item.href} target="_blank" rel="noreferrer">
-                          {humanizeLegacyCommandCopy(item.value)}
-                        </a>
-                      ) : (
-                        humanizeLegacyCommandCopy(item.value)
-                      )}
-                    </dd>
-                    <dd className="mt-1 text-sm leading-6 text-zinc-500">{humanizeLegacyCommandCopy(item.detail)}</dd>
-                  </div>
-                ))}
-              </dl>
             </details>
 
-            <details className="rounded-lg border border-zinc-200 p-4" open>
+            <details className="rounded-lg border border-zinc-200 p-4">
+              <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
+                <span>Rules</span>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">simple</Badge>
+              </summary>
+              <p className="mt-3 text-base leading-7 text-zinc-600">
+                Everything starts in chat. The group decides what should become PR work.
+              </p>
+              <div className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
+                {projectRuleItems.map(([question, answer]) => (
+                  <div key={question} className="py-3">
+                    <p className="text-sm font-semibold text-zinc-500">{question}</p>
+                    <p className="mt-1 text-base leading-7 text-zinc-700">{humanizeLegacyCommandCopy(answer)}</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+
+            <details className="rounded-lg border border-zinc-200 p-4">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
                 <span>Changelog</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{topChangelogItems.length} updates</Badge>
@@ -2279,21 +2264,16 @@ export function CommandWavesConsole() {
           </section>
 
           <section className="min-w-0 rounded-lg border border-zinc-200 p-5">
-            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Rules</p>
-            <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Rules of the build</h2>
-            <div className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
-              {ruleHighlights.map(([label, detail]) => (
-                <div key={label} className="py-3">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{label}</p>
-                  <p className="mt-1 text-base leading-7 text-zinc-700">{detail}</p>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reference</p>
+            <h2 className="mt-1 text-3xl font-semibold text-zinc-950">Build details</h2>
+            <p className="mt-3 text-base leading-7 text-zinc-600">
+              The top Rules accordion is the plain-English source. These notes keep access, reports, and code checks visible.
+            </p>
             <div className="mt-5 border-t border-zinc-200 pt-4">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Access notes</p>
               <ul className="mt-2 grid gap-2 text-base leading-7 text-zinc-600">
-                {participationGateNotes.slice(0, 2).map((gate) => (
-                  <li key={gate}>- {gate}</li>
+                {participationGateNotes.slice(0, 2).map((note) => (
+                  <li key={note}>- {note}</li>
                 ))}
               </ul>
               <Button type="button" variant="secondary" className="mt-3" onClick={prepareJoinRequest}>

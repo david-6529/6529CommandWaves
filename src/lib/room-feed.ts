@@ -40,8 +40,8 @@ function decisionFeedItem(poll: PollState | null): RoomFeedItem | null {
     return {
       id: "decision",
       label: "Decision",
-      title: "Room decision recorded",
-      body: `The room decision recorded ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+      title: "Project decision recorded",
+      body: `The project decision recorded ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       status: `${poll.yesVotes} yes, ${poll.noVotes} no`,
       href: poll.decision.url,
       hrefLabel: "Open decision",
@@ -62,7 +62,7 @@ function draftDecisionItem(): RoomFeedItem {
     id: "draft-decision",
     label: "Draft status",
     title: "Not decided yet",
-    body: "Share this draft in the room before PR work starts.",
+    body: "Discuss this draft in chat before PR work starts.",
     status: "needs decision",
   };
 }
@@ -144,7 +144,7 @@ export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFe
       id: "next-proposal",
       label: "Next proposal",
       title: draftTitle,
-      body: `${clean(draft?.proposer ?? "", "A builder")} is preparing this as the next PR-sized hook change for the room.`,
+      body: `${clean(draft?.proposer ?? "", "A builder")} is preparing this as the next PR-sized hook change for chat.`,
       status: "draft",
     });
     items.push(draftDecisionItem());
@@ -185,7 +185,7 @@ export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFe
           id: "start",
           label: "Start",
           title: "No hook activity yet",
-          body: "Pick one small hook change and bring it to the room.",
+          body: "Pick one small hook change and bring it to chat.",
           status: "waiting",
         },
       ];

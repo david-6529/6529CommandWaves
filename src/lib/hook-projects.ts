@@ -78,11 +78,11 @@ function waveStatus(wave: CommandWave) {
   }
 
   if (poll?.decision?.url) {
-    return `Room decision recorded with ${poll.yesVotes} yes and ${poll.noVotes} no.`;
+    return `Project decision recorded with ${poll.yesVotes} yes and ${poll.noVotes} no.`;
   }
 
   if (poll?.status === "passed") {
-    return "Vote passed locally. Add the room decision URL.";
+    return "Vote passed locally. Add the project decision URL.";
   }
 
   if (poll) {
@@ -96,21 +96,21 @@ function gateSnapshotLabel(wave: CommandWave) {
   const gates = wave.gates.map((gate) => gate.trim()).filter(Boolean);
 
   if (!gates.length) {
-    return "gate unset";
+    return "access not set";
   }
 
   if (gates.some((gate) => /\b(rep|tdh|holder|allowlist|qna|quiz|manual|advisory|not enforced)\b/i.test(gate))) {
     return "manual review";
   }
 
-  return "open gate";
+  return "open access";
 }
 
 function gateDetails(wave: CommandWave) {
   const gates = wave.gates.map((gate) => gate.trim()).filter(Boolean);
 
   if (!gates.length) {
-    return ["Participation gate is not set yet."];
+    return ["Who can join is not set yet."];
   }
 
   return gates.slice(0, 4);
