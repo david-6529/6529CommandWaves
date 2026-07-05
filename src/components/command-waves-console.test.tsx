@@ -55,7 +55,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Start in chat so builders can shape the idea.");
+    expect(text).toContain("Save the scoped work once builders can see it.");
     expect(text).toContain("Use GitHub PRs for code changes.");
+    expect(text).toContain("Scope work");
+    expect(text).toContain("Save scoped work");
+    expect(text).toContain("Project log");
   });
 
   it("does not bring back removed homepage clutter or old positioning copy", () => {

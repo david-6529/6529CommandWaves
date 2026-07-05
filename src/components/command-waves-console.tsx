@@ -131,7 +131,7 @@ const proposalTypeOptions: ProposalTypeOption[] = [
 const proposalFlowSteps = [
   ["Discuss", "Start in chat so builders can shape the idea."],
   ["Decide", "Record a visible decision for important hook work."],
-  ["Save", "Save the scoped proposal once builders can see it."],
+  ["Record", "Save the scoped work once builders can see it."],
   ["Build", "Use GitHub PRs for code changes."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
@@ -2312,7 +2312,7 @@ export function CommandWavesConsole() {
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-950">Proposal draft</summary>
+          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-950">Scope work</summary>
           <div className="mt-4 max-w-4xl">
             <div className="grid gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-5">
               {proposalFlowSteps.map(([label, detail], index) => (
@@ -2392,7 +2392,7 @@ export function CommandWavesConsole() {
                 Copy draft
               </Button>
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
+                {apiBusy === "proposal" ? "Saving" : "Save scoped work"}
               </Button>
               <JumpLink href="#project-chat">Open chat</JumpLink>
             </div>
@@ -2443,7 +2443,7 @@ export function CommandWavesConsole() {
           onToggle={(event) => setActivityOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-950">
-            <span>History</span>
+            <span>Project log</span>
             <Badge className="border-zinc-200 bg-zinc-50 text-zinc-600">{buildTimeline.length} steps</Badge>
           </summary>
           <div className="mt-4 divide-y divide-zinc-200 border-y border-zinc-200">
@@ -2467,7 +2467,7 @@ export function CommandWavesConsole() {
           </div>
           {orderedLedgerEvents.length ? (
             <details className="mt-4 border-y border-zinc-200 py-3">
-              <summary className="cursor-pointer text-base font-semibold text-zinc-950">Show raw log</summary>
+              <summary className="cursor-pointer text-base font-semibold text-zinc-950">Show raw events</summary>
               <div className="mt-3 divide-y divide-zinc-200 border-t border-zinc-200">
                 {orderedLedgerEvents.map((event) => (
                   <div key={event.id} className="grid gap-2 py-3 md:grid-cols-[7rem_12rem_1fr]">
