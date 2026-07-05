@@ -1,35 +1,35 @@
 # Contributing To The First Hook Phase
 
-This repo uses one 6529 room to coordinate one smart contract repo.
+This repo uses one 6529 project chat to coordinate one smart contract repo.
 
 ## Simple Flow
 
 1. Discuss ideas in the community space.
 2. Turn one idea into a PR-sized proposal.
-3. Get the room decision.
+3. Get the project decision.
 4. Build on a prepared branch.
 5. Open a draft PR with the Command Waves manifest.
 6. Wait for review before humans merge, deploy, pay, or change governance.
 
 ## Before Opening A PR
 
-- Link the work to an approved room proposal.
+- Link the work to an approved project proposal.
 - Keep the PR scoped to that proposal.
 - Include the Command Waves manifest in the PR body.
 - Include tests or reviewer records for the approved scope.
-- Submit only context reads, drafts, room updates, or PR work in phase 1.
+- Submit only context reads, drafts, chat updates, or PR work in phase 1.
 - Keep deploys, payments, merges, and governance changes out of phase 1 PRs.
 - Use the agent build step only for approved PR work.
 
 ## Local Verification
 
-Run the same app quality gate used by CI:
+Run the same app quality check used by CI:
 
 ```bash
 npm run verify
 ```
 
-This runs typecheck, lint, tests, and build. It does not merge, deploy, spend funds, or post to the room.
+This runs typecheck, lint, tests, and build. It does not merge, deploy, spend funds, or post to project chat.
 The app rejects PR work that fails hook preflight.
 
 ## Hook Guardrails
@@ -44,7 +44,7 @@ The app rejects PR work that fails hook preflight.
 
 A PR should be ready to review when a human can answer:
 
-- Which room approved this work?
+- Which project decision approved this work?
 - Which proposal does this PR implement?
 - Did the manifest match the proposal, rules, and vote?
 - Did the tests cover the approved hook bounds?
