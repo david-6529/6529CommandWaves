@@ -918,6 +918,24 @@ function createChatWorkTitle(message: string) {
   return normalized.length > 72 ? `${normalized.slice(0, 69).trimEnd()}...` : normalized;
 }
 
+function shortWalletAddress(address: string) {
+  const trimmed = address.trim();
+
+  return trimmed.length > 12 ? `${trimmed.slice(0, 6)}...${trimmed.slice(-4)}` : trimmed;
+}
+
+type BrowserWalletProvider = {
+  request?: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
+function browserWalletProvider() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return (window as Window & { ethereum?: BrowserWalletProvider }).ethereum ?? null;
+}
+
 export function CommandWavesConsole() {
   const [wave, setWave] = useState<CommandWave>(() => cloneDemoWave());
   const [waveUrl, setWaveUrl] = useState(wave.waveUrl);
@@ -946,6 +964,7 @@ export function CommandWavesConsole() {
   const [waveRoomMessage, setWaveRoomMessage] = useState("");
   const [discussionTabId, setDiscussionTabId] = useState<DiscussionTabId>("general");
   const [walletNotice, setWalletNotice] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
@@ -1802,6 +1821,32 @@ export function CommandWavesConsole() {
     });
   }
 
+  async function connectWallet() {
+    const provider = browserWalletProvider();
+
+    if (!provider?.request) {
+      setWalletNotice("No browser wallet found. Use Request access in chat for this phase.");
+      return;
+    }
+
+    setWalletNotice("Opening wallet.");
+
+    try {
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      const address = Array.isArray(accounts) && typeof accounts[0] === "string" ? accounts[0] : "";
+
+      if (!address) {
+        setWalletNotice("Wallet did not return an address.");
+        return;
+      }
+
+      setWalletAddress(address);
+      setWalletNotice("Wallet connected. Project access is still manually reviewed.");
+    } catch {
+      setWalletNotice("Wallet connection was cancelled.");
+    }
+  }
+
   async function copyBuilderWaveProposalDraft({ openDiscussion = false } = {}) {
     const discussionTab = openDiscussion && wave.waveUrl ? openBlankDiscussionTab() : null;
 
@@ -2016,14 +2061,16 @@ export function CommandWavesConsole() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Wallet</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-600">Access is manual for now.</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-600">
+                    {walletAddress ? shortWalletAddress(walletAddress) : "Access is manual for now."}
+                  </p>
                 </div>
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => setWalletNotice("Wallet connection is not wired in this phase. Use Request access in chat.")}
+                  onClick={() => void connectWallet()}
                 >
-                  Connect wallet
+                  {walletAddress ? "Connected" : "Connect wallet"}
                 </Button>
               </div>
               {walletNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{walletNotice}</p> : null}
