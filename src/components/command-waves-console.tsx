@@ -1807,6 +1807,13 @@ export function CommandWavesConsole() {
   }
 
   function preparePrDiscussion() {
+    if (!repoCanRunCode) {
+      setDiscussionTabId("build");
+      setWaveRoomMessage("Repo setup to discuss: which GitHub repo should hold the hook before PR work starts?");
+      setWaveRoomNotice("Repo setup discussion draft ready.");
+      return;
+    }
+
     const prReference = activeExecutionPrUrl ?? "PR link";
 
     setDiscussionTabId("review");
@@ -2187,7 +2194,7 @@ export function CommandWavesConsole() {
                     Open repo
                   </a>
                 ) : projectRepoIsPlaceholder ? (
-                  <p className="mt-1 text-base leading-7 text-zinc-600">Placeholder repo</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-600">Add real repo before PR build.</p>
                 ) : (
                   <p className="mt-1 text-base leading-7 text-zinc-600">Repo not set yet.</p>
                 )}
@@ -2233,7 +2240,7 @@ export function CommandWavesConsole() {
                   Request access
                 </Button>
                 <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
-                  Discuss PR
+                  {repoCanRunCode ? "Discuss PR" : "Discuss repo setup"}
                 </Button>
               </div>
             </div>

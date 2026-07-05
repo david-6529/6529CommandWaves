@@ -43,7 +43,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Decision");
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
     expect(text).toContain("Code repo");
-    expect(text).toContain("Placeholder repo");
+    expect(text).toContain("Add real repo before PR build.");
     expect(text).toContain("Set a real GitHub repo before the PR build step.");
     expect(text).toContain("Repo setup needed");
     expect(text).toContain("Project discussion");
@@ -52,7 +52,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Review");
     expect(text).toContain("Chat with builders");
     expect(text).toContain("The same box starts the work.");
-    expect(text).toContain("Discuss PR");
+    expect(text).toContain("Discuss repo setup");
     expect(text).toContain("Add to discussion");
     expect(text).toContain("Post to chat");
     expect(text).toContain("Builders");
