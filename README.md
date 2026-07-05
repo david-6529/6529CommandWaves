@@ -380,7 +380,7 @@ If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
 `$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit?remote=1`. Set `LAUNCH_AUDIT_REMOTE=0` only for local shape checks.
 
 The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
-`LAUNCH_AUDIT_PATH`. The verifier prints blockers, open items, and an operator checklist.
+`LAUNCH_AUDIT_PATH`. The verifier prints the status draft, blockers, open items, and an operator checklist.
 
 Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed by Next:
 

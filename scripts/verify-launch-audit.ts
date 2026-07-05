@@ -62,6 +62,11 @@ async function main() {
     console.log(result.nextAction.detail);
   }
 
+  if (result.statusDraft) {
+    console.log("Status draft:");
+    console.log(result.statusDraft);
+  }
+
   for (const item of result.checks) {
     console.log(`${item.status.toUpperCase()} ${item.id}: ${item.message}`);
   }
