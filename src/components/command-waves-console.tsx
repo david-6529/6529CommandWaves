@@ -1763,6 +1763,13 @@ export function CommandWavesConsole() {
     });
   }
 
+  function preparePrDiscussion() {
+    const prReference = activeExecutionPrUrl ?? "PR link";
+
+    setWaveRoomMessage(`PR to discuss: ${prReference}\n\nWhat should builders review?`);
+    setWaveRoomNotice("PR discussion draft ready.");
+  }
+
   function proposalTemplateValues() {
     return new Set(proposalTypeOptions.flatMap((item) => [item.title, item.request, item.limits]));
   }
@@ -2092,6 +2099,9 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
                   Request access
                 </Button>
+                <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
+                  Discuss PR
+                </Button>
               </div>
             </div>
 
@@ -2100,7 +2110,7 @@ export function CommandWavesConsole() {
                 <Textarea
                   rows={4}
                   value={waveRoomMessage}
-                  placeholder="Example: I think the next PR should add fee cap tests before touching contract code."
+                  placeholder="Ask a question, suggest work, or paste a PR link to discuss."
                   onChange={(event) => {
                     setWaveRoomMessage(event.target.value);
                     setWaveRoomNotice("");

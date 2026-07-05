@@ -88,6 +88,7 @@ async function main() {
     "Work",
     "Being discussed",
     "Chat with builders",
+    "Discuss PR",
     "Save work item",
     "Latest posts",
     "Latest activity",

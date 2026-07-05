@@ -32,6 +32,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Work");
     expect(text).toContain("Being discussed");
     expect(text).toContain("Chat with builders");
+    expect(text).toContain("Discuss PR");
     expect(text).toContain("Save work item");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible activity in chat and GitHub.");
