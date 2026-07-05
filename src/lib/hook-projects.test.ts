@@ -2,8 +2,13 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createActiveHookProjects } from "./hook-projects";
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 describe("active hook projects", () => {
-  it("lists the hook build with its room and repo", () => {
+  it("lists the placeholder hook build as setup work", () => {
     const projects = createActiveHookProjects(demoWave);
 
     expect(projects).toEqual([
@@ -26,18 +31,35 @@ describe("active hook projects", () => {
         ],
         gateSnapshotLabel: "manual review",
         orchestrationSnapshotLabel: "high approved",
-        codeSnapshotLabel: "PR reviewed",
-        nextActionStatus: "ready",
-        nextActionLabel: "ready",
-        nextActionTitle: "Loop complete",
-        nextActionDetail: "The approved hook work has a PR, review, project update, and launch packet.",
+        codeSnapshotLabel: "repo needed",
+        nextActionStatus: "action",
+        nextActionLabel: "next",
+        nextActionTitle: "Set the project",
+        nextActionDetail: "Confirm one project chat and one code repo before proposals start.",
         waveStatus: "Project decision recorded with 5 yes and 1 no.",
-        codeStatus: "PR reviewed and logged.",
+        codeStatus: "Replace the placeholder repo before PR work can run.",
         latestPrUrl: null,
-        reviewStatusLabel: "review passed",
-        evidenceLabel: "1 proposal, 1 run, 1 review",
+        reviewStatusLabel: "not ready",
+        evidenceLabel: "1 proposal, repo not set",
       }),
     ]);
+  });
+
+  it("lists a configured hook build with reviewed PR evidence", () => {
+    const projects = createActiveHookProjects(configuredDemoWave);
+
+    expect(projects[0]).toMatchObject({
+      status: "active",
+      repoLabel: "6529-Collections/6529-hook",
+      codeSnapshotLabel: "PR reviewed",
+      nextActionStatus: "ready",
+      nextActionLabel: "ready",
+      nextActionTitle: "Loop complete",
+      nextActionDetail: "The approved hook work has a PR, review, project update, and launch packet.",
+      codeStatus: "PR reviewed and logged.",
+      reviewStatusLabel: "review passed",
+      evidenceLabel: "1 proposal, 1 run, 1 review",
+    });
   });
 
   it("falls back to setup state before a project is configured", () => {
@@ -72,7 +94,7 @@ describe("active hook projects", () => {
 
   it("summarizes local wave approval before code evidence exists", () => {
     const projects = createActiveHookProjects({
-      ...demoWave,
+      ...configuredDemoWave,
       proposals: [{ ...demoWave.proposals[0], status: "approved" }],
       executions: [],
       reviews: [],
@@ -93,7 +115,7 @@ describe("active hook projects", () => {
 
   it("shows a readable review state after a PR record exists", () => {
     const projects = createActiveHookProjects({
-      ...demoWave,
+      ...configuredDemoWave,
       proposals: [{ ...demoWave.proposals[0], status: "reviewing" }],
       reviews: [],
     });
@@ -124,7 +146,7 @@ describe("active hook projects", () => {
 
   it("shows a readable review state when changes are requested", () => {
     const projects = createActiveHookProjects({
-      ...demoWave,
+      ...configuredDemoWave,
       reviews: [{ ...demoWave.reviews[0], status: "changes_requested" }],
     });
 

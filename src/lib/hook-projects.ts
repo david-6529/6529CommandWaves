@@ -78,6 +78,14 @@ function findPullRequestUrl(wave: CommandWave) {
   );
 }
 
+function hasConfiguredRepo(wave: CommandWave) {
+  return Boolean(wave.repoUrl.trim() && !isPlaceholderValue(wave.repoUrl));
+}
+
+function hasPlaceholderRepo(wave: CommandWave) {
+  return isPlaceholderValue(wave.repoUrl);
+}
+
 function waveStatus(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal;
@@ -155,6 +163,10 @@ function orchestrationSnapshotLabel(wave: CommandWave) {
 }
 
 function codeStatus(wave: CommandWave) {
+  if (hasPlaceholderRepo(wave)) {
+    return "Replace the placeholder repo before PR work can run.";
+  }
+
   const phaseWork = selectPhaseWork(wave);
 
   if (phaseWork.prReview?.status === "pass") {
@@ -177,6 +189,10 @@ function codeStatus(wave: CommandWave) {
 }
 
 function codeSnapshotLabel(wave: CommandWave) {
+  if (hasPlaceholderRepo(wave)) {
+    return "repo needed";
+  }
+
   const phaseWork = selectPhaseWork(wave);
 
   if (phaseWork.prReview?.status === "pass") {
@@ -199,6 +215,10 @@ function codeSnapshotLabel(wave: CommandWave) {
 }
 
 function reviewStatus(wave: CommandWave) {
+  if (hasPlaceholderRepo(wave)) {
+    return "not ready";
+  }
+
   const phaseWork = selectPhaseWork(wave);
 
   if (phaseWork.prReview?.status === "pass") {
@@ -227,8 +247,15 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const phaseWork = selectPhaseWork(wave);
     const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
-    const hasProject = Boolean(wave.waveUrl.trim() && wave.repoUrl.trim() && !isPlaceholderValue(wave.repoUrl));
+    const hasProject = Boolean(wave.waveUrl.trim() && hasConfiguredRepo(wave));
     const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
+    const evidenceLabel = hasPlaceholderRepo(wave)
+      ? `${countLabel(wave.proposals.length, "proposal")}, repo not set`
+      : [
+          countLabel(wave.proposals.length, "proposal"),
+          countLabel(wave.executions.length, "run"),
+          countLabel(wave.reviews.length, "review"),
+        ].join(", ");
 
     return {
       id: wave.id,
@@ -255,11 +282,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       codeStatus: codeStatus(wave),
       latestPrUrl: findPullRequestUrl(wave),
       reviewStatusLabel: reviewStatus(wave),
-      evidenceLabel: [
-        countLabel(wave.proposals.length, "proposal"),
-        countLabel(wave.executions.length, "run"),
-        countLabel(wave.reviews.length, "review"),
-      ].join(", "),
+      evidenceLabel,
       latestActivity,
     };
   });

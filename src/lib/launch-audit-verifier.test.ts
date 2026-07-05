@@ -49,9 +49,18 @@ const readyEnv = {
   COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave/state",
 };
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+  })),
+};
+
 describe("launch audit verifier", () => {
   it("passes a ready first loop audit", async () => {
-    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: readyEnv,
       checkSetupRemote: true,
@@ -63,7 +72,7 @@ describe("launch audit verifier", () => {
       status: "pass",
       launchStatus: "ready",
       generatedAt: "2026-06-20T13:00:00.000Z",
-      projectName: demoWave.name,
+      projectName: configuredDemoWave.name,
       blockers: [],
     });
     expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
@@ -88,11 +97,11 @@ describe("launch audit verifier", () => {
     expect(result.statusDraft).toContain("Project launch status");
     expect(result.statusDraft).toContain("Status: ready");
     expect(result.stateEvidence).toEqual({
-      waveStateHash: hashValue(demoWave),
-      rulesHash: hashValue(demoWave.rules),
-      proposalCount: demoWave.proposals.length,
-      reviewCount: demoWave.reviews.length,
-      ledgerEventCount: demoWave.ledger.length,
+      waveStateHash: hashValue(configuredDemoWave),
+      rulesHash: hashValue(configuredDemoWave.rules),
+      proposalCount: configuredDemoWave.proposals.length,
+      reviewCount: configuredDemoWave.reviews.length,
+      ledgerEventCount: configuredDemoWave.ledger.length,
     });
     expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });

@@ -26,7 +26,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon managed");
     expect(text).toContain("This pilot coordinates the design of a 6529 AMM hook through group chat");
-    expect(text).toContain("Next work: Add fee cap tests.");
+    expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("daemon, a 6529 account, keeps this summary");
     expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
     expect(text).toContain("GitHub repo is a placeholder until the first hook repo is configured.");
@@ -39,11 +39,13 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
-    expect(text).toContain("Next work");
+    expect(text).toContain("Current work");
     expect(text).toContain("Decision");
     expect(text).toContain("Confirm scope in chat before saving a proposal.");
     expect(text).toContain("Code repo");
     expect(text).toContain("Placeholder repo");
+    expect(text).toContain("Set a real GitHub repo before the PR build step.");
+    expect(text).toContain("Repo setup needed");
     expect(text).toContain("Project discussion");
     expect(text).toContain("General");
     expect(text).toContain("Build");

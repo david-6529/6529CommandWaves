@@ -11,18 +11,27 @@ const verificationTargets = {
   launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
 };
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+  })),
+};
+
 describe("launch status draft", () => {
   it("summarizes open launch items for the builder wave", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: null,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
-    const draft = createLaunchStatusDraft({ wave: demoWave, audit, verificationTargets });
+    const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
 
     expect(draft).toContain("Project launch status");
-    expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Project chat: ${configuredDemoWave.waveUrl}`);
+    expect(draft).toContain(`Code repo: ${configuredDemoWave.repoUrl}`);
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain(
@@ -41,7 +50,7 @@ describe("launch status draft", () => {
 
   it("states when checked records have no launch gaps", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: getReadinessChecks({
         NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
         DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
@@ -84,9 +93,9 @@ describe("launch status draft", () => {
         canSave: true,
         canRunCode: true,
       },
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
-    const draft = createLaunchStatusDraft({ wave: demoWave, audit, verificationTargets });
+    const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
 
     expect(audit.status).toBe("ready");
     expect(draft).toContain("Status: ready");
@@ -98,11 +107,11 @@ describe("launch status draft", () => {
 
   it("names production env work in copied launch status", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: getReadinessChecks({ NODE_ENV: "production" }),
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
-    const draft = createLaunchStatusDraft({ wave: demoWave, audit, verificationTargets });
+    const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
 
     expect(draft).toContain("Operator checklist:");
     expect(draft).toContain("- Set a strong ADMIN_API_KEY before public launch.");

@@ -67,7 +67,7 @@ What remains manual or MVP-only:
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting uses visible app activity and project chat posts pulled into the app. Full scoring across GitHub commits,
   reviews, merges, and off-app activity is still future work.
-- The demo work loop can be complete while the public launch audit remains blocked by deployment and environment setup.
+- The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until setup is real.
 
 What we are working on next:
 

@@ -96,7 +96,7 @@ describe("command wave persistence", () => {
     });
   });
 
-  it("refreshes stale built-in hook demo records without changing custom activity", async () => {
+  it("strips stale built-in hook PR records while the repo is a placeholder", async () => {
     await replaceCommandWave({
       ...demoWave,
       proposals: [{ ...demoWave.proposals[0], status: "approved" }],
@@ -124,15 +124,17 @@ describe("command wave persistence", () => {
 
     const wave = await getCommandWave();
 
-    expect(wave.executions[0]?.summary).toBe(demoWave.executions[0]?.summary);
-    expect(wave.proposals[0]?.status).toBe("complete");
-    expect(wave.ledger[0]?.message).toBe("Created the hook build and attached project chat and code repo.");
+    expect(wave.executions).toEqual([]);
+    expect(wave.reviews).toEqual([]);
+    expect(wave.proposals[0]?.status).toBe("approved");
+    expect(wave.ledger[0]?.message).toBe("Created the hook build with project chat. GitHub repo setup is still needed.");
   });
 
   it("normalizes old hook-room copy without replacing custom activity", async () => {
     await replaceCommandWave({
       ...demoWave,
       name: "6529 Hook Builder",
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
       gates: [
         "Builder wave allowlist for phase 1 (manual note only, not enforced by this app)",
         "REP or TDH access checks are planned, not enforced here",
@@ -218,7 +220,7 @@ describe("command wave persistence", () => {
     expect(wave.repoUrl).toBe("https://github.com/6529-Collections/custom-hook");
   });
 
-  it("refreshes old complete hook demo records that lack deterministic evidence", async () => {
+  it("strips old complete hook demo records that lack deterministic evidence while the repo is a placeholder", async () => {
     await replaceCommandWave({
       ...demoWave,
       executions: [
@@ -244,9 +246,9 @@ describe("command wave persistence", () => {
 
     const wave = await getCommandWave();
 
-    expect(wave.executions[0]?.artifacts.some((artifact) => artifact.startsWith("run-manifest:"))).toBe(true);
-    expect(wave.executions[0]?.artifacts.some((artifact) => artifact.startsWith("agent-handoff:"))).toBe(true);
-    expect(wave.reviews[0]?.proof?.attestationHash).toHaveLength(64);
+    expect(wave.executions).toEqual([]);
+    expect(wave.reviews).toEqual([]);
+    expect(wave.proposals[0]?.status).toBe("approved");
   });
 
   it("refreshes old built-in hook demo records that lack decision receipts", async () => {

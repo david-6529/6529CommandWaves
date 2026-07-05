@@ -19,6 +19,15 @@ const productionReadyChecks = getReadinessChecks({
   COMMAND_WAVE_STATE_URL: "https://command-waves.6529.io/api/command-wave/state",
 });
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+  })),
+};
+
 const productionSetupValidation: SetupValidation = {
   waveId: "6529-hook-builder",
   repo: {
@@ -78,10 +87,10 @@ const productionSetupValidation: SetupValidation = {
 describe("first phase launch audit", () => {
   it("marks the completed demo flow and first-phase production checks ready", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: productionReadyChecks,
       setupValidation: productionSetupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("ready");
@@ -130,9 +139,9 @@ describe("first phase launch audit", () => {
 
   it("keeps launch in setup mode until setup is checked", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: productionReadyChecks,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -147,10 +156,10 @@ describe("first phase launch audit", () => {
 
   it("keeps launch in setup mode until readiness is checked", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: null,
       setupValidation: productionSetupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -185,10 +194,10 @@ describe("first phase launch audit", () => {
       canRunCode: false,
     };
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: productionReadyChecks,
       setupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("blocked");
@@ -226,10 +235,10 @@ describe("first phase launch audit", () => {
       ),
     };
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: productionReadyChecks,
       setupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -262,10 +271,10 @@ describe("first phase launch audit", () => {
       ),
     };
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: productionReadyChecks,
       setupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -286,10 +295,10 @@ describe("first phase launch audit", () => {
 
   it("blocks the first loop when required launch checks fail", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: getReadinessChecks({}),
       setupValidation: productionSetupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("blocked");
@@ -314,10 +323,10 @@ describe("first phase launch audit", () => {
       "6529_MOCK_MODE": "false",
     });
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: firstLoopChecks,
       setupValidation: productionSetupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -352,10 +361,10 @@ describe("first phase launch audit", () => {
       ADMIN_API_KEY: "admin",
     });
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: mockModeChecks,
       setupValidation: productionSetupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -393,7 +402,7 @@ describe("first phase launch audit", () => {
 
   it("requires a project decision receipt before the first loop", () => {
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       polls: [{ ...demoWave.polls[0], decision: null }],
     };
     const audit = createFirstPhaseLaunchAudit({
@@ -426,7 +435,7 @@ describe("first phase launch audit", () => {
     }
 
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       polls: [
         {
           ...demoWave.polls[0],
@@ -462,7 +471,7 @@ describe("first phase launch audit", () => {
     }
 
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       polls: [
         {
           ...demoWave.polls[0],
@@ -492,7 +501,7 @@ describe("first phase launch audit", () => {
 
   it("blocks the first loop when reviewed PR work has no PR link", () => {
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       executions: [
         {
           ...demoWave.executions[0],
@@ -519,7 +528,7 @@ describe("first phase launch audit", () => {
 
   it("blocks the first loop when reviewed PR work has no review proof", () => {
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       reviews: [
         {
           ...demoWave.reviews[0],
@@ -546,7 +555,7 @@ describe("first phase launch audit", () => {
 
   it("blocks the first loop when participation notes imply live authority", () => {
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       gates: ["30% of TDH holders can contribute"],
     };
     const audit = createFirstPhaseLaunchAudit({
@@ -570,7 +579,7 @@ describe("first phase launch audit", () => {
 
   it("does not require participation notes before the first loop", () => {
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       gates: [],
     };
     const audit = createFirstPhaseLaunchAudit({
@@ -591,7 +600,7 @@ describe("first phase launch audit", () => {
 
   it("allows harmless participation note formatting differences", () => {
     const wave = {
-      ...demoWave,
+      ...configuredDemoWave,
       gates: ["  Community builders welcome  "],
     };
     const audit = createFirstPhaseLaunchAudit({
@@ -612,10 +621,10 @@ describe("first phase launch audit", () => {
 
   it("does not emit em dash characters", () => {
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: getReadinessChecks({}),
       setupValidation: productionSetupValidation,
-      wave: demoWave,
+      wave: configuredDemoWave,
     });
 
     expect(JSON.stringify(audit)).not.toContain("\u2014");

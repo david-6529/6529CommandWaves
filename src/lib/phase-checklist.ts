@@ -4,6 +4,7 @@ import {
   type CommandWave,
   type PollState,
 } from "./command-waves";
+import { isPlaceholderValue } from "./env-placeholders";
 import { selectPhaseWork, type PhaseWork } from "./phase-work";
 
 export type PhaseChecklistStatus = "done" | "active" | "waiting" | "blocked";
@@ -27,13 +28,18 @@ function setupCanRunCode(wave: CommandWave) {
     /^https?:\/\/github\.com\/[^/\s]+\/[^/\s?#]+(?:[?#].*)?$/.test(repoText) ||
     /^[^/\s]+\/[^/\s]+$/.test(repoText);
 
-  return Boolean(waveText && repoLooksValid);
+  return Boolean(waveText && repoLooksValid && !isPlaceholderValue(repoText));
 }
 
 function buildStatus(
   execution: PhaseWork["prExecution"],
   decisionDone: boolean,
+  canRunCode: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
+  if (!canRunCode) {
+    return { status: "waiting", detail: "Build waits for a configured GitHub repo." };
+  }
+
   if (execution?.status === "complete") {
     return { status: "done", detail: "PR record is ready." };
   }
@@ -52,7 +58,12 @@ function buildStatus(
 function reviewStatus(
   execution: PhaseWork["prExecution"],
   review: PhaseWork["prReview"],
+  canRunCode: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
+  if (!canRunCode) {
+    return { status: "waiting", detail: "Review waits for a PR from a configured GitHub repo." };
+  }
+
   if (review?.status === "pass") {
     return { status: "done", detail: "Reviewer proof and checks are recorded." };
   }
@@ -84,10 +95,11 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
         requireUrl: true,
       })
     : null;
-  const build = buildStatus(execution, decisionDone);
-  const reviewItem = reviewStatus(execution, review);
+  const build = buildStatus(execution, decisionDone, canRunCode);
+  const reviewItem = reviewStatus(execution, review, canRunCode);
   const loggedReview = Boolean(
-    proposal &&
+    canRunCode &&
+      proposal &&
       review?.status === "pass" &&
       wave.ledger.some(
         (event) =>
@@ -100,7 +112,7 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       id: "project",
       label: "Choose project",
       status: canRunCode ? "done" : "active",
-      detail: canRunCode ? "Project chat and code repo are set." : "Set a valid project chat and code repo.",
+      detail: canRunCode ? "Project chat and code repo are set." : "Set a valid project chat and real GitHub repo.",
     },
     {
       id: "proposal",
@@ -149,7 +161,7 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
     {
       id: "log",
       label: "Log",
-      status: loggedReview ? "done" : review?.status === "pass" ? "active" : "waiting",
+      status: loggedReview ? "done" : canRunCode && review?.status === "pass" ? "active" : "waiting",
       detail: loggedReview
         ? "Audit log, discussion update draft, and launch packet are ready."
         : "Log the result before sharing it back.",

@@ -123,6 +123,20 @@ describe("Command wave store", () => {
     });
   });
 
+  it("keeps the default placeholder repo out of PR and review state", async () => {
+    const wave = await getCommandWave();
+
+    expect(wave.repoUrl).toBe("https://github.com/your-org/your-hook-repo");
+    expect(wave.proposals[0]).toMatchObject({
+      id: "cmd-001",
+      status: "approved",
+    });
+    expect(wave.executions).toEqual([]);
+    expect(wave.reviews).toEqual([]);
+    expect(wave.ledger.map((event) => event.type)).not.toContain("execution_logged");
+    expect(wave.ledger.map((event) => event.type)).not.toContain("guardian_reviewed");
+  });
+
   it("does not replace custom setup with environment setup", async () => {
     await updateCommandWaveSetup({
       waveUrl: "https://6529.io/waves/custom-room",
@@ -515,7 +529,7 @@ describe("Command wave store", () => {
   });
 
   it("rejects reviews unless the proposal is waiting for review", async () => {
-    await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow("Proposal is not ready for review.");
+    await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow("Proposal execution not found.");
 
     await makeSeedProposalReadyToBuild();
     await executeProposal({ proposalId: "cmd-001" });

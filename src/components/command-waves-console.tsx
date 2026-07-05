@@ -25,6 +25,7 @@ import { createContributionReport, createContributionReportDraft } from "@/lib/c
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "@/lib/agent-identities";
+import { withPlaceholderRepoSetupState } from "@/lib/command-wave-sanitize";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { isPlaceholderValue } from "@/lib/env-placeholders";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
@@ -220,7 +221,7 @@ function shortTime(value: string) {
 }
 
 function cloneDemoWave(): CommandWave {
-  return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
+  return withPlaceholderRepoSetupState(JSON.parse(JSON.stringify(demoWave)) as CommandWave);
 }
 
 type WaveApiResponse = ApiErrorPayload & {
@@ -1042,6 +1043,7 @@ export function CommandWavesConsole() {
       ? phaseWork.prReview
       : (wave.reviews.find((review) => review.proposalId === activeProposal.id) ?? null)
     : null;
+  const repoCanRunCode = Boolean(wave.repoUrl.trim() && !isPlaceholderValue(wave.repoUrl));
   const readyForNextHookChange = activeReview?.status === "pass";
   const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
   const visibleSupportProposals = supportProposals.slice(0, 3);
@@ -1127,6 +1129,7 @@ export function CommandWavesConsole() {
       activeProposal.kind === "open_pr" &&
       activeProposal.status === "approved" &&
       activePrHasWaveDecision &&
+      repoCanRunCode &&
       !activeExecution,
   );
   const showBuildAction = Boolean(activeProposalIsPr && !activeExecution);
@@ -1135,6 +1138,7 @@ export function CommandWavesConsole() {
     activeProposal &&
       activeProposalIsPr &&
       activePrHasWaveDecision &&
+      repoCanRunCode &&
       !activeExecution &&
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
@@ -3647,8 +3651,10 @@ export function CommandWavesConsole() {
                       {activeExecution?.summary
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
-                          ? activePrHasWaveDecision
-                            ? "Ready to build the approved PR."
+                          ? !repoCanRunCode
+                            ? "Set a real GitHub repo before the PR build step."
+                            : activePrHasWaveDecision
+                              ? "Ready to build the approved PR."
                             : "Record the decision receipt before the PR build step."
                           : "Only code PR work uses the build step in phase 1."}
                     </p>
@@ -3666,7 +3672,13 @@ export function CommandWavesConsole() {
                         disabled={isBusy || !canBuildApprovedPr}
                         onClick={buildApprovedPr}
                       >
-                        {apiBusy === "execute" ? "Building" : activePrHasWaveDecision ? "Build approved PR" : "Decision receipt needed"}
+                        {apiBusy === "execute"
+                          ? "Building"
+                          : !repoCanRunCode
+                            ? "Repo setup needed"
+                            : activePrHasWaveDecision
+                              ? "Build approved PR"
+                              : "Decision receipt needed"}
                       </Button>
                     ) : null}
                     {canCopyCodexPacket ? (

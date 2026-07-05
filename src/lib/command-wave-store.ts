@@ -1,5 +1,6 @@
 import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "./configured-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
+import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
 import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./command-wave-seed";
 import { demoWave } from "./demo-wave";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
@@ -219,7 +220,7 @@ async function store() {
     const seededWave = migrated && hasInitialCommandWaveProject() && isBuiltInHookProject(migrated)
       ? applyInitialCommandWaveProject(migrated)
       : baseWave;
-    const wave = withCurrentHookRoomCopy(withFirstPhaseRules(seededWave));
+    const wave = withPlaceholderRepoSetupState(withCurrentHookRoomCopy(withFirstPhaseRules(seededWave)));
 
     if (persisted && wave !== persisted) {
       await savePersistedCommandWave(wave);
@@ -289,7 +290,7 @@ function initialProposalStatus(ruleMode: CommandWave["rules"]["rulesByKind"][Com
 
 export async function getCommandWave() {
   const currentStore = await store();
-  const wave = withCurrentHookRoomCopy(withFirstPhaseRules(currentStore.wave));
+  const wave = withPlaceholderRepoSetupState(withCurrentHookRoomCopy(withFirstPhaseRules(currentStore.wave)));
 
   if (wave !== currentStore.wave) {
     await savePersistedCommandWave(wave);
@@ -304,7 +305,7 @@ export function clearCommandWaveStoreForTests() {
 }
 
 export async function replaceCommandWave(wave: CommandWave) {
-  const nextWave = withCurrentHookRoomCopy(withFirstPhaseRules(wave));
+  const nextWave = withPlaceholderRepoSetupState(withCurrentHookRoomCopy(withFirstPhaseRules(wave)));
 
   await savePersistedCommandWave(nextWave);
   (await store()).wave = nextWave;

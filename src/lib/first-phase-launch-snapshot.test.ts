@@ -85,7 +85,14 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
     expect(snapshot.statusDraft).toContain("- Launch audit: https://command-waves.example.com/api/command-wave/launch/audit");
     expect(snapshot.statusDraft).toContain("does not approve work or move funds");
-    expect(snapshot.phaseChecklist.every((item) => item.status === "done")).toBe(true);
+    expect(snapshot.phaseChecklist.map((item) => [item.id, item.status])).toEqual([
+      ["project", "active"],
+      ["proposal", "done"],
+      ["decision", "done"],
+      ["build", "waiting"],
+      ["review", "waiting"],
+      ["log", "waiting"],
+    ]);
     expect(snapshot.launchAudit.nextAction).toMatchObject({
       itemId: "setup_project_check",
       title: "Fix setup",

@@ -3,9 +3,14 @@ import { demoWave } from "./demo-wave";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 describe("phase next action", () => {
-  it("marks the completed demo loop ready", () => {
-    const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
+  it("marks the configured demo loop ready", () => {
+    const nextAction = createPhaseNextAction(createPhaseChecklist(configuredDemoWave));
 
     expect(nextAction).toMatchObject({
       status: "ready",
@@ -40,7 +45,7 @@ describe("phase next action", () => {
   it("points approved work to the PR build step", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
-        ...demoWave,
+        ...configuredDemoWave,
         proposals: [{ ...demoWave.proposals[0], status: "approved" }],
         executions: [],
         reviews: [],
@@ -58,7 +63,7 @@ describe("phase next action", () => {
   it("points local vote approval without a receipt back to decision", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
-        ...demoWave,
+        ...configuredDemoWave,
         proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
         polls: [{ ...demoWave.polls[0], decision: null }],
         executions: [],
@@ -78,7 +83,7 @@ describe("phase next action", () => {
   it("keeps result sharing draft-only and human reviewed", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
-        ...demoWave,
+        ...configuredDemoWave,
         ledger: demoWave.ledger.filter((event) => event.type !== "guardian_reviewed"),
       }),
     );
@@ -95,7 +100,7 @@ describe("phase next action", () => {
   it("keeps support items from becoming the PR build next action", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
-        ...demoWave,
+        ...configuredDemoWave,
         proposals: [
           {
             ...demoWave.proposals[0],
@@ -122,7 +127,7 @@ describe("phase next action", () => {
   it("surfaces blocked decisions before later waiting steps", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
-        ...demoWave,
+        ...configuredDemoWave,
         proposals: [{ ...demoWave.proposals[0], status: "rejected" }],
         polls: [{ ...demoWave.polls[0], status: "failed" }],
         executions: [],
@@ -139,7 +144,7 @@ describe("phase next action", () => {
   });
 
   it("does not emit em dash characters", () => {
-    const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
+    const nextAction = createPhaseNextAction(createPhaseChecklist(configuredDemoWave));
 
     expect(JSON.stringify(nextAction)).not.toContain("\u2014");
   });
