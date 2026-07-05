@@ -1,3 +1,4 @@
+import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { commandWaveProductCopy } from "./product-copy";
 
@@ -122,6 +123,26 @@ function accessSnapshotReady(value: unknown) {
   );
 }
 
+function agentBoundaryReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const orchestrator = isRecord(record?.orchestrator) ? record.orchestrator : null;
+  const reviewer = isRecord(record?.reviewer) ? record.reviewer : null;
+  const githubRepo = isRecord(record?.githubRepo) ? record.githubRepo : null;
+
+  return Boolean(
+    record &&
+      orchestrator &&
+      reviewer &&
+      githubRepo &&
+      asString(orchestrator.handle) === orchestratorAgentIdentity.handle &&
+      asString(orchestrator.accountType) === orchestratorAgentIdentity.accountType &&
+      asString(orchestrator.status) === orchestratorAgentIdentity.status &&
+      asString(reviewer.status) === reviewAgentIdentity.status &&
+      asString(reviewer.accountType) === reviewAgentIdentity.accountType &&
+      asString(githubRepo.status) === githubRepoPlaceholder.status,
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -231,6 +252,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const hasAccessSummary = accessSnapshotReady(snapshot?.access);
+  const hasAgentBoundary = agentBoundaryReady(snapshot?.agents);
   const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
   const hasStateEvidence = Boolean(stateEvidence);
   const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
@@ -281,6 +303,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasAccessSummary
         ? "Human-readable access summary is published."
         : "Launch audit must publish who can join and how access works.",
+    ),
+    check(
+      "agent_boundary",
+      hasAgentBoundary ? "pass" : "fail",
+      hasAgentBoundary
+        ? "Agent identities and placeholder boundaries are published."
+        : "Launch audit must publish daemon, reviewer placeholder, and GitHub repo placeholder boundaries.",
     ),
     check(
       "state_evidence",

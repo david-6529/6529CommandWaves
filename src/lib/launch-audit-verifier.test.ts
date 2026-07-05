@@ -81,6 +81,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "access_summary")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "agent_boundary")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",
     });
@@ -203,6 +206,55 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "access_summary")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish who can join and how access works.",
+    });
+  });
+
+  it("fails when daemon is not the active orchestrator identity", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      agents: {
+        ...snapshot.agents,
+        orchestrator: {
+          ...snapshot.agents.orchestrator,
+          handle: "other-agent",
+        },
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "agent_boundary")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish daemon, reviewer placeholder, and GitHub repo placeholder boundaries.",
+    });
+  });
+
+  it("fails when reviewer or repo placeholders are missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      agents: {
+        ...snapshot.agents,
+        reviewer: {
+          ...snapshot.agents.reviewer,
+          status: "active",
+        },
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "agent_boundary")).toMatchObject({
+      status: "fail",
     });
   });
 
