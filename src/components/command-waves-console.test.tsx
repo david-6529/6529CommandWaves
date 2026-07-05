@@ -108,6 +108,27 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain("bg-zinc-950");
   });
 
+  it("does not render light-mode surface classes", () => {
+    const html = renderedConsoleHtml();
+
+    for (const className of [
+      "border-zinc-200",
+      "border-zinc-300",
+      "bg-white",
+      "bg-zinc-50",
+      "bg-zinc-100",
+      "text-zinc-950",
+      "text-zinc-900",
+      "text-zinc-800",
+      "text-zinc-700",
+      "text-zinc-600",
+      "text-blue-700",
+      "text-blue-600",
+    ]) {
+      expect(html).not.toContain(className);
+    }
+  });
+
   it("keeps the top context accordions stacked with only the summary open", () => {
     const html = renderedConsoleHtml();
     const start = html.indexOf('aria-label="Project context"');
