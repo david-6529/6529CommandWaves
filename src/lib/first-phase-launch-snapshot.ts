@@ -13,6 +13,7 @@ import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createLaunchStatusDraft } from "./launch-status-draft";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
+import { createPublicProjectSnapshot } from "./public-project-snapshot";
 import { hashValue } from "./run-manifest";
 import { validateCommandWaveSetup, type SetupValidation } from "./setup-validation";
 import { getReadinessChecks, getReadinessSummary, type ReadinessCheck } from "./system/readiness";
@@ -27,6 +28,7 @@ export type FirstPhaseLaunchSnapshot = {
     repoUrl: string;
   };
   setupCheckMode: "shape" | "remote";
+  projectSnapshot: CommandWaveStateSnapshot["projectSnapshot"];
   access: CommandWaveStateSnapshot["access"];
   productContract: CommandWaveStateSnapshot["productContract"];
   authorityBoundary: CommandWaveStateSnapshot["authorityBoundary"];
@@ -118,6 +120,7 @@ export async function createFirstPhaseLaunchSnapshot(
       repoUrl: wave.repoUrl,
     },
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
+    projectSnapshot: createPublicProjectSnapshot(wave),
     access: createParticipationAccessSnapshot(wave.gates),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,

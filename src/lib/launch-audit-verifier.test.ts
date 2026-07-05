@@ -87,6 +87,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "project_snapshot")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "pass",
     });
@@ -274,6 +277,25 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish the simple project, discussion, decision, PR, review, and log flow.",
+    });
+  });
+
+  it("fails when the public project snapshot is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      projectSnapshot: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "project_snapshot")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish current work, decision, repo state, next step, and recent changes.",
     });
   });
 

@@ -25,6 +25,19 @@ describe("first phase launch snapshot", () => {
       repoUrl: demoWave.repoUrl,
     });
     expect(snapshot.setupCheckMode).toBe("shape");
+    expect(snapshot.projectSnapshot).toMatchObject({
+      currentWork: {
+        title: "Draft the non-upgradeable hook scaffold",
+      },
+      repo: {
+        status: "placeholder",
+        label: "Add real repo before PR build.",
+      },
+      nextStep: {
+        label: "Choose project",
+        detail: "Set a valid project chat and real GitHub repo.",
+      },
+    });
     expect(snapshot.access).toMatchObject({
       label: "manual review",
       summary: "Ask in chat to join. Access is reviewed manually for now.",

@@ -13,6 +13,17 @@ describe("command wave state snapshot", () => {
       version: "command-wave-state-v0.1",
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: demoWave,
+      projectSnapshot: {
+        currentWork: {
+          title: "Draft the non-upgradeable hook scaffold",
+        },
+        repo: {
+          status: "placeholder",
+        },
+        nextStep: {
+          label: "Choose project",
+        },
+      },
       access: {
         label: "manual review",
         summary: "Ask in chat to join. Access is reviewed manually for now.",
@@ -66,6 +77,7 @@ describe("command wave state snapshot", () => {
       },
     });
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
+    expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("review recorded");
     expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");

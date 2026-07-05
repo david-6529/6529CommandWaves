@@ -143,6 +143,34 @@ function agentBoundaryReady(value: unknown) {
   );
 }
 
+function projectSnapshotReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const currentWork = isRecord(record?.currentWork) ? record.currentWork : null;
+  const decision = isRecord(record?.decision) ? record.decision : null;
+  const repo = isRecord(record?.repo) ? record.repo : null;
+  const nextStep = isRecord(record?.nextStep) ? record.nextStep : null;
+
+  return Boolean(
+    record &&
+      asString(record.summary) &&
+      currentWork &&
+      asString(currentWork.title) &&
+      asString(currentWork.status) &&
+      asString(currentWork.detail) &&
+      decision &&
+      asString(decision.status) &&
+      asString(decision.detail) &&
+      repo &&
+      asString(repo.status) &&
+      asString(repo.label) &&
+      nextStep &&
+      asString(nextStep.label) &&
+      asString(nextStep.status) &&
+      asString(nextStep.detail) &&
+      Array.isArray(record.latestChanges),
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -249,6 +277,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
   const setupCheckMode = asString(snapshot?.setupCheckMode);
+  const hasProjectSnapshot = projectSnapshotReady(snapshot?.projectSnapshot);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const hasAccessSummary = accessSnapshotReady(snapshot?.access);
@@ -289,6 +318,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasProductContract
         ? "Phase 1 product contract is published."
         : "Launch audit must publish the simple project, discussion, decision, PR, review, and log flow.",
+    ),
+    check(
+      "project_snapshot",
+      hasProjectSnapshot ? "pass" : "fail",
+      hasProjectSnapshot
+        ? "Current project snapshot is published."
+        : "Launch audit must publish current work, decision, repo state, next step, and recent changes.",
     ),
     check(
       "authority_boundary",
