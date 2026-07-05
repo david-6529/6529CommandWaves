@@ -1124,6 +1124,15 @@ export function CommandWavesConsole() {
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
+  const currentDecisionDetail = activePollNeedsWaveDecision
+    ? "Record the project decision before PR work starts."
+    : activePollDecisionRecorded
+      ? `${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Decision link recorded.`
+      : activePoll?.status === "open"
+        ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Decision still open.`
+        : activeProposal
+          ? "No decision required by current rules."
+          : "Discuss scope in chat before saving a proposal.";
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -2164,7 +2173,7 @@ export function CommandWavesConsole() {
             <div className="mt-5 grid gap-4 border-t border-zinc-200 pt-4 sm:grid-cols-2">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
-                <p className="mt-1 text-base leading-7 text-zinc-600">Confirm scope in chat before saving a proposal.</p>
+                <p className="mt-1 text-base leading-7 text-zinc-600">{currentDecisionDetail}</p>
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code repo</p>
