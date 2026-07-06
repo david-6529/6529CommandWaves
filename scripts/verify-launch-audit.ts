@@ -1,8 +1,21 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fetchJsonWithTimeout } from "../src/lib/http-fetch";
+import { fetchJsonWithTimeout, type TimedFetchError } from "../src/lib/http-fetch";
 import { launchAuditRemoteEnabled, launchAuditUrlFromAppUrl } from "../src/lib/launch-audit-url";
 import { verifyLaunchAuditPayload } from "../src/lib/launch-audit-verifier";
+
+type LoadedLaunchAudit = {
+  payload: unknown;
+  sourceUrl: string | null;
+};
+
+type LaunchAuditStateFetchErrorPayload = {
+  launchAuditStateFetchError: {
+    url: string;
+    status: number;
+    statusText: string;
+  };
+};
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
@@ -16,7 +29,23 @@ async function readJsonUrl<T>(url: string): Promise<T> {
   });
 }
 
-async function loadLaunchAuditPayload() {
+async function readOptionalJsonUrl(url: string): Promise<unknown> {
+  try {
+    return await readJsonUrl<unknown>(url);
+  } catch (error) {
+    const fetchError = error as TimedFetchError;
+
+    return {
+      launchAuditStateFetchError: {
+        url: fetchError.url ?? url,
+        status: fetchError.status ?? 0,
+        statusText: fetchError.statusText ?? (error instanceof Error ? error.message : "Fetch failed"),
+      },
+    } satisfies LaunchAuditStateFetchErrorPayload;
+  }
+}
+
+async function loadLaunchAuditPayload(): Promise<LoadedLaunchAudit> {
   const auditPath = process.env.LAUNCH_AUDIT_PATH;
   const auditUrl =
     process.env.LAUNCH_AUDIT_URL?.trim() ||
@@ -25,14 +54,62 @@ async function loadLaunchAuditPayload() {
     });
 
   if (auditPath?.trim()) {
-    return readJsonFile<unknown>(resolve(auditPath));
+    return {
+      payload: readJsonFile<unknown>(resolve(auditPath)),
+      sourceUrl: null,
+    };
   }
 
   if (auditUrl) {
-    return readJsonUrl<unknown>(auditUrl);
+    return {
+      payload: await readJsonUrl<unknown>(auditUrl),
+      sourceUrl: auditUrl,
+    };
   }
 
   throw new Error("Set LAUNCH_AUDIT_PATH, LAUNCH_AUDIT_URL, or NEXT_PUBLIC_APP_URL before running launch audit verification.");
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function asString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function unwrapAudit(payload: unknown) {
+  const record = isRecord(payload) ? payload : null;
+
+  return isRecord(record?.audit) ? record.audit : record;
+}
+
+function resolveCommandWaveStateUrl(payload: unknown, sourceUrl: string | null) {
+  const explicitUrl = process.env.LAUNCH_AUDIT_STATE_URL?.trim();
+
+  if (explicitUrl) {
+    return explicitUrl;
+  }
+
+  const audit = unwrapAudit(payload);
+  const targets = isRecord(audit?.verificationTargets) ? audit.verificationTargets : null;
+  const targetUrl = asString(targets?.commandWaveStateUrl);
+
+  if (!targetUrl) {
+    return null;
+  }
+
+  try {
+    if (targetUrl.startsWith("http://") || targetUrl.startsWith("https://")) {
+      return targetUrl;
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || sourceUrl;
+
+    return baseUrl ? new URL(targetUrl, baseUrl).toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 function writeResult(path: string | undefined, value: unknown) {
@@ -47,8 +124,13 @@ function writeResult(path: string | undefined, value: unknown) {
 }
 
 async function main() {
-  const payload = await loadLaunchAuditPayload();
-  const result = verifyLaunchAuditPayload(payload);
+  const { payload, sourceUrl } = await loadLaunchAuditPayload();
+  const stateUrl = resolveCommandWaveStateUrl(payload, sourceUrl);
+  const commandWaveState = stateUrl ? await readOptionalJsonUrl(stateUrl) : undefined;
+  const result = verifyLaunchAuditPayload(payload, {
+    commandWaveState,
+    requirePublicState: Boolean(stateUrl),
+  });
 
   writeResult(process.env.LAUNCH_AUDIT_VERIFICATION_PATH, result);
 
@@ -56,6 +138,9 @@ async function main() {
   console.log(`Launch status: ${result.launchStatus}`);
   console.log(`Project: ${result.projectName ?? "unknown"}`);
   console.log(`Generated: ${result.generatedAt ?? "unknown"}`);
+  if (stateUrl) {
+    console.log(`Public state target: ${stateUrl}`);
+  }
 
   if (result.nextAction) {
     console.log(`Next action: ${result.nextAction.title}`);
@@ -74,6 +159,10 @@ async function main() {
     console.log(
       `Records: ${result.stateEvidence.proposalCount} proposals, ${result.stateEvidence.reviewCount} reviews, ${result.stateEvidence.ledgerEventCount} ledger events.`,
     );
+  }
+
+  if (result.publicState) {
+    console.log(`State snapshot hash: ${result.publicState.stateHash}`);
   }
 
   for (const item of result.checks) {

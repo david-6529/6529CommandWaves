@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { verifyLaunchAuditPayload } from "./launch-audit-verifier";
@@ -66,7 +67,10 @@ describe("launch audit verifier", () => {
       checkSetupRemote: true,
       setupValidation: readySetupValidation,
     });
-    const result = verifyLaunchAuditPayload(snapshot);
+    const commandWaveState = createCommandWaveStateSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:01:00.000Z",
+    });
+    const result = verifyLaunchAuditPayload(snapshot, { commandWaveState });
 
     expect(result).toMatchObject({
       status: "pass",
@@ -106,6 +110,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
       status: "pass",
     });
@@ -128,6 +135,10 @@ describe("launch audit verifier", () => {
       proposalCount: configuredDemoWave.proposals.length,
       reviewCount: configuredDemoWave.reviews.length,
       ledgerEventCount: configuredDemoWave.ledger.length,
+    });
+    expect(result.publicState).toMatchObject({
+      stateHash: commandWaveState.stateHash,
+      waveStateHash: hashValue(configuredDemoWave),
     });
     expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });
@@ -449,6 +460,33 @@ describe("launch audit verifier", () => {
     });
   });
 
+  it("fails when the public state endpoint payload is stale", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const commandWaveState = createCommandWaveStateSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:01:00.000Z",
+    });
+    const result = verifyLaunchAuditPayload(snapshot, {
+      commandWaveState: {
+        ...commandWaveState,
+        projectSnapshot: {
+          ...commandWaveState.projectSnapshot,
+          summary: "Tampered summary",
+        },
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.publicState).toBeNull();
+    expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
+      status: "fail",
+    });
+  });
+
   it("fails when the human-readable status draft is missing", async () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
@@ -579,6 +617,7 @@ describe("launch audit verifier", () => {
     expect(result.status).toBe("fail");
     expect(result.launchStatus).toBe("unknown");
     expect(result.stateEvidence).toBeNull();
+    expect(result.publicState).toBeNull();
     expect(result.auditHash).toBeNull();
     expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "payload_shape")).toMatchObject({

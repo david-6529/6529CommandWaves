@@ -1,4 +1,5 @@
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { createLaunchAuditHash } from "./launch-audit-hash";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { commandWaveProductCopy } from "./product-copy";
@@ -8,6 +9,23 @@ export type LaunchAuditVerificationCheck = {
   id: string;
   status: "pass" | "fail";
   message: string;
+};
+
+export type LaunchAuditStateEvidence = {
+  waveStateHash: string;
+  rulesHash: string;
+  proposalCount: number;
+  reviewCount: number;
+  ledgerEventCount: number;
+};
+
+export type LaunchAuditPublicState = LaunchAuditStateEvidence & {
+  stateHash: string;
+};
+
+export type LaunchAuditVerificationOptions = {
+  commandWaveState?: unknown;
+  requirePublicState?: boolean;
 };
 
 export type LaunchAuditVerificationResult = {
@@ -20,13 +38,8 @@ export type LaunchAuditVerificationResult = {
     detail: string;
   } | null;
   statusDraft: string | null;
-  stateEvidence: {
-    waveStateHash: string;
-    rulesHash: string;
-    proposalCount: number;
-    reviewCount: number;
-    ledgerEventCount: number;
-  } | null;
+  stateEvidence: LaunchAuditStateEvidence | null;
+  publicState: LaunchAuditPublicState | null;
   auditHash: string | null;
   blockers: string[];
   openItems: string[];
@@ -291,6 +304,51 @@ function collectStateEvidence(value: unknown): LaunchAuditVerificationResult["st
   };
 }
 
+function collectPublicState(value: unknown, expected: LaunchAuditStateEvidence | null): LaunchAuditPublicState | null {
+  const record = isRecord(value) ? value : null;
+  const wave = isRecord(record?.wave) ? record.wave : null;
+  const rules = isRecord(wave?.rules) ? wave.rules : null;
+  const proposals = Array.isArray(wave?.proposals) ? wave.proposals : null;
+  const reviews = Array.isArray(wave?.reviews) ? wave.reviews : null;
+  const ledger = Array.isArray(wave?.ledger) ? wave.ledger : null;
+  const stateHash = asString(record?.stateHash);
+  const waveStateHash = asString(record?.waveStateHash);
+
+  if (
+    !record ||
+    record.version !== "command-wave-state-v0.1" ||
+    !wave ||
+    !rules ||
+    !proposals ||
+    !reviews ||
+    !ledger ||
+    !expected ||
+    !isSha256Hash(stateHash) ||
+    !isSha256Hash(waveStateHash) ||
+    stateHash !== createCommandWaveStateHash(record) ||
+    waveStateHash !== hashValue(wave)
+  ) {
+    return null;
+  }
+
+  const evidence = {
+    stateHash,
+    waveStateHash,
+    rulesHash: hashValue(rules),
+    proposalCount: proposals.length,
+    reviewCount: reviews.length,
+    ledgerEventCount: ledger.length,
+  };
+
+  return evidence.waveStateHash === expected.waveStateHash &&
+    evidence.rulesHash === expected.rulesHash &&
+    evidence.proposalCount === expected.proposalCount &&
+    evidence.reviewCount === expected.reviewCount &&
+    evidence.ledgerEventCount === expected.ledgerEventCount
+    ? evidence
+    : null;
+}
+
 function statusDraftReady(value: unknown) {
   const draft = asString(value);
 
@@ -382,7 +440,10 @@ function productContractReady(value: unknown) {
   );
 }
 
-export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificationResult {
+export function verifyLaunchAuditPayload(
+  payload: unknown,
+  options: LaunchAuditVerificationOptions = {},
+): LaunchAuditVerificationResult {
   const snapshot = unwrapSnapshot(payload);
   const launchAudit = isRecord(snapshot?.launchAudit) ? snapshot.launchAudit : null;
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
@@ -399,6 +460,8 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const hasAgentBoundary = agentBoundaryReady(snapshot?.agents);
   const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
   const hasStateEvidence = Boolean(stateEvidence);
+  const shouldVerifyPublicState = options.requirePublicState === true || typeof options.commandWaveState !== "undefined";
+  const publicState = shouldVerifyPublicState ? collectPublicState(options.commandWaveState, stateEvidence) : null;
   const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
   const hasLaunchPacket = launchPacketReady(snapshot?.launchPacket);
   const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
@@ -500,6 +563,17 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
         ? "Launch audit is tied to hashed wave state evidence."
         : "Launch audit must publish wave state hash, rules hash, and record counts.",
     ),
+    ...(shouldVerifyPublicState
+      ? [
+          check(
+            "public_state_endpoint",
+            publicState ? "pass" : "fail",
+            publicState
+              ? "Public command-wave state matches the launch audit evidence."
+              : "Public command-wave state must return a valid snapshot hash and match the launch audit evidence.",
+          ),
+        ]
+      : []),
     check(
       "status_draft",
       hasStatusDraft ? "pass" : "fail",
@@ -548,6 +622,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
         : null,
     statusDraft: asString(snapshot?.statusDraft),
     stateEvidence,
+    publicState,
     auditHash: asString(snapshot?.auditHash),
     blockers,
     openItems,
