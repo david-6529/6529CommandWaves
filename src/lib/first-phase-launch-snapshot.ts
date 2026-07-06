@@ -10,9 +10,11 @@ import { createContributionReport, type ContributionReport } from "./contributio
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { hasProductionValue } from "./env-placeholders";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
+import { createLaunchPacket, type LaunchPacket } from "./launch-packet";
 import { createLaunchStatusDraft } from "./launch-status-draft";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
+import { selectPhaseWork } from "./phase-work";
 import { publicHookSafety } from "./public-hook-safety";
 import { createPublicProjectSnapshot } from "./public-project-snapshot";
 import { createPublicWorkflowProof } from "./public-workflow-proof";
@@ -51,6 +53,7 @@ export type FirstPhaseLaunchSnapshot = {
   };
   setupValidation: SetupValidation;
   statusDraft: string;
+  launchPacket: LaunchPacket;
   reports: {
     contribution: ContributionReport;
     developerFee: DeveloperFeePlan;
@@ -99,6 +102,26 @@ export async function createFirstPhaseLaunchSnapshot(
     ));
   const readinessChecks = options.readinessChecks ?? getReadinessChecks(env);
   const phaseChecklist = createPhaseChecklist(wave);
+  const phaseWork = selectPhaseWork(wave);
+  const launchPacketProposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
+  const launchPacketUsesPrWork = Boolean(
+    launchPacketProposal && phaseWork.prProposal && launchPacketProposal.id === phaseWork.prProposal.id,
+  );
+  const launchPacketPoll = launchPacketUsesPrWork
+    ? phaseWork.prPoll
+    : launchPacketProposal
+      ? wave.polls.find((poll) => poll.proposalId === launchPacketProposal.id) ?? null
+      : null;
+  const launchPacketExecution = launchPacketUsesPrWork
+    ? phaseWork.prExecution
+    : launchPacketProposal
+      ? wave.executions.find((execution) => execution.proposalId === launchPacketProposal.id) ?? null
+      : null;
+  const launchPacketReview = launchPacketUsesPrWork
+    ? phaseWork.prReview
+    : launchPacketProposal
+      ? wave.reviews.find((review) => review.proposalId === launchPacketProposal.id) ?? null
+      : null;
   const launchAudit = createFirstPhaseLaunchAudit({
     phaseChecklist,
     readinessChecks,
@@ -148,6 +171,15 @@ export async function createFirstPhaseLaunchSnapshot(
       wave,
       audit: launchAudit,
       verificationTargets,
+    }),
+    launchPacket: createLaunchPacket({
+      wave,
+      proposal: launchPacketProposal,
+      poll: launchPacketPoll,
+      execution: launchPacketExecution,
+      review: launchPacketReview,
+      verificationTargets,
+      generatedAt,
     }),
     reports: {
       contribution: contributionReport,

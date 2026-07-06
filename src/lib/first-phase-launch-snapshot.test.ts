@@ -121,6 +121,24 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
     expect(snapshot.statusDraft).toContain("- Launch audit: https://command-waves.example.com/api/command-wave/launch/audit");
     expect(snapshot.statusDraft).toContain("does not approve work or move funds");
+    expect(snapshot.launchPacket).toMatchObject({
+      version: "command-wave-launch-packet-v0.1",
+      proposalId: "cmd-001",
+      generatedAt: "2026-06-20T13:00:00.000Z",
+    });
+    expect(snapshot.launchPacket.text).toContain("# Project launch packet");
+    expect(snapshot.launchPacket.text).toContain("## Workflow Proof");
+    expect(snapshot.launchPacket.text).toContain("## Verification");
+    expect(snapshot.launchPacket.text).toContain("## Authority Limits");
+    expect(snapshot.launchPacket.text).toContain(
+      "Command-wave state: https://command-waves.example.com/api/command-wave/state",
+    );
+    expect(snapshot.launchPacket.text).toContain(
+      "Launch audit: https://command-waves.example.com/api/command-wave/launch/audit",
+    );
+    expect(snapshot.launchPacket.text).toContain(
+      "This packet does not grant reputation, token weight, payouts, permissions, or merge rights.",
+    );
     expect(snapshot.phaseChecklist.map((item) => [item.id, item.status])).toEqual([
       ["project", "active"],
       ["proposal", "done"],

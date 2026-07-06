@@ -105,6 +105,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "launch_packet")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
       status: "pass",
     });
@@ -435,6 +438,26 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish a human-readable launch status draft with guardrails and verification links.",
+    });
+  });
+
+  it("fails when the human-readable launch packet is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      launchPacket: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "launch_packet")).toMatchObject({
+      status: "fail",
+      message:
+        "Launch audit must publish a human-readable launch packet with workflow proof, verification links, and authority limits.",
     });
   });
 

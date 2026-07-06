@@ -295,6 +295,27 @@ function statusDraftReady(value: unknown) {
   );
 }
 
+function launchPacketReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const text = asString(record?.text);
+
+  return Boolean(
+    record &&
+      asString(record.version) === "command-wave-launch-packet-v0.1" &&
+      asString(record.generatedAt) &&
+      text &&
+      text.includes("# Project launch packet") &&
+      text.includes("## Workflow Proof") &&
+      text.includes("## Contribution Report") &&
+      text.includes("## Developer Fee Records") &&
+      text.includes("## Verification") &&
+      text.includes("## Authority Limits") &&
+      text.includes("Humans keep merge, deploy, payment, and governance authority") &&
+      text.includes("This packet does not grant reputation, token weight, payouts, permissions, or merge rights") &&
+      text.includes("No automatic posting, merging, deploying, spending, or payouts"),
+  );
+}
+
 function contributionReportReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const method = isRecord(record?.method) ? record.method : null;
@@ -360,6 +381,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
   const hasStateEvidence = Boolean(stateEvidence);
   const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
+  const hasLaunchPacket = launchPacketReady(snapshot?.launchPacket);
   const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
   const hasContributionReport = contributionReportReady(reports?.contribution);
   const hasDeveloperFeePlan = developerFeePlanReady(reports?.developerFee);
@@ -458,6 +480,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasStatusDraft
         ? "Human-readable launch status draft is published."
         : "Launch audit must publish a human-readable launch status draft with guardrails and verification links.",
+    ),
+    check(
+      "launch_packet",
+      hasLaunchPacket ? "pass" : "fail",
+      hasLaunchPacket
+        ? "Human-readable launch packet is published."
+        : "Launch audit must publish a human-readable launch packet with workflow proof, verification links, and authority limits.",
     ),
     check(
       "contribution_report",

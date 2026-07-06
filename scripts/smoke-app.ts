@@ -158,6 +158,7 @@ async function main() {
 
   const stateEvidence = objectValue(audit, "stateEvidence");
   const statusDraft = objectValue(audit, "statusDraft");
+  const launchPacket = objectValue(audit, "launchPacket");
   const reports = objectValue(audit, "reports");
 
   assertJsonObject("Launch audit state evidence", stateEvidence);
@@ -167,6 +168,7 @@ async function main() {
   for (const label of ["Project launch status", "Operator checklist:", "Verification:", "Guardrails:"]) {
     assertIncludes("Launch audit status draft", statusDraft, label);
   }
+  assertJsonObject("Launch audit launch packet", launchPacket);
   assertJsonObject("Launch audit reports", reports);
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectSnapshot");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "hookSafety");
@@ -175,6 +177,10 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "delegatecall");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "workflowProof");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Public proof of the chat, decision, PR, review, and log path");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "launchPacket");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "# Project launch packet");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "## Workflow Proof");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "## Authority Limits");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Pull request");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "currentWork");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "nextStep");
