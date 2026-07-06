@@ -139,7 +139,10 @@ function agentBoundaryReady(value: unknown) {
       asString(orchestrator.status) === orchestratorAgentIdentity.status &&
       asString(reviewer.status) === reviewAgentIdentity.status &&
       asString(reviewer.accountType) === reviewAgentIdentity.accountType &&
-      asString(githubRepo.status) === githubRepoPlaceholder.status,
+      asString(githubRepo.status) === githubRepoPlaceholder.status &&
+      asString(githubRepo.label) === githubRepoPlaceholder.label &&
+      asString(githubRepo.url) === githubRepoPlaceholder.url &&
+      asString(githubRepo.description) === githubRepoPlaceholder.description,
   );
 }
 

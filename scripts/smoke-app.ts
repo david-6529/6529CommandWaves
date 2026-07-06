@@ -140,6 +140,7 @@ async function main() {
   ]) {
     assertIncludes("Home page", renderedHtml, label);
   }
+  assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assertNoEmDash("Home page", renderedHtml);
 
   const readiness = await fetchJson("/api/readiness");
@@ -183,6 +184,11 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "daemon");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "review-agent");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "githubRepo");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
+  assert(
+    !JSON.stringify(launchPayload).includes("https://github.com/6529-Collections/6529-hook"),
+    "Launch audit response still includes the old concrete hook repo.",
+  );
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Discuss in chat");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "authorityBoundary");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "accessStatus");
@@ -212,6 +218,11 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "daemon");
   assertIncludes("State response", JSON.stringify(statePayload), "review-agent");
   assertIncludes("State response", JSON.stringify(statePayload), "githubRepo");
+  assertIncludes("State response", JSON.stringify(statePayload), "https://github.com/your-org/your-hook-repo");
+  assert(
+    !JSON.stringify(statePayload).includes("https://github.com/6529-Collections/6529-hook"),
+    "State response still includes the old concrete hook repo.",
+  );
   assertIncludes("State response", JSON.stringify(statePayload), "Discuss in chat");
   assertIncludes("State response", JSON.stringify(statePayload), "accessStatus");
   assert(!JSON.stringify(statePayload).includes("gateStatus"), "State response still includes gateStatus.");

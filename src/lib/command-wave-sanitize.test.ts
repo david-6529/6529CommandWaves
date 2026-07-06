@@ -18,10 +18,24 @@ describe("command wave sanitizer", () => {
     expect(JSON.stringify(wave)).not.toContain("\u2014");
   });
 
-  it("keeps configured repos untouched", () => {
-    const configuredWave = {
+  it("resets seeded concrete pilot repo evidence to placeholder state", () => {
+    const stalePilotWave = {
       ...demoWave,
       repoUrl: "https://github.com/6529-Collections/6529-hook",
+    };
+    const wave = withPlaceholderRepoSetupState(stalePilotWave);
+
+    expect(wave.repoUrl).toBe("https://github.com/your-org/your-hook-repo");
+    expect(wave.executions).toEqual([]);
+    expect(wave.reviews).toEqual([]);
+    expect(wave.ledger.map((event) => event.type)).not.toContain("execution_logged");
+    expect(wave.ledger.map((event) => event.type)).not.toContain("guardian_reviewed");
+  });
+
+  it("keeps configured custom repos untouched", () => {
+    const configuredWave = {
+      ...demoWave,
+      repoUrl: "https://github.com/6529-Collections/custom-hook",
     };
 
     expect(withPlaceholderRepoSetupState(configuredWave)).toBe(configuredWave);

@@ -13,7 +13,11 @@ describe("agent identities", () => {
 
   it("keeps review and repo surfaces marked as placeholders", () => {
     expect(reviewAgentIdentity.status).toBe("placeholder");
-    expect(githubRepoPlaceholder.status).toBe("placeholder");
+    expect(githubRepoPlaceholder).toMatchObject({
+      status: "placeholder",
+      label: "Placeholder repo",
+      url: "https://github.com/your-org/your-hook-repo",
+    });
     expect(JSON.stringify({ reviewAgentIdentity, githubRepoPlaceholder })).not.toContain("\u2014");
   });
 });

@@ -16,5 +16,8 @@ export const reviewAgentIdentity = {
 
 export const githubRepoPlaceholder = {
   status: "placeholder",
+  label: "Placeholder repo",
+  url: "https://github.com/your-org/your-hook-repo",
   description: "GitHub repo is a placeholder until the first hook repo is configured.",
+  nextStep: "Connect the real hook repo before PR work can run.",
 } as const;

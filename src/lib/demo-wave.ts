@@ -1,6 +1,7 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
 import { createWaveDecisionReceipt, defaultRules } from "./command-waves";
 import { createAgentHandoffPacket, formatAgentHandoffArtifact } from "./agent-handoff";
+import { githubRepoPlaceholder } from "./agent-identities";
 import { createCommandPrManifest, createGuardianAttestation } from "./github/pr-reviewer-gate";
 import { defaultParticipationGates } from "./participation-gates";
 import { pullRequestUrl } from "./github/repo";
@@ -53,7 +54,7 @@ const preExecutionWave: CommandWave = {
   id: "cw-6529-hook-builder",
   name: "6529 Hook",
   waveUrl: "https://6529.io/waves/6529-hook-builder",
-  repoUrl: "https://github.com/your-org/your-hook-repo",
+  repoUrl: githubRepoPlaceholder.url,
   gates: [...defaultParticipationGates],
   rules: defaultRules,
   proposals: [reviewingProposal],
@@ -116,7 +117,7 @@ function createDemoExecution(wave: CommandWave): ExecutionRecord {
       `budget cap $${runManifest.maxCostUsd}`,
       "PR body includes Command Waves manifest",
       "PR #12",
-      pullRequestUrl(wave.repoUrl, 12) ?? "https://github.com/6529-Collections/6529-hook/pull/12",
+      pullRequestUrl(wave.repoUrl, 12) ?? `${githubRepoPlaceholder.url}/pull/12`,
       "head local-demo-c0dex",
       "forge test passed",
     ],
