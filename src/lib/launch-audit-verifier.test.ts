@@ -96,6 +96,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "workflow_proof")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "workflow_proof_ready")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "pass",
     });
@@ -340,6 +343,37 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "workflow_proof")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish chat, decision, PR, review, and log proof steps.",
+    });
+  });
+
+  it("fails a ready audit when workflow proof is not complete", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      workflowProof: {
+        ...snapshot.workflowProof,
+        readyCount: 4,
+        steps: snapshot.workflowProof.steps.map((step) =>
+          step.id === "pr"
+            ? {
+                ...step,
+                status: "needed",
+                evidenceUrl: null,
+              }
+            : step,
+        ),
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "workflow_proof_ready")).toMatchObject({
+      status: "fail",
+      message: "Ready launch audit must publish ready chat, decision, PR, review, and log proof steps.",
     });
   });
 

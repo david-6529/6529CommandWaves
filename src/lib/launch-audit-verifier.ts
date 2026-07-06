@@ -215,6 +215,31 @@ function workflowProofReady(value: unknown) {
   );
 }
 
+function workflowProofComplete(value: unknown) {
+  const requiredStepIds = ["chat", "decision", "pr", "review", "log"];
+  const urlStepIds = new Set(["chat", "decision", "pr"]);
+  const record = isRecord(value) ? value : null;
+  const steps = Array.isArray(record?.steps) ? record.steps.filter(isRecord) : [];
+  const stepById = new Map(steps.map((step) => [asString(step.id), step]));
+
+  return Boolean(
+    workflowProofReady(value) &&
+      record &&
+      asNumber(record.readyCount) === requiredStepIds.length &&
+      asNumber(record.blockedCount) === 0 &&
+      requiredStepIds.every((id) => {
+        const step = stepById.get(id);
+
+        return (
+          step &&
+          asString(step.status) === "ready" &&
+          isSha256Hash(step.evidenceHash) &&
+          (!urlStepIds.has(id) || Boolean(asString(step.evidenceUrl)))
+        );
+      }),
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -324,6 +349,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const hasProjectSnapshot = projectSnapshotReady(snapshot?.projectSnapshot);
   const hasHookSafety = hookSafetyReady(snapshot?.hookSafety);
   const hasWorkflowProof = workflowProofReady(snapshot?.workflowProof);
+  const hasCompleteWorkflowProof = workflowProofComplete(snapshot?.workflowProof);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const hasAccessSummary = accessSnapshotReady(snapshot?.access);
@@ -385,6 +411,15 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasWorkflowProof
         ? "Public workflow proof is published."
         : "Launch audit must publish chat, decision, PR, review, and log proof steps.",
+    ),
+    check(
+      "workflow_proof_ready",
+      launchStatus !== "ready" || hasCompleteWorkflowProof ? "pass" : "fail",
+      launchStatus !== "ready"
+        ? "Workflow proof readiness is checked when launch status is ready."
+        : hasCompleteWorkflowProof
+          ? "Ready workflow proof covers chat, decision, PR, review, and log."
+          : "Ready launch audit must publish ready chat, decision, PR, review, and log proof steps.",
     ),
     check(
       "authority_boundary",
