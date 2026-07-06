@@ -155,6 +155,7 @@ async function main() {
 
   assertJsonObject("Launch audit response audit", audit);
   assert(objectValue(audit, "version") === "command-wave-launch-audit-v0.1", "Launch audit returned the wrong version.");
+  assertSha256("Launch audit bundle hash", objectValue(audit, "auditHash"));
 
   const stateEvidence = objectValue(audit, "stateEvidence");
   const statusDraft = objectValue(audit, "statusDraft");
@@ -171,6 +172,7 @@ async function main() {
   assertJsonObject("Launch audit launch packet", launchPacket);
   assertSha256("Launch audit launch packet hash", objectValue(launchPacket, "packetHash"));
   assertJsonObject("Launch audit reports", reports);
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "auditHash");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectSnapshot");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "hookSafety");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Hook contracts are immutable by default");

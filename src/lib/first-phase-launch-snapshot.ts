@@ -9,6 +9,7 @@ import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { hasProductionValue } from "./env-placeholders";
+import { createLaunchAuditHash } from "./launch-audit-hash";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createLaunchPacket, type LaunchPacket } from "./launch-packet";
 import { createLaunchStatusDraft } from "./launch-status-draft";
@@ -25,6 +26,7 @@ import { getReadinessChecks, getReadinessSummary, type ReadinessCheck } from "./
 export type FirstPhaseLaunchSnapshot = {
   version: "command-wave-launch-audit-v0.1";
   generatedAt: string;
+  auditHash: string;
   project: {
     id: string;
     name: string;
@@ -136,8 +138,7 @@ export async function createFirstPhaseLaunchSnapshot(
     launchAuditUrl: appRouteUrl(launchAuditPath, env),
   };
   const contributionReport = createContributionReport(wave, { generatedAt });
-
-  return {
+  const snapshotWithoutHash = {
     version: "command-wave-launch-audit-v0.1",
     generatedAt,
     project: {
@@ -191,5 +192,10 @@ export async function createFirstPhaseLaunchSnapshot(
     },
     phaseChecklist,
     launchAudit,
+  } satisfies Omit<FirstPhaseLaunchSnapshot, "auditHash">;
+
+  return {
+    ...snapshotWithoutHash,
+    auditHash: createLaunchAuditHash(snapshotWithoutHash),
   };
 }

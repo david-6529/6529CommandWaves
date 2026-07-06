@@ -1,4 +1,5 @@
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { createLaunchAuditHash } from "./launch-audit-hash";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { commandWaveProductCopy } from "./product-copy";
 import { hashValue } from "./run-manifest";
@@ -26,6 +27,7 @@ export type LaunchAuditVerificationResult = {
     reviewCount: number;
     ledgerEventCount: number;
   } | null;
+  auditHash: string | null;
   blockers: string[];
   openItems: string[];
   operatorChecklist: string[];
@@ -52,6 +54,13 @@ function unwrapSnapshot(payload: unknown) {
   const record = isRecord(payload) ? payload : null;
 
   return isRecord(record?.audit) ? record.audit : record;
+}
+
+function auditHashReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const auditHash = asString(record?.auditHash);
+
+  return Boolean(record && isSha256Hash(auditHash) && auditHash === createLaunchAuditHash(record));
 }
 
 function itemSummary(value: unknown) {
@@ -379,6 +388,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
   const setupCheckMode = asString(snapshot?.setupCheckMode);
+  const hasAuditHash = auditHashReady(snapshot);
   const hasProjectSnapshot = projectSnapshotReady(snapshot?.projectSnapshot);
   const hasHookSafety = hookSafetyReady(snapshot?.hookSafety);
   const hasWorkflowProof = workflowProofReady(snapshot?.workflowProof);
@@ -405,6 +415,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       snapshot?.version === "command-wave-launch-audit-v0.1" && Boolean(launchAudit)
         ? "Launch audit payload is readable."
         : "Launch audit payload is missing or has the wrong version.",
+    ),
+    check(
+      "audit_hash",
+      hasAuditHash ? "pass" : "fail",
+      hasAuditHash
+        ? "Launch audit bundle hash is valid."
+        : "Launch audit must publish a valid hash for the public audit bundle.",
     ),
     check(
       "launch_status",
@@ -531,6 +548,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
         : null,
     statusDraft: asString(snapshot?.statusDraft),
     stateEvidence,
+    auditHash: asString(snapshot?.auditHash),
     blockers,
     openItems,
     operatorChecklist: launchAudit ? launchOperatorChecklistLines(openItemRecords) : [],

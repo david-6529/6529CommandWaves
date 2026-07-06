@@ -73,7 +73,11 @@ describe("launch audit verifier", () => {
       launchStatus: "ready",
       generatedAt: "2026-06-20T13:00:00.000Z",
       projectName: configuredDemoWave.name,
+      auditHash: snapshot.auditHash,
       blockers: [],
+    });
+    expect(result.checks.find((item) => item.id === "audit_hash")).toMatchObject({
+      status: "pass",
     });
     expect(result.checks.find((item) => item.id === "authority_boundary")).toMatchObject({
       status: "pass",
@@ -140,6 +144,28 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
       status: "fail",
       message: "Launch audit must be generated with remote setup checks.",
+    });
+  });
+
+  it("fails when the launch audit bundle hash is stale", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      project: {
+        ...snapshot.project,
+        name: "Changed project name",
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "audit_hash")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish a valid hash for the public audit bundle.",
     });
   });
 
@@ -553,6 +579,7 @@ describe("launch audit verifier", () => {
     expect(result.status).toBe("fail");
     expect(result.launchStatus).toBe("unknown");
     expect(result.stateEvidence).toBeNull();
+    expect(result.auditHash).toBeNull();
     expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "payload_shape")).toMatchObject({
       status: "fail",

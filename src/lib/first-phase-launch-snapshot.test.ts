@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
+import { createLaunchAuditHash } from "./launch-audit-hash";
 import { hashValue } from "./run-manifest";
 
 const launchEnv = {
@@ -18,6 +19,9 @@ describe("first phase launch snapshot", () => {
 
     expect(snapshot.version).toBe("command-wave-launch-audit-v0.1");
     expect(snapshot.generatedAt).toBe("2026-06-20T13:00:00.000Z");
+    const { auditHash, ...snapshotWithoutHash } = snapshot;
+    expect(auditHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(auditHash).toBe(createLaunchAuditHash(snapshotWithoutHash));
     expect(snapshot.project).toMatchObject({
       id: demoWave.id,
       name: demoWave.name,
