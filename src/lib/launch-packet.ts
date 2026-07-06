@@ -5,6 +5,7 @@ import { createContributionReport, type ContributionReport } from "./contributio
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { latestLedgerTimestamp } from "./ledger";
+import { createPublicWorkflowProof } from "./public-workflow-proof";
 
 export type LaunchPacket = {
   version: "command-wave-launch-packet-v0.1";
@@ -235,6 +236,23 @@ function feeLines(plan: DeveloperFeePlan) {
   ];
 }
 
+function workflowProofLines(wave: CommandWave) {
+  const proof = createPublicWorkflowProof(wave);
+
+  return [
+    `- Summary: ${proof.summary}`,
+    `- Source of truth: ${proof.sourceOfTruth}`,
+    `- Code surface: ${proof.codeSurface}`,
+    `- Status: ${proof.readyCount} ready, ${proof.blockedCount} blocked.`,
+    "- Steps:",
+    ...proof.steps.map((step) => {
+      const evidence = step.evidenceUrl ?? step.evidenceHash ?? "no evidence yet";
+
+      return `- ${step.label}: ${step.status}. ${step.detail} Evidence: ${evidence}`;
+    }),
+  ];
+}
+
 function verificationLines(targets: LaunchPacketVerificationTargets | null | undefined) {
   if (!targets) {
     return ["- Setup proof: not attached.", "- Command-wave state: not attached."];
@@ -313,6 +331,9 @@ export function createLaunchPacket({
     "",
     "## Review",
     ...reviewLines(review),
+    "",
+    "## Workflow Proof",
+    ...workflowProofLines(wave),
     "",
     "## Contribution Report",
     ...contributionLines(contributionReport),

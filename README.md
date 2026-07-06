@@ -191,6 +191,7 @@ Audit and launch:
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
 - Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
+- The copyable launch packet includes the same workflow proof chain for chat share-back.
 - The local demo separates current work status from launch readiness. Launch readiness still fails until production env,
   durable storage, live 6529 mode, GitHub PR adapter, guardian state, and required checks are configured.
 

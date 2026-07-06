@@ -36,6 +36,15 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
     expect(packet.text).toContain("Project decision receipt:");
     expect(packet.text).toContain("Review proof:");
+    expect(packet.text).toContain("## Workflow Proof");
+    expect(packet.text).toContain("Summary: Public proof of the chat, decision, PR, review, and log path for the first hook build.");
+    expect(packet.text).toContain("Source of truth: project chat");
+    expect(packet.text).toContain("Code surface: GitHub PR");
+    expect(packet.text).toContain("Project chat: ready.");
+    expect(packet.text).toContain("Decision: ready.");
+    expect(packet.text).toContain("Pull request: blocked. GitHub repo is still a placeholder.");
+    expect(packet.text).toContain("Review: blocked. Review waits for a real hook repo and PR record.");
+    expect(packet.text).toContain("Log: ready.");
     expect(packet.text).toContain("## Contribution Report");
     expect(packet.text).toContain("Complete proposal: 6 report points.");
     expect(packet.text).toContain("Project decision receipt: 2 report points.");
@@ -86,6 +95,8 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Reviewer route: PR work needs reviewer CI before human merge.");
     expect(packet.text).toContain("Build: waiting for an approved PR change.");
     expect(packet.text).toContain("Review: waiting for a PR record.");
+    expect(packet.text).toContain("## Workflow Proof");
+    expect(packet.text).toContain("Pull request: blocked. GitHub repo is still a placeholder.");
     expect(packet.text).toContain("Choose one PR-sized hook change.");
     expect(packet.text).toContain("Setup proof: not attached.");
     expect(packet.text).toContain("Command-wave state: not attached.");
