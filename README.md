@@ -48,6 +48,7 @@ What exists now:
 - Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
+- Public project state includes a full snapshot hash, so setup checks can detect stale or edited state payloads.
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
   contract signal checks.

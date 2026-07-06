@@ -1,4 +1,5 @@
 import { normalizeWaveId } from "./6529/client";
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import type { CommandWave } from "./command-waves";
 import { extractRequiredStatusChecks } from "./github/required-status-checks";
 import type { SetupProof } from "./setup-proof";
@@ -58,11 +59,14 @@ function commandWaveStateFromPayload(payload: unknown) {
   const version = record?.version === "command-wave-state-v0.1" ? record.version : null;
   const wave = version && isCommandWave(record?.wave) ? record.wave : null;
   const waveStateHash = asString(record?.waveStateHash);
+  const stateHash = asString(record?.stateHash);
 
   return {
+    record,
     version,
     wave,
     waveStateHash,
+    stateHash,
   };
 }
 
@@ -121,6 +125,7 @@ export function verifySetupProofAgainstGitHubPayloads(
   if (proof.verificationTargets.commandWaveStateUrl) {
     const state = commandWaveStateFromPayload(options.commandWaveState);
     const wave = state.wave;
+    const stateSnapshotHashMatches = Boolean(state.record && state.stateHash === createCommandWaveStateHash(state.record));
 
     checks.push(
       check(
@@ -138,6 +143,15 @@ export function verifySetupProofAgainstGitHubPayloads(
         wave
           ? "Command-wave state URL returned a wave payload."
           : "Command-wave state URL did not return a readable wave payload.",
+      ),
+    );
+    checks.push(
+      check(
+        "command_wave_state_snapshot_hash",
+        stateSnapshotHashMatches ? "pass" : "fail",
+        stateSnapshotHashMatches
+          ? "Command-wave state snapshot hash matches the published payload."
+          : "Command-wave state snapshot hash is missing or does not match the published payload.",
       ),
     );
 

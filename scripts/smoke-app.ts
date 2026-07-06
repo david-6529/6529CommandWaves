@@ -211,6 +211,7 @@ async function main() {
 
   assert(objectValue(statePayload, "version") === "command-wave-state-v0.1", "State endpoint returned the wrong version.");
   assert(objectValue(statePayload, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Launch audit state hash does not match public state hash.");
+  assertSha256("State response snapshot hash", objectValue(statePayload, "stateHash"));
   assertIncludes("State response", JSON.stringify(statePayload), "projectSnapshot");
   assertIncludes("State response", JSON.stringify(statePayload), "hookSafety");
   assertIncludes("State response", JSON.stringify(statePayload), "Hook contracts are immutable by default");
@@ -237,6 +238,7 @@ async function main() {
   assert(!JSON.stringify(statePayload).includes("gateStatus"), "State response still includes gateStatus.");
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
   assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
+  assertIncludes("State response", JSON.stringify(statePayload), "stateHash");
   assertIncludes("State response", JSON.stringify(statePayload), "humansControl");
   assertIncludes("State response", JSON.stringify(statePayload), "Auto-merge PRs");
   assertNoEmDash("State response", JSON.stringify(statePayload));

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { commandWaveStateUrlFromEnv, createCommandWaveStateSnapshot } from "./command-wave-state";
 import { hashValue } from "./run-manifest";
 
@@ -86,6 +87,10 @@ describe("command wave state snapshot", () => {
         expectedPayload: "command-wave-state-v0.1 snapshot",
       },
     });
+    const { stateHash, ...snapshotWithoutStateHash } = snapshot;
+
+    expect(stateHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(stateHash).toBe(createCommandWaveStateHash(snapshotWithoutStateHash));
     expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
     expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("review recorded");
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
@@ -102,6 +107,7 @@ describe("command wave state snapshot", () => {
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
     expect(snapshot.authorityBoundary.agentLimits.join(" ")).toContain("Reviewer checks are evidence");
     expect(snapshot.authorityBoundary).not.toHaveProperty("gateStatus");
+    expect(JSON.stringify(snapshot)).not.toContain("\u2014");
   });
 
   it("builds the public state URL from env", () => {

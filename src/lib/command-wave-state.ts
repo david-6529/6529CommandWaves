@@ -1,4 +1,5 @@
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { hasProductionValue } from "./env-placeholders";
@@ -14,6 +15,7 @@ export type CommandWaveStateSnapshot = {
   generatedAt: string;
   wave: CommandWave;
   waveStateHash: string;
+  stateHash: string;
   projectSnapshot: PublicProjectSnapshot;
   hookSafety: PublicHookSafety;
   workflowProof: PublicWorkflowProof;
@@ -86,8 +88,7 @@ export function createCommandWaveStateSnapshot(
   options: { generatedAt?: string } = {},
 ): CommandWaveStateSnapshot {
   const generatedAt = options.generatedAt ?? new Date().toISOString();
-
-  return {
+  const snapshotWithoutHash = {
     version: "command-wave-state-v0.1",
     generatedAt,
     wave,
@@ -110,6 +111,11 @@ export function createCommandWaveStateSnapshot(
       envVar: "COMMAND_WAVE_STATE_URL",
       expectedPayload: "command-wave-state-v0.1 snapshot",
     },
+  } satisfies Omit<CommandWaveStateSnapshot, "stateHash">;
+
+  return {
+    ...snapshotWithoutHash,
+    stateHash: createCommandWaveStateHash(snapshotWithoutHash),
   };
 }
 

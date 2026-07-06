@@ -175,6 +175,46 @@ describe("setup verifier", () => {
     expect(result.checks.find((item) => item.id === "command_wave_state_hash")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "command_wave_state_snapshot_hash")).toMatchObject({
+      status: "pass",
+    });
+  });
+
+  it("fails when the published command-wave state snapshot hash is stale", () => {
+    const proof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+      commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
+    });
+    const state = createCommandWaveStateSnapshot(demoWave, {
+      generatedAt: "2026-06-21T12:01:00.000Z",
+    });
+    const result = verifySetupProofAgainstGitHubPayloads(
+      proof,
+      [
+        {
+          required_status_checks: {
+            contexts: ["Command Waves Guardian"],
+          },
+        },
+      ],
+      {
+        commandWaveState: {
+          ...state,
+          projectSnapshot: {
+            ...state.projectSnapshot,
+            summary: "Tampered summary",
+          },
+        },
+      },
+    );
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "command_wave_state_hash")).toMatchObject({
+      status: "pass",
+    });
+    expect(result.checks.find((item) => item.id === "command_wave_state_snapshot_hash")).toMatchObject({
+      status: "fail",
+    });
   });
 
   it("fails when the published command-wave state target points to another wave", () => {
