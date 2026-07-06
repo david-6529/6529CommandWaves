@@ -93,6 +93,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "hook_safety")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "workflow_proof")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "state_evidence")).toMatchObject({
       status: "pass",
     });
@@ -318,6 +321,25 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "hook_safety")).toMatchObject({
       status: "fail",
       message: "Launch audit must publish immutable-hook, bounded-parameter, and blocked-action guardrails.",
+    });
+  });
+
+  it("fails when the public workflow proof is missing", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      workflowProof: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "workflow_proof")).toMatchObject({
+      status: "fail",
+      message: "Launch audit must publish chat, decision, PR, review, and log proof steps.",
     });
   });
 

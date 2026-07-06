@@ -172,6 +172,9 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Hook contracts are immutable by default");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "bound-focused tests");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "delegatecall");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "workflowProof");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Public proof of the chat, decision, PR, review, and log path");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Pull request");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "currentWork");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "nextStep");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "latestChanges");
@@ -198,6 +201,9 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "Hook contracts are immutable by default");
   assertIncludes("State response", JSON.stringify(statePayload), "bound-focused tests");
   assertIncludes("State response", JSON.stringify(statePayload), "delegatecall");
+  assertIncludes("State response", JSON.stringify(statePayload), "workflowProof");
+  assertIncludes("State response", JSON.stringify(statePayload), "Public proof of the chat, decision, PR, review, and log path");
+  assertIncludes("State response", JSON.stringify(statePayload), "Pull request");
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
   assertIncludes("State response", JSON.stringify(statePayload), "nextStep");
   assertIncludes("State response", JSON.stringify(statePayload), "latestChanges");

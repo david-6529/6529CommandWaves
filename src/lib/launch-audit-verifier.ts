@@ -188,6 +188,33 @@ function hookSafetyReady(value: unknown) {
   );
 }
 
+function workflowProofReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const steps = Array.isArray(record?.steps) ? record.steps.filter(isRecord) : [];
+  const stepById = new Map(steps.map((step) => [asString(step.id), step]));
+  const requiredStepIds = ["chat", "decision", "pr", "review", "log"];
+
+  return Boolean(
+    record &&
+      asString(record.summary)?.includes("chat, decision, PR, review, and log") &&
+      asString(record.sourceOfTruth) === "project chat" &&
+      asString(record.codeSurface) === "GitHub PR" &&
+      asNumber(record.readyCount) !== null &&
+      asNumber(record.blockedCount) !== null &&
+      requiredStepIds.every((id) => {
+        const step = stepById.get(id);
+        const status = asString(step?.status);
+
+        return (
+          step &&
+          asString(step.label) &&
+          asString(step.detail) &&
+          (status === "ready" || status === "needed" || status === "blocked")
+        );
+      }),
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -296,6 +323,7 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const hasProjectSnapshot = projectSnapshotReady(snapshot?.projectSnapshot);
   const hasHookSafety = hookSafetyReady(snapshot?.hookSafety);
+  const hasWorkflowProof = workflowProofReady(snapshot?.workflowProof);
   const hasProductContract = productContractReady(snapshot?.productContract);
   const hasAuthorityBoundary = authorityBoundaryReady(snapshot?.authorityBoundary);
   const hasAccessSummary = accessSnapshotReady(snapshot?.access);
@@ -350,6 +378,13 @@ export function verifyLaunchAuditPayload(payload: unknown): LaunchAuditVerificat
       hasHookSafety
         ? "Immutable hook safety contract is published."
         : "Launch audit must publish immutable-hook, bounded-parameter, and blocked-action guardrails.",
+    ),
+    check(
+      "workflow_proof",
+      hasWorkflowProof ? "pass" : "fail",
+      hasWorkflowProof
+        ? "Public workflow proof is published."
+        : "Launch audit must publish chat, decision, PR, review, and log proof steps.",
     ),
     check(
       "authority_boundary",

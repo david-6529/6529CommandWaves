@@ -44,6 +44,16 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("explicit cap");
     expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("Deploy scripts");
+    expect(snapshot.workflowProof).toMatchObject({
+      summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
+      sourceOfTruth: "project chat",
+      codeSurface: "GitHub PR",
+      blockedCount: 2,
+    });
+    expect(snapshot.workflowProof.steps.find((step) => step.id === "pr")).toMatchObject({
+      status: "blocked",
+      detail: "GitHub repo is still a placeholder. Replace it before PR work can run.",
+    });
     expect(snapshot.access).toMatchObject({
       label: "manual review",
       summary: "Ask in chat to join. Access is reviewed manually for now.",
