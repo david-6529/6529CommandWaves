@@ -6,12 +6,14 @@ import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-p
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { latestLedgerTimestamp } from "./ledger";
 import { createPublicWorkflowProof } from "./public-workflow-proof";
+import { hashValue } from "./run-manifest";
 
 export type LaunchPacket = {
   version: "command-wave-launch-packet-v0.1";
   proposalId: string | null;
   generatedAt: string;
   text: string;
+  packetHash: string;
 };
 
 export type LaunchPacketVerificationTargets = {
@@ -354,10 +356,15 @@ export function createLaunchPacket({
     `- ${nextStep(proposal, execution, review)}`,
   ].join("\n");
 
-  return {
+  const packet = {
     version: "command-wave-launch-packet-v0.1",
     proposalId: proposal?.id ?? null,
     generatedAt,
     text,
+  } satisfies Omit<LaunchPacket, "packetHash">;
+
+  return {
+    ...packet,
+    packetHash: hashValue(packet),
   };
 }

@@ -169,6 +169,7 @@ async function main() {
     assertIncludes("Launch audit status draft", statusDraft, label);
   }
   assertJsonObject("Launch audit launch packet", launchPacket);
+  assertSha256("Launch audit launch packet hash", objectValue(launchPacket, "packetHash"));
   assertJsonObject("Launch audit reports", reports);
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectSnapshot");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "hookSafety");

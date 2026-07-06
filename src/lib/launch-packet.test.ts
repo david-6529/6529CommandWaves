@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createLaunchPacket } from "./launch-packet";
+import { hashValue } from "./run-manifest";
 
 describe("launch packet", () => {
   it("creates a human-reviewed packet for the hook launch", () => {
@@ -24,6 +25,14 @@ describe("launch packet", () => {
       proposalId: proposal.id,
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
+    expect(packet.packetHash).toBe(
+      hashValue({
+        version: packet.version,
+        proposalId: packet.proposalId,
+        generatedAt: packet.generatedAt,
+        text: packet.text,
+      }),
+    );
     expect(packet.text).toContain("# Project launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain("Participation notes (advisory):");

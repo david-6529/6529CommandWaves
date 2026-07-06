@@ -126,6 +126,7 @@ describe("first phase launch snapshot", () => {
       proposalId: "cmd-001",
       generatedAt: "2026-06-20T13:00:00.000Z",
     });
+    expect(snapshot.launchPacket.packetHash).toMatch(/^[a-f0-9]{64}$/);
     expect(snapshot.launchPacket.text).toContain("# Project launch packet");
     expect(snapshot.launchPacket.text).toContain("## Workflow Proof");
     expect(snapshot.launchPacket.text).toContain("## Verification");

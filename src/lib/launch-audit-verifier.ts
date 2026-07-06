@@ -1,6 +1,7 @@
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { commandWaveProductCopy } from "./product-copy";
+import { hashValue } from "./run-manifest";
 
 export type LaunchAuditVerificationCheck = {
   id: string;
@@ -297,13 +298,21 @@ function statusDraftReady(value: unknown) {
 
 function launchPacketReady(value: unknown) {
   const record = isRecord(value) ? value : null;
+  const version = asString(record?.version);
+  const generatedAt = asString(record?.generatedAt);
   const text = asString(record?.text);
+  const packetHash = asString(record?.packetHash);
+  const proposalId =
+    record && (record.proposalId === null || typeof record.proposalId === "string") ? record.proposalId : undefined;
 
   return Boolean(
     record &&
-      asString(record.version) === "command-wave-launch-packet-v0.1" &&
-      asString(record.generatedAt) &&
+      version === "command-wave-launch-packet-v0.1" &&
+      typeof proposalId !== "undefined" &&
+      generatedAt &&
       text &&
+      isSha256Hash(packetHash) &&
+      packetHash === hashValue({ version, proposalId, generatedAt, text }) &&
       text.includes("# Project launch packet") &&
       text.includes("## Workflow Proof") &&
       text.includes("## Contribution Report") &&

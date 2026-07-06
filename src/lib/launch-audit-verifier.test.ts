@@ -108,6 +108,7 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "launch_packet")).toMatchObject({
       status: "pass",
     });
+    expect(snapshot.launchPacket.packetHash).toMatch(/^[a-f0-9]{64}$/);
     expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
       status: "pass",
     });
@@ -451,6 +452,29 @@ describe("launch audit verifier", () => {
     const result = verifyLaunchAuditPayload({
       ...snapshot,
       launchPacket: undefined,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "launch_packet")).toMatchObject({
+      status: "fail",
+      message:
+        "Launch audit must publish a human-readable launch packet with workflow proof, verification links, and authority limits.",
+    });
+  });
+
+  it("fails when the human-readable launch packet hash is stale", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      launchPacket: {
+        ...snapshot.launchPacket,
+        text: `${snapshot.launchPacket.text}\n- extra line`,
+      },
     });
 
     expect(result.status).toBe("fail");
