@@ -12,8 +12,8 @@ const mockDropsFixture = {
       id: "drop-003",
       serial_no: 3,
       created_at: "2026-06-20T12:10:00.000Z",
-      content: "Review passed cmd-001. The hook scaffold matched the approved proposal and rules.",
-      author: { handle: "reviewer-agent" },
+      content: "Repo setup needed before PR work. Which GitHub repo should hold the hook?",
+      author: { handle: "daemon" },
       drop_type: "CHAT",
     },
     {
