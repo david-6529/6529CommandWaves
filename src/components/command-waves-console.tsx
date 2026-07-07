@@ -136,7 +136,7 @@ const proposalTypeOptions: ProposalTypeOption[] = [
 const proposalFlowSteps = [
   ["Discuss", "Start in chat so builders can shape the idea."],
   ["Decide", "Record a visible decision for important hook work."],
-  ["Record", "Save the scoped work once builders can see it."],
+  ["Record", "Save the proposal once builders can see it."],
   ["Build", "Use GitHub PRs once the repo is connected."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
@@ -961,7 +961,7 @@ function createChatWorkTitle(message: string) {
   const normalized = (message.trim().split("\n")[0] ?? "").replace(/\s+/g, " ").trim();
 
   if (!normalized) {
-    return "New work item";
+    return "New proposal";
   }
 
   return normalized.length > 72 ? `${normalized.slice(0, 69).trimEnd()}...` : normalized;
@@ -1407,7 +1407,7 @@ export function CommandWavesConsole() {
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
-    ["How does work start?", "Post in chat. Good ideas become small work items the group can discuss."],
+    ["How does work start?", "Post in chat. Good ideas become small proposals the group can discuss."],
     [
       "How are PRs approved?",
       "The group records a project decision before PR work starts. Review approval is manual in this phase.",
@@ -2515,7 +2515,7 @@ export function CommandWavesConsole() {
                   disabled={!canSaveChatWorkItem}
                   onClick={() => void saveChatWorkItem()}
                 >
-                  {apiBusy === "proposal" ? "Saving" : "Save as work"}
+                  {apiBusy === "proposal" ? "Saving" : "Save proposal"}
                 </Button>
                 <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
                   Clear
@@ -2688,7 +2688,7 @@ export function CommandWavesConsole() {
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-50">Scope work</summary>
+          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-50">Propose work</summary>
           <div className="mt-4 max-w-4xl">
             <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:grid-cols-5">
               {proposalFlowSteps.map(([label, detail], index) => (
@@ -2774,7 +2774,7 @@ export function CommandWavesConsole() {
                 Copy draft
               </Button>
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Saving" : "Save scoped work"}
+                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
               </Button>
               <JumpLink href="#project-chat">Open chat</JumpLink>
             </div>
@@ -3093,7 +3093,7 @@ export function CommandWavesConsole() {
               <p className="mt-1 text-sm leading-6 text-zinc-400">{phaseNextAction.detail}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={openSuggestSection}>
-                  Suggest a change
+                  Propose work
                 </Button>
                 <Button type="button" variant="secondary" onClick={openActivitySection}>
                   View history

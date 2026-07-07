@@ -76,7 +76,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Questions, ideas, risks, and work all start here.");
     expect(text).toContain("Repo placeholder");
     expect(text).toContain("Post to chat");
-    expect(text).toContain("Save as work");
+    expect(text).toContain("Save proposal");
     expect(text).toContain("Recent chat");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
@@ -90,12 +90,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Start in chat so builders can shape the idea.");
-    expect(text).toContain("Save the scoped work once builders can see it.");
+    expect(text).toContain("Save the proposal once builders can see it.");
     expect(text).toContain("Use GitHub PRs once the repo is connected.");
-    expect(text).toContain("Scope work");
+    expect(text).toContain("Propose work");
     expect(text).toContain("Boundaries and success criteria");
     expect(text).toContain("Details");
-    expect(text).toContain("Save scoped work");
     expect(text).toContain("Chat launch");
     expect(text).toContain("PR loop");
     expect(text).toContain("Project log");
@@ -128,6 +127,9 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Next move");
     expect(text).not.toContain("Swarm chat");
     expect(text).not.toContain("Suggest work");
+    expect(text).not.toContain("Scope work");
+    expect(text).not.toContain("Save as work");
+    expect(text).not.toContain("Save scoped work");
     expect(text).not.toContain("A shared room for people and agents");
     expect(text).not.toContain("Room discussion");
     expect(text).not.toContain("Project discussion");

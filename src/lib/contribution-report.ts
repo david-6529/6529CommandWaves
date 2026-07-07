@@ -215,7 +215,7 @@ export function createContributionReport(
 
     contributor.score += points;
     addScoreBasis(contributor, "Proposal work", points);
-    addRationale(contributor, "Proposed scoped work");
+    addRationale(contributor, "Proposed work");
 
     if (proposal.status === "complete") {
       addRationale(contributor, "Carried work through review");
