@@ -3,6 +3,7 @@ import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedC
 import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
 import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./command-wave-seed";
 import { demoWave } from "./demo-wave";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { defaultParticipationGates, normalizeParticipationGates } from "./participation-gates";
@@ -613,6 +614,18 @@ export async function reviewProposal(input: unknown) {
 
   if (execution.status !== "complete") {
     throw Object.assign(new Error("Proposal execution is not complete."), { status: 409 });
+  }
+
+  if (proposal.kind === "open_pr") {
+    if (!validateSetupShape({ waveUrl: wave.waveUrl, repoUrl: wave.repoUrl }).canRunCode) {
+      throw Object.assign(new Error("A valid GitHub repo is required before reviewing PR work."), { status: 409 });
+    }
+
+    if (!gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl).length) {
+      throw Object.assign(new Error("A GitHub PR link for the configured repo is required before review."), {
+        status: 409,
+      });
+    }
   }
 
   const review = await getConfiguredGuardianAdapter().review({ wave, proposal, execution });

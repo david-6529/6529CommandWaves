@@ -509,6 +509,55 @@ describe("Command wave store", () => {
     });
   });
 
+  it("rejects review when the repo is no longer configured", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({ proposalId: "cmd-001" });
+
+    await replaceCommandWave({
+      ...executed,
+      id: "custom-stale-review",
+      repoUrl: "https://github.com/your-org/your-hook-repo",
+    });
+
+    await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow(
+      "A valid GitHub repo is required before reviewing PR work.",
+    );
+  });
+
+  it("rejects review when execution has no PR link for the configured repo", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({ proposalId: "cmd-001" });
+
+    await replaceCommandWave({
+      ...executed,
+      executions: executed.executions.map((execution) => ({
+        ...execution,
+        artifacts: execution.artifacts.filter((artifact) => !artifact.startsWith("https://github.com/")),
+      })),
+    });
+
+    await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow(
+      "A GitHub PR link for the configured repo is required before review.",
+    );
+  });
+
+  it("rejects review when execution points to another repo", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({ proposalId: "cmd-001" });
+
+    await replaceCommandWave({
+      ...executed,
+      repoUrl: "https://github.com/6529-Collections/other-hook",
+    });
+
+    await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow(
+      "A GitHub PR link for the configured repo is required before review.",
+    );
+  });
+
   it("does not execute support items in the phase 1 build step", async () => {
     const submitted = await submitCommandProposal({
       title: "Draft launch scope note",
