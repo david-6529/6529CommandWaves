@@ -24,7 +24,7 @@ function pollLine(poll: PollState | null) {
   }
 
   if (poll.decision) {
-    return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, receipt ${decisionReference(poll)}.`;
+    return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, decision link ${decisionReference(poll)}.`;
   }
 
   return `Decision: ${poll.status} with ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;

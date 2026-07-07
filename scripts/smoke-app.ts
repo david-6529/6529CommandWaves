@@ -176,6 +176,7 @@ async function main() {
   assert(!renderedHtml.includes(`6529 ${staleDecisionCopy}`), "Home page should not expose internal decision-link legacy language.");
   assert(!renderedHtml.includes(staleDecisionLabel), "Home page should not expose legacy decision-link labels.");
   assert(!renderedHtml.includes(staleDecisionLabels), "Home page should not expose legacy decision-link labels.");
+  assert(!renderedHtml.includes("receipt https://"), "Home page should not expose stale decision proof copy.");
   assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assert(

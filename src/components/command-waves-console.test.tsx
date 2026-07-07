@@ -87,6 +87,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("1 report points");
     expect(text).toContain("Decision links: 2 report points");
     expect(text).toContain("Decision link");
+    expect(text).not.toContain("receipt https://");
     expect(text).not.toContain("Decision " + "receipts");
     expect(text).not.toContain("Decision " + "receipt");
     expect(text).toContain("Builder details");
