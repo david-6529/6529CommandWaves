@@ -5,7 +5,7 @@ describe("first phase scope inventory", () => {
   it("keeps the launch focused on one hook chat and one hook repo", () => {
     expect(firstPhaseScopeInventory.useNow).toContain("One public project chat and one GitHub repo.");
     expect(firstPhaseScopeInventory.useNow).toContain("Project snapshot with chat, code, PR, and review state.");
-    expect(firstPhaseScopeInventory.useNow).toContain("Manual project decision receipts before PR work runs.");
+    expect(firstPhaseScopeInventory.useNow).toContain("Manual project decision links before PR work runs.");
     expect(firstPhaseScopeInventory.parkLater).toContain("Broad swarm marketplace flows or external agent endpoints.");
     expect(firstPhaseScopeInventory.parkLater).toContain("Upgradeable hook contracts by default.");
   });

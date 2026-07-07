@@ -107,7 +107,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Review: waiting for a PR record.");
   });
 
-  it("keeps local vote approval waiting for a project decision receipt", () => {
+  it("keeps local vote approval waiting for a project decision link", () => {
     const draft = createWaveUpdateDraft({
       wave: demoWave,
       proposal: {

@@ -594,7 +594,7 @@ export async function recordVote(input: unknown) {
       actor: voterIdentity,
       type: passed ? "poll_passed" : "rule_check",
       message: passed
-        ? `${proposal.id} local vote passed. Record the project decision receipt before work can run.`
+        ? `${proposal.id} local vote passed. Record the project decision link before work can run.`
         : `Recorded ${vote} vote from ${voterIdentity} for ${proposal.id}.`,
     },
   );
@@ -648,7 +648,7 @@ export async function recordDecisionReceipt(input: unknown) {
     {
       actor: recordedBy,
       type: "poll_passed",
-      message: `Recorded project decision receipt for ${proposal.id}.`,
+      message: `Recorded project decision link for ${proposal.id}.`,
     },
   );
 
@@ -673,7 +673,7 @@ export async function executeProposal(input: unknown) {
 
   if (!pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     if (proposal.status === "approved" || poll?.status === "passed") {
-      throw Object.assign(new Error("Record the project decision receipt before building PR work."), { status: 409 });
+      throw Object.assign(new Error("Record the project decision link before building PR work."), { status: 409 });
     }
 
     throw Object.assign(new Error("Proposal is not approved for execution."), { status: 409 });

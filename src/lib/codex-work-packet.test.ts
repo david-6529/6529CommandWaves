@@ -49,7 +49,7 @@ describe("Codex work packet", () => {
     ).toThrow("Use a configured GitHub repo before creating a Codex work packet.");
   });
 
-  it("requires a project decision receipt for PR work packets", () => {
+  it("requires a project decision link for PR work packets", () => {
     const proposal = {
       ...configuredDemoWave.proposals[0],
       status: "approved" as const,
@@ -65,7 +65,7 @@ describe("Codex work packet", () => {
         proposal,
         poll,
       }),
-    ).toThrow("Record the project decision receipt before creating a Codex work packet.");
+    ).toThrow("Record the project decision link before creating a Codex work packet.");
   });
 
   it("only creates packets for PR commands", () => {
@@ -81,7 +81,7 @@ describe("Codex work packet", () => {
     ).toThrow("Codex work packets are only available for PR commands.");
   });
 
-  it("requires a project decision URL for PR work packet receipts", () => {
+  it("requires a project decision URL for PR work packets", () => {
     const proposal = {
       ...configuredDemoWave.proposals[0],
       status: "approved" as const,
@@ -101,6 +101,6 @@ describe("Codex work packet", () => {
         proposal,
         poll,
       }),
-    ).toThrow("Record the project decision receipt before creating a Codex work packet.");
+    ).toThrow("Record the project decision link before creating a Codex work packet.");
   });
 });

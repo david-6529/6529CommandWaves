@@ -131,7 +131,7 @@ export function formatProposalForWave(proposal: CommandProposal, poll: PollState
     ? `Vote required: quorum ${poll.quorumRequired}, yes ${poll.yesPercentRequired}%.`
     : "No vote required by current rules.";
   const decisionText = poll?.decision
-    ? `Decision receipt: ${poll.decision.dropId ?? poll.decision.url ?? "recorded"} (${poll.decision.source}).`
+    ? `Decision link: ${poll.decision.dropId ?? poll.decision.url ?? "recorded"} (${poll.decision.source}).`
     : null;
 
   return [

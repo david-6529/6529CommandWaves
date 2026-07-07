@@ -72,7 +72,7 @@ describe("PR reviewer gate", () => {
     expect(result.checks.find((item) => item.id === "vote")?.status).toBe("fail");
   });
 
-  it("passes a vote-gated command with a manual project decision receipt", () => {
+  it("passes a vote-gated command with a manual project decision link", () => {
     const wave = approvedDemoWave();
     const proposal = {
       ...wave.proposals[0],
@@ -112,7 +112,7 @@ describe("PR reviewer gate", () => {
     expect(result.checks.find((item) => item.id === "vote")?.status).toBe("pass");
   });
 
-  it("fails local counted vote approval without a project decision receipt", () => {
+  it("fails local counted vote approval without a project decision link", () => {
     const wave = approvedDemoWave();
     const proposal = {
       ...wave.proposals[0],
@@ -146,11 +146,11 @@ describe("PR reviewer gate", () => {
     expect(result.status).toBe("fail");
     expect(voteCheck).toMatchObject({
       status: "fail",
-      message: "Local vote passed. Record a project decision receipt before PR review can pass.",
+      message: "Local vote passed. Record a project decision link before PR review can pass.",
     });
   });
 
-  it("fails a stored decision receipt URL from another wave", () => {
+  it("fails a stored decision link URL from another wave", () => {
     const wave = approvedDemoWave();
     const proposal = {
       ...wave.proposals[0],

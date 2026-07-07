@@ -18,10 +18,10 @@ describe("legacy command copy", () => {
     );
     expect(humanizeLegacyCommandCopy("Builder wave approved cmd-001.")).toBe("Project chat approved cmd-001.");
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder 6529 decision receipt.")).toBe(
-      "Decision recorded a project decision receipt.",
+      "Decision recorded a project decision link.",
     );
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder wave decision receipt.")).toBe(
-      "Decision recorded a project decision receipt.",
+      "Decision recorded a project decision link.",
     );
     expect(humanizeLegacyCommandCopy("Room approved cmd-001 with 5 yes and 1 no.")).toBe(
       "Builders approved the hook scaffold with 5 yes and 1 no.",

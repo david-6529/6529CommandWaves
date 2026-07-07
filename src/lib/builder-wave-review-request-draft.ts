@@ -51,7 +51,7 @@ export function createBuilderWaveReviewRequestDraft({
     "",
     "Review checklist:",
     "- PR matches the approved work and limits.",
-    "- Command Waves manifest and project decision receipt are present.",
+    "- Command Waves manifest and project decision link are present.",
     "- Tests cover capped hook parameters and guardrails.",
     "- No proxy, delegatecall, deploy, payment, or governance change is introduced.",
     "- Findings should be posted in the PR and summarized back to chat.",

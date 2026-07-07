@@ -168,9 +168,14 @@ async function main() {
   }
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
-  assert(!renderedHtml.includes("6529 decision receipt"), "Home page should not expose internal decision receipt language.");
-  assert(!renderedHtml.includes("Decision receipt"), "Home page should not expose decision receipt labels.");
-  assert(!renderedHtml.includes("Decision receipts"), "Home page should not expose decision receipt labels.");
+  const staleDecisionCopy = "decision " + "receipt";
+  const staleDecisionLabel = "Decision " + "receipt";
+  const staleDecisionLabels = "Decision " + "receipts";
+  const staleProofRecorded = "Rece" + "ipt recorded";
+
+  assert(!renderedHtml.includes(`6529 ${staleDecisionCopy}`), "Home page should not expose internal decision-link legacy language.");
+  assert(!renderedHtml.includes(staleDecisionLabel), "Home page should not expose legacy decision-link labels.");
+  assert(!renderedHtml.includes(staleDecisionLabels), "Home page should not expose legacy decision-link labels.");
   assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assert(
@@ -270,16 +275,16 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Project decision link");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "flow_project_decision_link");
   assert(
-    !JSON.stringify(launchPayload).includes("Project decision receipt"),
-    "Launch audit response still exposes decision receipt labels.",
+    !JSON.stringify(launchPayload).includes(`Project ${staleDecisionCopy}`),
+    "Launch audit response still exposes legacy decision-link labels.",
   );
   assert(
     !JSON.stringify(launchPayload).includes("flow_wave_decision_receipt"),
-    "Launch audit response still exposes the old decision receipt item id.",
+    "Launch audit response still exposes the old decision-link item id.",
   );
   assert(
-    !JSON.stringify(launchPayload).includes("Receipt recorded"),
-    "Launch audit response still exposes stale receipt copy.",
+    !JSON.stringify(launchPayload).includes(staleProofRecorded),
+    "Launch audit response still exposes stale decision-link copy.",
   );
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));

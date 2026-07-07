@@ -92,7 +92,7 @@ describe("Command Waves rule engine", () => {
     expect(evaluatePoll(passed)).toMatchObject({ quorumMet: true, thresholdMet: true, passed: true });
   });
 
-  it("treats a recorded project decision receipt as manual approval evidence", () => {
+  it("treats a recorded project decision link as manual approval evidence", () => {
     const receipt = createWaveDecisionReceipt({
       proposalId: "cmd-test",
       reference: "https://6529.io/waves/hook-builder/drops/drop-123",
@@ -136,7 +136,7 @@ describe("Command Waves rule engine", () => {
     expect(pollApprovalPassed(poll)).toBe(false);
   });
 
-  it("validates decision receipt URLs against the configured discussion", () => {
+  it("validates decision link URLs against the configured discussion", () => {
     const waveUrl = "https://6529.io/waves/hook-builder";
 
     expect(

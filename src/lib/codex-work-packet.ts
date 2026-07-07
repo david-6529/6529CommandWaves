@@ -50,7 +50,7 @@ export function createCodexWorkPacket({
   }
 
   if (proposal.kind === "open_pr" && !pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
-    throw Object.assign(new Error("Record the project decision receipt before creating a Codex work packet."), {
+    throw Object.assign(new Error("Record the project decision link before creating a Codex work packet."), {
       status: 409,
     });
   }

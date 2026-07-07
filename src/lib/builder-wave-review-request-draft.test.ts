@@ -18,7 +18,7 @@ describe("builder wave review request draft", () => {
     expect(draft).toContain(`Work: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
     expect(draft).toContain(`PR: ${demoWave.repoUrl}/pull/12`);
     expect(draft).toContain("Build record:");
-    expect(draft).toContain("- Command Waves manifest and project decision receipt are present.");
+    expect(draft).toContain("- Command Waves manifest and project decision link are present.");
     expect(draft).toContain("- No proxy, delegatecall, deploy, payment, or governance change is introduced.");
     expect(draft).toContain("does not merge, deploy, approve payouts, or change governance");
     expect(draft).not.toContain("\u2014");

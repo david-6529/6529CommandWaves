@@ -251,7 +251,7 @@ describe("command wave persistence", () => {
     expect(wave.proposals[0]?.status).toBe("approved");
   });
 
-  it("refreshes old built-in hook demo records that lack decision receipts", async () => {
+  it("refreshes old built-in hook demo records that lack decision links", async () => {
     await replaceCommandWave({
       ...demoWave,
       proposals: [

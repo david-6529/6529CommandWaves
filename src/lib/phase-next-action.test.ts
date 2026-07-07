@@ -94,7 +94,7 @@ describe("phase next action", () => {
     });
   });
 
-  it("points local vote approval without a receipt back to decision", () => {
+  it("points local vote approval without a decision link back to decision", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({
         ...configuredDemoWave,
@@ -118,7 +118,7 @@ describe("phase next action", () => {
     const nextAction = createPhaseNextAction([
       { id: "project", label: "Choose project", status: "done", detail: "Project chat and GitHub repo are set." },
       { id: "proposal", label: "Propose work", status: "done", detail: "cmd-001: Draft hook scaffold" },
-      { id: "decision", label: "Decide", status: "done", detail: "Receipt recorded." },
+      { id: "decision", label: "Decide", status: "done", detail: "Decision link recorded." },
       { id: "build", label: "Build PR", status: "done", detail: "PR record is ready." },
       { id: "review", label: "Review", status: "done", detail: "Reviewer proof and checks are recorded." },
       { id: "log", label: "Log", status: "active", detail: "Log the result before sharing it back." },

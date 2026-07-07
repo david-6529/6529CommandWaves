@@ -2,7 +2,7 @@
 
 - Builder wave:
 - Approved command id:
-- Decision receipt URL:
+- Decision link URL:
 
 ## Scope
 

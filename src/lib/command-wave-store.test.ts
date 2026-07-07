@@ -213,7 +213,7 @@ describe("Command wave store", () => {
     });
     expect(voted.polls[0].votes.map((vote) => vote.voterIdentity)).toEqual(["carol", "bob", "alice"]);
     expect(voted.ledger[0].message).toBe(
-      "cmd-002 local vote passed. Record the project decision receipt before work can run.",
+      "cmd-002 local vote passed. Record the project decision link before work can run.",
     );
   });
 
@@ -282,7 +282,7 @@ describe("Command wave store", () => {
     );
   });
 
-  it("records a manual project decision receipt as approval evidence", async () => {
+  it("records a manual project decision link as approval evidence", async () => {
     await submitCommandProposal({
       title: "Open a PR",
       proposer: "tester",
@@ -313,10 +313,10 @@ describe("Command wave store", () => {
         recordedBy: "david",
       },
     });
-    expect(approved.ledger[0].message).toBe("Recorded project decision receipt for cmd-002.");
+    expect(approved.ledger[0].message).toBe("Recorded project decision link for cmd-002.");
   });
 
-  it("rejects decision receipt URLs from another wave", async () => {
+  it("rejects decision link URLs from another wave", async () => {
     await updateCommandWaveSetup({
       waveUrl: "https://6529.io/waves/new-command-wave",
       repoUrl: "https://github.com/6529-Collections/new-command-wave",
@@ -339,7 +339,7 @@ describe("Command wave store", () => {
     ).rejects.toThrow("Project decision URL must match the configured discussion.");
   });
 
-  it("rejects malformed decision receipt URLs", async () => {
+  it("rejects malformed decision link URLs", async () => {
     await submitCommandProposal({
       title: "Open a PR",
       proposer: "tester",
@@ -455,7 +455,7 @@ describe("Command wave store", () => {
     await expect(recordVote({ proposalId: "cmd-002", voterIdentity: "dave", vote: "yes" })).rejects.toThrow("Poll is not open.");
   });
 
-  it("requires a project decision receipt before PR execution", async () => {
+  it("requires a project decision link before PR execution", async () => {
     await configureRealRepo();
 
     await submitCommandProposal({
@@ -472,7 +472,7 @@ describe("Command wave store", () => {
     await recordVote({ proposalId: "cmd-002", voterIdentity: "carol", vote: "yes" });
 
     await expect(executeProposal({ proposalId: "cmd-002" })).rejects.toThrow(
-      "Record the project decision receipt before building PR work.",
+      "Record the project decision link before building PR work.",
     );
 
     await recordDecisionReceipt({

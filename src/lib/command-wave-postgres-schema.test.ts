@@ -33,7 +33,7 @@ describe("Command Waves Postgres schema", () => {
     expect(schema).toContain("proof_json jsonb not null default '{}'::jsonb");
   });
 
-  it("stores manual project decision receipts with polls", () => {
+  it("stores manual project decisions with polls", () => {
     expect(schema).toContain("decision_receipt_json jsonb not null default '{}'::jsonb");
     expect(schema).toContain("poll_drop_id_6529 text");
     expect(schema).toContain("command_polls_drop_id_6529_idx");

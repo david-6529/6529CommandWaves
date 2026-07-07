@@ -390,6 +390,6 @@ export function createWaveDecisionReceipt({
     url: isUrl ? trimmedReference : null,
     recordedBy: recordedBy.trim() || "manual reviewer",
     recordedAt,
-    summary: summary?.trim() || `Manual project decision receipt for ${proposalId} in ${waveUrl}.`,
+    summary: summary?.trim() || `Manual project decision link for ${proposalId} in ${waveUrl}.`,
   };
 }
