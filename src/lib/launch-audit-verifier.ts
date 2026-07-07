@@ -511,7 +511,7 @@ function productContractReady(value: unknown) {
       stringArrayIncludes(record.workflow, "Review") &&
       stringArrayIncludes(record.workflow, "Log result") &&
       stringArrayIncludes(record.publicSurfaces, "Project chat") &&
-      stringArrayIncludes(record.publicSurfaces, "GitHub repo once configured") &&
+      stringArrayIncludes(record.publicSurfaces, "GitHub repo placeholder until selected") &&
       stringArrayIncludes(record.publicSurfaces, "Build audit log"),
   );
 }

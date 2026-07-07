@@ -44,7 +44,7 @@ describe("command wave state snapshot", () => {
         name: "Decentralized Coding: Beta",
         purpose: "A simple way for people and agents to build in public",
         workflow: ["Choose project", "Discuss in chat", "Record decision", "Build PR", "Review", "Log result"],
-        publicSurfaces: ["Project chat", "GitHub repo once configured", "Build audit log"],
+        publicSurfaces: ["Project chat", "GitHub repo placeholder until selected", "Build audit log"],
       },
       authorityBoundary: {
         phase: "first_public_hook_build",

@@ -1403,7 +1403,7 @@ export function CommandWavesConsole() {
       : "Open launch controls";
   const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
   const projectRepoIsPlaceholder = isPlaceholderValue(projectRepoHref);
-  const projectRepoLabel = "GitHub repo";
+  const projectRepoLabel = projectRepoIsPlaceholder ? githubRepoPlaceholder.label : "GitHub repo";
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
