@@ -142,6 +142,7 @@ async function main() {
     "Builders",
     "Profiles show visible chat, PR, and review activity.",
     "Visible contribution",
+    "Decision links: 2 report points",
     "Builder details",
     "Access notes, reports, and code checks for builders who want the details.",
     "The group records a project decision before PR work starts.",
@@ -167,6 +168,7 @@ async function main() {
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
   assert(!renderedHtml.includes("6529 decision receipt"), "Home page should not expose internal decision receipt language.");
+  assert(!renderedHtml.includes("Decision receipts"), "Home page should not expose decision receipt labels.");
   assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assertNoEmDash("Home page", renderedHtml);
@@ -315,6 +317,11 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "Discuss in chat");
   assertIncludes("State response", JSON.stringify(statePayload), "accessStatus");
   assert(!JSON.stringify(statePayload).includes("gateStatus"), "State response still includes gateStatus.");
+  assertIncludes("State response", JSON.stringify(statePayload), "Builders approved with 5 yes and 1 no.");
+  assert(
+    !JSON.stringify(statePayload).includes("Project decision link recorded"),
+    "State response still exposes stale decision link copy.",
+  );
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
   assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
   assertIncludes("State response", JSON.stringify(statePayload), "chatPosts");

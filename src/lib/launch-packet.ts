@@ -162,14 +162,14 @@ function decisionLines(poll: PollState | null) {
   const voteLine = `- Vote: ${poll.status}, ${poll.yesVotes} yes, ${poll.noVotes} no, quorum ${poll.quorumRequired}, yes threshold ${poll.yesPercentRequired}%.`;
 
   if (!poll.decision) {
-    return [voteLine, "- Project decision receipt: not recorded yet."];
+    return [voteLine, "- Project decision link: not recorded yet."];
   }
 
   return [
     voteLine,
-    `- Project decision receipt: ${humanizeLegacyCommandCopy(poll.decision.summary)}`,
-    `- Receipt source: ${poll.decision.source}`,
-    `- Receipt reference: ${poll.decision.url ?? poll.decision.dropId ?? "recorded"}`,
+    `- Project decision link: ${humanizeLegacyCommandCopy(poll.decision.summary)}`,
+    `- Decision source: ${poll.decision.source}`,
+    `- Decision link: ${poll.decision.url ?? poll.decision.dropId ?? "recorded"}`,
   ];
 }
 

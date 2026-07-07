@@ -13,13 +13,13 @@ describe("command orchestration summary", () => {
     expect(summary).toEqual({
       workType: "Open PR",
       risk: "high",
-      decisionRoute: "vote required, quorum 3, yes threshold 60%, decision receipt recorded",
+      decisionRoute: "vote required, quorum 3, yes threshold 60%, decision link recorded",
       ruleReason: "Code changes need visible approval before execution.",
       reviewerRoute: "Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records before human merge.",
     });
   });
 
-  it("flags a recorded PR receipt from the wrong wave", () => {
+  it("flags a recorded PR decision link from the wrong wave", () => {
     const summary = createCommandOrchestrationSummary({
       wave: demoWave,
       proposal: demoWave.proposals[0],
@@ -33,11 +33,11 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary.decisionRoute).toBe(
-      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Project decision URL must match the configured discussion.",
+      "vote required, quorum 3, yes threshold 60%, decision link needs fix: Project decision URL must match the configured discussion.",
     );
   });
 
-  it("requires a 6529 drop URL for PR work receipts", () => {
+  it("requires a 6529 drop URL for PR work decision links", () => {
     const summary = createCommandOrchestrationSummary({
       wave: demoWave,
       proposal: demoWave.proposals[0],
@@ -52,7 +52,7 @@ describe("command orchestration summary", () => {
     });
 
     expect(summary.decisionRoute).toBe(
-      "vote required, quorum 3, yes threshold 60%, receipt needs fix: Project decision URL is required for PR work.",
+      "vote required, quorum 3, yes threshold 60%, decision link needs fix: Project decision URL is required for PR work.",
     );
   });
 

@@ -44,10 +44,10 @@ function routeForPoll(wave: CommandWave, proposal: CommandProposal, poll: PollSt
     });
 
     if (!referenceCheck.ok) {
-      return `${route}, receipt needs fix: ${referenceCheck.message}`;
+      return `${route}, decision link needs fix: ${referenceCheck.message}`;
     }
 
-    return `${route}, decision receipt recorded`;
+    return `${route}, decision link recorded`;
   }
 
   if (poll.status === "passed") {

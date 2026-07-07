@@ -74,6 +74,9 @@ describe("public workflow proof", () => {
     expect(proof.steps.find((step) => step.id === "decision")?.evidenceUrl).toBe(
       "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
     );
+    expect(proof.steps.find((step) => step.id === "decision")?.detail).toBe(
+      "Builders approved with 5 yes and 1 no.",
+    );
     expect(proof.steps.find((step) => step.id === "pr")?.evidenceUrl).toBe(
       "https://github.com/6529-Collections/6529-hook/pull/12",
     );
@@ -149,6 +152,9 @@ describe("public workflow proof", () => {
   });
 
   it("does not emit em dash characters", () => {
-    expect(JSON.stringify(createPublicWorkflowProof(demoWave))).not.toContain("\u2014");
+    const proofJson = JSON.stringify(createPublicWorkflowProof(demoWave));
+
+    expect(proofJson).not.toContain("\u2014");
+    expect(proofJson).not.toContain("Project decision link recorded");
   });
 });

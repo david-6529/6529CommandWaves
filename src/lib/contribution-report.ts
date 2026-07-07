@@ -152,7 +152,7 @@ function evidenceSummary(wave: CommandWave, chatPostCount: number) {
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
-    ...(decisionCount ? [countLabel(decisionCount, "project decision receipt")] : []),
+    ...(decisionCount ? [countLabel(decisionCount, "project decision link")] : []),
     ...(chatPostCount ? [countLabel(chatPostCount, "chat post")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
@@ -168,7 +168,7 @@ const scoringRubric = [
   "Other proposal: 3 report points.",
   "Recorded PR linked to a proposal: 2 report points.",
   "Repo-bound Guardian review proof linked to a proposal: 2 report points.",
-  "Project decision receipt: 2 report points.",
+  "Project decision link: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
   "Chat post pulled into app: 1 report point.",
 ];
@@ -176,7 +176,7 @@ const scoringRubric = [
 const coverage = {
   included: [
     "Work proposals stored by this app.",
-    "Votes and recorded project decision receipts stored by this app.",
+    "Votes and recorded project decision links stored by this app.",
     "Chat posts pulled into this app.",
     "Recorded GitHub PR links and repo-bound Guardian review proof.",
     "Attributed activity log events stored by this app.",
@@ -249,8 +249,8 @@ export function createContributionReport(
 
       contributor.decisions += 1;
       contributor.score += 2;
-      addScoreBasis(contributor, "Decision receipts", 2);
-      addRationale(contributor, "Recorded project decision receipt");
+      addScoreBasis(contributor, "Decision links", 2);
+      addRationale(contributor, "Recorded project decision link");
     }
 
     for (const vote of poll.votes ?? []) {

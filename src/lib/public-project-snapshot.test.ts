@@ -37,6 +37,16 @@ describe("public project snapshot", () => {
       label: "review recorded",
       message: "Review passed the hook scaffold. It matched the builder decision and rules.",
     });
+    const approvalSnapshot = createPublicProjectSnapshot({
+      ...demoWave,
+      executions: [],
+      reviews: [],
+      ledger: demoWave.ledger.filter((event) => event.type !== "guardian_reviewed" && event.type !== "execution_logged"),
+    });
+    expect(approvalSnapshot.latestChanges[0]).toMatchObject({
+      label: "builders approved",
+      message: "Builders approved the hook scaffold with 5 yes and 1 no.",
+    });
     expect(JSON.stringify(snapshot)).not.toContain("\u2014");
   });
 

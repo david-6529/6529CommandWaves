@@ -93,7 +93,7 @@ function decisionEvidence(wave: CommandWave) {
 
   return {
     status: "ready" as const,
-    detail: `${poll.yesVotes} yes, ${poll.noVotes} no. Project decision link recorded.`,
+    detail: `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
     evidenceUrl: decision.url,
     evidenceHash: hashValue({ poll, decision }),
   };

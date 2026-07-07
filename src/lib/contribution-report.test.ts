@@ -64,7 +64,7 @@ describe("contribution report", () => {
       "Other proposal: 3 report points.",
       "Recorded PR linked to a proposal: 2 report points.",
       "Repo-bound Guardian review proof linked to a proposal: 2 report points.",
-      "Project decision receipt: 2 report points.",
+      "Project decision link: 2 report points.",
       "Vote or attributed activity log event: 1 report point.",
       "Chat post pulled into app: 1 report point.",
     ]);
@@ -77,7 +77,7 @@ describe("contribution report", () => {
         "Proposal work: 6 report points",
         "PR evidence: 2 report points",
         "Review proof: 2 report points",
-        "Decision receipts: 2 report points",
+        "Decision links: 2 report points",
         "Votes: 1 report point",
         "Activity log: 1 report point",
       ],
@@ -88,7 +88,7 @@ describe("contribution report", () => {
     });
     expect(report.contributors[0].rationale).toContain("Linked approved work to a GitHub PR");
     expect(report.contributors[0].rationale).toContain("Received repo-bound Guardian review proof");
-    expect(report.contributors[0].rationale).toContain("Recorded project decision receipt");
+    expect(report.contributors[0].rationale).toContain("Recorded project decision link");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
     expect(report.contributors.some((contributor) => contributor.identity === "Decision")).toBe(false);
   });
@@ -222,7 +222,7 @@ describe("contribution report", () => {
     expect(draft).toContain("Review proof: 2 report points");
     expect(draft).toContain("1 PR");
     expect(draft).toContain("1 review proof");
-    expect(draft).toContain("Decision receipts: 2 report points");
+    expect(draft).toContain("Decision links: 2 report points");
     expect(draft).toContain("Report scores are an AI-readable activity report, not a permission system.");
     expect(draft).toContain("Reputation, token weight, payouts, and merge rights must use separate human-approved rules.");
     expect(draft).not.toContain("\u2014");

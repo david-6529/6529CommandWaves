@@ -1146,9 +1146,9 @@ export function CommandWavesConsole() {
       : activeExecution
         ? "PR logged"
         : activePollDecisionRecorded
-          ? "decision recorded"
+          ? "approved"
           : activePollNeedsWaveDecision
-            ? "decision receipt needed"
+            ? "decision link needed"
             : activePoll?.status === "open"
               ? "decision open"
               : activeSupportProposal
@@ -3931,7 +3931,7 @@ export function CommandWavesConsole() {
                             ? "PR build waits until maintainers select the GitHub repo."
                             : activePrHasWaveDecision
                               ? "Ready to build the approved PR."
-                            : "Record the decision receipt before the PR build step."
+                            : "Record the decision link before the PR build step."
                           : "Only code PR work uses the build step in phase 1."}
                     </p>
                     {activeExecution?.artifacts.length ? (

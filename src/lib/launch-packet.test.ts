@@ -85,10 +85,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("## Orchestration");
     expect(packet.text).toContain("- Work type: Open PR");
     expect(packet.text).toContain("- Risk: high");
-    expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision receipt recorded.");
+    expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision link recorded.");
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
-    expect(packet.text).toContain("Project decision receipt: Builders approved the hook scaffold with 5 yes and 1 no.");
+    expect(packet.text).toContain("Project decision link: Builders approved the hook scaffold with 5 yes and 1 no.");
     expect(packet.text).not.toContain("Room approved");
     expect(packet.text).toContain("Review proof: not bound to the selected GitHub repo.");
     expect(packet.text).toContain("- Build: blocked");
@@ -105,10 +105,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Log: needed. Log waits for the selected hook repo and reviewed PR.");
     expect(packet.text).toContain("## Contribution Report");
     expect(packet.text).toContain("Complete proposal: 6 report points.");
-    expect(packet.text).toContain("Project decision receipt: 2 report points.");
+    expect(packet.text).toContain("Project decision link: 2 report points.");
     expect(packet.text).toContain("david: report score 10");
     expect(packet.text).toContain("Proposal work: 6 report points");
-    expect(packet.text).toContain("Decision receipts: 2 report points");
+    expect(packet.text).toContain("Decision links: 2 report points");
     expect(packet.text).not.toContain("1 GitHub PR link");
     expect(packet.text).not.toContain("1 Guardian review proof");
     expect(packet.text).toContain("## Developer Fee Records");
@@ -237,7 +237,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("Participation gate:");
   });
 
-  it("keeps local vote approval waiting for a project decision receipt", () => {
+  it("keeps local vote approval waiting for a project decision link", () => {
     const packet = createLaunchPacket({
       wave: demoWave,
       proposal: {
@@ -253,7 +253,7 @@ describe("launch packet", () => {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
-    expect(packet.text).toContain("Project decision receipt: not recorded yet.");
+    expect(packet.text).toContain("Project decision link: not recorded yet.");
     expect(packet.text).toContain("Build: waiting for a recorded project decision.");
   });
 

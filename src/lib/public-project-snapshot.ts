@@ -15,7 +15,7 @@ function eventTypeLabel(type: string) {
     proposal_submitted: "work proposed",
     rule_check: "safety check",
     poll_opened: "decision opened",
-    poll_passed: "decision recorded",
+    poll_passed: "builders approved",
     execution_started: "run started",
     execution_logged: "PR recorded",
     guardian_reviewed: "review recorded",
