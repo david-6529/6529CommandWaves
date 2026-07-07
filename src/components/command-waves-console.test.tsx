@@ -50,15 +50,15 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Placeholder until selected.");
     expect(text).toContain("Select the GitHub repo before the PR build step.");
     expect(text).toContain("Repo setup needed");
-    expect(text).toContain("Project discussion");
+    expect(text).toContain("Project chat");
     expect(text).toContain("General");
     expect(text).toContain("Build");
     expect(text).toContain("Review");
-    expect(text).toContain("Chat with builders");
-    expect(text).toContain("The same box starts the work.");
-    expect(text).toContain("Discuss repo setup");
-    expect(text).toContain("Save as work");
-    expect(text).toContain("Post to chat");
+    expect(text).toContain("Questions, ideas, risks, and work all start here.");
+    expect(text).toContain("Repo setup");
+    expect(text).toContain("Save work item");
+    expect(text).toContain("Post message");
+    expect(text).toContain("Recent chat");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
     expect(text).toContain("Visible contribution");
@@ -96,6 +96,12 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Suggest work");
     expect(text).not.toContain("A shared room for people and agents");
     expect(text).not.toContain("Room discussion");
+    expect(text).not.toContain("Project discussion");
+    expect(text).not.toContain("Chat with builders");
+    expect(text).not.toContain("The same box starts the work.");
+    expect(text).not.toContain("Discuss repo setup");
+    expect(text).not.toContain("Save as work");
+    expect(text).not.toContain("Post to chat");
     expect(text).not.toContain("\u2014");
     expect(text).not.toContain("Gate");
     expect(text).not.toContain("gate unset");
@@ -121,13 +127,13 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain("bg-zinc-950");
   });
 
-  it("keeps project discussion as an open accordion with chat tabs", () => {
+  it("keeps project chat as an open accordion with chat tabs", () => {
     const html = renderedConsoleHtml();
 
     expect(html).toContain('<details id="project-chat"');
     expect(html).toContain('open="">');
     expect(html).toContain('role="tablist"');
-    expect(html).toContain('aria-label="Project discussion sections"');
+    expect(html).toContain('aria-label="Project chat sections"');
     expect(html).toContain('role="tab"');
     expect(html).toContain(">General</button>");
     expect(html).toContain(">Build</button>");

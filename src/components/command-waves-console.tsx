@@ -143,22 +143,22 @@ const discussionTabs = [
   {
     id: "general",
     label: "General",
-    title: "Chat with builders",
-    detail: "Ask a question, suggest a change, or call out risk. The same box starts the work.",
+    title: "Chat",
+    detail: "Questions, ideas, risks, and work all start here.",
     placeholder: "Ask a question, suggest work, or share context.",
   },
   {
     id: "build",
     label: "Build",
-    title: "Scope work",
-    detail: "Turn a promising idea into one small change builders can decide on.",
+    title: "Work",
+    detail: "Shape one change small enough for a decision and a PR.",
     placeholder: "Describe the change builders should discuss or decide on.",
   },
   {
     id: "review",
     label: "Review",
-    title: "Review PRs",
-    detail: "Paste a PR, test result, or review concern so builders can inspect it together.",
+    title: "Review",
+    detail: "Share PR links, test results, and concerns before merge.",
     placeholder: "Paste a PR link, test result, or review note.",
   },
 ] as const;
@@ -1269,7 +1269,7 @@ export function CommandWavesConsole() {
   const hasRoomMessage = Boolean(waveRoomMessage.trim());
   const canPostRoomMessage = Boolean(hasRoomMessage && roomPostTargetUrl);
   const chatWorkSpec =
-    `Captured from ${selectedDiscussionTab.label.toLowerCase()} project discussion. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.`;
+    `Captured from ${selectedDiscussionTab.label.toLowerCase()} chat. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.`;
   const canSaveChatWorkItem = Boolean(hasRoomMessage && apiBusy === null);
   const builderWaveProposalDraft = useMemo(
     () =>
@@ -2241,13 +2241,12 @@ export function CommandWavesConsole() {
 
           <details id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-800 p-5" open>
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-              <span>Project discussion</span>
+              <span>Project chat</span>
               <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{selectedDiscussionTab.label}</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Project chat</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{selectedDiscussionTab.title}</h2>
                 <p className="mt-2 max-w-xl text-base leading-7 text-zinc-400">{selectedDiscussionTab.detail}</p>
               </div>
@@ -2256,12 +2255,12 @@ export function CommandWavesConsole() {
                   Request access
                 </Button>
                 <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
-                  {repoCanRunCode ? "Discuss PR" : "Discuss repo setup"}
+                  {repoCanRunCode ? "Add PR note" : "Repo setup"}
                 </Button>
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Project discussion sections">
+            <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Project chat sections">
               {discussionTabs.map((tab) => {
                 const selected = tab.id === selectedDiscussionTab.id;
 
@@ -2285,7 +2284,7 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-5">
-              <Field label="Message">
+              <Field label="Message or work idea">
                 <Textarea
                   rows={4}
                   value={waveRoomMessage}
@@ -2304,7 +2303,7 @@ export function CommandWavesConsole() {
                   disabled={!canSaveChatWorkItem}
                   onClick={() => void saveChatWorkItem()}
                 >
-                  {apiBusy === "proposal" ? "Saving" : "Save as work"}
+                  {apiBusy === "proposal" ? "Saving" : "Save work item"}
                 </Button>
                 <Button
                   type="button"
@@ -2312,7 +2311,7 @@ export function CommandWavesConsole() {
                   disabled={isBusy || !canPostRoomMessage}
                   onClick={() => void postBuilderWaveChatDraft()}
                 >
-                  {apiBusy === "roomPost" ? "Posting" : "Post to chat"}
+                  {apiBusy === "roomPost" ? "Posting" : "Post message"}
                 </Button>
                 <Button
                   type="button"
@@ -2342,8 +2341,7 @@ export function CommandWavesConsole() {
             <section className="mt-5 border-t border-zinc-800 pt-4" aria-label="Project chat snapshot">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Latest posts</p>
-                  <h3 className="mt-1 text-lg font-semibold text-zinc-50">Latest activity</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Recent chat</h3>
                 </div>
                 <Button
                   type="button"
