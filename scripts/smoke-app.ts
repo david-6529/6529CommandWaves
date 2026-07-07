@@ -86,12 +86,14 @@ async function main() {
     "Connect wallet",
     "Project summary",
     "daemon managed",
-    "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.",
+    "This page is the working snapshot for the 6529 AMM hook build.",
+    "Builders use chat to shape ideas, record decisions, attach pull requests, and review the result.",
     "Draft the non-upgradeable hook scaffold",
-    "Next: Connect repo.",
-    "daemon, a 6529 account, keeps this summary",
-    "Review agent is a placeholder until the production reviewer service is wired.",
-    "GitHub repo is a placeholder until the first hook repo is configured.",
+    "Next step: Select the GitHub repo before PR work can run.",
+    "PR work waits until the repo is selected.",
+    "daemon keeps this summary and changelog current.",
+    "Review agent is a placeholder for this phase.",
+    "GitHub repo is a placeholder until the hook repo is selected.",
     "Changelog",
     "Rules",
     "Who can join?",
@@ -103,9 +105,9 @@ async function main() {
     "Connect wallet if you want, then use Request access in chat.",
     "Current work",
     "5 yes, 1 no. Decision link recorded.",
-    "Code repo",
-    "Add real repo before PR build.",
-    "Set a real GitHub repo before the PR build step.",
+    "GitHub repo",
+    "Placeholder until selected.",
+    "Select the GitHub repo before the PR build step.",
     "Repo setup needed",
     "Project discussion",
     "General",
@@ -114,7 +116,7 @@ async function main() {
     "Chat with builders",
     "The same box starts the work.",
     "Discuss repo setup",
-    "Add to discussion",
+    "Save as work",
     "Post to chat",
     "Latest posts",
     "Latest activity",
@@ -122,20 +124,17 @@ async function main() {
     "Profiles show visible chat, PR, and review activity.",
     "Visible contribution",
     "Build reference",
-    "The top Rules accordion is the plain-English source.",
-    "The group records a project decision before approved PR work starts.",
+    "Access notes, reports, and code checks for builders who want the details.",
+    "The group records a project decision before PR work starts.",
+    "Review approval is manual in this phase.",
     "Report points summarize visible work only.",
     "They do not grant access, payouts, or merge rights.",
-    "Code checks",
     "Start in chat so builders can shape the idea.",
     "Save the scoped work once builders can see it.",
     "Use GitHub PRs once the repo is connected.",
-    "Work type",
-    "Safety checks",
     "Scope work",
     "Save scoped work",
     "Project log",
-    "Report method",
     "Visible activity report",
     "Maintainer tools",
   ]) {
@@ -201,7 +200,7 @@ async function main() {
   assertIncludes(
     "Launch audit response",
     JSON.stringify(launchPayload),
-    "Repo: Placeholder repo (Connect the real hook repo before PR work can run.)",
+    "Repo: GitHub repo placeholder (Select the hook repo before PR work can run.)",
   );
   assert(
     !JSON.stringify(launchPayload).includes("https://github.com/6529-Collections/6529-hook"),
@@ -259,8 +258,8 @@ async function main() {
   assertSha256("Projects response hash", objectValue(projectsPayload, "projectsHash"));
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "Hook Build");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Placeholder repo");
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Connect the repo");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Select the repo");
   assert(
     !JSON.stringify(projectsPayload).includes("https://github.com/6529-Collections/6529-hook"),
     "Projects response still includes the old concrete hook repo.",
