@@ -182,7 +182,7 @@ describe("contribution report", () => {
   it("does not count daemon or system authors as builder contribution", () => {
     const report = createContributionReport(demoWave, {
       chatPosts: [
-        { author: "daemon", preview: "Repo setup needed before PR work." },
+        { author: "daemon", preview: "Repo placeholder for now." },
         { author: "reviewer-agent", preview: "Review placeholder note." },
         { author: "wave-poll", preview: "Decision passed." },
         { author: "chat-builder", preview: "I can review the next hook PR." },

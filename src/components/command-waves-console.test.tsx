@@ -28,7 +28,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("This pilot is the shared workspace for the 6529 AMM hook.");
     expect(text).toContain("Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.");
     expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
-    expect(text).toContain("Next: Select the GitHub repo before PR work can run.");
+    expect(text).toContain("Next: PR work waits until maintainers select the GitHub repo.");
     expect(text).toContain("GitHub repo is still a placeholder, so PR work waits.");
     expect(text).toContain("Latest change: cmd-001 passed with 5 yes, 1 no, and a project decision receipt.");
     expect(text).toContain("daemon keeps the log current.");
@@ -58,24 +58,23 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("A reviewer check must pass before humans merge.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Current work");
-    expect(text).toContain("repo needed");
+    expect(text).toContain("repo placeholder");
     expect(text).toContain("Draft hook scaffold");
     expect(text).toContain("Next");
-    expect(text).toContain("Select the repo");
-    expect(text).toContain("Select repo");
+    expect(text).toContain("Repo placeholder");
+    expect(text).toContain("View setup");
     expect(text).toContain("Decision");
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
     expect(text).toContain("GitHub repo");
     expect(text).toContain("The GitHub repo is a placeholder until the pilot repo is selected.");
     expect(text).toContain("This default is only a placeholder. Select the pilot repo before creating PR work.");
-    expect(text).toContain("Select the GitHub repo before the PR build step.");
-    expect(text).toContain("Repo setup needed");
+    expect(text).toContain("PR build waits until maintainers select the GitHub repo.");
     expect(text).toContain("Project chat");
     expect(text).toContain("General");
     expect(text).toContain("Build");
     expect(text).toContain("Review");
     expect(text).toContain("Questions, ideas, risks, and work all start here.");
-    expect(text).toContain("Repo setup");
+    expect(text).toContain("Repo placeholder");
     expect(text).toContain("Post to chat");
     expect(text).toContain("Save as work");
     expect(text).toContain("Recent chat");
@@ -106,7 +105,7 @@ describe("CommandWavesConsole", () => {
   it("links the current blocker to the repo setup field", () => {
     const html = renderedConsoleHtml();
 
-    expect(html).toContain(">Select repo</button>");
+    expect(html).toContain(">View setup</button>");
     expect(html).toContain('id="project-repo-url"');
     expect(html).toContain('id="project-access-key"');
     expect(html).toContain('id="who-can-join"');
@@ -233,7 +232,8 @@ describe("CommandWavesConsole", () => {
     expect(activeProjectsHtml).toContain("Hook Build");
     expect(activeProjectsHtml).toContain("GitHub repo placeholder");
     expect(activeProjectsHtml).toContain(">Open chat</a>");
-    expect(activeProjectsHtml).toContain(">Select repo</button>");
+    expect(activeProjectsHtml).toContain("Repo placeholder");
+    expect(activeProjectsHtml).not.toContain(">Select repo</button>");
     expect(activeProjectsHtml).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(activeProjectsHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);
   });

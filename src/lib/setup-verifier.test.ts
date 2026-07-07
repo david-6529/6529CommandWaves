@@ -78,7 +78,7 @@ describe("setup verifier", () => {
     expect(result.requiredChecks).toEqual([]);
     expect(result.checks.find((item) => item.id === "github_repo")).toMatchObject({
       status: "fail",
-      message: "Select the GitHub repo before verifying required checks.",
+      message: "Use a configured GitHub repo before verifying required checks.",
     });
     expect(result.checks.some((item) => item.id === "required_check_Command Waves Guardian")).toBe(false);
   });
@@ -110,7 +110,7 @@ describe("setup verifier", () => {
     expect(result.requiredChecks).toEqual([]);
     expect(result.checks.find((item) => item.id === "github_repo")).toMatchObject({
       status: "fail",
-      message: "Setup proof uses a placeholder GitHub repo. Select the real repo before verifying required checks.",
+      message: "Setup proof uses a placeholder GitHub repo. Use a configured repo before verifying required checks.",
     });
   });
 

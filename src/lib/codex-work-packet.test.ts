@@ -46,7 +46,7 @@ describe("Codex work packet", () => {
         proposal: demoWave.proposals[0],
         poll: demoWave.polls[0],
       }),
-    ).toThrow("Select the GitHub repo before creating a Codex work packet.");
+    ).toThrow("Use a configured GitHub repo before creating a Codex work packet.");
   });
 
   it("requires a project decision receipt for PR work packets", () => {

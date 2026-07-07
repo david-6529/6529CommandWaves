@@ -315,7 +315,7 @@ function nextStep(
   }
 
   if (!configuredGitHubRepo(wave.repoUrl)) {
-    return "Select the GitHub repo before PR work can run.";
+    return "PR work waits until maintainers select the GitHub repo.";
   }
 
   if (!execution) {

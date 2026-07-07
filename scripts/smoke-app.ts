@@ -90,7 +90,7 @@ async function main() {
     "This pilot is the shared workspace for the 6529 AMM hook.",
     "Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.",
     "Draft the non-upgradeable hook scaffold",
-    "Next: Select the GitHub repo before PR work can run.",
+    "Next: PR work waits until maintainers select the GitHub repo.",
     "GitHub repo is still a placeholder, so PR work waits.",
     "Latest change: cmd-001 passed with 5 yes, 1 no, and a project decision receipt.",
     "daemon keeps the log current.",
@@ -117,16 +117,15 @@ async function main() {
     "Connect wallet if you want, then use Request access in chat.",
     "Current work",
     "Draft hook scaffold",
-    "Select the repo",
-    "Select repo",
+    "Repo placeholder",
+    "View setup",
     "5 yes, 1 no. Decision link recorded.",
     "GitHub repo",
     "id=\"project-repo-url\"",
     "id=\"project-access-key\"",
     "The GitHub repo is a placeholder until the pilot repo is selected.",
     "This default is only a placeholder. Select the pilot repo before creating PR work.",
-    "Select the GitHub repo before the PR build step.",
-    "Repo setup needed",
+    "PR build waits until maintainers select the GitHub repo.",
     "Project chat",
     "id=\"project-chat-tab-general\"",
     "aria-controls=\"project-chat-panel-general\"",
@@ -136,7 +135,7 @@ async function main() {
     "Build",
     "Review",
     "Questions, ideas, risks, and work all start here.",
-    "Repo setup",
+    "Repo placeholder",
     "Post to chat",
     "Save as work",
     "Recent chat",
@@ -330,7 +329,7 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "Hook Build");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Select the repo");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Repo placeholder");
   assert(
     !JSON.stringify(projectsPayload).includes("https://github.com/your-org/your-hook-repo"),
     "Projects response should not expose the placeholder repo URL as a selected repo.",

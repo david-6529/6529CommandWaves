@@ -129,7 +129,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("run-manifest:{");
     expect(packet.text).toContain("No automatic payouts.");
     expect(packet.text).toContain("This packet does not grant reputation, token weight, payouts, permissions, or merge rights.");
-    expect(packet.text).toContain("Select the GitHub repo before PR work can run.");
+    expect(packet.text).toContain("PR work waits until maintainers select the GitHub repo.");
     expect(packet.text).not.toContain("automatically posted");
     expect(packet.text).not.toContain("\u2014");
   });

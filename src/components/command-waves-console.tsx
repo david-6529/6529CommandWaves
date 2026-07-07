@@ -1139,7 +1139,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "repo needed"
+    ? "repo placeholder"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
@@ -1906,8 +1906,8 @@ export function CommandWavesConsole() {
   function preparePrDiscussion() {
     if (!repoCanRunCode) {
       setDiscussionTabId("build");
-      setProjectChatMessage("Repo setup to discuss: which GitHub repo should hold the hook before PR work starts?");
-      setProjectChatNotice("Repo setup discussion draft ready.");
+      setProjectChatMessage("Repo placeholder: which GitHub repo should hold the hook before PR work starts?");
+      setProjectChatNotice("Repo placeholder discussion draft ready.");
       return;
     }
 
@@ -2353,9 +2353,7 @@ export function CommandWavesConsole() {
                     {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
                     <JumpLink href="#project-chat">Message builders</JumpLink>
                     {!project.repoUrl ? (
-                      <Button type="button" variant="secondary" onClick={() => openSetupControls({ focusRepo: true })}>
-                        Select repo
-                      </Button>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">Repo placeholder</Badge>
                     ) : null}
                   </div>
                 </div>
@@ -2379,7 +2377,7 @@ export function CommandWavesConsole() {
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{phaseNextAction.detail}</p>
                 {projectRepoIsPlaceholder ? (
                   <Button type="button" variant="secondary" className="mt-3" onClick={() => openSetupControls({ focusRepo: true })}>
-                    Select repo
+                    View setup
                   </Button>
                 ) : null}
               </div>
@@ -2444,7 +2442,7 @@ export function CommandWavesConsole() {
                   Request access
                 </Button>
                 <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
-                  {repoCanRunCode ? "Add PR note" : "Repo setup"}
+                  {repoCanRunCode ? "Add PR note" : "Repo placeholder"}
                 </Button>
               </div>
             </div>
@@ -3929,7 +3927,7 @@ export function CommandWavesConsole() {
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
                           ? !repoCanRunCode
-                            ? "Select the GitHub repo before the PR build step."
+                            ? "PR build waits until maintainers select the GitHub repo."
                             : activePrHasWaveDecision
                               ? "Ready to build the approved PR."
                             : "Record the decision receipt before the PR build step."
@@ -3952,7 +3950,7 @@ export function CommandWavesConsole() {
                         {apiBusy === "execute"
                           ? "Building"
                           : !repoCanRunCode
-                            ? "Repo setup needed"
+                            ? "Repo placeholder"
                             : activePrHasWaveDecision
                               ? "Build approved PR"
                               : "Decision receipt needed"}

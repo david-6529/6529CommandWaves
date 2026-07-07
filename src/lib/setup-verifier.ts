@@ -73,14 +73,14 @@ function commandWaveStateFromPayload(payload: unknown) {
 
 function githubRepoCheck(proof: SetupProof) {
   if (!proof.github) {
-    return check("github_repo", "fail", "Select the GitHub repo before verifying required checks.");
+    return check("github_repo", "fail", "Use a configured GitHub repo before verifying required checks.");
   }
 
   if (isPlaceholderValue(proof.github.repoUrl)) {
     return check(
       "github_repo",
       "fail",
-      "Setup proof uses a placeholder GitHub repo. Select the real repo before verifying required checks.",
+      "Setup proof uses a placeholder GitHub repo. Use a configured repo before verifying required checks.",
     );
   }
 

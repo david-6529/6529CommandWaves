@@ -8,10 +8,10 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
       summaryParagraphs: [
         "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
       ],
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
@@ -28,9 +28,9 @@ describe("public project snapshot", () => {
         url: null,
       },
       nextStep: {
-        label: "Select repo",
+        label: "Repo placeholder",
         status: "active",
-        detail: "Select the GitHub repo before PR work can run.",
+        detail: "PR work waits until maintainers select the GitHub repo.",
       },
     });
     expect(snapshot.latestChanges[0]).toMatchObject({
