@@ -70,6 +70,8 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
     const copy =
       active.id === "project" && active.label === "Select repo"
         ? { title: "Select the repo", detail: active.detail }
+        : active.id === "review" && active.detail.toLowerCase().includes("reviewer process")
+          ? { title: "Select reviewer process", detail: active.detail }
         : actionCopyByStep[active.id];
 
     return {

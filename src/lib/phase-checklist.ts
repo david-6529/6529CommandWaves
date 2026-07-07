@@ -4,6 +4,7 @@ import {
   type CommandWave,
   type PollState,
 } from "./command-waves";
+import { reviewAgentIdentity } from "./agent-identities";
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
@@ -66,15 +67,20 @@ function reviewStatus(
   canRunCode: boolean,
   hasConfiguredPrLink: boolean,
   reviewProofBound: boolean,
+  reviewerProcessSelected: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (!canRunCode) {
     return { status: "waiting", detail: "Review waits for a PR from the selected GitHub repo." };
   }
 
   if (review?.status === "pass") {
-    return reviewProofBound
+    if (!reviewProofBound) {
+      return { status: "blocked", detail: "Reviewer proof must be bound to the selected GitHub repo." };
+    }
+
+    return reviewerProcessSelected
       ? { status: "done", detail: "Reviewer proof and checks are recorded." }
-      : { status: "blocked", detail: "Reviewer proof must be bound to the selected GitHub repo." };
+      : { status: "active", detail: "Select the reviewer process before marking review complete." };
   }
 
   if (review && review.status !== "waiting") {
@@ -124,6 +130,7 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
   const review = phaseWork.prReview;
   const hasConfiguredPrLink = Boolean(execution && gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl).length);
   const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
+  const reviewerProcessSelected = reviewAgentIdentity.status !== "placeholder";
   const decisionDone = proposal ? isDecisionDone(proposal.status, poll, wave.waveUrl) : false;
   const decisionReferenceCheck = poll?.decision
     ? validateWaveDecisionReference({
@@ -133,12 +140,13 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
       })
     : null;
   const build = buildStatus(execution, decisionDone, canRunCode, hasConfiguredPrLink);
-  const reviewItem = reviewStatus(execution, review, canRunCode, hasConfiguredPrLink, reviewProofBound);
+  const reviewItem = reviewStatus(execution, review, canRunCode, hasConfiguredPrLink, reviewProofBound, reviewerProcessSelected);
   const projectItem = projectSetupItem(wave, canRunCode);
   const loggedReview = Boolean(
     canRunCode &&
       hasConfiguredPrLink &&
       reviewProofBound &&
+      reviewerProcessSelected &&
       proposal &&
       review?.status === "pass" &&
       wave.ledger.some(

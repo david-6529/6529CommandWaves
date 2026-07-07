@@ -631,13 +631,20 @@ export function createFirstPhaseLaunchAudit({
   setupValidation?: SetupValidation | null;
   wave?: CommandWave | null;
 }): FirstPhaseLaunchAudit {
-  const flowItems: FirstPhaseLaunchAuditItem[] = phaseChecklist.map((item) => ({
-    id: `flow_${item.id}`,
-    label: item.label,
-    status: phaseItemStatus(item.status),
-    detail: item.detail,
-    source: "flow",
-  }));
+  const reviewerPlaceholderOwnsReviewGap =
+    reviewAgentIdentity.status === "placeholder" &&
+    phaseChecklist.some(
+      (item) => item.id === "review" && item.status !== "done" && item.detail.toLowerCase().includes("reviewer process"),
+    );
+  const flowItems: FirstPhaseLaunchAuditItem[] = phaseChecklist
+    .filter((item) => !(reviewerPlaceholderOwnsReviewGap && (item.id === "review" || item.id === "log")))
+    .map((item) => ({
+      id: `flow_${item.id}`,
+      label: item.label,
+      status: phaseItemStatus(item.status),
+      detail: item.detail,
+      source: "flow",
+    }));
   const readinessItems: FirstPhaseLaunchAuditItem[] = readinessChecks
     ? readinessChecks
         .filter(includeLaunchReadinessCheck)

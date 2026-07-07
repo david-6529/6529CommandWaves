@@ -32,15 +32,15 @@ const configuredDemoWave = {
 };
 
 describe("phase next action", () => {
-  it("marks the configured demo loop ready", () => {
+  it("points configured demo loop to reviewer process selection", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(configuredDemoWave));
 
     expect(nextAction).toMatchObject({
-      status: "ready",
-      statusLabel: "ready",
-      stepLabel: "Log",
-      title: "Loop complete",
-      detail: "The approved hook work has a PR, review, project update, and launch packet.",
+      status: "action",
+      statusLabel: "next",
+      stepLabel: "Review",
+      title: "Select reviewer process",
+      detail: "Select the reviewer process before marking review complete.",
     });
   });
 
@@ -115,12 +115,14 @@ describe("phase next action", () => {
   });
 
   it("keeps result sharing draft-only and human reviewed", () => {
-    const nextAction = createPhaseNextAction(
-      createPhaseChecklist({
-        ...configuredDemoWave,
-        ledger: demoWave.ledger.filter((event) => event.type !== "guardian_reviewed"),
-      }),
-    );
+    const nextAction = createPhaseNextAction([
+      { id: "project", label: "Choose project", status: "done", detail: "Project chat and GitHub repo are set." },
+      { id: "proposal", label: "Propose work", status: "done", detail: "cmd-001: Draft hook scaffold" },
+      { id: "decision", label: "Decide", status: "done", detail: "Receipt recorded." },
+      { id: "build", label: "Build PR", status: "done", detail: "PR record is ready." },
+      { id: "review", label: "Review", status: "done", detail: "Reviewer proof and checks are recorded." },
+      { id: "log", label: "Log", status: "active", detail: "Log the result before sharing it back." },
+    ]);
 
     expect(nextAction).toMatchObject({
       status: "action",

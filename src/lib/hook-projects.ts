@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { reviewAgentIdentity } from "./agent-identities";
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
@@ -87,6 +88,10 @@ function hasPlaceholderRepo(wave: CommandWave) {
   return isPlaceholderValue(wave.repoUrl);
 }
 
+function reviewerProcessSelected() {
+  return reviewAgentIdentity.status !== "placeholder";
+}
+
 function waveStatus(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal;
@@ -173,7 +178,9 @@ function codeStatus(wave: CommandWave) {
   const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(phaseWork.prReview, wave.repoUrl);
 
   if (phaseWork.prReview?.status === "pass" && reviewProofBound) {
-    return "PR reviewed and logged.";
+    return reviewerProcessSelected()
+      ? "PR reviewed and logged."
+      : "Reviewer process must be selected before review is complete.";
   }
 
   if (phaseWork.prReview?.status === "pass") {
@@ -205,7 +212,7 @@ function codeSnapshotLabel(wave: CommandWave) {
   const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(phaseWork.prReview, wave.repoUrl);
 
   if (phaseWork.prReview?.status === "pass" && reviewProofBound) {
-    return "PR reviewed";
+    return reviewerProcessSelected() ? "PR reviewed" : "reviewer pending";
   }
 
   if (phaseWork.prReview?.status === "pass") {
@@ -236,7 +243,7 @@ function reviewStatus(wave: CommandWave) {
   const prUrl = findPullRequestUrl(wave);
 
   if (phaseWork.prReview?.status === "pass" && guardianReviewProofBoundToConfiguredRepo(phaseWork.prReview, wave.repoUrl)) {
-    return "review passed";
+    return reviewerProcessSelected() ? "review passed" : "reviewer process needed";
   }
 
   if (phaseWork.prReview?.status === "pass") {
@@ -270,12 +277,14 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const boundReviewCount = wave.reviews.filter((review) =>
       guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl),
     ).length;
+    const reviewEvidenceLabel =
+      boundReviewCount > 0 && !reviewerProcessSelected() ? "reviewer pending" : countLabel(boundReviewCount, "review");
     const evidenceLabel = hasPlaceholderRepo(wave)
       ? `${countLabel(wave.proposals.length, "proposal")}, repo not set`
       : [
           countLabel(wave.proposals.length, "proposal"),
           countLabel(wave.executions.length, "run"),
-          countLabel(boundReviewCount, "review"),
+          reviewEvidenceLabel,
         ].join(", ");
 
     return {

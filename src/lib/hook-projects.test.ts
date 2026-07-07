@@ -68,20 +68,20 @@ describe("active hook projects", () => {
     ]);
   });
 
-  it("lists a configured hook build with reviewed PR evidence", () => {
+  it("lists a configured hook build with reviewer process pending", () => {
     const projects = createActiveHookProjects(configuredDemoWave);
 
     expect(projects[0]).toMatchObject({
       status: "active",
       repoLabel: "6529-Collections/6529-hook",
-      codeSnapshotLabel: "PR reviewed",
-      nextActionStatus: "ready",
-      nextActionLabel: "ready",
-      nextActionTitle: "Loop complete",
-      nextActionDetail: "The approved hook work has a PR, review, project update, and launch packet.",
-      codeStatus: "PR reviewed and logged.",
-      reviewStatusLabel: "review passed",
-      evidenceLabel: "1 proposal, 1 run, 1 review",
+      codeSnapshotLabel: "reviewer pending",
+      nextActionStatus: "action",
+      nextActionLabel: "next",
+      nextActionTitle: "Select reviewer process",
+      nextActionDetail: "Select the reviewer process before marking review complete.",
+      codeStatus: "Reviewer process must be selected before review is complete.",
+      reviewStatusLabel: "reviewer process needed",
+      evidenceLabel: "1 proposal, 1 run, reviewer pending",
     });
   });
 

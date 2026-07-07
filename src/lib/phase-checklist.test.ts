@@ -31,13 +31,16 @@ const configuredDemoWave = {
 };
 
 describe("phase checklist", () => {
-  it("marks a configured hook demo as completed through log", () => {
+  it("keeps a configured hook demo waiting on reviewer process", () => {
     const checklist = createPhaseChecklist(configuredDemoWave);
 
     expect(checklist.map((item) => item.id)).toEqual(["project", "proposal", "decision", "build", "review", "log"]);
-    expect(checklist.map((item) => item.status)).toEqual(["done", "done", "done", "done", "done", "done"]);
-    expect(checklist.find((item) => item.id === "log")?.detail).toContain("discussion update draft");
-    expect(checklist.find((item) => item.id === "log")?.detail).toContain("launch packet");
+    expect(checklist.map((item) => item.status)).toEqual(["done", "done", "done", "done", "active", "waiting"]);
+    expect(checklist.find((item) => item.id === "review")).toMatchObject({
+      status: "active",
+      detail: "Select the reviewer process before marking review complete.",
+    });
+    expect(checklist.find((item) => item.id === "log")?.detail).toBe("Log the result before sharing it back.");
   });
 
   it("blocks PR work while the GitHub repo is a placeholder", () => {
@@ -242,7 +245,7 @@ describe("phase checklist", () => {
       ],
     });
 
-    expect(checklist.map((item) => item.status)).toEqual(["done", "done", "done", "done", "done", "done"]);
+    expect(checklist.map((item) => item.status)).toEqual(["done", "done", "done", "done", "active", "waiting"]);
     expect(checklist.find((item) => item.id === "proposal")?.detail).toContain("cmd-001");
   });
 });

@@ -211,7 +211,7 @@ Audit and launch:
 - Public command-wave state includes the informational contribution report method and notes.
 - Public launch audit includes the hashed wave state, rules, and full audit bundle it checked.
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
-  The proof keeps review and log pending while the reviewer process is still a placeholder.
+  The proof and checklist keep review and log pending while the reviewer process is still a placeholder.
 - Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.
   Fee planning waits for a selected reviewer process and reviewed PR loop.
 - Public launch audit publishes the same human-readable launch packet builders can share back to chat, with a packet hash.
