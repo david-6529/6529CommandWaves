@@ -46,6 +46,7 @@ import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-che
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
+import { createPublicProjectSnapshot } from "@/lib/public-project-snapshot";
 import { createRoomFeed } from "@/lib/room-feed";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { setupValidationNotice, type SetupValidation } from "@/lib/setup-validation";
@@ -1153,6 +1154,7 @@ export function CommandWavesConsole() {
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
   const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
+  const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
   const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
@@ -2108,8 +2110,7 @@ export function CommandWavesConsole() {
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} managed</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-400">
-                This pilot coordinates the design of a 6529 AMM hook through group chat, scoped decisions, reviewer
-                checks, and GitHub PRs once a real repo is connected. {currentFocusLabel}: {humanizeLegacyCommandCopy(currentFocusTitle)}.
+                {publicProjectSnapshot.summary}
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-400">
                 {orchestratorAgentIdentity.handle}, a {orchestratorAgentIdentity.accountType}, keeps this summary and

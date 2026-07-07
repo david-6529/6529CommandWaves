@@ -8,7 +8,7 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "One public project chat coordinates one hook repo through discussion, decision, PR work, review, and a clear log.",
+        "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log. Current work: Draft the non-upgradeable hook scaffold. Next: Choose project. Add real repo before PR build.",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
         status: "complete",
@@ -33,5 +33,23 @@ describe("public project snapshot", () => {
       message: "Review passed cmd-001. The hook scaffold matched the vote and rules.",
     });
     expect(JSON.stringify(snapshot)).not.toContain("\u2014");
+  });
+
+  it("updates the daemon summary from current project state", () => {
+    const emptyWave = {
+      ...demoWave,
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+      ledger: [],
+    };
+    const configuredWave = {
+      ...demoWave,
+      repoUrl: "https://github.com/builders/hook",
+    };
+
+    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Current work: Choose one hook change.");
+    expect(createPublicProjectSnapshot(configuredWave).summary).toContain("GitHub repo configured.");
   });
 });

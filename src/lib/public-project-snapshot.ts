@@ -116,7 +116,27 @@ function nextStepSnapshot(wave: CommandWave) {
       };
 }
 
+function projectSummary({
+  currentWork,
+  repo,
+  nextStep,
+}: {
+  currentWork: ReturnType<typeof currentWorkSnapshot>;
+  repo: ReturnType<typeof repoSnapshot>;
+  nextStep: ReturnType<typeof nextStepSnapshot>;
+}) {
+  return [
+    "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.",
+    `Current work: ${currentWork.title}.`,
+    `Next: ${nextStep.label}.`,
+    repo.label,
+  ].join(" ");
+}
+
 export function createPublicProjectSnapshot(wave: CommandWave) {
+  const currentWork = currentWorkSnapshot(wave);
+  const repo = repoSnapshot(wave);
+  const nextStep = nextStepSnapshot(wave);
   const latestChanges = ledgerEventsByRecency(wave.ledger)
     .slice(0, 3)
     .map((event) => ({
@@ -126,12 +146,11 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
     }));
 
   return {
-    summary:
-      "One public project chat coordinates one hook repo through discussion, decision, PR work, review, and a clear log.",
-    currentWork: currentWorkSnapshot(wave),
+    summary: projectSummary({ currentWork, repo, nextStep }),
+    currentWork,
     decision: decisionSnapshot(wave),
-    repo: repoSnapshot(wave),
-    nextStep: nextStepSnapshot(wave),
+    repo,
+    nextStep,
     latestChanges,
   };
 }

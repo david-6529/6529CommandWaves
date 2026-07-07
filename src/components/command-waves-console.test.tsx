@@ -25,8 +25,9 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon managed");
-    expect(text).toContain("GitHub PRs once a real repo is connected");
+    expect(text).toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
+    expect(text).toContain("Next: Choose project.");
     expect(text).toContain("daemon, a 6529 account, keeps this summary");
     expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
     expect(text).toContain("GitHub repo is a placeholder until the first hook repo is configured.");
@@ -106,6 +107,19 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain("dark-app");
     expect(html).toContain("advanced-dark-surface");
     expect(html).toContain("bg-zinc-950");
+  });
+
+  it("keeps project discussion as an open accordion with chat tabs", () => {
+    const html = renderedConsoleHtml();
+
+    expect(html).toContain('<details id="project-chat"');
+    expect(html).toContain('open="">');
+    expect(html).toContain('role="tablist"');
+    expect(html).toContain('aria-label="Project discussion sections"');
+    expect(html).toContain('role="tab"');
+    expect(html).toContain(">General</button>");
+    expect(html).toContain(">Build</button>");
+    expect(html).toContain(">Review</button>");
   });
 
   it("does not render light-mode surface classes", () => {
