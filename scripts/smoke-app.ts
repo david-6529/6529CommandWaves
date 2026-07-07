@@ -224,6 +224,8 @@ async function main() {
   assert(!JSON.stringify(launchPayload).includes("gateStatus"), "Launch audit response still includes gateStatus.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Auto-merge PRs");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Visible activity report");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "chatPosts");
+  assert(!JSON.stringify(launchPayload).includes("roomPosts"), "Launch audit response still includes roomPosts.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
 
@@ -259,6 +261,8 @@ async function main() {
   assert(!JSON.stringify(statePayload).includes("gateStatus"), "State response still includes gateStatus.");
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
   assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
+  assertIncludes("State response", JSON.stringify(statePayload), "chatPosts");
+  assert(!JSON.stringify(statePayload).includes("roomPosts"), "State response still includes roomPosts.");
   assertIncludes("State response", JSON.stringify(statePayload), "stateHash");
   assertIncludes("State response", JSON.stringify(statePayload), "humansControl");
   assertIncludes("State response", JSON.stringify(statePayload), "Auto-merge PRs");

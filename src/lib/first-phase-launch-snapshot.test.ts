@@ -108,6 +108,9 @@ describe("first phase launch snapshot", () => {
       },
     });
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
+    expect(snapshot.reports.contribution.contributors[0]).toHaveProperty("chatPosts");
+    expect(JSON.stringify(snapshot.reports.contribution)).toContain("chatPosts");
+    expect(JSON.stringify(snapshot.reports.contribution)).not.toContain("roomPosts");
     expect(snapshot.reports.developerFee).toMatchObject({
       mode: "manual_review",
     });

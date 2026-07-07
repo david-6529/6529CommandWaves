@@ -107,6 +107,9 @@ describe("command wave state snapshot", () => {
     expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
+    expect(snapshot.reports.contribution.contributors[0]).toHaveProperty("chatPosts");
+    expect(JSON.stringify(snapshot.reports.contribution)).toContain("chatPosts");
+    expect(JSON.stringify(snapshot.reports.contribution)).not.toContain("roomPosts");
     expect(snapshot.authorityBoundary.agentLimits.join(" ")).toContain("Reviewer checks are evidence");
     expect(snapshot.authorityBoundary).not.toHaveProperty("gateStatus");
     expect(JSON.stringify(snapshot)).not.toContain("\u2014");
