@@ -38,6 +38,24 @@ export type RepoPullRequestCommentResult = {
   id: string | number | null;
 };
 
+export type RepoCheckRunInput = {
+  repoUrl: string;
+  name: string;
+  headSha: string;
+  summary: string;
+  status?: "queued" | "in_progress" | "completed";
+  conclusion?: "success" | "failure" | "neutral" | "cancelled" | "skipped" | "timed_out" | "action_required";
+  detailsUrl?: string;
+  externalId?: string;
+};
+
+export type RepoCheckRunResult = {
+  id: string | number | null;
+  url: string;
+  status: string | null;
+  conclusion: string | null;
+};
+
 export type OrchestratorRunInput = {
   wave: CommandWave;
   proposal: CommandProposal;
@@ -57,6 +75,7 @@ export type WaveAdapter = {
 export type RepoAdapter = {
   openPullRequest(input: RepoPullRequestInput): Promise<RepoPullRequestResult>;
   commentOnPullRequest?(input: RepoPullRequestCommentInput): Promise<RepoPullRequestCommentResult>;
+  createCheckRun?(input: RepoCheckRunInput): Promise<RepoCheckRunResult>;
 };
 
 export type OrchestratorAdapter = {

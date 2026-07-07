@@ -57,6 +57,16 @@ export const localRepoAdapter: RepoAdapter = {
       url: `${input.repoUrl.replace(/\/$/, "")}/pull/${input.prNumber}#issuecomment-${stable}`,
     };
   },
+  async createCheckRun(input) {
+    const stable = stableNumber(`${input.repoUrl}:${input.name}:${input.headSha}:${input.summary}`);
+
+    return {
+      id: `local-check-${stable}`,
+      url: `${input.repoUrl.replace(/\/$/, "")}/checks/${stable}`,
+      status: input.status ?? (input.conclusion ? "completed" : "in_progress"),
+      conclusion: input.conclusion ?? null,
+    };
+  },
 };
 
 export type LocalOrchestratorOptions = {

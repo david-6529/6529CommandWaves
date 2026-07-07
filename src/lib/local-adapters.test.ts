@@ -72,6 +72,24 @@ describe("local command adapters", () => {
     });
   });
 
+  it("can create local check run records", async () => {
+    const checkRun = await localRepoAdapter.createCheckRun?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      name: "Command Waves Guardian",
+      headSha: "0123456789abcdef0123456789abcdef01234567",
+      status: "completed",
+      conclusion: "success",
+      summary: "Guardian review passed.",
+    });
+
+    expect(checkRun).toMatchObject({
+      id: expect.stringMatching(/^local-check-/),
+      url: expect.stringContaining("https://github.com/6529-Collections/6529-hook/checks/"),
+      status: "completed",
+      conclusion: "success",
+    });
+  });
+
   it("passes the configured base branch into the PR adapter and handoff packet", async () => {
     let prBaseBranch = "";
     const orchestrator = createLocalOrchestratorAdapter({

@@ -178,6 +178,159 @@ describe("GitHub pull request adapter", () => {
     ).rejects.toThrow("GitHub PR comment failed: 403 Forbidden - bad comment");
   });
 
+  it("creates a completed GitHub check run", async () => {
+    const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
+    const adapter = createGitHubPullRequestAdapter({
+      apiBaseUrl: "https://api.example.test",
+      token: "token",
+      fetchImpl: async (input, init) => {
+        calls.push({ input, init });
+
+        return jsonResponse({
+          id: 202,
+          html_url: "https://github.com/6529-Collections/6529-hook/runs/202",
+          status: "completed",
+          conclusion: "success",
+        });
+      },
+    });
+
+    const result = await adapter.createCheckRun?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      name: "Command Waves Guardian",
+      headSha: "0123456789abcdef0123456789abcdef01234567",
+      status: "completed",
+      conclusion: "success",
+      summary: "Guardian review passed. Attestation hash: abc123.",
+      detailsUrl: "https://command-waves.example.com/proof",
+      externalId: "guardian:cmd-001",
+    });
+
+    expect(result).toEqual({
+      id: 202,
+      url: "https://github.com/6529-Collections/6529-hook/runs/202",
+      status: "completed",
+      conclusion: "success",
+    });
+    expect(String(calls[0]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/check-runs");
+    expect(calls[0]?.init?.method).toBe("POST");
+    expect(JSON.parse(String(calls[0]?.init?.body))).toEqual({
+      name: "Command Waves Guardian",
+      head_sha: "0123456789abcdef0123456789abcdef01234567",
+      status: "completed",
+      conclusion: "success",
+      details_url: "https://command-waves.example.com/proof",
+      external_id: "guardian:cmd-001",
+      output: {
+        title: "Command Waves Guardian",
+        summary: "Guardian review passed. Attestation hash: abc123.",
+      },
+    });
+  });
+
+  it("requires a GitHub token before creating check runs", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      env: {},
+      fetchImpl: async () => jsonResponse({}),
+    });
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "Command Waves Guardian",
+        headSha: "0123456789abcdef0123456789abcdef01234567",
+        status: "completed",
+        conclusion: "success",
+        summary: "Guardian review passed.",
+      }),
+    ).rejects.toThrow("Creating GitHub check runs requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN.");
+  });
+
+  it("validates check run inputs before calling GitHub", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "",
+        headSha: "0123456789abcdef0123456789abcdef01234567",
+        status: "completed",
+        conclusion: "success",
+        summary: "Guardian review passed.",
+      }),
+    ).rejects.toThrow("GitHub check run name is required.");
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "Command Waves Guardian",
+        headSha: "abc123",
+        status: "completed",
+        conclusion: "success",
+        summary: "Guardian review passed.",
+      }),
+    ).rejects.toThrow("GitHub check run head SHA must be a full 40-character SHA.");
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "Command Waves Guardian",
+        headSha: "0123456789abcdef0123456789abcdef01234567",
+        status: "in_progress",
+        conclusion: "success",
+        summary: "Guardian review passed.",
+      }),
+    ).rejects.toThrow("GitHub check run conclusion requires completed status.");
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "Command Waves Guardian",
+        headSha: "0123456789abcdef0123456789abcdef01234567",
+        status: "completed",
+        summary: "Guardian review passed.",
+      }),
+    ).rejects.toThrow("Completed GitHub check runs require a conclusion.");
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "Command Waves Guardian",
+        headSha: "0123456789abcdef0123456789abcdef01234567",
+        status: "completed",
+        conclusion: "success",
+        summary: " ",
+      }),
+    ).rejects.toThrow("GitHub check run summary is required.");
+    expect(called).toBe(false);
+  });
+
+  it("surfaces GitHub check run API failures", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => new Response("bad check", { status: 422, statusText: "Unprocessable Entity" }),
+    });
+
+    await expect(
+      adapter.createCheckRun?.({
+        repoUrl: "6529-Collections/6529-hook",
+        name: "Command Waves Guardian",
+        headSha: "0123456789abcdef0123456789abcdef01234567",
+        status: "completed",
+        conclusion: "failure",
+        summary: "Guardian review failed.",
+      }),
+    ).rejects.toThrow("GitHub check run failed: 422 Unprocessable Entity - bad check");
+  });
+
   it("rejects non-draft pull request requests in phase 1", async () => {
     let called = false;
     const adapter = createGitHubPullRequestAdapter({

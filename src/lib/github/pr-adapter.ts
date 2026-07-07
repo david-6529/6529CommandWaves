@@ -1,4 +1,4 @@
-import type { RepoAdapter, RepoPullRequestCommentInput, RepoPullRequestInput } from "../adapters";
+import type { RepoAdapter, RepoCheckRunInput, RepoPullRequestCommentInput, RepoPullRequestInput } from "../adapters";
 import { fetchTextResponseWithTimeout } from "../http-fetch";
 import { parseGitHubRepoUrl, pullRequestUrl } from "./repo";
 
@@ -90,6 +90,58 @@ function validateCommentBody(value: string) {
   }
 
   return body;
+}
+
+function validateCheckRunName(value: string) {
+  const name = value.trim();
+
+  if (!name) {
+    throw Object.assign(new Error("GitHub check run name is required."), { status: 400 });
+  }
+
+  if (name.length > 100) {
+    throw Object.assign(new Error("GitHub check run name must be 100 characters or less."), { status: 400 });
+  }
+
+  return name;
+}
+
+function validateCheckRunHeadSha(value: string) {
+  const headSha = value.trim();
+
+  if (!/^[0-9a-f]{40}$/i.test(headSha)) {
+    throw Object.assign(new Error("GitHub check run head SHA must be a full 40-character SHA."), { status: 400 });
+  }
+
+  return headSha;
+}
+
+function validateCheckRunSummary(value: string) {
+  const summary = value.trim();
+
+  if (!summary) {
+    throw Object.assign(new Error("GitHub check run summary is required."), { status: 400 });
+  }
+
+  if (summary.length > 65_536) {
+    throw Object.assign(new Error("GitHub check run summary must be 65536 characters or less."), { status: 400 });
+  }
+
+  return summary;
+}
+
+function validateCheckRunState(input: RepoCheckRunInput) {
+  const status = input.status ?? (input.conclusion ? "completed" : "in_progress");
+
+  if (input.conclusion && status !== "completed") {
+    throw Object.assign(new Error("GitHub check run conclusion requires completed status."), { status: 400 });
+  }
+
+  if (status === "completed" && !input.conclusion) {
+    throw Object.assign(new Error("Completed GitHub check runs require a conclusion."), { status: 400 });
+  }
+
+  return status;
 }
 
 const githubNonOkStatuses = Array.from({ length: 400 }, (_value, index) => index + 200).filter(
@@ -221,6 +273,51 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
       return {
         id: payloadId(payload?.id),
         url: payloadText(payload?.html_url) ?? `${repo.htmlUrl}/pull/${prNumber}#issuecomment-unknown`,
+      };
+    },
+    async createCheckRun(input: RepoCheckRunInput) {
+      const repo = parseGitHubRepoUrl(input.repoUrl);
+      const token = githubToken(options);
+
+      if (!repo) {
+        throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
+      }
+
+      if (!token) {
+        throw Object.assign(new Error("Creating GitHub check runs requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN."), {
+          status: 503,
+        });
+      }
+
+      const name = validateCheckRunName(input.name);
+      const headSha = validateCheckRunHeadSha(input.headSha);
+      const summary = validateCheckRunSummary(input.summary);
+      const status = validateCheckRunState(input);
+      const payload = await requestGitHub(
+        apiBaseUrl,
+        repoApiPath(repo, "/check-runs"),
+        token,
+        fetchImpl,
+        {
+          name,
+          head_sha: headSha,
+          status,
+          ...(input.conclusion ? { conclusion: input.conclusion } : {}),
+          ...(input.detailsUrl?.trim() ? { details_url: input.detailsUrl.trim() } : {}),
+          ...(input.externalId?.trim() ? { external_id: input.externalId.trim() } : {}),
+          output: {
+            title: name,
+            summary,
+          },
+        },
+        "GitHub check run",
+      );
+
+      return {
+        id: payloadId(payload?.id),
+        url: payloadText(payload?.html_url) ?? `${repo.htmlUrl}/commit/${headSha}/checks`,
+        status: payloadText(payload?.status),
+        conclusion: payloadText(payload?.conclusion),
       };
     },
   };
