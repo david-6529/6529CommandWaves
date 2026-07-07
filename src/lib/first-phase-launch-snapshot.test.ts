@@ -53,11 +53,11 @@ describe("first phase launch snapshot", () => {
       summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
       sourceOfTruth: "project chat",
       codeSurface: "GitHub PR",
-      blockedCount: 3,
+      blockedCount: 0,
     });
     expect(snapshot.workflowProof.steps.find((step) => step.id === "pr")).toMatchObject({
-      status: "blocked",
-      detail: "GitHub repo is still a placeholder. Select it before PR work can run.",
+      status: "needed",
+      detail: "GitHub repo is a placeholder. Select it before PR work can run.",
     });
     expect(snapshot.access).toMatchObject({
       label: "manual review",

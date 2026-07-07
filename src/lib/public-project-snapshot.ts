@@ -127,7 +127,7 @@ function projectSummary({
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "The GitHub repo is still a placeholder, so PR work waits until the repo is selected."
+      ? "The GitHub repo is a placeholder, so PR work waits until the repo is selected."
       : "The GitHub repo is connected, so approved changes can move into PR review.";
 
   return [

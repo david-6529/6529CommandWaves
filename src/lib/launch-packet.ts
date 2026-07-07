@@ -198,7 +198,7 @@ function buildLines(wave: CommandWave, poll: PollState | null, execution: Execut
     `- Summary: ${
       repoConfigured
         ? humanizeLegacyCommandCopy(execution.summary)
-        : "GitHub repo is still a placeholder. Select it before PR work can run."
+        : "GitHub repo is a placeholder. Select it before PR work can run."
     }`,
     "- Build records:",
     ...limitedList(buildEvidenceItems(execution.artifacts, wave.repoUrl), 6, "No build artifacts recorded."),

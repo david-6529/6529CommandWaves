@@ -110,7 +110,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
   const missingConfiguredPrLink = Boolean(repoConfigured && execution?.status === "complete" && !prUrl);
   const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
   const prStatus: PublicWorkflowProofStepStatus = !repoConfigured
-    ? "blocked"
+    ? "needed"
     : execution?.status === "complete"
       ? prUrl
         ? "ready"
@@ -119,7 +119,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
         ? "needed"
         : "needed";
   const reviewStatus: PublicWorkflowProofStepStatus = !repoConfigured
-    ? "blocked"
+    ? "needed"
     : missingConfiguredPrLink
       ? "blocked"
     : review?.status === "pass" && reviewProofBound
@@ -159,7 +159,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
       label: "Pull request",
       status: prStatus,
       detail: !repoConfigured
-        ? "GitHub repo is still a placeholder. Select it before PR work can run."
+        ? "GitHub repo is a placeholder. Select it before PR work can run."
         : missingConfiguredPrLink
           ? "PR record is complete but no PR link matches the configured repo."
         : execution?.status === "complete"
@@ -187,9 +187,9 @@ export function createPublicWorkflowProof(wave: CommandWave) {
     {
       id: "log",
       label: "Log",
-      status: !repoConfigured || missingConfiguredPrLink ? "blocked" : logReady ? "ready" : "needed",
+      status: !repoConfigured ? "needed" : missingConfiguredPrLink ? "blocked" : logReady ? "ready" : "needed",
       detail: !repoConfigured
-        ? "Log waits for a selected hook repo and reviewed PR."
+        ? "Log waits for the selected hook repo and reviewed PR."
         : missingConfiguredPrLink
           ? "Log waits for a PR link that matches the configured repo."
         : review?.status === "pass" && !reviewProofBound

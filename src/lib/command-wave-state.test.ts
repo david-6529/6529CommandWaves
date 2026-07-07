@@ -34,7 +34,7 @@ describe("command wave state snapshot", () => {
         summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
         sourceOfTruth: "project chat",
         codeSurface: "GitHub PR",
-        blockedCount: 3,
+        blockedCount: 0,
       },
       access: {
         label: "manual review",
@@ -100,9 +100,9 @@ describe("command wave state snapshot", () => {
     expect(snapshot.workflowProof.steps.map((step) => [step.id, step.status])).toEqual([
       ["chat", "ready"],
       ["decision", "ready"],
-      ["pr", "blocked"],
-      ["review", "blocked"],
-      ["log", "blocked"],
+      ["pr", "needed"],
+      ["review", "needed"],
+      ["log", "needed"],
     ]);
     expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");

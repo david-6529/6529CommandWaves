@@ -38,23 +38,23 @@ describe("public workflow proof", () => {
       summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
       sourceOfTruth: "project chat",
       codeSurface: "GitHub PR",
-      blockedCount: 3,
+      blockedCount: 0,
     });
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
       ["chat", "ready"],
       ["decision", "ready"],
-      ["pr", "blocked"],
-      ["review", "blocked"],
-      ["log", "blocked"],
+      ["pr", "needed"],
+      ["review", "needed"],
+      ["log", "needed"],
     ]);
     expect(proof.steps.find((step) => step.id === "pr")).toMatchObject({
       label: "Pull request",
-      detail: "GitHub repo is still a placeholder. Select it before PR work can run.",
+      detail: "GitHub repo is a placeholder. Select it before PR work can run.",
       evidenceUrl: null,
     });
     expect(proof.steps.find((step) => step.id === "log")).toMatchObject({
       label: "Log",
-      detail: "Log waits for a selected hook repo and reviewed PR.",
+      detail: "Log waits for the selected hook repo and reviewed PR.",
       evidenceHash: null,
     });
   });
