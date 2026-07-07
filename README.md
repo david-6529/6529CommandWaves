@@ -175,6 +175,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 Default workspace:
 
 - Project overview with chat, repo, access, and current status.
+- Collapsed active-project list with chat, repo state, current focus, and next step.
 - Current hook task, saved discussion items, visible decision need, recent PR evidence, latest log, and next action.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct chat posting when configured, recent posts, and copyable discussion draft.

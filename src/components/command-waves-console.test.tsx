@@ -39,6 +39,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Rules");
     expect(text).toContain("Flow");
     expect(text).toContain("Project, Discuss, Decide, PR, Review, Log");
+    expect(text).toContain("Active projects");
+    expect(text).toContain("Start with the pilot hook. More hook projects can appear here after this loop works.");
+    expect(text).toContain("Hook Build");
+    expect(text).toContain("6529-hook-builder");
+    expect(text).toContain("Message builders");
     expect(text).toContain("Discuss");
     expect(text).toContain("PR");
     expect(text).toContain("Log");
@@ -202,7 +207,7 @@ describe("CommandWavesConsole", () => {
   it("keeps the top context accordions stacked with only the summary open", () => {
     const html = renderedConsoleHtml();
     const start = html.indexOf('aria-label="Project context"');
-    const end = html.indexOf('id="workspace"');
+    const end = html.indexOf('aria-label="Build flow"');
     const contextHtml = html.slice(start, end);
 
     expect(start).toBeGreaterThan(-1);
@@ -212,6 +217,23 @@ describe("CommandWavesConsole", () => {
     expect(contextHtml).toContain("Project summary");
     expect(contextHtml).toContain("Rules");
     expect(contextHtml).toContain("Changelog");
+  });
+
+  it("keeps the public active projects list collapsed and placeholder-safe", () => {
+    const html = renderedConsoleHtml();
+    const start = html.indexOf('id="active-projects"');
+    const end = html.indexOf('id="workspace"');
+    const activeProjectsHtml = html.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(activeProjectsHtml).toContain("Active projects");
+    expect(activeProjectsHtml).toContain("Hook Build");
+    expect(activeProjectsHtml).toContain("GitHub repo placeholder");
+    expect(activeProjectsHtml).toContain(">Open chat</a>");
+    expect(activeProjectsHtml).toContain(">Select repo</button>");
+    expect(activeProjectsHtml).not.toContain("https://github.com/your-org/your-hook-repo");
+    expect(activeProjectsHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);
   });
 
   it("shows the full public launch setup checklist in maintainer tools", () => {
