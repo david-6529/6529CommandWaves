@@ -1,25 +1,30 @@
 # Contributing To The First Hook Phase
 
-This repo uses one 6529 project chat to coordinate one smart contract repo.
+This repo uses one 6529 project chat to coordinate one smart contract repo. The pilot GitHub repo is still a placeholder
+until maintainers select it, so PR work starts only after that setup is done.
 
 ## Simple Flow
 
 1. Discuss ideas in the community space.
 2. Turn one idea into a PR-sized proposal.
 3. Get the project decision.
-4. Build on a prepared branch.
-5. Open a draft PR with the Command Waves manifest.
-6. Wait for review before humans merge, deploy, pay, or change governance.
+4. Select the pilot GitHub repo before PR work.
+5. Build on a prepared branch.
+6. Open a draft PR with the Command Waves manifest.
+7. Wait for review before humans merge, deploy, pay, or change governance.
 
 ## Before Opening A PR
 
 - Link the work to an approved project proposal.
+- Make sure the pilot GitHub repo has been selected.
 - Keep the PR scoped to that proposal.
 - Include the Command Waves manifest in the PR body.
 - Include tests or reviewer records for the approved scope.
 - Submit only context reads, drafts, chat updates, or PR work in phase 1.
 - Keep deploys, payments, merges, and governance changes out of phase 1 PRs.
 - Use the agent build step only for approved PR work.
+- Treat `daemon` as the orchestration account that summarizes chat and routes work. It does not merge, deploy, spend
+  funds, or override maintainers.
 
 ## Local Verification
 
@@ -51,3 +56,4 @@ A PR should be ready to review when a human can answer:
 - Did the change avoid deploys, payments, and governance control?
 
 The app and guardian checks provide records. Humans still make merge, deploy, payment, and governance decisions.
+The reviewer process is a placeholder for this phase until maintainers select the production reviewer route.
