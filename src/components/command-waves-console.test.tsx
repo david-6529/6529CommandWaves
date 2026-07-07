@@ -33,6 +33,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("daemon keeps this summary and changelog current.");
     expect(text).toContain("Review agent is a placeholder for this phase.");
     expect(text).toContain("GitHub repo is a placeholder until the hook repo is selected.");
+    expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
     expect(text).toContain("Who can join?");
@@ -51,6 +52,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
     expect(text).toContain("GitHub repo");
     expect(text).toContain("Placeholder until selected.");
+    expect(text).toContain("This default is only a placeholder. Select the real hook repo before creating PR work.");
     expect(text).toContain("Select the GitHub repo before the PR build step.");
     expect(text).toContain("Repo setup needed");
     expect(text).toContain("Project chat");
@@ -86,6 +88,7 @@ describe("CommandWavesConsole", () => {
 
     expect(html).toContain(">Select repo</button>");
     expect(html).toContain('id="project-repo-url"');
+    expect(html).toContain('id="project-access-key"');
     expect(html).toContain("Maintainer setup");
   });
 

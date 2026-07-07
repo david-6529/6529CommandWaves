@@ -173,6 +173,7 @@ function projectChatPanelId(id: DiscussionTabId) {
 }
 
 const projectRepoInputId = "project-repo-url";
+const projectAccessKeyInputId = "project-access-key";
 
 const hookGuardrails = [
   "Hook contracts stay immutable by default.",
@@ -1003,6 +1004,7 @@ export function CommandWavesConsole() {
   const [setupValidation, setSetupValidation] = useState<SetupValidation | null>(null);
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null);
   const [setupControlsOpen, setSetupControlsOpen] = useState(false);
+  const [accessKeyControlsOpen, setAccessKeyControlsOpen] = useState(false);
   const [readinessControlsOpen, setReadinessControlsOpen] = useState(false);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
@@ -1356,6 +1358,12 @@ export function CommandWavesConsole() {
     launchNextActionItemId.startsWith("setup_");
   const launchActionRunsReadiness =
     launchNextActionItemId === "readiness_not_checked" || launchNextActionItemId.startsWith("readiness_");
+  const launchActionFocusesRepo =
+    launchNextActionItemId === "flow_project" ||
+    launchNextActionItemId === "setup_repo_placeholder" ||
+    launchNextActionItemId === "setup_repo_reachable" ||
+    launchNextActionItemId === "readiness_initial_hook_project";
+  const launchActionFocusesAccessKey = launchNextActionItemId === "readiness_admin_api_key";
   const launchActionButtonText = launchActionRunsSetup
     ? apiBusy === "setup" || apiBusy === "launch"
       ? "Checking"
@@ -1367,6 +1375,7 @@ export function CommandWavesConsole() {
       : "Open launch controls";
   const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
   const projectRepoIsPlaceholder = isPlaceholderValue(projectRepoHref);
+  const projectRepoLabel = projectRepoIsPlaceholder ? "GitHub repo placeholder" : "GitHub repo";
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
@@ -1621,14 +1630,19 @@ export function CommandWavesConsole() {
     void runWaveAction("reset", () => requestWave("/api/command-wave", { method: "DELETE" }, accessKey), "Starter state restored.");
   }
 
-  function openSetupControls(options: { focusRepo?: boolean } = {}) {
+  function openSetupControls(options: { focusRepo?: boolean; focusAccessKey?: boolean } = {}) {
     setSetupControlsOpen(true);
+    setAccessKeyControlsOpen((open) => open || Boolean(options.focusAccessKey));
     window.requestAnimationFrame(() => {
       setupControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
       if (options.focusRepo) {
         window.setTimeout(() => {
           document.getElementById(projectRepoInputId)?.focus();
+        }, 150);
+      } else if (options.focusAccessKey) {
+        window.setTimeout(() => {
+          document.getElementById(projectAccessKeyInputId)?.focus();
         }, 150);
       }
     });
@@ -1651,13 +1665,13 @@ export function CommandWavesConsole() {
 
   function runLaunchNextAction() {
     if (launchActionRunsSetup) {
-      openSetupControls();
+      openSetupControls({ focusRepo: launchActionFocusesRepo });
       void checkLaunchAudit();
       return;
     }
 
     if (launchActionRunsReadiness) {
-      openSetupControls();
+      openSetupControls({ focusRepo: launchActionFocusesRepo, focusAccessKey: launchActionFocusesAccessKey });
       void checkReadiness();
       return;
     }
@@ -2275,7 +2289,7 @@ export function CommandWavesConsole() {
                 <p className="mt-1 text-base leading-7 text-zinc-400">{currentDecisionDetail}</p>
               </div>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">GitHub repo</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{projectRepoLabel}</p>
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a
                     className="mt-1 inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
@@ -3037,7 +3051,7 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Set the first hook source and GitHub repo. More hook projects can use the same shape later.
+                The GitHub repo is a placeholder until selected. Add the real hook repo only when PR work should start.
               </p>
               <div className="rounded-md border border-amber-800 bg-amber-950/20 p-3">
                 <p className="text-sm font-semibold text-amber-100">Server key needed before launch</p>
@@ -3097,7 +3111,7 @@ export function CommandWavesConsole() {
                   </div>
                 ) : null}
               </div>
-              <Field label="GitHub repo">
+              <Field label={projectRepoLabel}>
                 <Input
                   id={projectRepoInputId}
                   value={repoUrl}
@@ -3107,6 +3121,11 @@ export function CommandWavesConsole() {
                   }}
                 />
               </Field>
+              {projectRepoIsPlaceholder ? (
+                <p className="text-xs leading-5 text-zinc-500">
+                  This default is only a placeholder. Select the real hook repo before creating PR work.
+                </p>
+              ) : null}
               {setupValidation ? (
                 <div className="rounded-md border border-zinc-800 bg-black p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -3159,7 +3178,11 @@ export function CommandWavesConsole() {
                   <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p>
                 ) : null}
               </div>
-              <details className="rounded-md border border-zinc-800 bg-black p-3">
+              <details
+                className="rounded-md border border-zinc-800 bg-black p-3"
+                open={accessKeyControlsOpen}
+                onToggle={(event) => setAccessKeyControlsOpen(event.currentTarget.open)}
+              >
                 <summary className="flex items-center justify-between gap-3 text-sm font-semibold text-zinc-100">
                   <span>Access key</span>
                   <Badge className={accessKey.trim() ? statusClass("complete") : "border-zinc-700 bg-zinc-900 text-zinc-400"}>
@@ -3169,6 +3192,7 @@ export function CommandWavesConsole() {
                 <div className="mt-3 grid gap-2">
                   <Field label="Key for protected actions">
                     <Input
+                      id={projectAccessKeyInputId}
                       type="password"
                       autoComplete="off"
                       value={accessKey}
