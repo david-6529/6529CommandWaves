@@ -74,4 +74,22 @@ describe("launch docs", () => {
     expect(readme).toContain("required hash fields");
     expect(readme).toContain("its own manifest URL");
   });
+
+  it("uses decision link copy in public launch docs", () => {
+    const docs = [
+      readRepoFile("README.md"),
+      readRepoFile("docs/mvp-plan.md"),
+      readRepoFile("docs/first-hook-launch-playbook.md"),
+      readRepoFile("docs/agent-harness-plan.md"),
+      readRepoFile("docs/github-reviewer-gate.md"),
+    ].join("\n");
+    const staleDecision = "decision " + "receipt";
+    const staleApproval = "approval " + "receipt";
+    const staleVote = "vote or " + "receipt";
+
+    expect(docs).toContain("decision link");
+    expect(docs).not.toMatch(new RegExp(`${staleDecision}s?`, "i"));
+    expect(docs).not.toMatch(new RegExp(staleApproval, "i"));
+    expect(docs).not.toMatch(new RegExp(staleVote, "i"));
+  });
 });

@@ -46,7 +46,7 @@ What exists now:
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
 - Client request timeouts so UI actions fail clearly instead of hanging.
-- Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
+- Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,
   and public project state.
 - Public active project index for agents or future UI surfaces that need the hook list and project chat links.
 - Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, launch track status, and required hash fields.
@@ -298,7 +298,7 @@ required guardian check.
 ## Durable Storage
 
 For a small first loop, local file storage can prove the chat-to-PR workflow while 6529 holds the public discussion and
-decision receipts. Before broad participation, use Postgres so setup, proposals, votes, decisions, PR records, reviews,
+decision links. Before broad participation, use Postgres so setup, proposals, votes, decisions, PR records, reviews,
 and ledger events survive server restarts.
 
 1. Create a Postgres database.
@@ -488,8 +488,8 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `DELETE /api/command-wave`: reset the local demo.
 - `POST /api/command-wave/proposals`: submit a work proposal.
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
-- `POST /api/command-wave/decision`: record a manual project decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from project chat.
-- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded project decision receipt.
+- `POST /api/command-wave/decision`: record a manual project decision link. Body requires `proposalId` and `reference`. PR commands require a decision URL from project chat.
+- `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded project decision link.
 - `POST /api/command-wave/execute`: prepare the target branch, commit the Codex work packet plus optional approved
   `{ path, content }` files, and open a draft PR record.
 - `POST /api/command-wave/review`: run the reviewer adapter, record a PR comment, create a check run, and save reviewer proof.

@@ -74,9 +74,9 @@ Later phases can add stricter approval paths for parked command kinds after the 
 2. A member proposes: "Draft the non-upgradeable hook scaffold with fee parameters capped at 100 bps and tests."
 3. The orchestration rules classify it as `open_pr`, high risk, vote required.
 4. The project decision approves the scoped work.
-5. The operator records the decision URL as a manual approval receipt.
+5. The operator records the decision URL as a manual decision link.
 6. The agent opens a PR with a Command Waves manifest.
-7. The GitHub reviewer gate checks the PR manifest, vote or receipt status, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
+7. The GitHub reviewer gate checks the PR manifest, vote or decision-link status, rules hash, approved prompt/spec hashes, risky file changes, and hook contract signals.
 8. Reviewer CI verifies tests, contract guardrails, and changed files before humans merge.
 9. The result, contribution activity, manual developer fee evidence, and launch packet are prepared for human review.
 

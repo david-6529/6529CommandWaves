@@ -23,8 +23,8 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 - One PR-sized command at a time.
 - Orchestration rules that classify risk and require votes for important changes.
 - Local or imported project decisions for approvals.
-- Manual decision receipts that link approved work to a decision URL in project chat.
-- Copyable Codex work packets for PR commands with a recorded project decision receipt.
+- Manual decision links that connect approved work to a decision URL in project chat.
+- Copyable Codex work packets for PR commands with a recorded project decision link.
 - Draft PRs with Command Waves manifests.
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Copyable chat launch brief for the first public post.
@@ -96,7 +96,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 7. Invite ideas in the general chat or thread.
 8. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
 9. Vote or approve through builder chat.
-10. Record the decision URL as the manual approval receipt.
+10. Record the decision URL as the manual decision link.
 11. Use the build step to prepare the branch, commit the Codex work packet, and open a draft PR record.
 12. Run any code-writing agent only inside that approved packet and branch.
 13. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.

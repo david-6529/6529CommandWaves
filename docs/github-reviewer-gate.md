@@ -82,8 +82,8 @@ The check fails if:
 - the manifest points to a missing proposal
 - the proposal is not approved, reviewing, or complete
 - the command is not an `open_pr` command
-- a required wave decision receipt has not been recorded
-- the manifest poll drop id does not match the recorded wave decision receipt
+- a required wave decision link has not been recorded
+- the manifest poll drop id does not match the recorded wave decision link
 - the manifest rules hash does not match the approved command
 - the manifest prompt/spec hashes do not match the approved command
 - the PR touches high-risk files without a high-risk or critical approval
@@ -98,8 +98,8 @@ The guardian should be deterministic. An LLM can help explain the result or sugg
 decision should come from checks that anyone can rerun.
 
 For the first phase, local counted votes are visible sentiment only. PR build and reviewer approval require a recorded
-wave decision receipt that points to a 6529 decision drop in the configured builder wave. The receipt does not claim live
-REP, TDH, or weighted voting.
+wave decision link that points to a 6529 decision drop in the configured builder wave. The link does not claim live REP,
+TDH, or weighted voting.
 
 ## Hook Contract Signals
 
