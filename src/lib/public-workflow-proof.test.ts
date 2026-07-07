@@ -30,12 +30,12 @@ describe("public workflow proof", () => {
     ]);
     expect(proof.steps.find((step) => step.id === "pr")).toMatchObject({
       label: "Pull request",
-      detail: "GitHub repo is still a placeholder. Replace it before PR work can run.",
+      detail: "GitHub repo is still a placeholder. Select it before PR work can run.",
       evidenceUrl: null,
     });
     expect(proof.steps.find((step) => step.id === "log")).toMatchObject({
       label: "Log",
-      detail: "Log waits for a real hook repo and reviewed PR.",
+      detail: "Log waits for a selected hook repo and reviewed PR.",
       evidenceHash: null,
     });
   });

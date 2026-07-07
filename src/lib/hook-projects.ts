@@ -57,13 +57,13 @@ function repoLabel(repoUrl: string) {
   const trimmed = repoUrl.trim();
 
   if (isPlaceholderValue(trimmed)) {
-    return "Placeholder repo";
+    return "GitHub repo placeholder";
   }
 
   const httpsMatch = trimmed.match(/^https?:\/\/github\.com\/([^/\s]+\/[^/\s?#]+)(?:[?#].*)?$/);
   const sshMatch = trimmed.match(/^git@github\.com:([^/\s]+\/[^/\s]+?)(?:\.git)?$/);
 
-  return (httpsMatch?.[1] ?? sshMatch?.[1] ?? trimmed) || "No code repo";
+  return (httpsMatch?.[1] ?? sshMatch?.[1] ?? trimmed) || "No GitHub repo";
 }
 
 function findPullRequestUrl(wave: CommandWave) {
@@ -164,7 +164,7 @@ function orchestrationSnapshotLabel(wave: CommandWave) {
 
 function codeStatus(wave: CommandWave) {
   if (hasPlaceholderRepo(wave)) {
-    return "Replace the placeholder repo before PR work can run.";
+    return "GitHub repo is a placeholder until selected.";
   }
 
   const phaseWork = selectPhaseWork(wave);
@@ -190,7 +190,7 @@ function codeStatus(wave: CommandWave) {
 
 function codeSnapshotLabel(wave: CommandWave) {
   if (hasPlaceholderRepo(wave)) {
-    return "repo needed";
+    return "repo placeholder";
   }
 
   const phaseWork = selectPhaseWork(wave);

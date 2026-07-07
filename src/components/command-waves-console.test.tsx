@@ -27,10 +27,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("daemon managed");
     expect(text).toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
-    expect(text).toContain("Next: Connect repo.");
+    expect(text).toContain("Next: Select repo.");
     expect(text).toContain("daemon, a 6529 account, keeps this summary");
     expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
-    expect(text).toContain("GitHub repo is a placeholder until the first hook repo is configured.");
+    expect(text).toContain("GitHub repo is a placeholder until the hook repo is selected.");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
     expect(text).toContain("Who can join?");
@@ -43,9 +43,9 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Current work");
     expect(text).toContain("Decision");
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
-    expect(text).toContain("Code repo");
-    expect(text).toContain("Add real repo before PR build.");
-    expect(text).toContain("Set a real GitHub repo before the PR build step.");
+    expect(text).toContain("GitHub repo");
+    expect(text).toContain("Placeholder until selected.");
+    expect(text).toContain("Select the GitHub repo before the PR build step.");
     expect(text).toContain("Repo setup needed");
     expect(text).toContain("Project discussion");
     expect(text).toContain("General");
@@ -97,6 +97,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Participation gate is not set yet.");
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("orchestrator managed");
+    expect(text).not.toContain("Add real repo before PR build.");
+    expect(text).not.toContain("Set a real GitHub repo");
   });
 
   it("keeps optional advanced drawers on the dark app surface", () => {

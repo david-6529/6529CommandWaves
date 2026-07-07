@@ -96,7 +96,7 @@ function summaryFor(status: FirstPhaseLaunchAuditStatus) {
 }
 
 const launchActionCopyByItemId: Record<string, string> = {
-  flow_project: "Set project chat and code repo",
+  flow_project: "Set project chat and GitHub repo",
   flow_proposal: "Propose one PR-sized hook change",
   flow_decision: "Record the project decision",
   flow_build: "Build the approved PR",
@@ -108,7 +108,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_not_checked: "Run launch setup check",
   setup_remote_check: "Run launch setup check",
   setup_wave_reachable: "Pick reachable project chat",
-  setup_repo_reachable: "Pick reachable code repo",
+  setup_repo_reachable: "Pick reachable GitHub repo",
   setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
   setup_repo_required_guardian_check: "Require guardian check",

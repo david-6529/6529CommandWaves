@@ -36,7 +36,7 @@ export function createBuilderWaveReviewRequestDraft({
     "Project review request",
     "",
     `Project chat: ${wave.waveUrl}`,
-    projectRepoLine("Code repo", wave.repoUrl),
+    projectRepoLine("GitHub repo", wave.repoUrl),
     `Work: ${proposal.id} - ${proposal.title}`,
     `PR: ${prUrl(execution) ?? "not recorded yet"}`,
     "",

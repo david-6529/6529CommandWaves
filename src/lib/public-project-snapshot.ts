@@ -29,7 +29,7 @@ function repoSnapshot(wave: CommandWave) {
   if (!repoUrl || isPlaceholderValue(repoUrl)) {
     return {
       status: "placeholder",
-      label: "Add real repo before PR build.",
+      label: "GitHub repo is a placeholder.",
       url: null,
     };
   }

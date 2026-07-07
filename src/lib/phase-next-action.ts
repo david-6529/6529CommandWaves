@@ -19,7 +19,7 @@ const actionCopyByStep: Record<
 > = {
   project: {
     title: "Set the project",
-    detail: "Confirm one project chat and one code repo before proposals start.",
+    detail: "Confirm one project chat and one GitHub repo before proposals start.",
   },
   proposal: {
     title: "Propose scoped hook work",
@@ -68,8 +68,8 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
 
   if (active) {
     const copy =
-      active.id === "project" && active.label === "Connect repo"
-        ? { title: "Connect the repo", detail: active.detail }
+      active.id === "project" && active.label === "Select repo"
+        ? { title: "Select the repo", detail: active.detail }
         : actionCopyByStep[active.id];
 
     return {

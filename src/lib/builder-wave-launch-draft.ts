@@ -16,7 +16,7 @@ export function createBuilderWaveLaunchDraft(wave: CommandWave) {
     "Project launch brief",
     "",
     `Project chat: ${wave.waveUrl}`,
-    projectRepoLine("Code repo", wave.repoUrl),
+    projectRepoLine("GitHub repo", wave.repoUrl),
     ...(rulesLine ? [rulesLine] : []),
     "",
     "Goal: coordinate the first public build for a non-upgradeable hook through project chat and one smart contract repo.",

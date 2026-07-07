@@ -36,11 +36,11 @@ describe("first phase launch snapshot", () => {
       updatedAt: "2026-06-20T12:50:00.000Z",
       repo: {
         status: "placeholder",
-        label: "Add real repo before PR build.",
+        label: "GitHub repo is a placeholder.",
       },
       nextStep: {
-        label: "Connect repo",
-        detail: "Set a real GitHub repo before PR work can run.",
+        label: "Select repo",
+        detail: "Select the GitHub repo before PR work can run.",
       },
     });
     expect(snapshot.hookSafety).toMatchObject({
@@ -57,7 +57,7 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.workflowProof.steps.find((step) => step.id === "pr")).toMatchObject({
       status: "blocked",
-      detail: "GitHub repo is still a placeholder. Replace it before PR work can run.",
+      detail: "GitHub repo is still a placeholder. Select it before PR work can run.",
     });
     expect(snapshot.access).toMatchObject({
       label: "manual review",
@@ -136,7 +136,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.launchPacket.packetHash).toMatch(/^[a-f0-9]{64}$/);
     expect(snapshot.launchPacket.text).toContain("# Project launch packet");
     expect(snapshot.launchPacket.text).toContain(
-      "Repo: Placeholder repo (Connect the real hook repo before PR work can run.)",
+      "Repo: GitHub repo placeholder (Select the hook repo before PR work can run.)",
     );
     expect(snapshot.launchPacket.text).toContain("## Workflow Proof");
     expect(snapshot.launchPacket.text).toContain("## Verification");

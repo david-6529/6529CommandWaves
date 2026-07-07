@@ -2128,7 +2128,7 @@ export function CommandWavesConsole() {
                 changelog current as chat, decisions, and repo activity change. {reviewAgentIdentity.description}{" "}
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
-                    Open the code repo
+                    Open the GitHub repo
                   </a>
                 ) : (
                   githubRepoPlaceholder.description
@@ -2195,7 +2195,7 @@ export function CommandWavesConsole() {
                 <p className="mt-1 text-base leading-7 text-zinc-400">{currentDecisionDetail}</p>
               </div>
               <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Code repo</p>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">GitHub repo</p>
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a
                     className="mt-1 inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
@@ -2206,7 +2206,7 @@ export function CommandWavesConsole() {
                     Open repo
                   </a>
                 ) : projectRepoIsPlaceholder ? (
-                  <p className="mt-1 text-base leading-7 text-zinc-400">Add real repo before PR build.</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-400">Placeholder until selected.</p>
                 ) : (
                   <p className="mt-1 text-base leading-7 text-zinc-400">Repo not set yet.</p>
                 )}
@@ -2713,7 +2713,7 @@ export function CommandWavesConsole() {
             </Badge>
           </summary>
           <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
-            Hook project source, code repo, access notes, and the next code step.
+            Hook project source, GitHub repo, access notes, and the next code step.
           </p>
           <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
@@ -2950,7 +2950,7 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                Set the first hook source and code repo. More hook projects can use the same shape later.
+                Set the first hook source and GitHub repo. More hook projects can use the same shape later.
               </p>
               <Field label="Project source">
                 <Input
@@ -3000,7 +3000,7 @@ export function CommandWavesConsole() {
                   </div>
                 ) : null}
               </div>
-              <Field label="Code repo">
+              <Field label="GitHub repo">
                 <Input
                   value={repoUrl}
                   onChange={(event) => {
@@ -3690,7 +3690,7 @@ export function CommandWavesConsole() {
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
                           ? !repoCanRunCode
-                            ? "Set a real GitHub repo before the PR build step."
+                            ? "Select the GitHub repo before the PR build step."
                             : activePrHasWaveDecision
                               ? "Ready to build the approved PR."
                             : "Record the decision receipt before the PR build step."

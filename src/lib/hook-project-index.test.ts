@@ -20,8 +20,8 @@ describe("hook project index", () => {
           id: demoWave.id,
           name: "Hook Build",
           waveLabel: "6529-hook-builder",
-          repoLabel: "Placeholder repo",
-          nextActionTitle: "Connect the repo",
+          repoLabel: "GitHub repo placeholder",
+          nextActionTitle: "Select the repo",
         },
       ],
     });

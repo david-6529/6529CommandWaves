@@ -32,7 +32,7 @@ describe("launch status draft", () => {
 
     expect(draft).toContain("Project launch status");
     expect(draft).toContain(`Project chat: ${configuredDemoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${configuredDemoWave.repoUrl}`);
+    expect(draft).toContain(`GitHub repo: ${configuredDemoWave.repoUrl}`);
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain(

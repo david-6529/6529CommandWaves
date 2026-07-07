@@ -29,10 +29,10 @@ describe("phase checklist", () => {
       ["log", "waiting"],
     ]);
     expect(checklist.find((item) => item.id === "project")).toMatchObject({
-      label: "Connect repo",
-      detail: "Set a real GitHub repo before PR work can run.",
+      label: "Select repo",
+      detail: "Select the GitHub repo before PR work can run.",
     });
-    expect(checklist.find((item) => item.id === "build")?.detail).toBe("Build waits for a configured GitHub repo.");
+    expect(checklist.find((item) => item.id === "build")?.detail).toBe("Build waits for a selected GitHub repo.");
   });
 
   it("shows setup as active before a valid repo is configured", () => {
@@ -57,7 +57,7 @@ describe("phase checklist", () => {
     ]);
     expect(checklist.find((item) => item.id === "project")).toMatchObject({
       label: "Choose project",
-      detail: "Set a project chat and real GitHub repo.",
+      detail: "Set a project chat and GitHub repo.",
     });
   });
 

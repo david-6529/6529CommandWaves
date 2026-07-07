@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createParticipationGuideDraft } from "./participation-guide-draft";
 
-const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+const placeholderRepoText = "GitHub repo placeholder (Select the hook repo before PR work can run.)";
 
 describe("participation guide draft", () => {
   it("creates a copyable participation guide for the builder wave", () => {
@@ -10,7 +10,7 @@ describe("participation guide draft", () => {
 
     expect(draft).toContain("Project participation guide");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${placeholderRepoText}`);
+    expect(draft).toContain(`GitHub repo: ${placeholderRepoText}`);
     expect(draft).not.toContain("Contributor rules:");
     expect(draft).toContain("Participation notes:");
     expect(draft).toContain("Builder loop:");
@@ -41,7 +41,7 @@ describe("participation guide draft", () => {
       repoUrl: "not a repo",
     });
 
-    expect(draft).toContain("Code repo: not a repo");
+    expect(draft).toContain("GitHub repo: not a repo");
     expect(draft).not.toContain("Contributor rules:");
   });
 });

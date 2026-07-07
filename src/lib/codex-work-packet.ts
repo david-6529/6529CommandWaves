@@ -46,7 +46,7 @@ export function createCodexWorkPacket({
   }
 
   if (!configuredGitHubRepo(wave.repoUrl)) {
-    throw Object.assign(new Error("Connect the real GitHub repo before creating a Codex work packet."), { status: 409 });
+    throw Object.assign(new Error("Select the GitHub repo before creating a Codex work packet."), { status: 409 });
   }
 
   if (proposal.kind === "open_pr" && !pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {

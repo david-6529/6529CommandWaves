@@ -197,7 +197,7 @@ function buildLines(wave: CommandWave, poll: PollState | null, execution: Execut
     `- Summary: ${
       repoConfigured
         ? humanizeLegacyCommandCopy(execution.summary)
-        : "GitHub repo is still a placeholder. Replace it before PR work can run."
+        : "GitHub repo is still a placeholder. Select it before PR work can run."
     }`,
     "- Build records:",
     ...limitedList(buildEvidenceItems(execution.artifacts, wave.repoUrl), 6, "No build artifacts recorded."),
@@ -295,7 +295,7 @@ function nextStep(
   }
 
   if (!configuredGitHubRepo(wave.repoUrl)) {
-    return "Connect the real GitHub repo before PR work can run.";
+    return "Select the GitHub repo before PR work can run.";
   }
 
   if (!execution) {

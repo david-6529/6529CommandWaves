@@ -36,7 +36,7 @@ describe("launch packet", () => {
     );
     expect(packet.text).toContain("# Project launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
-    expect(packet.text).toContain("Repo: Placeholder repo (Connect the real hook repo before PR work can run.)");
+    expect(packet.text).toContain("Repo: GitHub repo placeholder (Select the hook repo before PR work can run.)");
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("Manual builder review for phase 1");
     expect(packet.text).toContain("## Orchestration");
@@ -48,7 +48,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Project decision receipt:");
     expect(packet.text).toContain("Review proof:");
     expect(packet.text).toContain("- Build: blocked");
-    expect(packet.text).toContain("GitHub repo is still a placeholder. Replace it before PR work can run.");
+    expect(packet.text).toContain("GitHub repo is still a placeholder. Select it before PR work can run.");
     expect(packet.text).toContain("## Workflow Proof");
     expect(packet.text).toContain("Summary: Public proof of the chat, decision, PR, review, and log path for the first hook build.");
     expect(packet.text).toContain("Source of truth: project chat");
@@ -57,8 +57,8 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Project chat: ready.");
     expect(packet.text).toContain("Decision: ready.");
     expect(packet.text).toContain("Pull request: blocked. GitHub repo is still a placeholder.");
-    expect(packet.text).toContain("Review: blocked. Review waits for a real hook repo and PR record.");
-    expect(packet.text).toContain("Log: blocked. Log waits for a real hook repo and reviewed PR.");
+    expect(packet.text).toContain("Review: blocked. Review waits for a selected hook repo and PR record.");
+    expect(packet.text).toContain("Log: blocked. Log waits for a selected hook repo and reviewed PR.");
     expect(packet.text).toContain("## Contribution Report");
     expect(packet.text).toContain("Complete proposal: 6 report points.");
     expect(packet.text).toContain("Project decision receipt: 2 report points.");
@@ -82,7 +82,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("run-manifest:{");
     expect(packet.text).toContain("No automatic payouts.");
     expect(packet.text).toContain("This packet does not grant reputation, token weight, payouts, permissions, or merge rights.");
-    expect(packet.text).toContain("Connect the real GitHub repo before PR work can run.");
+    expect(packet.text).toContain("Select the GitHub repo before PR work can run.");
     expect(packet.text).not.toContain("automatically posted");
     expect(packet.text).not.toContain("\u2014");
   });

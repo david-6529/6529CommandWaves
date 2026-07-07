@@ -37,7 +37,7 @@ function buildStatus(
   canRunCode: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (!canRunCode) {
-    return { status: "waiting", detail: "Build waits for a configured GitHub repo." };
+    return { status: "waiting", detail: "Build waits for a selected GitHub repo." };
   }
 
   if (execution?.status === "complete") {
@@ -61,7 +61,7 @@ function reviewStatus(
   canRunCode: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (!canRunCode) {
-    return { status: "waiting", detail: "Review waits for a PR from a configured GitHub repo." };
+    return { status: "waiting", detail: "Review waits for a PR from the selected GitHub repo." };
   }
 
   if (review?.status === "pass") {
@@ -84,22 +84,22 @@ function projectSetupItem(wave: CommandWave, canRunCode: boolean): Pick<PhaseChe
     return {
       label: "Choose project",
       status: "done",
-      detail: "Project chat and code repo are set.",
+      detail: "Project chat and GitHub repo are set.",
     };
   }
 
   if (wave.waveUrl.trim()) {
     return {
-      label: "Connect repo",
+      label: "Select repo",
       status: "active",
-      detail: "Set a real GitHub repo before PR work can run.",
+      detail: "Select the GitHub repo before PR work can run.",
     };
   }
 
   return {
     label: "Choose project",
     status: "active",
-    detail: "Set a project chat and real GitHub repo.",
+    detail: "Set a project chat and GitHub repo.",
   };
 }
 

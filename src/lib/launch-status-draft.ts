@@ -96,7 +96,7 @@ export function createLaunchStatusDraft({
     "Project launch status",
     "",
     `Project chat: ${wave.waveUrl}`,
-    projectRepoLine("Code repo", wave.repoUrl),
+    projectRepoLine("GitHub repo", wave.repoUrl),
     `Status: ${audit.statusLabel}`,
     audit.summary,
     "",

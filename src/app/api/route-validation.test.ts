@@ -212,7 +212,7 @@ describe("API route validation", () => {
 
     expect(response.status).toBe(409);
     await expect(responsePayload(response)).resolves.toMatchObject({
-      error: "Connect the real GitHub repo before creating a Codex work packet.",
+      error: "Select the GitHub repo before creating a Codex work packet.",
     });
   });
 

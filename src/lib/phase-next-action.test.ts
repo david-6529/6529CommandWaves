@@ -47,9 +47,9 @@ describe("phase next action", () => {
 
     expect(nextAction).toMatchObject({
       status: "action",
-      stepLabel: "Connect repo",
-      title: "Connect the repo",
-      detail: "Set a real GitHub repo before PR work can run.",
+      stepLabel: "Select repo",
+      title: "Select the repo",
+      detail: "Select the GitHub repo before PR work can run.",
     });
   });
 

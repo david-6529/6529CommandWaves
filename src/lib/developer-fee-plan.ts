@@ -54,7 +54,7 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
     "Project developer fee plan",
     "",
     `Project chat: ${wave.waveUrl}`,
-    projectRepoLine("Code repo", wave.repoUrl),
+    projectRepoLine("GitHub repo", wave.repoUrl),
     plan.summary,
     "",
     "Records for human review:",

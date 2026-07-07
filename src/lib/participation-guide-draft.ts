@@ -21,7 +21,7 @@ export function createParticipationGuideDraft(wave: CommandWave) {
     "Project participation guide",
     "",
     `Project chat: ${wave.waveUrl}`,
-    projectRepoLine("Code repo", wave.repoUrl),
+    projectRepoLine("GitHub repo", wave.repoUrl),
     ...(rulesLine ? [rulesLine] : []),
     "",
     "Participation notes:",

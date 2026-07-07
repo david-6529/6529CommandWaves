@@ -15,8 +15,10 @@ describe("agent identities", () => {
     expect(reviewAgentIdentity.status).toBe("placeholder");
     expect(githubRepoPlaceholder).toMatchObject({
       status: "placeholder",
-      label: "Placeholder repo",
+      label: "GitHub repo placeholder",
       url: "https://github.com/your-org/your-hook-repo",
+      description: "GitHub repo is a placeholder until the hook repo is selected.",
+      nextStep: "Select the hook repo before PR work can run.",
     });
     expect(JSON.stringify({ reviewAgentIdentity, githubRepoPlaceholder })).not.toContain("\u2014");
   });

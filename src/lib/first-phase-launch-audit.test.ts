@@ -204,7 +204,7 @@ describe("first phase launch audit", () => {
     expect(audit.nextAction).toMatchObject({
       status: "blocked",
       itemId: "setup_repo_reachable",
-      title: "Pick reachable code repo",
+      title: "Pick reachable GitHub repo",
       detail: "GitHub repo check failed: 404 Not Found",
     });
     expect(audit.blockers).toContainEqual(

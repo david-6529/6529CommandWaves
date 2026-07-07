@@ -25,7 +25,7 @@ export function createBuilderWaveDecisionDraft({ wave, proposal, poll }: Builder
     "Project decision request",
     "",
     `Project chat: ${wave.waveUrl}`,
-    projectRepoLine("Code repo", wave.repoUrl),
+    projectRepoLine("GitHub repo", wave.repoUrl),
     `Proposal: ${proposal.id} - ${cleanLine(proposal.title)}`,
     `Work type: ${commandKindLabel(proposal.kind)}`,
     "",

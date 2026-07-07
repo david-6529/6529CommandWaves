@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createBuilderWaveLaunchDraft } from "./builder-wave-launch-draft";
 import { demoWave } from "./demo-wave";
 
-const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+const placeholderRepoText = "GitHub repo placeholder (Select the hook repo before PR work can run.)";
 
 describe("builder wave launch draft", () => {
   it("creates a concise first post for the hook builder wave", () => {
@@ -10,7 +10,7 @@ describe("builder wave launch draft", () => {
 
     expect(draft).toContain("Project launch brief");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${placeholderRepoText}`);
+    expect(draft).toContain(`GitHub repo: ${placeholderRepoText}`);
     expect(draft).not.toContain("Contributor rules:");
     expect(draft).toContain("coordinate the first public build for a non-upgradeable hook");
     expect(draft).toContain("Wait for a project decision before PR work starts.");
@@ -40,7 +40,7 @@ describe("builder wave launch draft", () => {
       repoUrl: "not a repo",
     });
 
-    expect(draft).toContain("Code repo: not a repo");
+    expect(draft).toContain("GitHub repo: not a repo");
     expect(draft).not.toContain("Contributor rules:");
   });
 });
