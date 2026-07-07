@@ -58,8 +58,8 @@ describe("launch status draft", () => {
       "- Setup check: Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
     );
     expect(draft).toContain("Operator checklist:");
-    expect(draft).toContain("- Run the setup check against the selected project chat and GitHub repo.");
-    expect(draft).toContain("- Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.");
+    expect(draft).toContain("- Run the setup check against the selected project chat and current repo setting.");
+    expect(draft).toContain("- If the repo is still a placeholder, PR checks stay blocked until the hook repo is selected.");
     expect(draft).toContain("- Run launch readiness from the app or /api/command-wave/launch/audit?remote=1.");
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Project index: ${verificationTargets.projectIndexUrl}`);
@@ -138,7 +138,7 @@ describe("launch status draft", () => {
     expect(draft).toContain("- Set a strong ADMIN_API_KEY before public launch.");
     expect(draft).toContain("- Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL.");
     expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.");
-    expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_REPO_URL to the hook GitHub repo.");
+    expect(draft).toContain("- Keep COMMAND_WAVE_INITIAL_REPO_URL as the placeholder until the selected hook repo is ready.");
     expect(draft).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
     expect(draft).toContain("- Set COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN with repo access.");
     expect(draft).toContain(

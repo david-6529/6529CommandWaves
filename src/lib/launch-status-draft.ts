@@ -21,16 +21,16 @@ function openItemLines(audit: FirstPhaseLaunchAudit) {
 
 const checklistByItemId: Record<string, string[]> = {
   setup_not_checked: [
-    "Run the setup check against the selected project chat and GitHub repo.",
-    "Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.",
+    "Run the setup check against the selected project chat and current repo setting.",
+    "If the repo is still a placeholder, PR checks stay blocked until the hook repo is selected.",
   ],
   setup_remote_check: [
-    "Run the setup check against the selected project chat and GitHub repo.",
-    "Confirm CONTRIBUTING.md, .github/PULL_REQUEST_TEMPLATE.md, and the required guardian check are ready.",
+    "Run the setup check against the selected project chat and current repo setting.",
+    "If the repo is still a placeholder, PR checks stay blocked until the hook repo is selected.",
   ],
   setup_wave_reachable: ["Pick a reachable 6529 project chat before inviting contributors."],
   setup_repo_reachable: ["Pick a reachable GitHub repo before inviting contributors."],
-  setup_repo_placeholder: ["Select the hook GitHub repo before saving setup or running PR work."],
+  setup_repo_placeholder: ["Keep the repo as a placeholder until the hook repo is selected, then replace it before PR work."],
   setup_project_check: ["Fix the setup check failure for the selected project chat and repo."],
   setup_repo_required_files: ["Add launch repo files before inviting contributors."],
   setup_repo_file_contributing_md: ["Add CONTRIBUTING.md to the hook repo."],
@@ -40,7 +40,7 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_app_url: ["Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL."],
   readiness_initial_hook_project: [
     "Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.",
-    "Set COMMAND_WAVE_INITIAL_REPO_URL to the hook GitHub repo.",
+    "Keep COMMAND_WAVE_INITIAL_REPO_URL as the placeholder until the selected hook repo is ready.",
   ],
   readiness_database: ["Set DATABASE_URL to production Postgres before durable public audit storage."],
   readiness_command_wave_store: ["Set COMMAND_WAVE_STORE=postgres for production state."],
@@ -53,7 +53,7 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_guardian_wave_state: [
     "Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
   ],
-  flow_project: ["Select the first project chat and hook GitHub repo."],
+  flow_project: ["Select the first project chat, and keep the repo placeholder until PR work starts."],
   flow_proposal: ["Create one PR-sized hook proposal before starting the first public loop."],
   flow_decision: ["Record the project decision before PR work starts."],
   flow_build: ["After the repo is configured, attach the PR record or Codex work packet for the approved change."],

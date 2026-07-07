@@ -37,7 +37,8 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "warn",
-      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before public launch.",
+      message:
+        "Set COMMAND_WAVE_INITIAL_WAVE_URL, and set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
     });
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
       status: "fail",
@@ -79,7 +80,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "pass",
-      message: "First hook chat and repo seed are configured.",
+      message: "First project chat and repo setting are configured.",
     });
   });
 
@@ -90,7 +91,8 @@ describe("readiness checks", () => {
 
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
-      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before public launch.",
+      message:
+        "Set COMMAND_WAVE_INITIAL_WAVE_URL, and set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
     });
   });
 
@@ -102,7 +104,7 @@ describe("readiness checks", () => {
 
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
-      message: "Use a valid 6529 wave and GitHub repo for the first hook project.",
+      message: "Use a valid 6529 wave and GitHub repo placeholder or selected repo for the first hook project.",
     });
   });
 
@@ -161,7 +163,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
-      message: "Replace placeholder first hook chat and repo values before public launch.",
+      message: "Replace placeholder first project chat before public launch. Replace the repo placeholder before PR work starts.",
     });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "fail",

@@ -75,6 +75,7 @@ DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_INITIAL_NAME="6529 Hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
+# Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
@@ -83,9 +84,9 @@ COMMAND_WAVE_REPO_ADAPTER=github
 COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
-1. Pick the builder chat and GitHub repo.
+1. Pick the builder chat. Keep the repo placeholder until the pilot repo is selected.
 2. Open Maintainer tools, run Launch readiness, and use the launch check to expose setup blockers.
-3. Confirm the hook repo has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, and the required guardian check.
+3. Select the hook repo before PR work, then confirm it has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, and the required guardian check.
 4. Copy the chat launch brief from setup.
 5. Post the brief with the chat, repo link, participation notes, and hook scope.
 6. Copy the participation guide and share it where new contributors will see it.

@@ -142,7 +142,8 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
       id: "initial_hook_project",
       label: "First hook project",
       status: production ? "fail" : "warn",
-      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before public launch.",
+      message:
+        "Set COMMAND_WAVE_INITIAL_WAVE_URL, and set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
     };
   }
 
@@ -151,7 +152,7 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
       id: "initial_hook_project",
       label: "First hook project",
       status: "fail",
-      message: "Replace placeholder first hook chat and repo values before public launch.",
+      message: "Replace placeholder first project chat before public launch. Replace the repo placeholder before PR work starts.",
     };
   }
 
@@ -168,7 +169,7 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
       id: "initial_hook_project",
       label: "First hook project",
       status: "fail",
-      message: "Use a valid 6529 wave and GitHub repo for the first hook project.",
+      message: "Use a valid 6529 wave and GitHub repo placeholder or selected repo for the first hook project.",
     };
   }
 
@@ -176,7 +177,7 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
     id: "initial_hook_project",
     label: "First hook project",
     status: "pass",
-    message: "First hook chat and repo seed are configured.",
+    message: "First project chat and repo setting are configured.",
   };
 }
 
