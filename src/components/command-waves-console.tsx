@@ -1193,7 +1193,7 @@ export function CommandWavesConsole() {
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
   const hasRecentDiscussionPosts = Boolean(primaryProjectContextPreview?.sampleDrops.length);
-  const roomRosterPosts = useMemo(
+  const chatRosterPosts = useMemo(
     () =>
       (primaryProjectContextPreview?.sampleDrops ?? []).map((drop) => ({
         author: drop.author,
@@ -1203,12 +1203,12 @@ export function CommandWavesConsole() {
     [primaryProjectContextPreview],
   );
   const contributionReport = useMemo(
-    () => createContributionReport(wave, { roomPosts: roomRosterPosts }),
-    [roomRosterPosts, wave],
+    () => createContributionReport(wave, { chatPosts: chatRosterPosts }),
+    [chatRosterPosts, wave],
   );
   const contributionReportDraft = useMemo(
-    () => createContributionReportDraft(wave, { roomPosts: roomRosterPosts }),
-    [roomRosterPosts, wave],
+    () => createContributionReportDraft(wave, { chatPosts: chatRosterPosts }),
+    [chatRosterPosts, wave],
   );
   const developerFeePlan = useMemo(() => createDeveloperFeePlan(wave, contributionReport), [wave, contributionReport]);
   const developerFeePlanDraft = useMemo(

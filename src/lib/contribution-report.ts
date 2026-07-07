@@ -11,12 +11,12 @@ export type ContributionContributor = {
   proposals: number;
   votes: number;
   decisions: number;
-  roomPosts: number;
+  chatPosts: number;
   ledgerEvents: number;
   rationale: string[];
 };
 
-export type ContributionRoomPost = {
+export type ContributionChatPost = {
   author: string;
   preview: string;
   createdAt?: string | null;
@@ -56,7 +56,7 @@ function addContributor(map: Map<string, ContributionContributor>, identity: str
     proposals: 0,
     votes: 0,
     decisions: 0,
-    roomPosts: 0,
+    chatPosts: 0,
     ledgerEvents: 0,
     rationale: [],
   };
@@ -104,11 +104,11 @@ function githubPrLinkCount(wave: CommandWave) {
   );
 }
 
-function roomPostPreview(value: string) {
+function chatPostPreview(value: string) {
   return value.trim().replace(/\s+/g, " ").slice(0, 110);
 }
 
-function isSystemRoomAuthor(identity: string) {
+function isSystemChatAuthor(identity: string) {
   const normalized = identity.trim().toLowerCase();
 
   return (
@@ -122,23 +122,23 @@ function isSystemRoomAuthor(identity: string) {
   );
 }
 
-function latestReportTimestamp(wave: CommandWave, roomPosts: ContributionRoomPost[]) {
+function latestReportTimestamp(wave: CommandWave, chatPosts: ContributionChatPost[]) {
   const ledgerLatest = latestLedgerTimestamp(wave.ledger);
-  const roomLatest = roomPosts
+  const chatLatest = chatPosts
     .map((post) => (post.createdAt ? Date.parse(post.createdAt) : 0))
     .filter((time) => Number.isFinite(time) && time > 0)
     .sort((left, right) => right - left)[0];
 
-  if (!roomLatest) {
+  if (!chatLatest) {
     return ledgerLatest;
   }
 
   const ledgerTime = Date.parse(ledgerLatest);
 
-  return roomLatest > (Number.isFinite(ledgerTime) ? ledgerTime : 0) ? new Date(roomLatest).toISOString() : ledgerLatest;
+  return chatLatest > (Number.isFinite(ledgerTime) ? ledgerTime : 0) ? new Date(chatLatest).toISOString() : ledgerLatest;
 }
 
-function evidenceSummary(wave: CommandWave, roomPostCount: number) {
+function evidenceSummary(wave: CommandWave, chatPostCount: number) {
   const voteCount = wave.polls.reduce((count, poll) => count + (poll.votes?.length ?? 0), 0);
   const decisionCount = wave.polls.filter((poll) => poll.decision).length;
   const prLinkCount = githubPrLinkCount(wave);
@@ -149,7 +149,7 @@ function evidenceSummary(wave: CommandWave, roomPostCount: number) {
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
     ...(decisionCount ? [countLabel(decisionCount, "project decision receipt")] : []),
-    ...(roomPostCount ? [countLabel(roomPostCount, "chat post")] : []),
+    ...(chatPostCount ? [countLabel(chatPostCount, "chat post")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
     ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
@@ -193,13 +193,13 @@ export function createContributionReport(
   options: {
     generatedAt?: string;
     limit?: number;
-    roomPosts?: ContributionRoomPost[];
+    chatPosts?: ContributionChatPost[];
   } = {},
 ): ContributionReport {
   const contributors = new Map<string, ContributionContributor>();
-  const roomPosts = options.roomPosts ?? [];
-  const includedRoomPosts: ContributionRoomPost[] = [];
-  let includedRoomPostCount = 0;
+  const chatPosts = options.chatPosts ?? [];
+  const includedChatPosts: ContributionChatPost[] = [];
+  let includedChatPostCount = 0;
 
   for (const proposal of wave.proposals) {
     const contributor = addContributor(contributors, proposal.proposer);
@@ -249,21 +249,21 @@ export function createContributionReport(
     addRationale(contributor, "Appears in the activity log");
   }
 
-  for (const post of roomPosts) {
-    if (isSystemRoomAuthor(post.author)) {
+  for (const post of chatPosts) {
+    if (isSystemChatAuthor(post.author)) {
       continue;
     }
 
     const contributor = addContributor(contributors, post.author);
 
-    contributor.roomPosts += 1;
+    contributor.chatPosts += 1;
     contributor.score += 1;
-    includedRoomPostCount += 1;
-    includedRoomPosts.push(post);
+    includedChatPostCount += 1;
+    includedChatPosts.push(post);
     addScoreBasis(contributor, "Chat posts", 1);
     addRationale(contributor, "Posted in chat");
 
-    const preview = roomPostPreview(post.preview);
+    const preview = chatPostPreview(post.preview);
 
     if (preview) {
       addRationale(contributor, `Recent chat post: ${preview}`);
@@ -277,13 +277,13 @@ export function createContributionReport(
   return {
     mode: "informational",
     method: reportMethod,
-    generatedAt: options.generatedAt ?? latestReportTimestamp(wave, includedRoomPosts),
+    generatedAt: options.generatedAt ?? latestReportTimestamp(wave, includedChatPosts),
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
       : "No contributor activity has been recorded yet.",
     coverage,
     scoringRubric,
-    evidence: evidenceSummary(wave, includedRoomPostCount),
+    evidence: evidenceSummary(wave, includedChatPostCount),
     contributors: sorted,
     notes: [
       "Report scores are an AI-readable activity report, not a permission system.",
@@ -299,7 +299,7 @@ export function createContributionReportDraft(
   options: {
     generatedAt?: string;
     limit?: number;
-    roomPosts?: ContributionRoomPost[];
+    chatPosts?: ContributionChatPost[];
   } = {},
 ) {
   const report = createContributionReport(wave, options);
@@ -309,7 +309,7 @@ export function createContributionReportDraft(
           countLabel(contributor.proposals, "proposal"),
           countLabel(contributor.votes, "vote"),
           countLabel(contributor.decisions, "decision"),
-          countLabel(contributor.roomPosts, "chat post"),
+          countLabel(contributor.chatPosts, "chat post"),
           countLabel(contributor.ledgerEvents, "activity log event"),
         ].join(", ");
 

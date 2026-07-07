@@ -138,7 +138,7 @@ describe("contribution report", () => {
 
   it("includes chat posts pulled into the app without granting authority", () => {
     const report = createContributionReport(demoWave, {
-      roomPosts: [
+      chatPosts: [
         {
           author: "chat-builder",
           preview: "I can review the next hook PR.",
@@ -157,7 +157,7 @@ describe("contribution report", () => {
     expect(report.contributors.find((contributor) => contributor.identity === "chat-builder")).toMatchObject({
       score: 1,
       scoreBasis: ["Chat posts: 1 report point"],
-      roomPosts: 1,
+      chatPosts: 1,
     });
     expect(report.contributors.some((contributor) => contributor.identity === "wave-poll")).toBe(false);
     expect(report.notes.join(" ")).toContain("not a permission system");
@@ -165,7 +165,7 @@ describe("contribution report", () => {
 
   it("does not count daemon or system authors as builder contribution", () => {
     const report = createContributionReport(demoWave, {
-      roomPosts: [
+      chatPosts: [
         { author: "daemon", preview: "Repo setup needed before PR work." },
         { author: "reviewer-agent", preview: "Review placeholder note." },
         { author: "wave-poll", preview: "Decision passed." },
@@ -179,7 +179,7 @@ describe("contribution report", () => {
     expect(report.contributors.find((contributor) => contributor.identity === "chat-builder")).toMatchObject({
       score: 1,
       scoreBasis: ["Chat posts: 1 report point"],
-      roomPosts: 1,
+      chatPosts: 1,
     });
   });
 

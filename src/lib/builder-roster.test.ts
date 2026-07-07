@@ -36,9 +36,9 @@ describe("builder roster", () => {
     expect(copy).not.toContain("\u2014");
   });
 
-  it("adds recent room authors without turning them into score authority", () => {
+  it("adds recent chat authors without turning them into score authority", () => {
     const report = createContributionReport(demoWave, {
-      roomPosts: [
+      chatPosts: [
         { author: "chat-builder", preview: "I can review the next small hook change." },
         { author: "david", preview: "I posted an update in chat." },
         { author: "wave-poll", preview: "Decision passed." },

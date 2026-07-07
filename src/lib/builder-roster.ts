@@ -36,7 +36,7 @@ function roleFor(contributor: ContributionContributor) {
     return "Voter";
   }
 
-  if (contributor.roomPosts > 0) {
+  if (contributor.chatPosts > 0) {
     return "Chat participant";
   }
 
@@ -52,7 +52,7 @@ function activityFor(contributor: ContributionContributor) {
     ...(contributor.proposals ? [countLabel(contributor.proposals, "proposal")] : []),
     ...(contributor.votes ? [countLabel(contributor.votes, "vote")] : []),
     ...(contributor.decisions ? [countLabel(contributor.decisions, "decision")] : []),
-    ...(contributor.roomPosts ? [countLabel(contributor.roomPosts, "chat post")] : []),
+    ...(contributor.chatPosts ? [countLabel(contributor.chatPosts, "chat post")] : []),
     ...(contributor.ledgerEvents ? [countLabel(contributor.ledgerEvents, "activity event")] : []),
   ];
 
@@ -60,24 +60,24 @@ function activityFor(contributor: ContributionContributor) {
 }
 
 function detailFor(contributor: ContributionContributor) {
-  const roomPostRationale = contributor.rationale.find((item) => item.startsWith("Recent chat post: "));
+  const chatPostRationale = contributor.rationale.find((item) => item.startsWith("Recent chat post: "));
 
-  if (contributor.roomPosts > 0 && contributor.proposals === 0 && contributor.votes === 0 && contributor.decisions === 0) {
-    return roomPostRationale ?? "Posted in chat";
+  if (contributor.chatPosts > 0 && contributor.proposals === 0 && contributor.votes === 0 && contributor.decisions === 0) {
+    return chatPostRationale ?? "Posted in chat";
   }
 
-  return contributor.rationale[0] ?? roomPostRationale ?? "Visible project activity";
+  return contributor.rationale[0] ?? chatPostRationale ?? "Visible project activity";
 }
 
 function scoreLabelFor(contributor: ContributionContributor) {
-  const onlyRoomActivity =
-    contributor.roomPosts > 0 &&
+  const onlyChatActivity =
+    contributor.chatPosts > 0 &&
     contributor.proposals === 0 &&
     contributor.votes === 0 &&
     contributor.decisions === 0 &&
     contributor.ledgerEvents === 0;
 
-  return onlyRoomActivity ? "chat activity" : reportPointLabel(contributor.score);
+  return onlyChatActivity ? "chat activity" : reportPointLabel(contributor.score);
 }
 
 function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
@@ -85,7 +85,7 @@ function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
     ["Proposals", contributor.proposals],
     ["Votes", contributor.votes],
     ["Decisions", contributor.decisions],
-    ["Chat posts", contributor.roomPosts],
+    ["Chat posts", contributor.chatPosts],
     ["Log", contributor.ledgerEvents],
   ]
     .filter(([, value]) => Number(value) > 0)
