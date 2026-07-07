@@ -28,7 +28,7 @@ describe("public project snapshot", () => {
         url: null,
       },
       nextStep: {
-        label: "Repo placeholder",
+        label: "GitHub repo placeholder",
         status: "active",
         detail: "PR work waits until maintainers select the GitHub repo.",
       },

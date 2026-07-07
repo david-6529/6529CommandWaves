@@ -61,7 +61,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("repo placeholder");
     expect(text).toContain("Draft hook scaffold");
     expect(text).toContain("Next");
-    expect(text).toContain("Repo placeholder");
+    expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("View setup");
     expect(text).toContain("Decision");
     expect(text).toContain("Builders approved with 5 yes and 1 no.");
@@ -76,7 +76,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Build");
     expect(text).toContain("Review");
     expect(text).toContain("Questions, ideas, risks, and work all start here.");
-    expect(text).toContain("Repo placeholder");
+    expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
     expect(text).toContain("Save proposal");
     expect(text).toContain("Recent chat");
@@ -250,7 +250,7 @@ describe("CommandWavesConsole", () => {
     expect(activeProjectsHtml).toContain("Hook Build");
     expect(activeProjectsHtml).toContain("GitHub repo placeholder");
     expect(activeProjectsHtml).toContain(">Open chat</a>");
-    expect(activeProjectsHtml).toContain("Repo placeholder");
+    expect(activeProjectsHtml).toContain("GitHub repo placeholder");
     expect(activeProjectsHtml).not.toContain(">Select repo</button>");
     expect(activeProjectsHtml).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(activeProjectsHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);

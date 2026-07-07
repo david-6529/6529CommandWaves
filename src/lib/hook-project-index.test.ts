@@ -22,7 +22,7 @@ describe("hook project index", () => {
           waveLabel: "6529-hook-builder",
           repoUrl: null,
           repoLabel: "GitHub repo placeholder",
-          nextActionTitle: "Repo placeholder",
+          nextActionTitle: "GitHub repo placeholder",
         },
       ],
     });

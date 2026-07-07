@@ -27,7 +27,7 @@ describe("command wave state snapshot", () => {
           status: "placeholder",
         },
         nextStep: {
-          label: "Repo placeholder",
+          label: "GitHub repo placeholder",
         },
       },
       hookSafety: {

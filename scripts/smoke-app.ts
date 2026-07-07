@@ -117,7 +117,7 @@ async function main() {
     "Connect wallet if you want, then use Request access in chat.",
     "Current work",
     "Draft hook scaffold",
-    "Repo placeholder",
+    "GitHub repo placeholder",
     "View setup",
     "Builders approved with 5 yes and 1 no.",
     "GitHub repo",
@@ -136,7 +136,7 @@ async function main() {
     "Build",
     "Review",
     "Questions, ideas, risks, and work all start here.",
-    "Repo placeholder",
+    "GitHub repo placeholder",
     "Post to chat",
     "Save proposal",
     "Recent chat",
@@ -364,7 +364,6 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "Hook Build");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Repo placeholder");
   assert(
     !JSON.stringify(projectsPayload).includes("https://github.com/your-org/your-hook-repo"),
     "Projects response should not expose the placeholder repo URL as a selected repo.",

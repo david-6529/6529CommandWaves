@@ -107,7 +107,7 @@ function projectSetupItem(wave: CommandWave, canRunCode: boolean): Pick<PhaseChe
 
   if (wave.waveUrl.trim()) {
     return {
-      label: "Repo placeholder",
+      label: "GitHub repo placeholder",
       status: "active",
       detail: "PR work waits until maintainers select the GitHub repo.",
     };

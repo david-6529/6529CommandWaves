@@ -55,7 +55,7 @@ describe("6529 wave context", () => {
       id: "drop-003",
       url: "https://6529.io/waves/mock-command-wave/drops/drop-003",
       author: "daemon",
-      preview: "Repo placeholder for now. Which GitHub repo should hold the hook before PR work starts?",
+      preview: "GitHub repo placeholder for now. Which GitHub repo should hold the hook before PR work starts?",
     });
     expect(preview.sampleDrops.find((drop) => drop.id === "drop-002")).toMatchObject({
       author: "wave-poll",

@@ -508,7 +508,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 ## Next Production Steps
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
-2. Set the initial hook wave, keep the repo placeholder until selection, then run the remote launch audit until setup is reachable.
+2. Set the initial hook wave, keep the GitHub repo placeholder until selection, then run the remote launch audit until setup is reachable.
 3. Add an isolated Codex worker that produces bounded patch files before the existing branch, commit, and draft PR sequence.
 4. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 5. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.

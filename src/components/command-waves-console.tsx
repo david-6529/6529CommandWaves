@@ -1140,7 +1140,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "repo placeholder"
+    ? "GitHub repo placeholder"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
@@ -1910,8 +1910,8 @@ export function CommandWavesConsole() {
   function preparePrDiscussion() {
     if (!repoCanRunCode) {
       setDiscussionTabId("build");
-      setProjectChatMessage("Repo placeholder: which GitHub repo should hold the hook before PR work starts?");
-      setProjectChatNotice("Repo placeholder discussion draft ready.");
+      setProjectChatMessage("GitHub repo placeholder: which GitHub repo should hold the hook before PR work starts?");
+      setProjectChatNotice("GitHub repo placeholder discussion draft ready.");
       return;
     }
 
@@ -2357,7 +2357,7 @@ export function CommandWavesConsole() {
                     {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
                     <JumpLink href="#project-chat">Message builders</JumpLink>
                     {!project.repoUrl ? (
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">Repo placeholder</Badge>
+                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">GitHub repo placeholder</Badge>
                     ) : null}
                   </div>
                 </div>
@@ -2446,7 +2446,7 @@ export function CommandWavesConsole() {
                   Request access
                 </Button>
                 <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
-                  {repoCanRunCode ? "Add PR note" : "Repo placeholder"}
+                  {repoCanRunCode ? "Add PR note" : "GitHub repo placeholder"}
                 </Button>
               </div>
             </div>
@@ -3957,7 +3957,7 @@ export function CommandWavesConsole() {
                         {apiBusy === "execute"
                           ? "Building"
                           : !repoCanRunCode
-                            ? "Repo placeholder"
+                            ? "GitHub repo placeholder"
                             : activePrHasWaveDecision
                               ? "Build approved PR"
                               : "Decision link needed"}

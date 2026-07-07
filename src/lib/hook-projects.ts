@@ -204,7 +204,7 @@ function codeStatus(wave: CommandWave) {
 
 function codeSnapshotLabel(wave: CommandWave) {
   if (hasPlaceholderRepo(wave)) {
-    return "repo placeholder";
+    return "GitHub repo placeholder";
   }
 
   const phaseWork = selectPhaseWork(wave);
@@ -282,7 +282,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const reviewEvidenceLabel =
       boundReviewCount > 0 && !reviewerProcessSelected() ? "reviewer pending" : countLabel(boundReviewCount, "review");
     const evidenceLabel = repoIsPlaceholder
-      ? `${countLabel(wave.proposals.length, "proposal")}, repo not set`
+      ? `${countLabel(wave.proposals.length, "proposal")}, GitHub repo not set`
       : [
           countLabel(wave.proposals.length, "proposal"),
           countLabel(wave.executions.length, "run"),

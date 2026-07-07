@@ -81,7 +81,7 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:05:03.000Z",
       actor: "Rule Engine",
       type: "rule_check",
-      message: "Marked the hook scaffold high risk. Builder decision required: quorum 3, yes 60%.",
+      message: "Marked the hook scaffold high risk. Project decision required: quorum 3, yes 60%.",
     },
     {
       id: "evt-004",

@@ -143,7 +143,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_remote_check: "Run launch setup check",
   setup_wave_reachable: "Pick reachable project chat",
   setup_repo_reachable: "Pick reachable GitHub repo",
-  setup_repo_placeholder: "Repo placeholder",
+  setup_repo_placeholder: "GitHub repo placeholder",
   setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
   setup_repo_required_guardian_check: "Require guardian check",
@@ -168,8 +168,8 @@ const launchActionCopyByItemId: Record<string, string> = {
 };
 
 function launchActionTitle(item: FirstPhaseLaunchAuditItem) {
-  if (item.id === "flow_project" && item.label === "Repo placeholder") {
-    return "Repo placeholder";
+  if (item.id === "flow_project" && item.label === "GitHub repo placeholder") {
+    return "GitHub repo placeholder";
   }
 
   const explicitTitle = launchActionCopyByItemId[item.id];

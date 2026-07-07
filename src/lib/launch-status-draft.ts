@@ -63,7 +63,7 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_guardian_wave_state: [
     "Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
   ],
-  flow_project: ["Select the first project chat, and keep the repo placeholder until PR work starts."],
+  flow_project: ["Select the first project chat, and keep the GitHub repo placeholder until PR work starts."],
   flow_proposal: ["Create one PR-sized hook proposal before starting the first public loop."],
   flow_decision: ["Record the project decision before PR work starts."],
   flow_build: ["After the repo is configured, attach the PR record or Codex work packet for the approved change."],
