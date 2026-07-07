@@ -526,6 +526,7 @@ describe("Command wave store", () => {
     });
 
     expect(executed.executions[0]?.artifacts).toContain("approved file test/FeeCap.t.sol");
+    expect(executed.executions[0]?.artifacts.some((artifact) => artifact.startsWith("approved-files:"))).toBe(true);
     expect(executed.executions[0]?.artifacts).toContain(
       "changed .command-waves/commands/cmd-001.md, test/FeeCap.t.sol",
     );
@@ -533,6 +534,7 @@ describe("Command wave store", () => {
     const reviewed = await reviewProposal({ proposalId: "cmd-001" });
 
     expect(reviewed.reviews[0]?.status).toBe("pass");
+    expect(reviewed.reviews[0]?.checks).toContain("Approved file manifest hashes 1 approved file.");
     expect(reviewed.reviews[0]?.proof?.inputs.changedPathsHash).toHaveLength(64);
   });
 

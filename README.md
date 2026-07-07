@@ -189,7 +189,7 @@ Safety and review:
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
 - Approved PR execution files are path, size, secret, deployment, governance, upgradeability, delegatecall, destructive
-  opcode, and hook-parameter checked before they are committed with the work packet.
+  opcode, and hook-parameter checked before commit. The execution log records a hash manifest for approved file content.
 - Reviewer output is written back to the PR as a bounded comment and check run.
 - PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, parameter writes, and bound-test evidence when patch records exist.
 

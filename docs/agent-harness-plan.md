@@ -46,6 +46,7 @@ Approved file bundle guardrails:
 - Secret files, repo control files, guardian files, setup-proof files, deployments, governance changes, upgradeability
   patterns, delegatecall, destructive opcodes, and uncapped parameter writes are rejected before commit.
 - Parameter writes need an explicit approved cap and changed bound-focused tests.
+- Execution artifacts include a hash manifest for approved file paths, content hashes, and sizes.
 
 Still missing:
 

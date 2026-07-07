@@ -11,6 +11,12 @@ import type { ExecutionRecord, GuardianReview, LedgerEvent } from "./command-wav
 import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { createCodexWorkPacket } from "./codex-work-packet";
 import {
+  createExecutionFileManifest,
+  executionFileManifestHashMatches,
+  findExecutionFileManifestArtifact,
+  formatExecutionFileManifestArtifact,
+} from "./execution-files";
+import {
   createCommandPrManifest,
   createGuardianAttestation,
   formatCommandPrManifestForPullRequest,
@@ -135,6 +141,18 @@ function changedPathsFromExecutionArtifacts(artifacts: string[]) {
   return [...new Set(paths)].sort((left, right) => left.localeCompare(right));
 }
 
+function approvedFilePathsFromArtifacts(artifacts: string[]) {
+  return artifacts
+    .filter((artifact) => artifact.startsWith("approved file "))
+    .map((artifact) => artifact.slice("approved file ".length).trim())
+    .filter(Boolean)
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function approvedFileCountLabel(count: number) {
+  return `${count} approved file${count === 1 ? "" : "s"}`;
+}
+
 export function createLocalOrchestratorAdapter(
   repoAdapterOrOptions: RepoAdapter | LocalOrchestratorOptions = localRepoAdapter,
 ): OrchestratorAdapter {
@@ -171,6 +189,9 @@ export function createLocalOrchestratorAdapter(
             })
           : null;
       const approvedFiles = input.files ?? [];
+      const approvedFileManifest = approvedFiles.length
+        ? createExecutionFileManifest(input.proposal.id, approvedFiles)
+        : null;
       const wavePost = [
         formatProposalForWave(input.proposal, input.poll),
         ...(prManifest ? ["", formatCommandPrManifestForPullRequest(prManifest)] : []),
@@ -238,6 +259,7 @@ export function createLocalOrchestratorAdapter(
             ? [
                 `packet path ${packetFilePath}`,
                 ...approvedFiles.map((file) => `approved file ${file.path}`),
+                ...(approvedFileManifest ? [formatExecutionFileManifestArtifact(approvedFileManifest)] : []),
                 `packet commit ${commit.commitSha}`,
                 `packet hash ${codexPacket?.packetHash}`,
                 commit.url,
@@ -268,6 +290,18 @@ export const localGuardianAdapter: GuardianAdapter = {
     const repository = configuredGitHubRepo(input.wave.repoUrl);
     const actualHandoff = findAgentHandoffArtifact(input.execution.artifacts);
     const changedPaths = changedPathsFromExecutionArtifacts(input.execution.artifacts);
+    const approvedFilePaths = approvedFilePathsFromArtifacts(input.execution.artifacts);
+    const approvedFileManifest = findExecutionFileManifestArtifact(input.execution.artifacts);
+    const approvedFileManifestPaths = approvedFileManifest?.files.map((file) => file.path).sort((left, right) => left.localeCompare(right)) ?? [];
+    const approvedFileManifestMatches =
+      approvedFilePaths.length === 0 ||
+      Boolean(
+        approvedFileManifest &&
+          approvedFileManifest.proposalId === input.proposal.id &&
+          approvedFileManifest.fileCount === approvedFilePaths.length &&
+          JSON.stringify(approvedFileManifestPaths) === JSON.stringify(approvedFilePaths) &&
+          executionFileManifestHashMatches(approvedFileManifest),
+      );
     const expectedHandoff =
       input.proposal.kind === "open_pr"
         ? createAgentHandoffPacket({
@@ -325,6 +359,7 @@ export const localGuardianAdapter: GuardianAdapter = {
       touchesDangerousSurface ||
       !manifestMatches ||
       !handoffMatches ||
+      !approvedFileManifestMatches ||
       !guardianGatePassed ||
       blockedHookSignals.length > 0 ||
       blockedParameterChecks.length > 0;
@@ -345,6 +380,11 @@ export const localGuardianAdapter: GuardianAdapter = {
               ? "Codex handoff packet does not match the approved run manifest."
               : "Codex handoff packet is missing for this PR command."
           : "No Codex handoff required for this command type.",
+        approvedFilePaths.length
+          ? approvedFileManifestMatches
+            ? `Approved file manifest hashes ${approvedFileCountLabel(approvedFilePaths.length)}.`
+            : "Approved file manifest is missing or does not match approved file paths."
+          : "No approved file manifest required.",
         `Allowed permissions: ${policy.permissions.join(", ")}.`,
         touchesDangerousSurface
           ? `Dangerous surface mentioned (${dangerousFlags.join(", ")}); human review required before completion.`

@@ -1,5 +1,6 @@
 import type { RepoCommitFile } from "./adapters";
 import type { CommandProposal } from "./command-waves";
+import { hashValue } from "./run-manifest";
 import {
   findHookContractSignals,
   proposalAllowsUpgradeabilityException,
@@ -10,6 +11,19 @@ import { findHookPatchSignals, riskAllowsHookPatchSignal, type HookPatchSignal }
 import { evaluateHookParameterPolicy } from "./safety/hook-parameter-policy";
 
 export const executionRequestBodyMaxBytes = 128 * 1024;
+
+export type ExecutionFileManifest = {
+  version: "command-wave-approved-files-v0.1";
+  proposalId: string;
+  fileCount: number;
+  totalContentLength: number;
+  files: Array<{
+    path: string;
+    contentHash: string;
+    contentLength: number;
+  }>;
+  manifestHash: string;
+};
 
 const maxApprovedFiles = 8;
 const maxApprovedFileChars = 20_000;
@@ -208,4 +222,57 @@ export function parseExecutionFiles(input: unknown, proposal: CommandProposal): 
   validateHookFileSafety(files, proposal);
 
   return files;
+}
+
+function manifestWithoutHash(manifest: Omit<ExecutionFileManifest, "manifestHash">) {
+  return manifest;
+}
+
+export function createExecutionFileManifest(proposalId: string, files: RepoCommitFile[]): ExecutionFileManifest {
+  const manifest = manifestWithoutHash({
+    version: "command-wave-approved-files-v0.1",
+    proposalId,
+    fileCount: files.length,
+    totalContentLength: files.reduce((total, file) => total + file.content.length, 0),
+    files: [...files]
+      .map((file) => ({
+        path: file.path,
+        contentHash: hashValue(file.content),
+        contentLength: file.content.length,
+      }))
+      .sort((left, right) => left.path.localeCompare(right.path)),
+  });
+
+  return {
+    ...manifest,
+    manifestHash: hashValue(manifest),
+  };
+}
+
+export function formatExecutionFileManifestArtifact(manifest: ExecutionFileManifest) {
+  return `approved-files:${JSON.stringify(manifest)}`;
+}
+
+export function findExecutionFileManifestArtifact(artifacts: string[]) {
+  const rawManifest = artifacts.find((artifact) => artifact.startsWith("approved-files:"))?.slice("approved-files:".length);
+
+  if (!rawManifest) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawManifest) as ExecutionFileManifest;
+  } catch {
+    return null;
+  }
+}
+
+export function executionFileManifestHashMatches(manifest: ExecutionFileManifest | null) {
+  if (!manifest) {
+    return false;
+  }
+
+  const { manifestHash, ...manifestWithoutManifestHash } = manifest;
+
+  return hashValue(manifestWithoutManifestHash) === manifestHash;
 }

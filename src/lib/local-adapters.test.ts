@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { demoWave } from "./demo-wave";
+import { findExecutionFileManifestArtifact } from "./execution-files";
 import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter, localRepoAdapter } from "./local-adapters";
 import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
 import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact } from "./run-manifest";
@@ -151,6 +152,22 @@ describe("local command adapters", () => {
     expect(committedPaths).toEqual([".command-waves/commands/cmd-001.md", "test/FeeCap.t.sol"]);
     expect(execution.artifacts).toContain("approved file test/FeeCap.t.sol");
     expect(execution.artifacts).toContain("changed .command-waves/commands/cmd-001.md, test/FeeCap.t.sol");
+
+    const approvedFileManifest = findExecutionFileManifestArtifact(execution.artifacts);
+
+    expect(approvedFileManifest).toMatchObject({
+      proposalId: "cmd-001",
+      fileCount: 1,
+      totalContentLength: expect.any(Number),
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+          contentLength: expect.any(Number),
+        },
+      ],
+      manifestHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
   });
 
   it("requires branch and commit support before opening PR work", async () => {
@@ -312,6 +329,32 @@ describe("local command adapters", () => {
     expect(review.status).toBe("pass");
     expect(review.proof?.inputs.repositoryHash).toHaveLength(64);
     expect(review.checks).toContain("Guardian PR gate passed.");
+  });
+
+  it("asks for changes when approved files have no manifest", async () => {
+    const proposal = configuredWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: configuredWave,
+      proposal,
+      poll: configuredWave.polls[0],
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+    const review = await localGuardianAdapter.review({
+      wave: configuredWave,
+      proposal,
+      execution: {
+        ...execution,
+        artifacts: execution.artifacts.filter((artifact) => !artifact.startsWith("approved-files:")),
+      },
+    });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain("Approved file manifest is missing or does not match approved file paths.");
   });
 
   it("asks for changes when the guardian PR gate fails", async () => {
