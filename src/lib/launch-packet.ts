@@ -3,6 +3,7 @@ import { commandKindLabel } from "./command-kind-copy";
 import { createCommandOrchestrationSummary } from "./command-orchestration-summary";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { configuredGitHubRepo, isGitHubPullRequestUrlForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { latestLedgerTimestamp } from "./ledger";
@@ -204,7 +205,19 @@ function buildLines(wave: CommandWave, poll: PollState | null, execution: Execut
   ];
 }
 
-function reviewLines(review: GuardianReview | null) {
+function reviewProofLine(wave: CommandWave, review: GuardianReview) {
+  if (!review.proof) {
+    return "- Review proof: not recorded.";
+  }
+
+  if (!guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl)) {
+    return "- Review proof: not bound to the selected GitHub repo.";
+  }
+
+  return `- Review proof: ${review.proof.verifierVersion} / ${review.proof.attestationHash}`;
+}
+
+function reviewLines(wave: CommandWave, review: GuardianReview | null) {
   if (!review) {
     return ["- Review: waiting for a PR record."];
   }
@@ -214,9 +227,7 @@ function reviewLines(review: GuardianReview | null) {
     `- Summary: ${humanizeLegacyCommandCopy(review.summary)}`,
     "- Review checks:",
     ...limitedList(review.checks.map(humanizeLegacyCommandCopy), 8, "No review checks recorded."),
-    review.proof
-      ? `- Review proof: ${review.proof.verifierVersion} / ${review.proof.attestationHash}`
-      : "- Review proof: not recorded.",
+    reviewProofLine(wave, review),
   ];
 }
 
@@ -357,7 +368,7 @@ export function createLaunchPacket({
     ...buildLines(wave, poll, execution),
     "",
     "## Review",
-    ...reviewLines(review),
+    ...reviewLines(wave, review),
     "",
     "## Workflow Proof",
     ...workflowProofLines(wave),

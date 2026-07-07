@@ -3,6 +3,33 @@ import { demoWave } from "./demo-wave";
 import { createLaunchPacket } from "./launch-packet";
 import { hashValue } from "./run-manifest";
 
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: configuredRepo.htmlUrl,
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
+  })),
+};
+
 describe("launch packet", () => {
   it("creates a human-reviewed packet for the hook launch", () => {
     const proposal = demoWave.proposals[0];
@@ -46,7 +73,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
     expect(packet.text).toContain("Project decision receipt:");
-    expect(packet.text).toContain("Review proof:");
+    expect(packet.text).toContain("Review proof: not bound to the selected GitHub repo.");
     expect(packet.text).toContain("- Build: blocked");
     expect(packet.text).toContain("GitHub repo is still a placeholder. Select it before PR work can run.");
     expect(packet.text).toContain("## Workflow Proof");
@@ -85,6 +112,22 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Select the GitHub repo before PR work can run.");
     expect(packet.text).not.toContain("automatically posted");
     expect(packet.text).not.toContain("\u2014");
+  });
+
+  it("shows repo-bound review proof in configured launch packets", () => {
+    const packet = createLaunchPacket({
+      wave: configuredDemoWave,
+      proposal: configuredDemoWave.proposals[0],
+      poll: configuredDemoWave.polls[0],
+      execution: configuredDemoWave.executions[0],
+      review: configuredDemoWave.reviews[0],
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+
+    expect(packet.text).toContain(
+      `Review proof: ${configuredDemoWave.reviews[0].proof?.verifierVersion} / ${configuredDemoWave.reviews[0].proof?.attestationHash}`,
+    );
+    expect(packet.text).not.toContain("Review proof: not bound to the selected GitHub repo.");
   });
 
   it("handles setup before a command exists", () => {

@@ -1,6 +1,7 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
 import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan } from "./developer-fee-plan";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { projectRepoLine } from "./project-repo-copy";
 
 export type WaveUpdateVerificationTargets = {
@@ -54,8 +55,16 @@ function reviewLine(review: GuardianReview | null) {
   return `Review: ${review.status}. ${review.summary}`;
 }
 
-function reviewProofLine(review: GuardianReview | null) {
-  return review?.proof ? `Review proof: ${review.proof.verifierVersion} / ${review.proof.attestationHash}` : null;
+function reviewProofLine(wave: CommandWave, review: GuardianReview | null) {
+  if (!review?.proof) {
+    return null;
+  }
+
+  if (!guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl)) {
+    return "Review proof: not bound to the selected GitHub repo.";
+  }
+
+  return `Review proof: ${review.proof.verifierVersion} / ${review.proof.attestationHash}`;
 }
 
 function contributorLine(wave: CommandWave) {
@@ -106,7 +115,7 @@ export function createWaveUpdateDraft({
   verificationTargets?: WaveUpdateVerificationTargets | null;
 }) {
   const pr = prLine(execution);
-  const reviewProof = reviewProofLine(review);
+  const reviewProof = reviewProofLine(wave, review);
   const verification = verificationLine(verificationTargets);
 
   return [
