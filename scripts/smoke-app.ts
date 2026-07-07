@@ -304,6 +304,34 @@ async function main() {
   );
   assertNoEmDash("Projects response", JSON.stringify(projectsPayload));
 
+  const verificationManifestPayload = await fetchJson("/api/command-wave/verification/manifest");
+  const verificationManifest = objectValue(verificationManifestPayload, "manifest");
+
+  assertJsonObject("Verification manifest", verificationManifest);
+  assert(
+    objectValue(verificationManifest, "version") === "command-wave-verification-manifest-v0.1",
+    "Verification manifest returned the wrong version.",
+  );
+  assertSha256("Verification manifest hash", objectValue(verificationManifest, "manifestHash"));
+  assert(
+    objectValue(verificationManifest, "manifestHash") ===
+      hashValue(Object.fromEntries(Object.entries(verificationManifest).filter(([key]) => key !== "manifestHash"))),
+    "Verification manifest hash did not match payload.",
+  );
+  const stableAnchors = objectValue(verificationManifest, "stableAnchors");
+
+  assertJsonObject("Verification manifest stable anchors", stableAnchors);
+  assert(objectValue(stableAnchors, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Verification manifest wave hash does not match launch audit.");
+  assert(objectValue(stableAnchors, "projectIndexHash") === objectValue(projectsPayload, "projectsHash"), "Verification manifest project hash does not match project index.");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/setup/proof");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/state");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/projects");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/audit");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/chat");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "chatLaunchHash");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "sourceAuditHash");
+  assertNoEmDash("Verification manifest", JSON.stringify(verificationManifestPayload));
+
   const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");
   const proof = objectValue(setupProofPayload, "proof");
 

@@ -5,6 +5,7 @@ import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
 import { GET as getHookProjects } from "./command-wave/projects/route";
 import { GET as getSetupProof } from "./command-wave/setup/proof/route";
 import { GET as getCommandWaveState } from "./command-wave/state/route";
+import { GET as getVerificationManifest } from "./command-wave/verification/manifest/route";
 import { GET as getReadiness } from "./readiness/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
 import { clearCommandWaveStoreForTests } from "@/lib/command-wave-store";
@@ -65,6 +66,7 @@ describe("API route rate limits", () => {
     ["hook projects", getHookProjects, "/api/command-wave/projects", 60],
     ["setup proof", getSetupProof, "/api/command-wave/setup/proof", 30],
     ["command-wave state", getCommandWaveState, "/api/command-wave/state", 60],
+    ["verification manifest", getVerificationManifest, "/api/command-wave/verification/manifest", 30],
     ["readiness", getReadiness, "/api/readiness", 30],
   ] satisfies [string, (request: Request) => Response | Promise<Response>, string, number][])(
     "rate limits %s reads",

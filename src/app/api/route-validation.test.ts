@@ -10,6 +10,7 @@ import { POST as submitProposalRoute } from "./command-wave/proposals/route";
 import { POST as reviewCommand } from "./command-wave/review/route";
 import { DELETE as resetWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
+import { GET as getVerificationManifest } from "./command-wave/verification/manifest/route";
 import { POST as recordVoteRoute } from "./command-wave/votes/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
 import {
@@ -233,6 +234,34 @@ describe("API route validation", () => {
         verification: {
           launchStatus: "blocked",
         },
+      },
+    });
+  });
+
+  it("publishes the public verification manifest", async () => {
+    const response = await getVerificationManifest(
+      request("https://command-waves.example.com/api/command-wave/verification/manifest"),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      manifest: {
+        version: "command-wave-verification-manifest-v0.1",
+        project: {
+          repoStatus: "placeholder",
+        },
+        stableAnchors: {
+          waveStateHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+          setupHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+          projectIndexHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+        },
+        endpoints: expect.arrayContaining([
+          expect.objectContaining({
+            id: "chat_launch",
+            requiredHashFields: ["chatLaunchHash", "sourceAuditHash"],
+          }),
+        ]),
+        manifestHash: expect.stringMatching(/^[a-f0-9]{64}$/),
       },
     });
   });
