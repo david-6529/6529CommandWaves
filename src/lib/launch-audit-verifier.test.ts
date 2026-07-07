@@ -7,13 +7,15 @@ import { verifyLaunchAuditPayload } from "./launch-audit-verifier";
 import { hashValue } from "./run-manifest";
 import type { SetupValidation } from "./setup-validation";
 
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 const readySetupValidation: SetupValidation = {
   waveId: "6529-hook-builder",
-  repo: {
-    owner: "6529-Collections",
-    repo: "6529-hook",
-    htmlUrl: "https://github.com/6529-Collections/6529-hook",
-  },
+  repo: configuredRepo,
   repoMetadata: null,
   repoRequiredFiles: [],
   checks: [
@@ -53,10 +55,22 @@ const readyEnv = {
 
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
   executions: demoWave.executions.map((execution) => ({
     ...execution,
-    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
   })),
 };
 

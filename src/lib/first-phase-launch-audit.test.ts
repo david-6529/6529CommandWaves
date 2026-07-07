@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createPhaseChecklist } from "./phase-checklist";
+import { hashValue } from "./run-manifest";
 import type { SetupValidation } from "./setup-validation";
 import { getReadinessChecks } from "./system/readiness";
 
@@ -19,22 +20,36 @@ const productionReadyChecks = getReadinessChecks({
   COMMAND_WAVE_STATE_URL: "https://command-waves.6529.io/api/command-wave/state",
 });
 
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
   executions: demoWave.executions.map((execution) => ({
     ...execution,
-    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
   })),
 };
 
 const productionSetupValidation: SetupValidation = {
   waveId: "6529-hook-builder",
-  repo: {
-    owner: "6529-Collections",
-    repo: "6529-hook",
-    htmlUrl: "https://github.com/6529-Collections/6529-hook",
-  },
+  repo: configuredRepo,
   repoMetadata: {
     owner: "6529-Collections",
     repo: "6529-hook",
@@ -578,7 +593,7 @@ describe("first phase launch audit", () => {
       ...configuredDemoWave,
       reviews: [
         {
-          ...demoWave.reviews[0],
+          ...configuredDemoWave.reviews[0],
           proof: undefined,
         },
       ],
@@ -596,6 +611,39 @@ describe("first phase launch audit", () => {
         id: "flow_audit_packet",
         status: "blocked",
         detail: "Launch packet needs Guardian review proof before contributors audit it.",
+      }),
+    );
+  });
+
+  it("blocks the first loop when review proof is not bound to the configured repo", () => {
+    const wave = {
+      ...configuredDemoWave,
+      reviews: configuredDemoWave.reviews.map((review) => ({
+        ...review,
+        proof: review.proof
+          ? {
+              ...review.proof,
+              inputs: {
+                ...review.proof.inputs,
+                repositoryHash: undefined,
+              },
+            }
+          : review.proof,
+      })),
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_audit_packet",
+        status: "blocked",
+        detail: "Launch packet needs Guardian review proof bound to the configured repo before contributors audit it.",
       }),
     );
   });

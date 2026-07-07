@@ -3,6 +3,7 @@ import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createLaunchStatusDraft } from "./launch-status-draft";
 import { createPhaseChecklist } from "./phase-checklist";
+import { hashValue } from "./run-manifest";
 import { getReadinessChecks } from "./system/readiness";
 
 const verificationTargets = {
@@ -12,12 +13,30 @@ const verificationTargets = {
   launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
 };
 
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
   executions: demoWave.executions.map((execution) => ({
     ...execution,
-    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
   })),
 };
 

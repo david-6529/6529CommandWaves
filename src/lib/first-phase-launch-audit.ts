@@ -1,7 +1,8 @@
-import { validateWaveDecisionReference, type CommandWave } from "./command-waves";
+import { validateWaveDecisionReference, type CommandWave, type GuardianReview } from "./command-waves";
 import { configuredGitHubRepo, gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { participationGateNeedsAdvisoryNote } from "./participation-gates";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
+import { hashValue } from "./run-manifest";
 import type { SetupCheckStatus, SetupValidation } from "./setup-validation";
 import type { ReadinessCheck } from "./system/readiness";
 
@@ -317,6 +318,13 @@ function hasGithubPrLinkForRepo(artifacts: string[], repoUrl: string | null | un
   return gitHubPullRequestUrlsForRepo(artifacts, repoUrl).length > 0;
 }
 
+function reviewProofBoundToConfiguredRepo(review: GuardianReview, repoUrl: string | null | undefined) {
+  const repo = configuredGitHubRepo(repoUrl);
+  const repositoryHash = review.proof?.inputs.repositoryHash;
+
+  return Boolean(repo && repositoryHash && repositoryHash === hashValue(repo));
+}
+
 function participationNotesItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
   if (!wave) {
     return [];
@@ -390,6 +398,18 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
           label: "Audit packet",
           status: "blocked",
           detail: "Launch packet needs Guardian review proof before contributors audit it.",
+          source: "flow",
+        },
+      ];
+    }
+
+    if (!reviewProofBoundToConfiguredRepo(review, wave?.repoUrl)) {
+      return [
+        {
+          id: "flow_audit_packet",
+          label: "Audit packet",
+          status: "blocked",
+          detail: "Launch packet needs Guardian review proof bound to the configured repo before contributors audit it.",
           source: "flow",
         },
       ];
