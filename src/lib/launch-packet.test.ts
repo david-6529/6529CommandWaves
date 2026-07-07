@@ -88,7 +88,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision receipt recorded.");
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
-    expect(packet.text).toContain("Project decision receipt: Project decision approved cmd-001 with 5 yes and 1 no.");
+    expect(packet.text).toContain("Project decision receipt: Builders approved the hook scaffold with 5 yes and 1 no.");
     expect(packet.text).not.toContain("Room approved");
     expect(packet.text).toContain("Review proof: not bound to the selected GitHub repo.");
     expect(packet.text).toContain("- Build: blocked");

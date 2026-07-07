@@ -1,4 +1,29 @@
 const copyReplacements: Array<[RegExp, string]> = [
+  [/\bSubmitted cmd-001 to draft the non-upgradeable hook scaffold\./g, "Proposed the non-upgradeable hook scaffold."],
+  [
+    /\bClassified cmd-001 as high risk\. Poll required: quorum 3, yes 60%\./g,
+    "Marked the hook scaffold high risk. Builder decision required: quorum 3, yes 60%.",
+  ],
+  [
+    /\bcmd-001 passed with 5 yes, 1 no, and a (?:project|6529) decision receipt\./g,
+    "Builders approved the hook scaffold with 5 yes and 1 no.",
+  ],
+  [
+    /\bProject decision approved cmd-001 with 5 yes and 1 no\./g,
+    "Builders approved the hook scaffold with 5 yes and 1 no.",
+  ],
+  [
+    /\bProject decision passed for cmd-001 with quorum met\./g,
+    "Builders approved the hook scaffold proposal.",
+  ],
+  [
+    /\bRoom approved cmd-001 with 5 yes and 1 no\./g,
+    "Builders approved the hook scaffold with 5 yes and 1 no.",
+  ],
+  [
+    /\bReview passed cmd-001\. The hook scaffold matched the vote and rules\./g,
+    "Review passed the hook scaffold. It matched the builder decision and rules.",
+  ],
   [/\b6529 Hook Builder\b/g, "Hook Build"],
   [/\b6529 Hook Project\b/g, "Hook Build"],
   [/\bWave Poll\b/g, "Decision"],

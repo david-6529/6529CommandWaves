@@ -24,7 +24,19 @@ describe("legacy command copy", () => {
       "Decision recorded a project decision receipt.",
     );
     expect(humanizeLegacyCommandCopy("Room approved cmd-001 with 5 yes and 1 no.")).toBe(
-      "Project decision approved cmd-001 with 5 yes and 1 no.",
+      "Builders approved the hook scaffold with 5 yes and 1 no.",
+    );
+    expect(humanizeLegacyCommandCopy("cmd-001 passed with 5 yes, 1 no, and a project decision receipt.")).toBe(
+      "Builders approved the hook scaffold with 5 yes and 1 no.",
+    );
+    expect(humanizeLegacyCommandCopy("cmd-001 passed with 5 yes, 1 no, and a 6529 decision receipt.")).toBe(
+      "Builders approved the hook scaffold with 5 yes and 1 no.",
+    );
+    expect(humanizeLegacyCommandCopy("Project decision passed for cmd-001 with quorum met.")).toBe(
+      "Builders approved the hook scaffold proposal.",
+    );
+    expect(humanizeLegacyCommandCopy("Review passed cmd-001. The hook scaffold matched the vote and rules.")).toBe(
+      "Review passed the hook scaffold. It matched the builder decision and rules.",
     );
   });
 });

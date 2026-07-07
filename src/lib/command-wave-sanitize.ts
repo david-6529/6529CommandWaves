@@ -89,7 +89,7 @@ function sanitizeBuiltInPoll(poll: PollState, waveUrl: string) {
       waveUrl,
       recordedBy: "david",
       recordedAt: "2026-06-20T12:40:30.000Z",
-      summary: "Project decision approved cmd-001 with 5 yes and 1 no.",
+      summary: "Builders approved the hook scaffold with 5 yes and 1 no.",
     }),
   };
 }

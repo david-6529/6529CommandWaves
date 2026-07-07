@@ -8,10 +8,10 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
       summaryParagraphs: [
         "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
       ],
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
@@ -35,7 +35,7 @@ describe("public project snapshot", () => {
     });
     expect(snapshot.latestChanges[0]).toMatchObject({
       label: "review recorded",
-      message: "Review passed cmd-001. The hook scaffold matched the vote and rules.",
+      message: "Review passed the hook scaffold. It matched the builder decision and rules.",
     });
     expect(JSON.stringify(snapshot)).not.toContain("\u2014");
   });

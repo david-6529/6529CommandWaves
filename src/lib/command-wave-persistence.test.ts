@@ -187,7 +187,7 @@ describe("command wave persistence", () => {
     expect(wave.name).toBe("6529 Hook");
     expect(wave.gates).toContain("Manual builder review for phase 1");
     expect(wave.gates).toContain("AI contribution report scores are not permissions");
-    expect(wave.polls[0]?.decision?.summary).toBe("Project decision approved cmd-001 with 5 yes and 1 no.");
+    expect(wave.polls[0]?.decision?.summary).toBe("Builders approved the hook scaffold with 5 yes and 1 no.");
     expect(wave.proposals[0]?.status).toBe("approved");
     expect(wave.executions[0]?.summary).toBe("Agent adapter opened a deterministic PR artifact for the approved work.");
     expect(wave.executions[0]?.artifacts).toEqual(["PR #99"]);

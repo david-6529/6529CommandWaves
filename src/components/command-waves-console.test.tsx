@@ -30,7 +30,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next: PR work waits until maintainers select the GitHub repo.");
     expect(text).toContain("GitHub repo is still a placeholder, so PR work waits.");
-    expect(text).toContain("Latest change: cmd-001 passed with 5 yes, 1 no, and a project decision receipt.");
+    expect(text).toContain("Latest change: Builders approved the hook scaffold with 5 yes and 1 no.");
     expect(text).toContain("daemon keeps the log current.");
     expect(text).toContain("Reviewer process is a placeholder for this phase.");
     expect(text).toContain("The GitHub repo is a placeholder until the pilot repo is selected.");
@@ -146,6 +146,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("Build reference");
     expect(text).not.toContain("Use Codex to draft");
+    expect(text).not.toContain("6529 decision receipt");
+    expect(text).not.toContain("cmd-001 passed");
     expect(text).not.toContain("orchestrator managed");
     expect(text).not.toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).not.toContain("production reviewer service is wired");

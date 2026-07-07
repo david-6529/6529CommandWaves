@@ -92,7 +92,7 @@ async function main() {
     "Draft the non-upgradeable hook scaffold",
     "Next: PR work waits until maintainers select the GitHub repo.",
     "GitHub repo is still a placeholder, so PR work waits.",
-    "Latest change: cmd-001 passed with 5 yes, 1 no, and a project decision receipt.",
+    "Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
     "daemon keeps the log current.",
     "Reviewer process is a placeholder for this phase.",
     "The GitHub repo is a placeholder until the pilot repo is selected.",
@@ -166,6 +166,8 @@ async function main() {
   }
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
+  assert(!renderedHtml.includes("6529 decision receipt"), "Home page should not expose internal decision receipt language.");
+  assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assertNoEmDash("Home page", renderedHtml);
 

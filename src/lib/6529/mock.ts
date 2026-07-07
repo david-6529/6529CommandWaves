@@ -20,7 +20,7 @@ const mockDropsFixture = {
       id: "drop-002",
       serial_no: 2,
       created_at: "2026-06-20T12:05:00.000Z",
-      content: "Project decision passed for cmd-001 with quorum met.",
+      content: "Builders approved the hook scaffold proposal.",
       author: { handle: "wave-poll" },
       drop_type: "CHAT",
     },

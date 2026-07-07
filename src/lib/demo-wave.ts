@@ -38,7 +38,7 @@ const poll: PollState = {
     waveUrl: "https://6529.io/waves/6529-hook-builder",
     recordedBy: "david",
     recordedAt: "2026-06-20T12:40:30.000Z",
-    summary: "Project decision approved cmd-001 with 5 yes and 1 no.",
+    summary: "Builders approved the hook scaffold with 5 yes and 1 no.",
   }),
   votes: [
     { voterIdentity: "david", vote: "yes", weight: 1, source: "local", at: "2026-06-20T12:10:00.000Z" },
@@ -74,21 +74,21 @@ const preExecutionWave: CommandWave = {
       at: "2026-06-20T12:05:00.000Z",
       actor: "david",
       type: "proposal_submitted",
-      message: "Submitted cmd-001 to draft the non-upgradeable hook scaffold.",
+      message: "Proposed the non-upgradeable hook scaffold.",
     },
     {
       id: "evt-003",
       at: "2026-06-20T12:05:03.000Z",
       actor: "Rule Engine",
       type: "rule_check",
-      message: "Classified cmd-001 as high risk. Poll required: quorum 3, yes 60%.",
+      message: "Marked the hook scaffold high risk. Builder decision required: quorum 3, yes 60%.",
     },
     {
       id: "evt-004",
       at: "2026-06-20T12:40:00.000Z",
       actor: "Decision",
       type: "poll_passed",
-      message: "cmd-001 passed with 5 yes, 1 no, and a project decision receipt.",
+      message: "Builders approved the hook scaffold with 5 yes and 1 no.",
     },
   ],
 };
@@ -190,7 +190,7 @@ export const demoWave: CommandWave = {
       at: "2026-06-20T12:50:00.000Z",
       actor: "Reviewer",
       type: "guardian_reviewed",
-      message: "Review passed cmd-001. The hook scaffold matched the vote and rules.",
+      message: "Review passed the hook scaffold. It matched the builder decision and rules.",
     },
   ],
 };

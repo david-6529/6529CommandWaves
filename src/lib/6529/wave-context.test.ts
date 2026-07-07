@@ -59,7 +59,7 @@ describe("6529 wave context", () => {
     });
     expect(preview.sampleDrops.find((drop) => drop.id === "drop-002")).toMatchObject({
       author: "wave-poll",
-      preview: "Project decision passed for cmd-001 with quorum met.",
+      preview: "Builders approved the hook scaffold proposal.",
     });
   });
 
