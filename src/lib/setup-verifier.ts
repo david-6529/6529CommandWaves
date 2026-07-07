@@ -1,6 +1,7 @@
 import { normalizeWaveId } from "./6529/client";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import type { CommandWave } from "./command-waves";
+import { isPlaceholderValue } from "./env-placeholders";
 import { extractRequiredStatusChecks } from "./github/required-status-checks";
 import type { SetupProof } from "./setup-proof";
 import { verifySetupProofHash } from "./setup-proof";
@@ -70,18 +71,35 @@ function commandWaveStateFromPayload(payload: unknown) {
   };
 }
 
+function githubRepoCheck(proof: SetupProof) {
+  if (!proof.github) {
+    return check("github_repo", "fail", "Setup proof does not name a GitHub repo.");
+  }
+
+  if (isPlaceholderValue(proof.github.repoUrl)) {
+    return check(
+      "github_repo",
+      "fail",
+      "Setup proof uses a placeholder GitHub repo. Select the real repo before verifying required checks.",
+    );
+  }
+
+  return check("github_repo", "pass", `Setup proof names ${proof.github.owner}/${proof.github.repo}.`);
+}
+
 export function verifySetupProofAgainstGitHubPayloads(
   proof: SetupProof,
   payloads: unknown[],
   options: SetupVerificationOptions = {},
 ): SetupVerificationResult {
-  const requiredChecks = proof.github?.requiredChecks ?? [];
+  const githubCheck = githubRepoCheck(proof);
+  const requiredChecks = githubCheck.status === "pass" ? proof.github?.requiredChecks ?? [] : [];
   const observedRequiredChecks = extractRequiredStatusChecks(payloads);
   const guardianEnforcementMode = proof.guardian?.enforcementMode;
   const storageDurability = proof.storage?.durability;
   const checks: SetupVerificationCheck[] = [
     check("proof_hash", verifySetupProofHash(proof) ? "pass" : "fail", "Setup proof hashes are internally consistent."),
-    check("github_repo", proof.github ? "pass" : "fail", "Setup proof names a GitHub repo."),
+    githubCheck,
     check(
       "guardian_enforcement",
       guardianEnforcementMode ? "pass" : "fail",

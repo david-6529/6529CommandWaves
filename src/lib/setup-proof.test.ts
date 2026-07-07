@@ -2,9 +2,14 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createSetupProof, setupProofOptionsFromEnv, verifySetupProofHash } from "./setup-proof";
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 describe("setup proof", () => {
   it("creates a third-party-verifiable setup proof", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-20T18:00:00.000Z",
     });
 
@@ -14,8 +19,8 @@ describe("setup proof", () => {
         id: "6529-hook-builder",
       },
       github: {
-        owner: "your-org",
-        repo: "your-hook-repo",
+        owner: "6529-Collections",
+        repo: "6529-hook",
         protectedBranch: "main",
         requiredReviewerCheck: "Command Waves Guardian",
       },
@@ -37,7 +42,7 @@ describe("setup proof", () => {
         databaseConfigured: false,
       },
       governance: {
-        rulesVersion: demoWave.rules.version,
+        rulesVersion: configuredDemoWave.rules.version,
         manifestSchemaVersion: "command-wave-pr-v0.1",
         reviewerGateVersion: "command-wave-reviewer-gate-v0.5",
       },
@@ -50,11 +55,23 @@ describe("setup proof", () => {
     expect(verifySetupProofHash(proof)).toBe(true);
   });
 
-  it("keeps setupHash stable while generatedAt changes", () => {
-    const first = createSetupProof(demoWave, {
+  it("does not publish placeholder GitHub setup targets", () => {
+    const proof = createSetupProof(demoWave, {
       generatedAt: "2026-06-20T18:00:00.000Z",
     });
-    const second = createSetupProof(demoWave, {
+
+    expect(proof.github).toBeNull();
+    expect(proof.verificationTargets.githubRepoUrl).toBeNull();
+    expect(proof.verificationTargets.githubRulesetsApi).toBeNull();
+    expect(proof.verificationTargets.githubBranchRulesApi).toBeNull();
+    expect(verifySetupProofHash(proof)).toBe(true);
+  });
+
+  it("keeps setupHash stable while generatedAt changes", () => {
+    const first = createSetupProof(configuredDemoWave, {
+      generatedAt: "2026-06-20T18:00:00.000Z",
+    });
+    const second = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-20T19:00:00.000Z",
     });
 
@@ -63,7 +80,7 @@ describe("setup proof", () => {
   });
 
   it("detects setup proof tampering", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-20T18:00:00.000Z",
     });
 
@@ -79,7 +96,7 @@ describe("setup proof", () => {
 
   it("can publish external guardian setup metadata from env", () => {
     const proof = createSetupProof(
-      demoWave,
+      configuredDemoWave,
       setupProofOptionsFromEnv({
         COMMAND_WAVE_GUARDIAN_MODE: "external_github_app",
         COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK: "Command Waves Guardian App",
@@ -107,7 +124,7 @@ describe("setup proof", () => {
   });
 
   it("normalizes direct external guardian options to strong external metadata", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       guardian: {
         enforcementMode: "external_github_app",
         workflowPath: ".github/workflows/guardian-review.yml",
@@ -129,7 +146,7 @@ describe("setup proof", () => {
 
   it("publishes production storage metadata from env", () => {
     const proof = createSetupProof(
-      demoWave,
+      configuredDemoWave,
       setupProofOptionsFromEnv({
         COMMAND_WAVE_STORE: "postgres",
         DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
@@ -147,7 +164,7 @@ describe("setup proof", () => {
 
   it("does not treat placeholder production env values as setup proof evidence", () => {
     const proof = createSetupProof(
-      demoWave,
+      configuredDemoWave,
       setupProofOptionsFromEnv({
         NODE_ENV: "production",
         NEXT_PUBLIC_APP_URL: "https://your-app.example",
@@ -169,7 +186,7 @@ describe("setup proof", () => {
 
   it("publishes the command-wave state URL from env", () => {
     const proof = createSetupProof(
-      demoWave,
+      configuredDemoWave,
       setupProofOptionsFromEnv({
         NEXT_PUBLIC_APP_URL: "https://hooks.example/",
       }),
@@ -181,7 +198,7 @@ describe("setup proof", () => {
 
   it("prefers an explicit command-wave state URL", () => {
     const proof = createSetupProof(
-      demoWave,
+      configuredDemoWave,
       setupProofOptionsFromEnv({
         COMMAND_WAVE_STATE_URL: "https://state.example/wave.json",
         NEXT_PUBLIC_APP_URL: "https://hooks.example",
@@ -194,7 +211,7 @@ describe("setup proof", () => {
 
   it("discloses local file storage as local durability", () => {
     const proof = createSetupProof(
-      demoWave,
+      configuredDemoWave,
       setupProofOptionsFromEnv({
         COMMAND_WAVE_STORE: "file",
       }),

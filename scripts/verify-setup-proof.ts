@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fetchJsonWithTimeout, type TimedFetchError } from "../src/lib/http-fetch";
+import { isPlaceholderValue } from "../src/lib/env-placeholders";
 import type { SetupProof } from "../src/lib/setup-proof";
 import { verifySetupProofAgainstGitHubPayloads } from "../src/lib/setup-verifier";
 
@@ -64,12 +65,16 @@ async function loadGitHubPayloads(proof: SetupProof) {
     return readJsonFile<unknown[]>(resolve(payloadPath));
   }
 
-  const urls = [proof.verificationTargets.githubRulesetsApi, proof.verificationTargets.githubBranchRulesApi].filter(
-    (item): item is string => Boolean(item),
-  );
+  if (!proof.github || isPlaceholderValue(proof.github.repoUrl)) {
+    return [];
+  }
+
+  const urls = [proof.verificationTargets.githubRulesetsApi, proof.verificationTargets.githubBranchRulesApi]
+    .filter((item): item is string => Boolean(item))
+    .filter((item) => !isPlaceholderValue(item));
 
   if (!urls.length) {
-    throw new Error("Setup proof does not include GitHub verification targets.");
+    return [];
   }
 
   return Promise.all(urls.map((url) => readOptionalJsonUrl(url, process.env.GITHUB_TOKEN)));

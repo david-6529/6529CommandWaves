@@ -5,6 +5,11 @@ import { extractRequiredStatusChecks } from "./github/required-status-checks";
 import { createSetupProof } from "./setup-proof";
 import { verifySetupProofAgainstGitHubPayloads } from "./setup-verifier";
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
 describe("setup verifier", () => {
   it("extracts required checks from ruleset payloads", () => {
     expect(
@@ -35,7 +40,7 @@ describe("setup verifier", () => {
   });
 
   it("passes when proof hash and required guardian check are present", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     const result = verifySetupProofAgainstGitHubPayloads(proof, [
@@ -48,13 +53,69 @@ describe("setup verifier", () => {
 
     expect(result.status).toBe("pass");
     expect(result.observedRequiredChecks).toEqual(["Command Waves Guardian"]);
+    expect(result.checks.find((item) => item.id === "github_repo")).toMatchObject({
+      status: "pass",
+      message: "Setup proof names 6529-Collections/6529-hook.",
+    });
     expect(result.checks.find((item) => item.id === "storage_declared")).toMatchObject({
       status: "pass",
     });
   });
 
-  it("fails when the guardian check is not required", () => {
+  it("fails clearly while the GitHub repo is a placeholder", () => {
     const proof = createSetupProof(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+    const result = verifySetupProofAgainstGitHubPayloads(proof, [
+      {
+        required_status_checks: {
+          contexts: ["Command Waves Guardian"],
+        },
+      },
+    ]);
+
+    expect(result.status).toBe("fail");
+    expect(result.requiredChecks).toEqual([]);
+    expect(result.checks.find((item) => item.id === "github_repo")).toMatchObject({
+      status: "fail",
+      message: "Setup proof does not name a GitHub repo.",
+    });
+    expect(result.checks.some((item) => item.id === "required_check_Command Waves Guardian")).toBe(false);
+  });
+
+  it("rejects legacy setup proofs that still name a placeholder GitHub repo", () => {
+    const proof = createSetupProof(configuredDemoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+    const placeholderProof = {
+      ...proof,
+      github: proof.github
+        ? {
+            ...proof.github,
+            owner: "your-org",
+            repo: "your-hook-repo",
+            repoUrl: "https://github.com/your-org/your-hook-repo",
+          }
+        : null,
+    };
+    const result = verifySetupProofAgainstGitHubPayloads(placeholderProof, [
+      {
+        required_status_checks: {
+          contexts: ["Command Waves Guardian"],
+        },
+      },
+    ]);
+
+    expect(result.status).toBe("fail");
+    expect(result.requiredChecks).toEqual([]);
+    expect(result.checks.find((item) => item.id === "github_repo")).toMatchObject({
+      status: "fail",
+      message: "Setup proof uses a placeholder GitHub repo. Select the real repo before verifying required checks.",
+    });
+  });
+
+  it("fails when the guardian check is not required", () => {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     const result = verifySetupProofAgainstGitHubPayloads(proof, [
@@ -72,7 +133,7 @@ describe("setup verifier", () => {
   });
 
   it("can require a stronger external guardian for production audits", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     const result = verifySetupProofAgainstGitHubPayloads(
@@ -94,7 +155,7 @@ describe("setup verifier", () => {
   });
 
   it("can require production storage for broad participation audits", () => {
-    const localProof = createSetupProof(demoWave, {
+    const localProof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       storage: {
         mode: "file",
@@ -113,7 +174,7 @@ describe("setup verifier", () => {
       ],
       { requireProductionStorage: true },
     );
-    const productionProof = createSetupProof(demoWave, {
+    const productionProof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       storage: {
         mode: "postgres",
@@ -142,7 +203,7 @@ describe("setup verifier", () => {
   });
 
   it("verifies the published command-wave state target when present", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
     });
@@ -156,7 +217,7 @@ describe("setup verifier", () => {
         },
       ],
       {
-        commandWaveState: createCommandWaveStateSnapshot(demoWave, {
+        commandWaveState: createCommandWaveStateSnapshot(configuredDemoWave, {
           generatedAt: "2026-06-21T12:01:00.000Z",
         }),
       },
@@ -181,11 +242,11 @@ describe("setup verifier", () => {
   });
 
   it("fails when the published command-wave state snapshot hash is stale", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
     });
-    const state = createCommandWaveStateSnapshot(demoWave, {
+    const state = createCommandWaveStateSnapshot(configuredDemoWave, {
       generatedAt: "2026-06-21T12:01:00.000Z",
     });
     const result = verifySetupProofAgainstGitHubPayloads(
@@ -218,12 +279,12 @@ describe("setup verifier", () => {
   });
 
   it("fails when the published command-wave state target points to another wave", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
     });
     const otherWave = {
-      ...demoWave,
+      ...configuredDemoWave,
       waveUrl: "https://6529.io/waves/other-hook-builder",
     };
     const result = verifySetupProofAgainstGitHubPayloads(
@@ -249,7 +310,7 @@ describe("setup verifier", () => {
   });
 
   it("fails when the command-wave state target returns a raw wave", () => {
-    const proof = createSetupProof(demoWave, {
+    const proof = createSetupProof(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
     });
@@ -263,7 +324,7 @@ describe("setup verifier", () => {
         },
       ],
       {
-        commandWaveState: demoWave,
+        commandWaveState: configuredDemoWave,
       },
     );
 

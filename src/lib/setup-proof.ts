@@ -1,8 +1,8 @@
 import { normalizeWaveId } from "./6529/client";
 import { commandWaveStateUrlFromEnv } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
-import { hasProductionValue } from "./env-placeholders";
-import { parseGitHubRepoUrl } from "./github/repo";
+import { hasProductionValue, isPlaceholderValue } from "./env-placeholders";
+import { parseGitHubRepoUrl, type GitHubRepoRef } from "./github/repo";
 import { REVIEWER_GATE_VERSION } from "./github/pr-reviewer-gate";
 import { hashValue } from "./run-manifest";
 
@@ -156,6 +156,16 @@ function envValue(env: Record<string, string | undefined>, key: string) {
   return value && hasProductionValue(value, env) ? value : undefined;
 }
 
+function configuredSetupRepo(repoUrl: string): GitHubRepoRef | null {
+  const repo = parseGitHubRepoUrl(repoUrl);
+
+  if (!repo || isPlaceholderValue(repoUrl) || isPlaceholderValue(repo.htmlUrl)) {
+    return null;
+  }
+
+  return repo;
+}
+
 function storageModeFromEnv(env: Record<string, string | undefined>): SetupProofStorageMode {
   const configuredMode = asStorageMode(envValue(env, "COMMAND_WAVE_STORE"));
 
@@ -242,7 +252,7 @@ export function createSetupProof(wave: CommandWave, options: SetupProofOptions =
     ...storageProofForMode(storageMode, databaseConfigured),
     ...options.storage,
   };
-  const repo = parseGitHubRepoUrl(wave.repoUrl);
+  const repo = configuredSetupRepo(wave.repoUrl);
   const baseProof = withoutHashes({
     version: "command-wave-setup-v0.1",
     generatedAt: options.generatedAt ?? new Date().toISOString(),

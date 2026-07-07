@@ -53,6 +53,7 @@ What exists now:
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
   contract signal checks.
+- Setup proof omits placeholder GitHub repo values and blocks required-check verification until the real repo is selected.
 - Launch audit, workflow proof, checklists, launch packets, update drafts, and contribution reports reject stale PR or review evidence unless the PR link and review proof are bound to the configured repo.
 - Review cannot record guardian proof unless the current execution includes a PR link for the configured repo.
 - GitHub guardian PR evidence includes the target repo and fails when it does not match the configured hook repo.
