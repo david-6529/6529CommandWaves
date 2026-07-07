@@ -1,4 +1,7 @@
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
+import { hookProjectIndexHashInput } from "./hook-project-index";
 import { verifyLaunchAuditPayload, type LaunchAuditVerificationCheck } from "./launch-audit-verifier";
+import { hashValue } from "./run-manifest";
 
 export type ChatLaunchVerificationResult = {
   status: "pass" | "fail";
@@ -46,7 +49,11 @@ function asString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function isSha256Hash(value: unknown) {
+function asNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function isSha256Hash(value: unknown): value is string {
   return typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 }
 
@@ -78,7 +85,112 @@ function launchStatusReady(value: unknown) {
   return status === "ready" || status === "needs_setup" || status === "blocked";
 }
 
-function verifyChatLaunchSnapshotPayload(payload: unknown): ChatLaunchVerificationResult | null {
+type ChatLaunchVerificationOptions = Parameters<typeof verifyLaunchAuditPayload>[1];
+
+type ChatLaunchStateEvidence = {
+  waveStateHash: string;
+  rulesHash: string;
+  proposalCount: number;
+  reviewCount: number;
+  ledgerEventCount: number;
+};
+
+function collectStateEvidence(value: unknown): ChatLaunchStateEvidence | null {
+  const record = isRecord(value) ? value : null;
+  const proposalCount = asNumber(record?.proposalCount);
+  const reviewCount = asNumber(record?.reviewCount);
+  const ledgerEventCount = asNumber(record?.ledgerEventCount);
+
+  if (
+    !record ||
+    !isSha256Hash(record.waveStateHash) ||
+    !isSha256Hash(record.rulesHash) ||
+    proposalCount === null ||
+    reviewCount === null ||
+    ledgerEventCount === null ||
+    !Number.isInteger(proposalCount) ||
+    !Number.isInteger(reviewCount) ||
+    !Number.isInteger(ledgerEventCount) ||
+    proposalCount < 0 ||
+    reviewCount < 0 ||
+    ledgerEventCount < 0
+  ) {
+    return null;
+  }
+
+  return {
+    waveStateHash: record.waveStateHash,
+    rulesHash: record.rulesHash,
+    proposalCount,
+    reviewCount,
+    ledgerEventCount,
+  };
+}
+
+function publicStateMatches(value: unknown, expected: ChatLaunchStateEvidence | null) {
+  const record = isRecord(value) ? value : null;
+  const wave = isRecord(record?.wave) ? record.wave : null;
+  const rules = isRecord(wave?.rules) ? wave.rules : null;
+  const proposals = Array.isArray(wave?.proposals) ? wave.proposals : null;
+  const reviews = Array.isArray(wave?.reviews) ? wave.reviews : null;
+  const ledger = Array.isArray(wave?.ledger) ? wave.ledger : null;
+  const stateHash = asString(record?.stateHash);
+  const waveStateHash = asString(record?.waveStateHash);
+
+  return Boolean(
+    record &&
+      record.version === "command-wave-state-v0.1" &&
+      wave &&
+      rules &&
+      proposals &&
+      reviews &&
+      ledger &&
+      expected &&
+      isSha256Hash(stateHash) &&
+      isSha256Hash(waveStateHash) &&
+      stateHash === createCommandWaveStateHash(record) &&
+      waveStateHash === hashValue(wave) &&
+      waveStateHash === expected.waveStateHash &&
+      hashValue(rules) === expected.rulesHash &&
+      proposals.length === expected.proposalCount &&
+      reviews.length === expected.reviewCount &&
+      ledger.length === expected.ledgerEventCount,
+  );
+}
+
+function projectIndexMatches(value: unknown, project: Record<string, unknown> | null) {
+  const record = isRecord(value) ? value : null;
+  const projects = Array.isArray(record?.projects) ? record.projects.filter(isRecord) : [];
+  const projectsHash = asString(record?.projectsHash);
+  const activeProjectId = asString(record?.activeProjectId);
+  const projectCount = asNumber(record?.projectCount);
+  const expectedProjectId = asString(project?.id);
+  const expectedWaveUrl = asString(project?.waveUrl);
+  const expectedRepoUrl = asString(project?.repoUrl);
+  const activeProject = projects.find((item) => asString(item.id) === expectedProjectId) ?? null;
+
+  return Boolean(
+    record &&
+      record.version === "command-wave-projects-v0.1" &&
+      project &&
+      expectedProjectId &&
+      expectedWaveUrl &&
+      expectedRepoUrl &&
+      activeProjectId === expectedProjectId &&
+      Number.isInteger(projectCount) &&
+      projectCount === projects.length &&
+      isSha256Hash(projectsHash) &&
+      projectsHash === hashValue(hookProjectIndexHashInput(record)) &&
+      activeProject &&
+      asString(activeProject.waveUrl) === expectedWaveUrl &&
+      asString(activeProject.repoUrl) === expectedRepoUrl,
+  );
+}
+
+function verifyChatLaunchSnapshotPayload(
+  payload: unknown,
+  options: ChatLaunchVerificationOptions = {},
+): ChatLaunchVerificationResult | null {
   const snapshot = unwrapSnapshot(payload);
   const chatLaunch = isRecord(snapshot?.chatLaunch) ? snapshot.chatLaunch : null;
   const prLoop = isRecord(snapshot?.prLoop) ? snapshot.prLoop : null;
@@ -90,6 +202,11 @@ function verifyChatLaunchSnapshotPayload(payload: unknown): ChatLaunchVerificati
   const openItems = collectItemSummaries(chatLaunch?.openItems);
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const sourceAuditHash = asString(snapshot?.sourceAuditHash);
+  const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
+  const shouldVerifyPublicState = options.requirePublicState === true || typeof options.commandWaveState !== "undefined";
+  const shouldVerifyProjectIndex = options.requireProjectIndex === true || typeof options.projectIndex !== "undefined";
+  const hasPublicState = shouldVerifyPublicState ? publicStateMatches(options.commandWaveState, stateEvidence) : null;
+  const hasProjectIndex = shouldVerifyProjectIndex ? projectIndexMatches(options.projectIndex, project) : null;
 
   if (snapshot?.version !== "command-wave-chat-launch-v0.1") {
     return null;
@@ -108,6 +225,35 @@ function verifyChatLaunchSnapshotPayload(payload: unknown): ChatLaunchVerificati
         ? "Source launch audit hash is present."
         : "Chat launch payload must include the source launch audit hash.",
     ),
+    check(
+      "state_evidence",
+      stateEvidence ? "pass" : "fail",
+      stateEvidence
+        ? "Chat launch audit is tied to hashed project state evidence."
+        : "Chat launch audit must publish wave state hash, rules hash, and record counts.",
+    ),
+    ...(shouldVerifyPublicState
+      ? [
+          check(
+            "public_state_endpoint",
+            hasPublicState ? "pass" : "fail",
+            hasPublicState
+              ? "Public command-wave state matches the chat launch audit evidence."
+              : "Public command-wave state must match the chat launch audit evidence.",
+          ),
+        ]
+      : []),
+    ...(shouldVerifyProjectIndex
+      ? [
+          check(
+            "project_index_endpoint",
+            hasProjectIndex ? "pass" : "fail",
+            hasProjectIndex
+              ? "Public project index includes the chat launch project."
+              : "Public project index must include the chat launch project.",
+          ),
+        ]
+      : []),
     check(
       "chat_launch_status",
       launchStatusReady(chatLaunchStatus) ? "pass" : "fail",
@@ -212,5 +358,5 @@ export function verifyChatLaunchPayload(
   payload: unknown,
   options: Parameters<typeof verifyLaunchAuditPayload>[1] = {},
 ): ChatLaunchVerificationResult {
-  return verifyChatLaunchSnapshotPayload(payload) ?? verifyChatLaunchAuditPayload(payload, options);
+  return verifyChatLaunchSnapshotPayload(payload, options) ?? verifyChatLaunchAuditPayload(payload, options);
 }

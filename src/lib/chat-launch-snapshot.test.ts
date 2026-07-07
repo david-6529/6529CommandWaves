@@ -19,6 +19,7 @@ describe("chat launch snapshot", () => {
         repoUrl: demoWave.repoUrl,
       },
       setupCheckMode: "shape",
+      stateEvidence: launchSnapshot.stateEvidence,
       prLoop: {
         status: launchSnapshot.launchAudit.status,
       },

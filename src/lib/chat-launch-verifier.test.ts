@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { githubRepoPlaceholder } from "./agent-identities";
+import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createChatLaunchSnapshot } from "./chat-launch-snapshot";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
+import { createHookProjectIndex } from "./hook-project-index";
 import { verifyChatLaunchAuditPayload, verifyChatLaunchPayload } from "./chat-launch-verifier";
 import type { SetupValidation } from "./setup-validation";
 
@@ -70,7 +72,14 @@ describe("chat launch verifier", () => {
       checkSetupRemote: true,
       setupValidation: chatReadySetupValidation,
     });
-    const result = verifyChatLaunchPayload(createChatLaunchSnapshot(launchSnapshot));
+    const result = verifyChatLaunchPayload(createChatLaunchSnapshot(launchSnapshot), {
+      commandWaveState: createCommandWaveStateSnapshot(demoWave, {
+        generatedAt: "2026-06-20T13:01:00.000Z",
+      }),
+      projectIndex: createHookProjectIndex(demoWave, {
+        generatedAt: "2026-06-20T13:02:00.000Z",
+      }),
+    });
 
     expect(result.status).toBe("pass");
     expect(result.chatLaunchStatus).toBe("ready");
@@ -79,6 +88,36 @@ describe("chat launch verifier", () => {
     expect(result.auditHash).toBe(launchSnapshot.auditHash);
     expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
       status: "pass",
+    });
+    expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
+      status: "pass",
+    });
+    expect(result.checks.find((item) => item.id === "project_index_endpoint")).toMatchObject({
+      status: "pass",
+    });
+  });
+
+  it("fails direct chat launch payloads when fetched state does not match", async () => {
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+      checkSetupRemote: true,
+      setupValidation: chatReadySetupValidation,
+    });
+    const mismatchedWave = {
+      ...demoWave,
+      name: "Other hook",
+    };
+    const result = verifyChatLaunchPayload(createChatLaunchSnapshot(launchSnapshot), {
+      commandWaveState: createCommandWaveStateSnapshot(mismatchedWave, {
+        generatedAt: "2026-06-20T13:01:00.000Z",
+      }),
+      requirePublicState: true,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
+      status: "fail",
     });
   });
 

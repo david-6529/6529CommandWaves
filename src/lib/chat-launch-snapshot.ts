@@ -10,6 +10,7 @@ export type ChatLaunchSnapshot = {
   sourceAuditHash: string;
   project: FirstPhaseLaunchSnapshot["project"];
   setupCheckMode: FirstPhaseLaunchSnapshot["setupCheckMode"];
+  stateEvidence: FirstPhaseLaunchSnapshot["stateEvidence"];
   chatLaunch: FirstPhaseLaunchAuditTrack;
   prLoop: {
     status: FirstPhaseLaunchSnapshot["launchAudit"]["status"];
@@ -42,6 +43,7 @@ export function createChatLaunchSnapshot(snapshot: FirstPhaseLaunchSnapshot): Ch
     sourceAuditHash: snapshot.auditHash,
     project: snapshot.project,
     setupCheckMode: snapshot.setupCheckMode,
+    stateEvidence: snapshot.stateEvidence,
     chatLaunch: snapshot.launchAudit.chatLaunch,
     prLoop: {
       status: snapshot.launchAudit.status,
