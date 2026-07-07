@@ -65,4 +65,12 @@ describe("launch docs", () => {
     expect(docs).toContain("npm run launch:audit");
     expect(docs).toContain("reviewed PR loop");
   });
+
+  it("documents the public verification manifest", () => {
+    const readme = readRepoFile("README.md");
+
+    expect(readme).toContain("/api/command-wave/verification/manifest");
+    expect(readme).toContain("required hash fields");
+    expect(readme).toContain("its own manifest URL");
+  });
 });

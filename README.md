@@ -49,6 +49,7 @@ What exists now:
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
 - Public active project index for agents or future UI surfaces that need the hook list and project chat links.
+- Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, and required hash fields.
 - Public project state includes a full snapshot hash, so setup checks can detect stale or edited state payloads.
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
@@ -194,6 +195,7 @@ Audit and launch:
 - Remote launch checks can be run from maintainer controls to refresh setup, required guardian check, and readiness blockers.
 - Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
+- Public verification manifest with stable anchors, required hash fields, and a self endpoint for third-party checks.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
 - Public launch audit separates chat launch readiness from the full reviewed PR loop.
@@ -459,7 +461,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
 - `GET /api/command-wave/projects`: public active hook project index with a stable project-list hash.
-- `GET /api/command-wave/verification/manifest`: public map of verification endpoints, hash fields, and stable anchors.
+- `GET /api/command-wave/verification/manifest`: public map of verification endpoints, required hash fields, stable anchors, and its own manifest URL.
 - `GET /api/command-wave/launch/audit`: public first-loop launch audit with authority boundary. Add `?remote=1` to run remote wave and repo setup checks.
 - `GET /api/command-wave/launch/chat`: public chat launch audit with `chatLaunchHash`. Add `?remote=1` before inviting builders into discussion.
 - `GET /api/command-wave`: return the current local command wave.
