@@ -46,6 +46,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("repo needed");
     expect(text).toContain("Next");
     expect(text).toContain("Select the repo");
+    expect(text).toContain("Select repo");
     expect(text).toContain("Decision");
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
     expect(text).toContain("GitHub repo");
@@ -78,6 +79,14 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Scope work");
     expect(text).toContain("Save scoped work");
     expect(text).toContain("Project log");
+  });
+
+  it("links the current blocker to the repo setup field", () => {
+    const html = renderedConsoleHtml();
+
+    expect(html).toContain(">Select repo</button>");
+    expect(html).toContain('id="project-repo-url"');
+    expect(html).toContain("Maintainer setup");
   });
 
   it("does not bring back removed homepage clutter or old positioning copy", () => {

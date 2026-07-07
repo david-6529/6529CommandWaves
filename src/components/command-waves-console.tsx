@@ -172,6 +172,8 @@ function projectChatPanelId(id: DiscussionTabId) {
   return `project-chat-panel-${id}`;
 }
 
+const projectRepoInputId = "project-repo-url";
+
 const hookGuardrails = [
   "Hook contracts stay immutable by default.",
   ...hookParameterPolicySummary.slice(1),
@@ -1608,10 +1610,16 @@ export function CommandWavesConsole() {
     void runWaveAction("reset", () => requestWave("/api/command-wave", { method: "DELETE" }, accessKey), "Starter state restored.");
   }
 
-  function openSetupControls() {
+  function openSetupControls(options: { focusRepo?: boolean } = {}) {
     setSetupControlsOpen(true);
     window.requestAnimationFrame(() => {
       setupControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      if (options.focusRepo) {
+        window.setTimeout(() => {
+          document.getElementById(projectRepoInputId)?.focus();
+        }, 150);
+      }
     });
   }
 
@@ -2236,6 +2244,11 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
                 <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{phaseNextAction.title}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{phaseNextAction.detail}</p>
+                {projectRepoIsPlaceholder ? (
+                  <Button type="button" variant="secondary" className="mt-3" onClick={() => openSetupControls({ focusRepo: true })}>
+                    Select repo
+                  </Button>
+                ) : null}
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
@@ -3056,6 +3069,7 @@ export function CommandWavesConsole() {
               </div>
               <Field label="GitHub repo">
                 <Input
+                  id={projectRepoInputId}
                   value={repoUrl}
                   onChange={(event) => {
                     setRepoUrl(event.target.value);
