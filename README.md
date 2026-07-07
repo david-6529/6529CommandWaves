@@ -181,11 +181,11 @@ Default workspace:
 - Builder message composer with direct chat posting when configured, recent posts, and copyable discussion draft.
 - Folded proposal form that asks for title, change, and success criteria before optional work details.
 - Builder profiles with profile links, visible chat and repo activity, and informational contribution signals.
-- Collapsed build reference: who can join, activity-report boundaries, and hook guardrails.
+- Collapsed builder details: who can join, activity-report boundaries, and hook guardrails.
 
 Safety and review:
 
-- Rules section with plain-English access notes.
+- How this works section with plain-English access notes.
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.

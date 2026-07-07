@@ -2250,7 +2250,7 @@ export function CommandWavesConsole() {
 
             <details className="rounded-lg border border-zinc-800 p-4">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-                <span>Rules</span>
+                <span>How this works</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">simple</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-400">
@@ -2480,7 +2480,7 @@ export function CommandWavesConsole() {
               role="tabpanel"
               aria-labelledby={projectChatTabId(selectedDiscussionTab.id)}
             >
-              <Field label="Message or work idea">
+              <Field label="Message">
                 <Textarea
                   rows={4}
                   value={projectChatMessage}
@@ -2645,7 +2645,7 @@ export function CommandWavesConsole() {
 
           <details id="build-reference" className="mt-6 border-b border-zinc-800 py-3">
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-              <span>Build reference</span>
+              <span>Builder details</span>
               <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">optional</Badge>
             </summary>
             <p className="mt-3 text-base leading-7 text-zinc-400">

@@ -36,7 +36,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("The GitHub repo is a placeholder until the pilot repo is selected.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
-    expect(text).toContain("Rules");
+    expect(text).toContain("How this works");
     expect(text).toContain("Flow");
     expect(text).toContain("Project, Discuss, Decide, PR, Review, Log");
     expect(text).toContain("Active projects");
@@ -83,7 +83,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Visible contribution");
     expect(text).toContain("1 report point");
     expect(text).not.toContain("1 report points");
-    expect(text).toContain("Build reference");
+    expect(text).toContain("Builder details");
     expect(text).toContain("Access notes, reports, and code checks for builders who want the details.");
     expect(text).toContain("The group records a project decision before PR work starts.");
     expect(text).toContain("Review approval is manual in this phase.");
@@ -144,6 +144,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Who can play");
     expect(text).not.toContain("Participation gate is not set yet.");
     expect(text).not.toContain("Build details");
+    expect(text).not.toContain("Build reference");
     expect(text).not.toContain("orchestrator managed");
     expect(text).not.toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).not.toContain("production reviewer service is wired");
@@ -218,7 +219,7 @@ describe("CommandWavesConsole", () => {
     expect(contextHtml.match(/<details\b/g) ?? []).toHaveLength(3);
     expect(contextHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(1);
     expect(contextHtml).toContain("Project summary");
-    expect(contextHtml).toContain("Rules");
+    expect(contextHtml).toContain("How this works");
     expect(contextHtml).toContain("Changelog");
   });
 
