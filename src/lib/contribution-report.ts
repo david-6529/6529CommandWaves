@@ -74,8 +74,12 @@ function countLabel(count: number, singular: string) {
   return `${count} ${count === 1 ? singular : `${singular}s`}`;
 }
 
+export function reportPointLabel(points: number) {
+  return `${points} report point${points === 1 ? "" : "s"}`;
+}
+
 function scoreLabel(points: number, source: string) {
-  return `${source}: ${points} report point${points === 1 ? "" : "s"}`;
+  return `${source}: ${reportPointLabel(points)}`;
 }
 
 function addScoreBasis(contributor: ContributionContributor, source: string, points: number) {

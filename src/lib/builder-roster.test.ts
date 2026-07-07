@@ -21,6 +21,7 @@ describe("builder roster", () => {
       ]),
     });
     expect(roster.some((member) => member.identity === "gpebbles" && member.role === "Voter")).toBe(true);
+    expect(roster.find((member) => member.identity === "gpebbles")?.scoreLabel).toBe("1 report point");
     expect(roster.some((member) => member.identity === "Decision")).toBe(false);
   });
 

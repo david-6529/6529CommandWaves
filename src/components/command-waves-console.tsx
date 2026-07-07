@@ -21,7 +21,7 @@ import {
   type CommandKind,
   type CommandWave,
 } from "@/lib/command-waves";
-import { createContributionReport, createContributionReportDraft } from "@/lib/contribution-report";
+import { createContributionReport, createContributionReportDraft, reportPointLabel } from "@/lib/contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "@/lib/agent-identities";
@@ -3883,9 +3883,7 @@ export function CommandWavesConsole() {
                     <p className="mt-1 text-xs leading-5 text-zinc-500">Activity basis: {contributor.scoreBasis.join(", ")}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">
-                      {contributor.score} report points
-                    </Badge>
+                    <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{reportPointLabel(contributor.score)}</Badge>
                     <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
                       {countLabel(contributor.proposals, "proposal")}
                     </Badge>

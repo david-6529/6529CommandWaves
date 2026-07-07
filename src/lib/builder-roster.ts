@@ -1,4 +1,4 @@
-import type { ContributionContributor, ContributionReport } from "./contribution-report";
+import { reportPointLabel, type ContributionContributor, type ContributionReport } from "./contribution-report";
 
 export type BuilderRosterStat = {
   label: string;
@@ -77,7 +77,7 @@ function scoreLabelFor(contributor: ContributionContributor) {
     contributor.decisions === 0 &&
     contributor.ledgerEvents === 0;
 
-  return onlyRoomActivity ? "chat activity" : `${contributor.score} report points`;
+  return onlyRoomActivity ? "chat activity" : reportPointLabel(contributor.score);
 }
 
 function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {

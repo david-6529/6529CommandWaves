@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
-import { createContributionReport, createContributionReportDraft } from "./contribution-report";
+import { createContributionReport, createContributionReportDraft, reportPointLabel } from "./contribution-report";
 import { hashValue } from "./run-manifest";
 
 const configuredRepo = {
@@ -31,6 +31,11 @@ const configuredDemoWave = {
 };
 
 describe("contribution report", () => {
+  it("formats report point labels cleanly", () => {
+    expect(reportPointLabel(1)).toBe("1 report point");
+    expect(reportPointLabel(2)).toBe("2 report points");
+  });
+
   it("summarizes visible activity without granting authority", () => {
     const report = createContributionReport(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",

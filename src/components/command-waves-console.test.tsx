@@ -62,6 +62,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
     expect(text).toContain("Visible contribution");
+    expect(text).toContain("1 report point");
+    expect(text).not.toContain("1 report points");
     expect(text).toContain("Build reference");
     expect(text).toContain("Access notes, reports, and code checks for builders who want the details.");
     expect(text).toContain("The group records a project decision before PR work starts.");

@@ -140,6 +140,7 @@ async function main() {
   ]) {
     assertIncludes("Home page", renderedHtml, label);
   }
+  assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assertNoEmDash("Home page", renderedHtml);
 
