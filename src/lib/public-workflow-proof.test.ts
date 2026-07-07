@@ -1,13 +1,32 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createPublicWorkflowProof } from "./public-workflow-proof";
+import { hashValue } from "./run-manifest";
+
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
 
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
   executions: demoWave.executions.map((execution) => ({
     ...execution,
-    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook")),
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
   })),
 };
 
@@ -86,6 +105,39 @@ describe("public workflow proof", () => {
     });
     expect(proof.steps.find((step) => step.id === "review")).toMatchObject({
       detail: "Review waits for a PR link that matches the configured repo.",
+    });
+  });
+
+  it("blocks review and log proof when review proof is not bound to the configured repo", () => {
+    const proof = createPublicWorkflowProof({
+      ...configuredDemoWave,
+      reviews: configuredDemoWave.reviews.map((review) => ({
+        ...review,
+        proof: review.proof
+          ? {
+              ...review.proof,
+              inputs: {
+                ...review.proof.inputs,
+                repositoryHash: undefined,
+              },
+            }
+          : review.proof,
+      })),
+    });
+
+    expect(proof.blockedCount).toBe(1);
+    expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
+      ["chat", "ready"],
+      ["decision", "ready"],
+      ["pr", "ready"],
+      ["review", "blocked"],
+      ["log", "needed"],
+    ]);
+    expect(proof.steps.find((step) => step.id === "review")).toMatchObject({
+      detail: "Review proof must be bound to the configured repo.",
+    });
+    expect(proof.steps.find((step) => step.id === "log")).toMatchObject({
+      detail: "Log waits for review proof bound to the configured repo.",
     });
   });
 
