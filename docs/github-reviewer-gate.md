@@ -50,6 +50,7 @@ This means the CI/GitHub App layer only has to gather:
 
 - PR body
 - changed file paths
+- target GitHub repository
 - current wave state
 - 6529 vote/proposal evidence
 
@@ -76,6 +77,8 @@ local demos.
 The check fails if:
 
 - the PR has no Command Waves manifest
+- the PR event is missing target repo evidence
+- the PR event repo does not match the configured hook repo
 - the manifest points to a missing proposal
 - the proposal is not approved, reviewing, or complete
 - the command is not an `open_pr` command

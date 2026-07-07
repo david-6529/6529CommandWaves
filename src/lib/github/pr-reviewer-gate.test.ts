@@ -17,6 +17,13 @@ function approvedDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
 }
 
+function configuredApprovedDemoWave(): CommandWave {
+  return {
+    ...approvedDemoWave(),
+    repoUrl: "https://github.com/6529-Collections/6529-hook",
+  };
+}
+
 describe("PR reviewer gate", () => {
   it("passes an approved open_pr manifest with normal app changes", () => {
     const wave = approvedDemoWave();
@@ -534,7 +541,7 @@ describe("PR reviewer gate", () => {
   });
 
   it("creates a guardian attestation from PR evidence", () => {
-    const wave = approvedDemoWave();
+    const wave = configuredApprovedDemoWave();
     const proposal = wave.proposals[0];
     const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
     const manifest = createCommandPrManifest({ wave, proposal, poll });
@@ -543,6 +550,11 @@ describe("PR reviewer gate", () => {
       evidence: {
         pullRequestBody: formatCommandPrManifestForPullRequest(manifest),
         changedPaths: ["src/app/page.tsx", "README.md"],
+        repository: {
+          owner: "6529-Collections",
+          repo: "6529-hook",
+          htmlUrl: "https://github.com/6529-Collections/6529-hook",
+        },
         generatedAt: "2026-06-21T12:00:00.000Z",
       },
     });
@@ -554,6 +566,50 @@ describe("PR reviewer gate", () => {
     expect(attestation.inputs.pollHash).toHaveLength(64);
     expect(attestation.inputs.manifestHash).toHaveLength(64);
     expect(attestation.inputs.changedFilesHash).toHaveLength(64);
+    expect(attestation.inputs.repositoryHash).toHaveLength(64);
+    expect(attestation.result.checks.find((item) => item.id === "repository")).toMatchObject({
+      status: "pass",
+      message: "GitHub PR evidence comes from the configured repo.",
+    });
+  });
+
+  it("fails PR evidence when repository evidence is missing or from another repo", () => {
+    const wave = configuredApprovedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const missingRepository = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        pullRequestBody: formatCommandPrManifestForPullRequest(manifest),
+        changedPaths: ["README.md"],
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+    const wrongRepository = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        pullRequestBody: formatCommandPrManifestForPullRequest(manifest),
+        changedPaths: ["README.md"],
+        repository: {
+          owner: "other-org",
+          repo: "other-hook",
+          htmlUrl: "https://github.com/other-org/other-hook",
+        },
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+
+    expect(missingRepository.result.status).toBe("fail");
+    expect(missingRepository.result.checks.find((item) => item.id === "repository")).toMatchObject({
+      status: "fail",
+      message: "Guardian PR evidence must include the GitHub repository.",
+    });
+    expect(wrongRepository.result.status).toBe("fail");
+    expect(wrongRepository.result.checks.find((item) => item.id === "repository")).toMatchObject({
+      status: "fail",
+      message: "Guardian PR evidence must come from the configured GitHub repo.",
+    });
   });
 
   it("fails PR evidence when the manifest is missing", () => {
@@ -640,13 +696,18 @@ describe("PR reviewer gate", () => {
   });
 
   it("verifies a pull request proof from attestation, wave state, and PR evidence", () => {
-    const wave = approvedDemoWave();
+    const wave = configuredApprovedDemoWave();
     const proposal = wave.proposals[0];
     const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
     const evidence = {
       pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
       changedPaths: ["src/app/page.tsx", "README.md"],
       changedFiles: [{ path: "src/app/page.tsx", patch: "@@\n+export default function Page() { return null; }" }],
+      repository: {
+        owner: "6529-Collections",
+        repo: "6529-hook",
+        htmlUrl: "https://github.com/6529-Collections/6529-hook",
+      },
     };
     const attestation = createGuardianPullRequestAttestation({
       wave,
@@ -663,13 +724,18 @@ describe("PR reviewer gate", () => {
   });
 
   it("fails pull request proof verification when PR evidence changes", () => {
-    const wave = approvedDemoWave();
+    const wave = configuredApprovedDemoWave();
     const proposal = wave.proposals[0];
     const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
     const evidence = {
       pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
       changedPaths: ["README.md"],
       changedFiles: [{ path: "README.md", patch: "@@\n+first" }],
+      repository: {
+        owner: "6529-Collections",
+        repo: "6529-hook",
+        htmlUrl: "https://github.com/6529-Collections/6529-hook",
+      },
     };
     const attestation = createGuardianPullRequestAttestation({
       wave,
@@ -691,6 +757,45 @@ describe("PR reviewer gate", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "changed_paths_hash")?.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "changed_files_hash")?.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "attestation_hash")?.status).toBe("fail");
+  });
+
+  it("fails pull request proof verification when repository evidence changes", () => {
+    const wave = configuredApprovedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const evidence = {
+      pullRequestBody: formatCommandPrManifestForPullRequest(createCommandPrManifest({ wave, proposal, poll })),
+      changedPaths: ["README.md"],
+      repository: {
+        owner: "6529-Collections",
+        repo: "6529-hook",
+        htmlUrl: "https://github.com/6529-Collections/6529-hook",
+      },
+    };
+    const attestation = createGuardianPullRequestAttestation({
+      wave,
+      evidence: {
+        ...evidence,
+        generatedAt: "2026-06-21T12:00:00.000Z",
+      },
+    });
+    const result = verifyGuardianPullRequestProof({
+      wave,
+      evidence: {
+        ...evidence,
+        repository: {
+          owner: "other-org",
+          repo: "other-hook",
+          htmlUrl: "https://github.com/other-org/other-hook",
+        },
+      },
+      attestation,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "repository_hash")?.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "result_hash")?.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "attestation_hash")?.status).toBe("fail");
   });
 });

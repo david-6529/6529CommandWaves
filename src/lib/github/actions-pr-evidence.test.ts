@@ -14,6 +14,10 @@ describe("GitHub Actions PR evidence", () => {
     expect(
       pullRequestEvidenceFromGitHubEvent(
         {
+          repository: {
+            full_name: "6529-Collections/6529-hook",
+            html_url: "https://github.com/6529-Collections/6529-hook",
+          },
           pull_request: {
             body: "PR body",
             files_url: "https://api.github.com/repos/example/repo/pulls/1/files",
@@ -26,7 +30,37 @@ describe("GitHub Actions PR evidence", () => {
     ).toEqual({
       pullRequestBody: "PR body",
       changedPaths: ["src/app/page.tsx"],
+      repository: {
+        owner: "6529-Collections",
+        repo: "6529-hook",
+        htmlUrl: "https://github.com/6529-Collections/6529-hook",
+      },
       changedFiles: [{ path: "src/app/page.tsx", patch: "@@\n+export default function Page() {}" }],
+    });
+  });
+
+  it("creates repository evidence from owner and repo fields when full name is missing", () => {
+    expect(
+      pullRequestEvidenceFromGitHubEvent(
+        {
+          repository: {
+            name: "6529-hook",
+            owner: {
+              login: "6529-Collections",
+            },
+          },
+          pull_request: {
+            body: "PR body",
+          },
+        },
+        ["README.md"],
+      ),
+    ).toMatchObject({
+      repository: {
+        owner: "6529-Collections",
+        repo: "6529-hook",
+        htmlUrl: "https://github.com/6529-Collections/6529-hook",
+      },
     });
   });
 

@@ -1,6 +1,15 @@
 import type { HookChangedFile } from "../safety/hook-diff-policy";
+import type { GuardianRepositoryEvidence } from "./pr-reviewer-gate";
 
 export type GitHubPullRequestEvent = {
+  repository?: {
+    full_name?: string | null;
+    html_url?: string | null;
+    name?: string | null;
+    owner?: {
+      login?: string | null;
+    } | null;
+  };
   pull_request?: {
     body?: string | null;
     files_url?: string | null;
@@ -12,6 +21,7 @@ export type PullRequestEvidence = {
   pullRequestBody: string;
   changedPaths: string[];
   changedFiles?: HookChangedFile[];
+  repository?: GuardianRepositoryEvidence;
 };
 
 export type GuardianPrCheckEnv = Record<string, string | undefined>;
@@ -22,6 +32,24 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 function asStringArray(value: unknown) {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function repositoryEvidenceFromGitHubEvent(event: GitHubPullRequestEvent): GuardianRepositoryEvidence | undefined {
+  const repository = event.repository;
+  const fullName = repository?.full_name?.trim() ?? "";
+  const fullNameParts = fullName.split("/");
+  const owner = fullNameParts.length === 2 ? fullNameParts[0] : (repository?.owner?.login?.trim() ?? "");
+  const repo = fullNameParts.length === 2 ? fullNameParts[1] : (repository?.name?.trim() ?? "");
+
+  if (!owner || !repo) {
+    return undefined;
+  }
+
+  return {
+    owner,
+    repo,
+    htmlUrl: repository?.html_url?.trim() || `https://github.com/${owner}/${repo}`,
+  };
 }
 
 export function pullRequestEvidenceFromGitHubEvent(
@@ -35,9 +63,12 @@ export function pullRequestEvidenceFromGitHubEvent(
     return null;
   }
 
+  const repository = repositoryEvidenceFromGitHubEvent(event);
+
   return {
     pullRequestBody: pullRequest.body ?? "",
     changedPaths,
+    ...(repository ? { repository } : {}),
     ...(changedFiles.length ? { changedFiles } : {}),
   };
 }

@@ -25,6 +25,7 @@ import {
 } from "../safety/hook-diff-policy";
 import { evaluateHookParameterPolicy, type HookParameterPolicyCheck } from "../safety/hook-parameter-policy";
 import { toolPolicyForProposal, type ToolPermission } from "../safety/tool-policy";
+import { configuredGitHubRepo } from "./pr-evidence";
 
 export const REVIEWER_GATE_VERSION = "command-wave-reviewer-gate-v0.5" as const;
 
@@ -73,6 +74,12 @@ export type ReviewerGateResult = {
   hookParameterChecks: HookParameterPolicyCheck[];
 };
 
+export type GuardianRepositoryEvidence = {
+  owner: string;
+  repo: string;
+  htmlUrl?: string | null;
+};
+
 export type GuardianAttestation = {
   version: "guardian-attestation-v0.1";
   generatedAt: string;
@@ -90,6 +97,7 @@ export type GuardianAttestation = {
     manifestHash: string | null;
     changedPathsHash: string;
     changedFilesHash?: string;
+    repositoryHash?: string;
     rulesHash: string;
   };
   result: ReviewerGateResult;
@@ -101,6 +109,7 @@ export type GuardianPullRequestEvidence = {
   pullRequestBody: string;
   changedPaths: string[];
   changedFiles?: HookChangedFile[];
+  repository?: GuardianRepositoryEvidence;
   generatedAt?: string;
 };
 
@@ -251,6 +260,35 @@ function validatePollDecisionReference(poll: PollState | null, waveUrl: string) 
   });
 }
 
+function repositoryMatchesWave(wave: CommandWave, repository: GuardianRepositoryEvidence | null) {
+  const configuredRepo = configuredGitHubRepo(wave.repoUrl);
+
+  if (!configuredRepo) {
+    return {
+      ok: false,
+      message: "Configured GitHub repo is required for guardian review.",
+    };
+  }
+
+  if (!repository) {
+    return {
+      ok: false,
+      message: "Guardian PR evidence must include the GitHub repository.",
+    };
+  }
+
+  const ok =
+    repository.owner.trim().toLowerCase() === configuredRepo.owner.toLowerCase() &&
+    repository.repo.trim().toLowerCase() === configuredRepo.repo.toLowerCase();
+
+  return {
+    ok,
+    message: ok
+      ? "GitHub PR evidence comes from the configured repo."
+      : "Guardian PR evidence must come from the configured GitHub repo.",
+  };
+}
+
 export function findPrDiffSignals(paths: string[] = []): PrDiffSignal[] {
   return paths.flatMap((path) =>
     diffSignalRules
@@ -352,6 +390,7 @@ export function validateCommandPrManifest({
   manifest,
   changedPaths = [],
   changedFiles = [],
+  repository,
 }: {
   wave: CommandWave;
   proposal: CommandProposal | null;
@@ -359,6 +398,7 @@ export function validateCommandPrManifest({
   manifest: CommandPrManifest | null;
   changedPaths?: string[];
   changedFiles?: HookChangedFile[];
+  repository?: GuardianRepositoryEvidence | null;
 }): ReviewerGateResult {
   const checks: ReviewerGateCheck[] = [];
   const diffSignals = findPrDiffSignals(changedPaths);
@@ -392,8 +432,12 @@ export function validateCommandPrManifest({
   const pollResult = poll ? evaluatePoll(poll) : null;
   const decisionReferenceCheck = validatePollDecisionReference(poll, wave.waveUrl);
   const approvalPassed = pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true });
+  const repositoryCheck = repository === undefined ? null : repositoryMatchesWave(wave, repository);
 
   checks.push(
+    ...(repositoryCheck
+      ? [check("repository", repositoryCheck.ok ? "pass" : "fail", repositoryCheck.message)]
+      : []),
     check(
       "wave_identity",
       manifest.waveId === expected.waveId && manifest.waveUrl === expected.waveUrl ? "pass" : "fail",
@@ -537,6 +581,7 @@ export function createGuardianAttestation({
   manifest,
   changedPaths = [],
   changedFiles = [],
+  repository,
   generatedAt,
 }: {
   wave: CommandWave;
@@ -545,6 +590,7 @@ export function createGuardianAttestation({
   manifest: CommandPrManifest | null;
   changedPaths?: string[];
   changedFiles?: HookChangedFile[];
+  repository?: GuardianRepositoryEvidence | null;
   generatedAt?: string;
 }): GuardianAttestation {
   const sortedChangedPaths = sortedPaths(changedPaths);
@@ -556,6 +602,7 @@ export function createGuardianAttestation({
     manifest,
     changedPaths: sortedChangedPaths,
     changedFiles: sortedChangedFiles,
+    repository,
   });
   const resultHash = hashValue(result);
   const attestationBase = {
@@ -575,6 +622,7 @@ export function createGuardianAttestation({
       manifestHash: manifest ? hashValue(manifest) : null,
       changedPathsHash: hashValue(sortedChangedPaths),
       changedFilesHash: hashValue(sortedChangedFiles),
+      ...(repository !== undefined ? { repositoryHash: hashValue(repository ?? null) } : {}),
       rulesHash: hashValue(wave.rules),
     },
     result,
@@ -594,6 +642,7 @@ export function verifyGuardianAttestation({
   manifest,
   changedPaths = [],
   changedFiles = [],
+  repository,
   attestation,
 }: {
   wave: CommandWave;
@@ -602,6 +651,7 @@ export function verifyGuardianAttestation({
   manifest: CommandPrManifest | null;
   changedPaths?: string[];
   changedFiles?: HookChangedFile[];
+  repository?: GuardianRepositoryEvidence | null;
   attestation: GuardianAttestation;
 }) {
   const expected = createGuardianAttestation({
@@ -611,6 +661,7 @@ export function verifyGuardianAttestation({
     manifest,
     changedPaths,
     changedFiles,
+    repository,
     generatedAt: attestation.generatedAt,
   });
 
@@ -635,6 +686,7 @@ export function createGuardianPullRequestAttestation({
     manifest,
     changedPaths: evidence.changedPaths,
     changedFiles: evidence.changedFiles ?? [],
+    repository: evidence.repository ?? null,
     generatedAt: evidence.generatedAt,
   });
 }
@@ -689,6 +741,17 @@ export function verifyGuardianPullRequestProof({
       attestation.inputs.changedFilesHash
         ? "Changed-file patch hash matches the attestation input."
         : "No changed-file patch hash is present on this legacy attestation.",
+    ),
+    verificationCheck(
+      "repository_hash",
+      expected.inputs.repositoryHash || attestation.inputs.repositoryHash
+        ? expected.inputs.repositoryHash === attestation.inputs.repositoryHash
+          ? "pass"
+          : "fail"
+        : "pass",
+      expected.inputs.repositoryHash || attestation.inputs.repositoryHash
+        ? "Repository evidence hash matches the attestation input."
+        : "No repository evidence hash is present on this legacy attestation.",
     ),
     verificationCheck(
       "result_hash",

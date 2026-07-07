@@ -55,6 +55,7 @@ What exists now:
   contract signal checks.
 - Launch audit and public workflow proof reject stale PR or review evidence unless the PR link belongs to the configured repo.
 - Review cannot record guardian proof unless the current execution includes a PR link for the configured repo.
+- GitHub guardian PR evidence includes the target repo and fails when it does not match the configured hook repo.
 - Local file storage for the demo flow and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
 What remains manual or MVP-only:
