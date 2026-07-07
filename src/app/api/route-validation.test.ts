@@ -177,6 +177,28 @@ describe("API route validation", () => {
     });
   });
 
+  it("marks legacy room-post errors as deprecated", async () => {
+    process.env.ADMIN_API_KEY = "strong-admin-key-for-route-tests";
+
+    const response = await postLegacyRoomMessage(
+      request("https://command-waves.example.com/api/6529/room-post", {
+        method: "POST",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/mock-command-wave",
+          content: "Missing admin key.",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(401);
+    expect(response.headers.get("Deprecation")).toBe("true");
+    expect(response.headers.get("Link")).toBe('</api/6529/chat-post>; rel="successor-version"');
+    expect(response.headers.get("X-Command-Waves-Canonical-Route")).toBe("/api/6529/chat-post");
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "Admin API key required.",
+    });
+  });
+
   it("rejects non-JSON mutation bodies at the route", async () => {
     const response = await submitProposalRoute(
       request("https://command-waves.example.com/api/command-wave/proposals", {
