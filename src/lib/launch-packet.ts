@@ -1,4 +1,5 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
+import { reviewAgentIdentity } from "./agent-identities";
 import { commandKindLabel } from "./command-kind-copy";
 import { createCommandOrchestrationSummary } from "./command-orchestration-summary";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
@@ -327,6 +328,10 @@ function nextStep(
 
   if (review.status !== "pass") {
     return "Resolve review findings before merge, deploy, payment, or governance decisions.";
+  }
+
+  if (reviewAgentIdentity.status === "placeholder") {
+    return "Select the reviewer process before claiming the reviewed PR loop is ready.";
   }
 
   return "Post this packet to chat after human review, then decide any payout separately.";

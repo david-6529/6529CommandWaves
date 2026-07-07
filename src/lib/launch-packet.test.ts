@@ -151,6 +151,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("PR evidence: 2 report points");
     expect(packet.text).toContain("Review proof: 2 report points");
     expect(packet.text).toContain("1 PR, 1 review proof");
+    expect(packet.text).toContain("Status: 3 ready, 0 blocked.");
+    expect(packet.text).toContain("Review: needed. Review proof exists, but the reviewer process is still a placeholder.");
+    expect(packet.text).toContain("Log: needed. Log waits for the selected reviewer process.");
+    expect(packet.text).toContain("Select the reviewer process before claiming the reviewed PR loop is ready.");
     expect(packet.text).not.toContain("Review proof: not bound to the selected GitHub repo.");
   });
 

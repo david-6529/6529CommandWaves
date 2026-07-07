@@ -59,17 +59,17 @@ describe("public workflow proof", () => {
     });
   });
 
-  it("publishes the ready proof chain when the repo is configured", () => {
+  it("keeps review and log pending while the reviewer process is a placeholder", () => {
     const proof = createPublicWorkflowProof(configuredDemoWave);
 
     expect(proof.blockedCount).toBe(0);
-    expect(proof.readyCount).toBe(5);
+    expect(proof.readyCount).toBe(3);
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
       ["chat", "ready"],
       ["decision", "ready"],
       ["pr", "ready"],
-      ["review", "ready"],
-      ["log", "ready"],
+      ["review", "needed"],
+      ["log", "needed"],
     ]);
     expect(proof.steps.find((step) => step.id === "decision")?.evidenceUrl).toBe(
       "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
@@ -77,7 +77,14 @@ describe("public workflow proof", () => {
     expect(proof.steps.find((step) => step.id === "pr")?.evidenceUrl).toBe(
       "https://github.com/6529-Collections/6529-hook/pull/12",
     );
-    expect(proof.steps.find((step) => step.id === "review")?.evidenceHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(proof.steps.find((step) => step.id === "review")).toMatchObject({
+      detail: "Review proof exists, but the reviewer process is still a placeholder.",
+      evidenceHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
+    expect(proof.steps.find((step) => step.id === "log")).toMatchObject({
+      detail: "Log waits for the selected reviewer process.",
+      evidenceHash: null,
+    });
   });
 
   it("blocks PR, review, and log proof when the PR link belongs to another repo", () => {

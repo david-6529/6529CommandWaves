@@ -5,6 +5,7 @@ import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { hashValue } from "./run-manifest";
 import { selectPhaseWork } from "./phase-work";
+import { reviewAgentIdentity } from "./agent-identities";
 
 export type PublicWorkflowProofStepId = "chat" | "decision" | "pr" | "review" | "log";
 export type PublicWorkflowProofStepStatus = "ready" | "needed" | "blocked";
@@ -109,6 +110,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
   const chatReady = hasProjectChat(wave);
   const missingConfiguredPrLink = Boolean(repoConfigured && execution?.status === "complete" && !prUrl);
   const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
+  const reviewerProcessSelected = reviewAgentIdentity.status !== "placeholder";
   const prStatus: PublicWorkflowProofStepStatus = !repoConfigured
     ? "needed"
     : execution?.status === "complete"
@@ -123,7 +125,9 @@ export function createPublicWorkflowProof(wave: CommandWave) {
     : missingConfiguredPrLink
       ? "blocked"
     : review?.status === "pass" && reviewProofBound
-      ? "ready"
+      ? reviewerProcessSelected
+        ? "ready"
+        : "needed"
       : review?.status === "pass"
         ? "blocked"
       : execution?.status === "complete"
@@ -134,6 +138,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
       prUrl &&
       review?.status === "pass" &&
       reviewProofBound &&
+      reviewerProcessSelected &&
       proposal &&
       wave.ledger.some(
         (event) =>
@@ -178,6 +183,8 @@ export function createPublicWorkflowProof(wave: CommandWave) {
           ? "Review waits for a PR link that matches the configured repo."
         : review?.status === "pass" && !reviewProofBound
           ? "Review proof must be bound to the configured repo."
+        : review?.status === "pass" && !reviewerProcessSelected
+          ? "Review proof exists, but the reviewer process is still a placeholder."
         : review?.status === "pass"
           ? humanizeLegacyCommandCopy(review.summary)
           : "Reviewer proof is required before humans merge.",
@@ -194,6 +201,8 @@ export function createPublicWorkflowProof(wave: CommandWave) {
           ? "Log waits for a PR link that matches the configured repo."
         : review?.status === "pass" && !reviewProofBound
           ? "Log waits for review proof bound to the configured repo."
+        : review?.status === "pass" && !reviewerProcessSelected
+          ? "Log waits for the selected reviewer process."
         : logReady
           ? "Reviewed result is recorded in the project log."
           : "Share the reviewed result back to project chat.",
