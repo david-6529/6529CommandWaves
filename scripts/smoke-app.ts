@@ -182,8 +182,8 @@ async function main() {
   assert(!renderedHtml.includes(staleBuilderDecision), "Home page should not expose stale decision requirement copy.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assert(
-    !renderedHtml.includes("value=\"https://github.com/your-org/your-hook-repo\""),
-    "Home page must not render the placeholder GitHub URL as a selected repo.",
+    !renderedHtml.includes("https://github.com/your-org/your-hook-repo"),
+    "Home page must not render the placeholder GitHub URL.",
   );
   assertNoEmDash("Home page", renderedHtml);
 

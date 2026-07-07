@@ -1,5 +1,6 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
 import { pollApprovalPassedForWave } from "./command-waves";
+import { configuredGitHubRepo, gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { selectPhaseWork } from "./phase-work";
 
 export type BuildTimelineStatus = "done" | "current" | "waiting" | "blocked";
@@ -14,12 +15,8 @@ export type BuildTimelineItem = {
   hrefLabel: string | null;
 };
 
-function prUrl(execution: ExecutionRecord | null) {
-  return (
-    execution?.artifacts.find((artifact) =>
-      /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
-    ) ?? null
-  );
+function prUrl(execution: ExecutionRecord | null, repoUrl: string) {
+  return execution ? (gitHubPullRequestUrlsForRepo(execution.artifacts, repoUrl)[0] ?? null) : null;
 }
 
 function proposalItem(proposal: CommandProposal | null): BuildTimelineItem {
@@ -113,7 +110,8 @@ function prItem(
   execution: ExecutionRecord | null,
 ): BuildTimelineItem {
   const decisionDone = pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true });
-  const href = prUrl(execution);
+  const repo = configuredGitHubRepo(wave.repoUrl);
+  const href = prUrl(execution, wave.repoUrl);
 
   if (!proposal || !decisionDone) {
     return {
@@ -121,6 +119,18 @@ function prItem(
       label: "PR",
       title: "Waiting for decision",
       detail: "The PR starts after approval is recorded.",
+      status: "waiting",
+      href: null,
+      hrefLabel: null,
+    };
+  }
+
+  if (!repo) {
+    return {
+      id: "pr",
+      label: "PR",
+      title: "GitHub repo placeholder",
+      detail: "PR work waits until maintainers select the GitHub repo.",
       status: "waiting",
       href: null,
       hrefLabel: null,
@@ -140,15 +150,25 @@ function prItem(
   }
 
   if (execution?.status === "complete") {
-    return {
-      id: "pr",
-      label: "PR",
-      title: "PR recorded",
-      detail: "Approved PR record is ready for review.",
-      status: "done",
-      href,
-      hrefLabel: href ? "Open PR" : null,
-    };
+    return href
+      ? {
+          id: "pr",
+          label: "PR",
+          title: "PR recorded",
+          detail: "Approved PR record is ready for review.",
+          status: "done",
+          href,
+          hrefLabel: "Open PR",
+        }
+      : {
+          id: "pr",
+          label: "PR",
+          title: "PR link needed",
+          detail: "Attach a PR from the selected GitHub repo.",
+          status: "blocked",
+          href: null,
+          hrefLabel: null,
+        };
   }
 
   return {
@@ -157,7 +177,7 @@ function prItem(
     title: "Build the approved PR",
     detail: "Use the approved packet and record the PR.",
     status: "current",
-    href: wave.repoUrl,
+    href: repo.htmlUrl,
     hrefLabel: "Open repo",
   };
 }

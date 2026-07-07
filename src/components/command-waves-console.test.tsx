@@ -114,7 +114,7 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain(">View setup</button>");
     expect(html).toContain('id="project-repo-url"');
     expect(html).toContain('placeholder="Select later, owner/repo or GitHub URL"');
-    expect(html).not.toContain('value="https://github.com/your-org/your-hook-repo"');
+    expect(html).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(html).toContain('id="project-access-key"');
     expect(html).toContain('id="who-can-join"');
     expect(html).toContain("Maintainer setup");

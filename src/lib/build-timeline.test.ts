@@ -2,9 +2,22 @@ import { describe, expect, it } from "vitest";
 import { createBuildTimeline } from "./build-timeline";
 import { demoWave } from "./demo-wave";
 
+const configuredRepo = {
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
+
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: configuredRepo.htmlUrl,
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+};
+
 describe("build timeline", () => {
   it("shows reviewed hook work as a completed loop with the next change current", () => {
-    const timeline = createBuildTimeline(demoWave, "Add fee cap tests");
+    const timeline = createBuildTimeline(configuredDemoWave, "Add fee cap tests");
 
     expect(timeline.map((item) => [item.label, item.status])).toEqual([
       ["Proposal", "done"],
@@ -19,7 +32,7 @@ describe("build timeline", () => {
       href: "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
       hrefLabel: "Open decision",
     });
-    expect(timeline[2].href).toBe(`${demoWave.repoUrl}/pull/12`);
+    expect(timeline[2].href).toBe(`${configuredRepo.htmlUrl}/pull/12`);
     expect(timeline[2]).toMatchObject({
       title: "PR recorded",
       detail: "Approved PR record is ready for review.",
@@ -29,6 +42,24 @@ describe("build timeline", () => {
       title: "Add fee cap tests",
       detail: "Bring the next small hook change to chat.",
     });
+  });
+
+  it("does not link the placeholder GitHub repo before selection", () => {
+    const timeline = createBuildTimeline({
+      ...demoWave,
+      executions: [],
+      reviews: [],
+    });
+
+    expect(timeline[2]).toMatchObject({
+      label: "PR",
+      status: "waiting",
+      title: "GitHub repo placeholder",
+      detail: "PR work waits until maintainers select the GitHub repo.",
+      href: null,
+      hrefLabel: null,
+    });
+    expect(JSON.stringify(timeline)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
 
   it("starts with a proposal when no hook PR exists yet", () => {
