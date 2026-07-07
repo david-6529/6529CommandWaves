@@ -213,6 +213,7 @@ Audit and launch:
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
   The proof keeps review and log pending while the reviewer process is still a placeholder.
 - Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.
+  Fee planning waits for a selected reviewer process and reviewed PR loop.
 - Public launch audit publishes the same human-readable launch packet builders can share back to chat, with a packet hash.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The copyable launch packet includes the same workflow proof chain for chat share-back.

@@ -33,7 +33,7 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 - Guardian workflow check for the selected hook repo.
 - Public command-wave state URL for guardian PR checks.
 - Contribution report as activity evidence.
-- Manual developer fee plan as payout evidence.
+- Manual developer fee plan as informational payout evidence.
 - Human-reviewed chat update draft.
 - Human-reviewed launch packet for the PR audit trail.
 
@@ -124,7 +124,8 @@ The launch audit publishes the wave state hash and rules hash it checked. Compar
 `/api/command-wave/state` payload when reviewing audit evidence.
 
 The launch audit also publishes contribution and developer fee records as informational evidence. It does not approve
-payments, choose recipients, grant access, or create merge authority.
+payments, choose recipients, grant access, or create merge authority. Fee planning waits for the selected reviewer process
+and reviewed PR loop.
 
 ## Success Criteria
 
