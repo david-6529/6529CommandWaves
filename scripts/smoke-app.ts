@@ -144,6 +144,7 @@ async function main() {
     "Scope work",
     "Save scoped work",
     "Project log",
+    "/api/command-wave/verification/manifest",
     "Visible activity report",
     "Maintainer tools",
     "Server key needed before launch",
@@ -182,6 +183,7 @@ async function main() {
   for (const label of ["Project launch status", "Operator checklist:", "Verification:", "Guardrails:"]) {
     assertIncludes("Launch audit status draft", statusDraft, label);
   }
+  assertIncludes("Launch audit status draft", statusDraft, "Verification manifest:");
   assertJsonObject("Launch audit launch packet", launchPacket);
   assertSha256("Launch audit launch packet hash", objectValue(launchPacket, "packetHash"));
   assertJsonObject("Launch audit reports", reports);
@@ -210,7 +212,9 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "configuredUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectIndexUrl");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "verificationManifestUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "chatLaunchUrl");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/projects");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/launch/chat");
   assertIncludes(
@@ -246,6 +250,8 @@ async function main() {
     "Chat launch hash did not match payload.",
   );
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "stateEvidence");
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "verificationManifestUrl");
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "chatLaunch");
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "prLoop");
   assertNoEmDash("Chat launch response", JSON.stringify(chatLaunchPayload));

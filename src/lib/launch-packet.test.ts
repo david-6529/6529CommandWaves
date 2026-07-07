@@ -51,6 +51,7 @@ describe("launch packet", () => {
       execution: demoWave.executions[0],
       review: demoWave.reviews[0],
       verificationTargets: {
+        verificationManifestUrl: "https://hooks.example/api/command-wave/verification/manifest",
         setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
         projectIndexUrl: "https://hooks.example/api/command-wave/projects",
         commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
@@ -109,6 +110,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("1 Guardian review proof");
     expect(packet.text).toContain("## Developer Fee Records");
     expect(packet.text).toContain("## Verification");
+    expect(packet.text).toContain("Verification manifest: https://hooks.example/api/command-wave/verification/manifest");
     expect(packet.text).toContain("Setup proof: https://hooks.example/api/command-wave/setup/proof");
     expect(packet.text).toContain("Project index: https://hooks.example/api/command-wave/projects");
     expect(packet.text).toContain("Command-wave state: https://hooks.example/api/command-wave/state");

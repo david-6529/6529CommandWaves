@@ -40,6 +40,7 @@ describe("wave update draft", () => {
       execution: demoWave.executions[0],
       review: demoWave.reviews[0],
       verificationTargets: {
+        verificationManifestUrl: "https://hooks.example/api/command-wave/verification/manifest",
         setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
         projectIndexUrl: "https://hooks.example/api/command-wave/projects",
         commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
@@ -55,6 +56,7 @@ describe("wave update draft", () => {
     expect(draft).toContain(`PR: ${demoWave.repoUrl}/pull/12`);
     expect(draft).toContain("Review proof: not bound to the selected GitHub repo.");
     expect(draft).toContain("Verification: setup proof https://hooks.example/api/command-wave/setup/proof");
+    expect(draft).toContain("verification manifest https://hooks.example/api/command-wave/verification/manifest");
     expect(draft).toContain("project index https://hooks.example/api/command-wave/projects");
     expect(draft).toContain("state https://hooks.example/api/command-wave/state");
     expect(draft).toContain("chat launch https://hooks.example/api/command-wave/launch/chat");

@@ -119,6 +119,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.reports.developerFee.requiredDecisions).toContain("Builders approve the fee budget before any payment.");
     expect(snapshot.reports.developerFee.blockedActions).toContain("No automatic payouts.");
     expect(snapshot.verificationTargets).toEqual({
+      verificationManifestUrl: "https://command-waves.example.com/api/command-wave/verification/manifest",
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       projectIndexUrl: "https://command-waves.example.com/api/command-wave/projects",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
@@ -129,6 +130,9 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.statusDraft).toContain("Status: checks needed");
     expect(snapshot.statusDraft).toContain("Next action: Select the repo");
     expect(snapshot.statusDraft).toContain("GitHub repo is a placeholder. PR work stays blocked until the repo is selected.");
+    expect(snapshot.statusDraft).toContain(
+      "- Verification manifest: https://command-waves.example.com/api/command-wave/verification/manifest",
+    );
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");
     expect(snapshot.statusDraft).toContain("- Project index: https://command-waves.example.com/api/command-wave/projects");
     expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
@@ -148,6 +152,9 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.launchPacket.text).toContain("## Workflow Proof");
     expect(snapshot.launchPacket.text).toContain("## Verification");
     expect(snapshot.launchPacket.text).toContain("## Authority Limits");
+    expect(snapshot.launchPacket.text).toContain(
+      "Verification manifest: https://command-waves.example.com/api/command-wave/verification/manifest",
+    );
     expect(snapshot.launchPacket.text).toContain(
       "Project index: https://command-waves.example.com/api/command-wave/projects",
     );
@@ -216,6 +223,9 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.verificationTargets.chatLaunchUrl).toBe(
       "https://command-waves.example.com/api/command-wave/launch/chat?remote=1",
     );
+    expect(snapshot.verificationTargets.verificationManifestUrl).toBe(
+      "https://command-waves.example.com/api/command-wave/verification/manifest",
+    );
   });
 
   it("does not publish placeholder app URLs as production verification targets", async () => {
@@ -229,6 +239,7 @@ describe("first phase launch snapshot", () => {
     });
 
     expect(snapshot.verificationTargets).toEqual({
+      verificationManifestUrl: "/api/command-wave/verification/manifest",
       setupProofUrl: "/api/command-wave/setup/proof",
       projectIndexUrl: "/api/command-wave/projects",
       commandWaveStateUrl: "/api/command-wave/state",

@@ -20,6 +20,7 @@ export type LaunchPacket = {
 };
 
 export type LaunchPacketVerificationTargets = {
+  verificationManifestUrl?: string;
   setupProofUrl: string;
   projectIndexUrl?: string;
   commandWaveStateUrl: string;
@@ -288,6 +289,7 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
   }
 
   return [
+    ...(targets.verificationManifestUrl ? [`- Verification manifest: ${targets.verificationManifestUrl}`] : []),
     `- Setup proof: ${targets.setupProofUrl}`,
     ...(targets.projectIndexUrl ? [`- Project index: ${targets.projectIndexUrl}`] : []),
     `- Command-wave state: ${targets.commandWaveStateUrl}`,

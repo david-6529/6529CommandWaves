@@ -3,6 +3,7 @@ import type { FirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { projectRepoLine } from "./project-repo-copy";
 
 export type LaunchStatusVerificationTargets = {
+  verificationManifestUrl?: string;
   setupProofUrl: string;
   projectIndexUrl?: string;
   commandWaveStateUrl: string;
@@ -123,6 +124,9 @@ export function createLaunchStatusDraft({
     ...launchOperatorChecklistLines(audit.openItems),
     "",
     "Verification:",
+    ...(verificationTargets.verificationManifestUrl
+      ? [`- Verification manifest: ${verificationTargets.verificationManifestUrl}`]
+      : []),
     `- Setup proof: ${verificationTargets.setupProofUrl}`,
     ...(verificationTargets.projectIndexUrl ? [`- Project index: ${verificationTargets.projectIndexUrl}`] : []),
     `- Command-wave state: ${verificationTargets.commandWaveStateUrl}`,

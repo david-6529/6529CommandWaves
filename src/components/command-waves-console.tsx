@@ -1246,6 +1246,7 @@ export function CommandWavesConsole() {
   const launchAuditReadyEvidence = launchAudit.readyItems.filter(isLaunchAuditEvidenceItem).slice(0, 5);
   const launchVerificationTargets = useMemo(
     () => ({
+      verificationManifestUrl: appUrlFromOrigin("/api/command-wave/verification/manifest", publicAppOrigin),
       setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
       projectIndexUrl: appUrlFromOrigin(projectIndexPath, publicAppOrigin),
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
@@ -4085,6 +4086,14 @@ export function CommandWavesConsole() {
                     Include these links so builders can verify setup, project state, and launch audit status.
                   </p>
                   <div className="mt-3 grid gap-2">
+                    <a
+                      className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"
+                      href={launchVerificationTargets.verificationManifestUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {launchVerificationTargets.verificationManifestUrl}
+                    </a>
                     <a
                       className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"
                       href={launchVerificationTargets.setupProofUrl}

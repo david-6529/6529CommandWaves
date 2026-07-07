@@ -49,6 +49,7 @@ export type FirstPhaseLaunchSnapshot = {
     ledgerEventCount: number;
   };
   verificationTargets: {
+    verificationManifestUrl: string;
     setupProofUrl: string;
     projectIndexUrl: string;
     commandWaveStateUrl: string;
@@ -136,6 +137,7 @@ export async function createFirstPhaseLaunchSnapshot(
   const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
   const chatLaunchPath = options.checkSetupRemote ? "/api/command-wave/launch/chat?remote=1" : "/api/command-wave/launch/chat";
   const verificationTargets = {
+    verificationManifestUrl: appRouteUrl("/api/command-wave/verification/manifest", env),
     setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
     projectIndexUrl: appRouteUrl("/api/command-wave/projects", env),
     commandWaveStateUrl,

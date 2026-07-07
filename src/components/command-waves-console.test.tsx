@@ -83,6 +83,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Chat launch");
     expect(text).toContain("PR loop");
     expect(text).toContain("Project log");
+    expect(text).toContain("/api/command-wave/verification/manifest");
   });
 
   it("links the current blocker to the repo setup field", () => {

@@ -7,6 +7,7 @@ import { hashValue } from "./run-manifest";
 import { getReadinessChecks } from "./system/readiness";
 
 const verificationTargets = {
+  verificationManifestUrl: "https://command-waves.example.com/api/command-wave/verification/manifest",
   setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
   projectIndexUrl: "https://command-waves.example.com/api/command-wave/projects",
   commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
@@ -64,6 +65,7 @@ describe("launch status draft", () => {
     expect(draft).toContain("- Run the setup check against the selected project chat and current repo setting.");
     expect(draft).toContain("- If the repo is still a placeholder, PR checks stay blocked until the hook repo is selected.");
     expect(draft).toContain("- Run launch readiness from the app or /api/command-wave/launch/audit?remote=1.");
+    expect(draft).toContain(`- Verification manifest: ${verificationTargets.verificationManifestUrl}`);
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Project index: ${verificationTargets.projectIndexUrl}`);
     expect(draft).toContain(`- Command-wave state: ${verificationTargets.commandWaveStateUrl}`);

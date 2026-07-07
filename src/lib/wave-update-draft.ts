@@ -5,6 +5,7 @@ import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proo
 import { projectRepoLine } from "./project-repo-copy";
 
 export type WaveUpdateVerificationTargets = {
+  verificationManifestUrl?: string;
   setupProofUrl: string;
   projectIndexUrl?: string;
   commandWaveStateUrl: string;
@@ -93,6 +94,7 @@ function verificationLine(targets: WaveUpdateVerificationTargets | null | undefi
   return targets
     ? [
         `Verification: setup proof ${targets.setupProofUrl}`,
+        ...(targets.verificationManifestUrl ? [`verification manifest ${targets.verificationManifestUrl}`] : []),
         ...(targets.projectIndexUrl ? [`project index ${targets.projectIndexUrl}`] : []),
         `state ${targets.commandWaveStateUrl}`,
         ...(targets.chatLaunchUrl ? [`chat launch ${targets.chatLaunchUrl}`] : []),
