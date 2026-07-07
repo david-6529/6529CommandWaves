@@ -3,6 +3,8 @@ import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "./developer-fee-plan";
 import { demoWave } from "./demo-wave";
 
+const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+
 describe("developer fee plan", () => {
   it("summarizes reviewed work without creating payment authority", () => {
     const report = createContributionReport(demoWave, { generatedAt: "2026-06-20T18:00:00.000Z" });
@@ -33,6 +35,7 @@ describe("developer fee plan", () => {
 
     expect(draft).toContain("Project developer fee plan");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
+    expect(draft).toContain(`Code repo: ${placeholderRepoText}`);
     expect(draft).toContain("Records for human review:");
     expect(draft).toContain("- Contribution report rationale.");
     expect(draft).toContain("Visible contributors for review:");

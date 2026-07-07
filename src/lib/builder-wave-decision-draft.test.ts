@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { createBuilderWaveDecisionDraft } from "./builder-wave-decision-draft";
 import { demoWave } from "./demo-wave";
 
+const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+
 describe("build project decision draft", () => {
   it("creates a concise decision request for the builder wave", () => {
     const draft = createBuilderWaveDecisionDraft({
@@ -12,7 +14,7 @@ describe("build project decision draft", () => {
 
     expect(draft).toContain("Project decision request");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Code repo: ${placeholderRepoText}`);
     expect(draft).toContain(`Proposal: ${demoWave.proposals[0].id} - ${demoWave.proposals[0].title}`);
     expect(draft).toContain("Local tally: 5 yes, 1 no.");
     expect(draft).toContain("Decision needed: approve, reject, or ask for edits");

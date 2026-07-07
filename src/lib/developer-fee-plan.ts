@@ -1,5 +1,6 @@
 import type { CommandWave } from "./command-waves";
 import type { ContributionReport } from "./contribution-report";
+import { projectRepoLine } from "./project-repo-copy";
 
 export type DeveloperFeePlan = {
   mode: "manual_review";
@@ -53,7 +54,7 @@ export function createDeveloperFeePlanDraft(wave: CommandWave, contributionRepor
     "Project developer fee plan",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Code repo: ${wave.repoUrl}`,
+    projectRepoLine("Code repo", wave.repoUrl),
     plan.summary,
     "",
     "Records for human review:",

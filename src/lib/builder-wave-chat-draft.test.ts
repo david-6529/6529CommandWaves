@@ -4,6 +4,8 @@ import { demoWave } from "./demo-wave";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 
+const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+
 describe("build room chat draft", () => {
   it("creates a concise message for the project chat", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
@@ -12,7 +14,7 @@ describe("build room chat draft", () => {
     expect(draft).toContain("Project chat message");
     expect(draft).toContain("I can review the fee cap tests.");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Repo: ${placeholderRepoText}`);
     expect(draft).toContain(`Current hook change: ${nextAction.title}`);
     expect(draft).toContain(`Status: ${nextAction.detail}`);
     expect(draft).not.toContain("Rules I am following");

@@ -1,5 +1,6 @@
 import type { CommandKind, CommandWave } from "./command-waves";
 import { commandKindLabel } from "./command-kind-copy";
+import { projectRepoLine } from "./project-repo-copy";
 
 export type BuilderWaveProposalDraftInput = {
   wave: CommandWave;
@@ -98,7 +99,7 @@ export function createBuilderWaveProposalDraft({
     `Change: ${cleanLine(title, "Untitled hook work")}`,
     `Proposer: ${cleanLine(proposer, "unknown")}`,
     `Project chat: ${wave.waveUrl}`,
-    `Repo: ${wave.repoUrl}`,
+    projectRepoLine("Repo", wave.repoUrl),
     "",
     requestHeading(kind),
     cleanLine(request, "No request written yet."),

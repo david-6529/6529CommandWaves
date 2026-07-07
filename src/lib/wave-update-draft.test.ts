@@ -13,6 +13,7 @@ describe("wave update draft", () => {
       review: demoWave.reviews[0],
       verificationTargets: {
         setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
+        projectIndexUrl: "https://hooks.example/api/command-wave/projects",
         commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
         launchAuditUrl: "https://hooks.example/api/command-wave/launch/audit",
       },
@@ -27,6 +28,7 @@ describe("wave update draft", () => {
       `Review proof: ${demoWave.reviews[0].proof?.verifierVersion} / ${demoWave.reviews[0].proof?.attestationHash}`,
     );
     expect(draft).toContain("Verification: setup proof https://hooks.example/api/command-wave/setup/proof");
+    expect(draft).toContain("project index https://hooks.example/api/command-wave/projects");
     expect(draft).toContain("state https://hooks.example/api/command-wave/state");
     expect(draft).toContain("launch audit https://hooks.example/api/command-wave/launch/audit.");
     expect(draft).toContain("humans keep merge, deploy, payment, and governance authority");

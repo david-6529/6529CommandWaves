@@ -1,5 +1,6 @@
 import type { CommandProposal, CommandWave, ExecutionRecord } from "./command-waves";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
+import { projectRepoLine } from "./project-repo-copy";
 
 function prUrl(execution: ExecutionRecord | null) {
   return (
@@ -35,7 +36,7 @@ export function createBuilderWaveReviewRequestDraft({
     "Project review request",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Code repo: ${wave.repoUrl}`,
+    projectRepoLine("Code repo", wave.repoUrl),
     `Work: ${proposal.id} - ${proposal.title}`,
     `PR: ${prUrl(execution) ?? "not recorded yet"}`,
     "",

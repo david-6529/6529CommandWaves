@@ -1,12 +1,6 @@
 import type { CommandWave } from "./command-waves";
-import { parseGitHubRepoUrl } from "./github/repo";
 import { normalizeParticipationGates } from "./participation-gates";
-
-function contributorRulesLine(repoUrl: string) {
-  const repo = parseGitHubRepoUrl(repoUrl);
-
-  return repo ? `Contributor rules: ${repo.htmlUrl}/blob/main/CONTRIBUTING.md` : null;
-}
+import { contributorRulesReferenceLine, projectRepoLine } from "./project-repo-copy";
 
 function hasManualQnaPrompt(gates: string[]) {
   return gates.some((gate) => /\b(qna|quiz|question|answer)\b/i.test(gate));
@@ -14,7 +8,7 @@ function hasManualQnaPrompt(gates: string[]) {
 
 export function createParticipationGuideDraft(wave: CommandWave) {
   const gates = normalizeParticipationGates(wave.gates);
-  const rulesLine = contributorRulesLine(wave.repoUrl);
+  const rulesLine = contributorRulesReferenceLine(wave.repoUrl);
   const qnaPrompt = hasManualQnaPrompt(gates)
     ? [
         "",
@@ -27,7 +21,7 @@ export function createParticipationGuideDraft(wave: CommandWave) {
     "Project participation guide",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Code repo: ${wave.repoUrl}`,
+    projectRepoLine("Code repo", wave.repoUrl),
     ...(rulesLine ? [rulesLine] : []),
     "",
     "Participation notes:",

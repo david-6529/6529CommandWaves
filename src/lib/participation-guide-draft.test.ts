@@ -2,14 +2,16 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createParticipationGuideDraft } from "./participation-guide-draft";
 
+const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+
 describe("participation guide draft", () => {
   it("creates a copyable participation guide for the builder wave", () => {
     const draft = createParticipationGuideDraft(demoWave);
 
     expect(draft).toContain("Project participation guide");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
-    expect(draft).toContain(`Contributor rules: ${demoWave.repoUrl}/blob/main/CONTRIBUTING.md`);
+    expect(draft).toContain(`Code repo: ${placeholderRepoText}`);
+    expect(draft).not.toContain("Contributor rules:");
     expect(draft).toContain("Participation notes:");
     expect(draft).toContain("Builder loop:");
     expect(draft).toContain("Orchestration rules classify risk");

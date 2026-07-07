@@ -2,14 +2,16 @@ import { describe, expect, it } from "vitest";
 import { createBuilderWaveLaunchDraft } from "./builder-wave-launch-draft";
 import { demoWave } from "./demo-wave";
 
+const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+
 describe("builder wave launch draft", () => {
   it("creates a concise first post for the hook builder wave", () => {
     const draft = createBuilderWaveLaunchDraft(demoWave);
 
     expect(draft).toContain("Project launch brief");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Code repo: ${demoWave.repoUrl}`);
-    expect(draft).toContain(`Contributor rules: ${demoWave.repoUrl}/blob/main/CONTRIBUTING.md`);
+    expect(draft).toContain(`Code repo: ${placeholderRepoText}`);
+    expect(draft).not.toContain("Contributor rules:");
     expect(draft).toContain("coordinate the first public build for a non-upgradeable hook");
     expect(draft).toContain("Wait for a project decision before PR work starts.");
     expect(draft).toContain("Open draft PRs with the repo template and Command Waves manifest.");

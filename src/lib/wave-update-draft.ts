@@ -1,9 +1,11 @@
 import type { CommandProposal, CommandWave, ExecutionRecord, GuardianReview, PollState } from "./command-waves";
 import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan } from "./developer-fee-plan";
+import { projectRepoLine } from "./project-repo-copy";
 
 export type WaveUpdateVerificationTargets = {
   setupProofUrl: string;
+  projectIndexUrl?: string;
   commandWaveStateUrl: string;
   launchAuditUrl?: string;
 };
@@ -81,6 +83,7 @@ function verificationLine(targets: WaveUpdateVerificationTargets | null | undefi
   return targets
     ? [
         `Verification: setup proof ${targets.setupProofUrl}`,
+        ...(targets.projectIndexUrl ? [`project index ${targets.projectIndexUrl}`] : []),
         `state ${targets.commandWaveStateUrl}`,
         ...(targets.launchAuditUrl ? [`launch audit ${targets.launchAuditUrl}`] : []),
       ].join("; ") + "."
@@ -110,7 +113,7 @@ export function createWaveUpdateDraft({
     "Project build update",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Repo: ${wave.repoUrl}`,
+    projectRepoLine("Repo", wave.repoUrl),
     proposal ? `Work: ${proposal.id} - ${proposal.title}` : "Work: none selected yet.",
     proposal ? `Status: ${proposal.status}` : "Status: setup",
     pollLine(poll),

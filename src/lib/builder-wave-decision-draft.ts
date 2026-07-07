@@ -1,5 +1,6 @@
 import type { CommandProposal, CommandWave, PollState } from "./command-waves";
 import { commandKindLabel } from "./command-kind-copy";
+import { projectRepoLine } from "./project-repo-copy";
 
 export type BuilderWaveDecisionDraftInput = {
   wave: CommandWave;
@@ -24,7 +25,7 @@ export function createBuilderWaveDecisionDraft({ wave, proposal, poll }: Builder
     "Project decision request",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Code repo: ${wave.repoUrl}`,
+    projectRepoLine("Code repo", wave.repoUrl),
     `Proposal: ${proposal.id} - ${cleanLine(proposal.title)}`,
     `Work type: ${commandKindLabel(proposal.kind)}`,
     "",

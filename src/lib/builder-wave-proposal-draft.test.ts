@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createBuilderWaveProposalDraft } from "./builder-wave-proposal-draft";
 
+const placeholderRepoText = "Placeholder repo (Connect the real hook repo before PR work can run.)";
+
 describe("build room proposal draft", () => {
   it("creates a concise hook proposal post", () => {
     const draft = createBuilderWaveProposalDraft({
@@ -20,7 +22,7 @@ describe("build room proposal draft", () => {
     expect(draft).toContain("Hook change proposal");
     expect(draft).toContain("Change: Draft hook scaffold");
     expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Repo: ${demoWave.repoUrl}`);
+    expect(draft).toContain(`Repo: ${placeholderRepoText}`);
     expect(draft).toContain("What I want to change:");
     expect(draft).toContain("Limits and tests:");
     expect(draft).toContain("Decision:");

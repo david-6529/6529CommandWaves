@@ -1,5 +1,5 @@
 import type { CommandWave } from "./command-waves";
-import { parseGitHubRepoUrl } from "./github/repo";
+import { contributorRulesReferenceLine, projectRepoLine } from "./project-repo-copy";
 
 function participationLine(gates: string[]) {
   if (!gates.length) {
@@ -9,20 +9,14 @@ function participationLine(gates: string[]) {
   return `Participation notes (advisory): ${gates.join(", ")}`;
 }
 
-function contributorRulesLine(repoUrl: string) {
-  const repo = parseGitHubRepoUrl(repoUrl);
-
-  return repo ? `Contributor rules: ${repo.htmlUrl}/blob/main/CONTRIBUTING.md` : null;
-}
-
 export function createBuilderWaveLaunchDraft(wave: CommandWave) {
-  const rulesLine = contributorRulesLine(wave.repoUrl);
+  const rulesLine = contributorRulesReferenceLine(wave.repoUrl);
 
   return [
     "Project launch brief",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Code repo: ${wave.repoUrl}`,
+    projectRepoLine("Code repo", wave.repoUrl),
     ...(rulesLine ? [rulesLine] : []),
     "",
     "Goal: coordinate the first public build for a non-upgradeable hook through project chat and one smart contract repo.",

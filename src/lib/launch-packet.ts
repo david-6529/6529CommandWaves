@@ -5,6 +5,7 @@ import { createContributionReport, type ContributionReport } from "./contributio
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { latestLedgerTimestamp } from "./ledger";
+import { projectRepoLine } from "./project-repo-copy";
 import { createPublicWorkflowProof } from "./public-workflow-proof";
 import { hashValue } from "./run-manifest";
 
@@ -18,6 +19,7 @@ export type LaunchPacket = {
 
 export type LaunchPacketVerificationTargets = {
   setupProofUrl: string;
+  projectIndexUrl?: string;
   commandWaveStateUrl: string;
   launchAuditUrl?: string;
 };
@@ -262,6 +264,7 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
 
   return [
     `- Setup proof: ${targets.setupProofUrl}`,
+    ...(targets.projectIndexUrl ? [`- Project index: ${targets.projectIndexUrl}`] : []),
     `- Command-wave state: ${targets.commandWaveStateUrl}`,
     ...(targets.launchAuditUrl ? [`- Launch audit: ${targets.launchAuditUrl}`] : []),
     `- Verify setup: SETUP_PROOF_URL=${targets.setupProofUrl} npm run setup:verify`,
@@ -315,7 +318,7 @@ export function createLaunchPacket({
     "",
     "## Project",
     `- Project chat: ${wave.waveUrl}`,
-    `- Repo: ${wave.repoUrl}`,
+    `- ${projectRepoLine("Repo", wave.repoUrl)}`,
     `- Rules: ${wave.rules.version}`,
     `- Participation notes (advisory): ${wave.gates.join(", ") || "none recorded"}`,
     "",

@@ -196,6 +196,13 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "review-agent");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "githubRepo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectIndexUrl");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/projects");
+  assertIncludes(
+    "Launch audit response",
+    JSON.stringify(launchPayload),
+    "Repo: Placeholder repo (Connect the real hook repo before PR work can run.)",
+  );
   assert(
     !JSON.stringify(launchPayload).includes("https://github.com/6529-Collections/6529-hook"),
     "Launch audit response still includes the old concrete hook repo.",

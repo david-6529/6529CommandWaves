@@ -50,6 +50,7 @@ export type FirstPhaseLaunchSnapshot = {
   };
   verificationTargets: {
     setupProofUrl: string;
+    projectIndexUrl: string;
     commandWaveStateUrl: string;
     launchAuditUrl: string;
   };
@@ -134,6 +135,7 @@ export async function createFirstPhaseLaunchSnapshot(
   const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
   const verificationTargets = {
     setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
+    projectIndexUrl: appRouteUrl("/api/command-wave/projects", env),
     commandWaveStateUrl,
     launchAuditUrl: appRouteUrl(launchAuditPath, env),
   };

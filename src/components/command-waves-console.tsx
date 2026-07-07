@@ -327,6 +327,7 @@ const accessKeyStorageKey = "command-waves-access-key";
 const wavePreviewMaxMessages = 50;
 const clientRequestTimeoutMs = 15_000;
 const setupProofPath = "/api/command-wave/setup/proof";
+const projectIndexPath = "/api/command-wave/projects";
 const commandWaveStatePath = "/api/command-wave/state";
 const launchAuditPath = "/api/command-wave/launch/audit";
 const remoteLaunchAuditPath = `${launchAuditPath}?remote=1`;
@@ -1217,6 +1218,7 @@ export function CommandWavesConsole() {
   const launchVerificationTargets = useMemo(
     () => ({
       setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
+      projectIndexUrl: appUrlFromOrigin(projectIndexPath, publicAppOrigin),
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
       launchAuditUrl: appUrlFromOrigin(remoteLaunchAuditPath, publicAppOrigin),
     }),
@@ -3151,7 +3153,17 @@ export function CommandWavesConsole() {
                   </div>
                   <div className="rounded-md border border-zinc-800 bg-zinc-950 p-3">
                     <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Review proof URLs</p>
-                    <div className="mt-3 grid gap-3 lg:grid-cols-3">
+                    <div className="mt-3 grid gap-3 lg:grid-cols-4">
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-100">Project index</p>
+                        <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{projectIndexPath}</p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Button type="button" variant="secondary" onClick={() => void copyLaunchUrl(projectIndexPath, "Project index URL")}>
+                            Copy index URL
+                          </Button>
+                          <LinkButton href={projectIndexPath}>Open index</LinkButton>
+                        </div>
+                      </div>
                       <div>
                         <p className="text-sm font-semibold text-zinc-100">Project state</p>
                         <p className="mt-1 break-all text-xs leading-5 text-zinc-500">{commandWaveStatePath}</p>

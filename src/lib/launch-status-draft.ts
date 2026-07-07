@@ -1,8 +1,10 @@
 import type { CommandWave } from "./command-waves";
 import type { FirstPhaseLaunchAudit } from "./first-phase-launch-audit";
+import { projectRepoLine } from "./project-repo-copy";
 
 export type LaunchStatusVerificationTargets = {
   setupProofUrl: string;
+  projectIndexUrl?: string;
   commandWaveStateUrl: string;
   launchAuditUrl?: string;
 };
@@ -94,7 +96,7 @@ export function createLaunchStatusDraft({
     "Project launch status",
     "",
     `Project chat: ${wave.waveUrl}`,
-    `Code repo: ${wave.repoUrl}`,
+    projectRepoLine("Code repo", wave.repoUrl),
     `Status: ${audit.statusLabel}`,
     audit.summary,
     "",
@@ -109,6 +111,7 @@ export function createLaunchStatusDraft({
     "",
     "Verification:",
     `- Setup proof: ${verificationTargets.setupProofUrl}`,
+    ...(verificationTargets.projectIndexUrl ? [`- Project index: ${verificationTargets.projectIndexUrl}`] : []),
     `- Command-wave state: ${verificationTargets.commandWaveStateUrl}`,
     ...(verificationTargets.launchAuditUrl ? [`- Launch audit: ${verificationTargets.launchAuditUrl}`] : []),
     "",
