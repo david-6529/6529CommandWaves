@@ -63,7 +63,8 @@ What remains manual or MVP-only:
 - Wallet connection is identity context for access drafts. Reputation, token, holder, allowlist, and QnA requirements are
   advisory notes until live wallet/session/score checks are wired.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
-- Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation.
+- Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation. PR work packets
+  require the real GitHub repo to be configured.
 - The GitHub repo is a placeholder in the default project state and must be replaced before PR work can run.
 - The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
   deploy, or spend funds.

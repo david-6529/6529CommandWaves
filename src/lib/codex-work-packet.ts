@@ -4,6 +4,7 @@ import {
   createCommandPrManifest,
   formatCommandPrManifestForPullRequest,
 } from "./github/pr-reviewer-gate";
+import { configuredGitHubRepo } from "./github/pr-evidence";
 import { createCommandRunManifest, hashValue, type CommandRunManifest } from "./run-manifest";
 
 export type CodexWorkPacket = {
@@ -42,6 +43,10 @@ export function createCodexWorkPacket({
 }): CodexWorkPacket {
   if (proposal.kind !== "open_pr") {
     throw Object.assign(new Error("Codex work packets are only available for PR commands."), { status: 409 });
+  }
+
+  if (!configuredGitHubRepo(wave.repoUrl)) {
+    throw Object.assign(new Error("Connect the real GitHub repo before creating a Codex work packet."), { status: 409 });
   }
 
   if (proposal.kind === "open_pr" && !pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {

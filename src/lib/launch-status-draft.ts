@@ -55,7 +55,7 @@ const checklistByItemId: Record<string, string[]> = {
   flow_project: ["Select the first project chat and hook GitHub repo."],
   flow_proposal: ["Create one PR-sized hook proposal before starting the first public loop."],
   flow_decision: ["Record the project decision before PR work starts."],
-  flow_build: ["Attach the PR record or Codex work packet for the approved change."],
+  flow_build: ["After the repo is configured, attach the PR record or Codex work packet for the approved change."],
   flow_review: ["Run reviewer checks against the PR before human merge decisions."],
   flow_log: ["Post the reviewed result back to project chat."],
   flow_wave_decision_receipt: ["Record the project decision URL for the approved PR work."],

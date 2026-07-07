@@ -200,7 +200,33 @@ describe("API route validation", () => {
     },
   );
 
+  it("rejects Codex packets while the repo is a placeholder", async () => {
+    const response = await createCodexPacket(
+      request("https://command-waves.example.com/api/command-wave/codex-packet", {
+        method: "POST",
+        body: JSON.stringify({
+          proposalId: "cmd-001",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(409);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      error: "Connect the real GitHub repo before creating a Codex work packet.",
+    });
+  });
+
   it("creates Codex packets for approved PR proposals at the route", async () => {
+    await updateSetup(
+      request("https://command-waves.example.com/api/command-wave", {
+        method: "PATCH",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/6529-hook-builder",
+          repoUrl: "https://github.com/6529-Collections/6529-hook",
+        }),
+      }),
+    );
+
     const response = await createCodexPacket(
       request("https://command-waves.example.com/api/command-wave/codex-packet", {
         method: "POST",
