@@ -129,6 +129,10 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("tool access");
     expect(text).not.toContain("Add real repo before PR build.");
     expect(text).not.toContain("Set a real GitHub repo");
+    expect(text).not.toContain("Optional demo tally only");
+    expect(text).not.toContain("Add demo yes");
+    expect(text).not.toContain("Add demo no");
+    expect(text).not.toContain("Posted to mock chat");
   });
 
   it("keeps optional advanced sections on the dark app surface", () => {

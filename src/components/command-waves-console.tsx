@@ -47,6 +47,7 @@ import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-n
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { createPublicProjectSnapshot } from "@/lib/public-project-snapshot";
+import { projectChatAuthorLabel } from "@/lib/project-chat-display";
 import { createProjectChatFeed } from "@/lib/project-chat-feed";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { setupValidationNotice, type SetupValidation } from "@/lib/setup-validation";
@@ -1807,7 +1808,7 @@ export function CommandWavesConsole() {
       setProjectChatMessage("");
       setChatPostUrl(post.url ?? "");
       setProjectChatNotice(
-        `${post.mode === "mock" ? "Posted to mock chat." : "Posted to project chat."}${
+        `${post.mode === "mock" ? "Saved to local chat." : "Posted to project chat."}${
           chatPreviewRefreshed ? " Chat preview refreshed." : ""
         }`,
       );
@@ -2456,7 +2457,7 @@ export function CommandWavesConsole() {
                   ? visibleProjectChatSnapshotDrops.slice(0, 2).map((drop) => (
                       <div key={drop.id} className="py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-50">{drop.author}</p>
+                          <p className="text-sm font-semibold text-zinc-50">{projectChatAuthorLabel(drop.author)}</p>
                           {drop.url ? (
                             <a
                               className="text-sm font-semibold text-blue-300 hover:text-blue-200"
@@ -2888,7 +2889,7 @@ export function CommandWavesConsole() {
                               <div key={drop.id} className="border-t border-zinc-900 pt-2 first:border-t-0 first:pt-0">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <p className="text-xs font-semibold text-zinc-500">
-                                    {drop.author}
+                                    {projectChatAuthorLabel(drop.author)}
                                   </p>
                                   {drop.url ? (
                                     <a
@@ -3415,7 +3416,7 @@ export function CommandWavesConsole() {
                       <div key={drop.id} className="border-t border-zinc-900 pt-2">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-xs font-semibold text-zinc-500">
-                            {drop.author}
+                            {projectChatAuthorLabel(drop.author)}
                           </p>
                           {drop.url ? (
                             <a
@@ -3710,7 +3711,7 @@ export function CommandWavesConsole() {
                         <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
                           <p className="mt-1 text-xs text-zinc-500">
-                            Optional demo tally only. The project decision is the approval source.
+                            Optional local tally only. The project decision is the approval source.
                           </p>
                         ) : null}
                       </div>
@@ -3731,10 +3732,10 @@ export function CommandWavesConsole() {
                     {activePollCanVote ? (
                       <div className="mt-3 flex gap-2">
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("yes")}>
-                          Add demo yes
+                          Add local yes
                         </Button>
                         <Button type="button" variant="secondary" disabled={isBusy} onClick={() => vote("no")}>
-                          Add demo no
+                          Add local no
                         </Button>
                       </div>
                     ) : null}

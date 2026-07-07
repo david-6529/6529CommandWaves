@@ -57,6 +57,10 @@ describe("6529 wave context", () => {
       author: "daemon",
       preview: "Repo setup needed before PR work. Which GitHub repo should hold the hook?",
     });
+    expect(preview.sampleDrops.find((drop) => drop.id === "drop-002")).toMatchObject({
+      author: "wave-poll",
+      preview: "Project decision passed for cmd-001 with quorum met.",
+    });
   });
 
   it("caps all-history previews to the requested latest drops", async () => {
