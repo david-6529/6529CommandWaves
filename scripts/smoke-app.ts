@@ -153,6 +153,8 @@ async function main() {
     "Save the scoped work once builders can see it.",
     "Use GitHub PRs once the repo is connected.",
     "Scope work",
+    "Boundaries and success criteria",
+    "Details",
     "Save scoped work",
     "Project log",
     "/api/command-wave/verification/manifest",

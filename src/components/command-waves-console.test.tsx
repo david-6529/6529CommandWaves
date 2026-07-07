@@ -94,6 +94,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Save the scoped work once builders can see it.");
     expect(text).toContain("Use GitHub PRs once the repo is connected.");
     expect(text).toContain("Scope work");
+    expect(text).toContain("Boundaries and success criteria");
+    expect(text).toContain("Details");
     expect(text).toContain("Save scoped work");
     expect(text).toContain("Chat launch");
     expect(text).toContain("PR loop");
@@ -234,6 +236,31 @@ describe("CommandWavesConsole", () => {
     expect(activeProjectsHtml).toContain(">Select repo</button>");
     expect(activeProjectsHtml).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(activeProjectsHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);
+  });
+
+  it("asks for proposal substance before optional proposal details", () => {
+    const html = renderedConsoleHtml();
+    const start = html.indexOf('id="start-building"');
+    const end = html.indexOf('id="recent-activity"');
+    const scopeHtml = html.slice(start, end);
+    const titleIndex = scopeHtml.indexOf("Title");
+    const changeIndex = scopeHtml.indexOf("Change");
+    const successIndex = scopeHtml.indexOf("Boundaries and success criteria");
+    const detailsIndex = scopeHtml.indexOf("Details");
+    const workTypeIndex = scopeHtml.indexOf("Work type");
+    const handleIndex = scopeHtml.indexOf("Your handle");
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(titleIndex).toBeGreaterThan(-1);
+    expect(changeIndex).toBeGreaterThan(titleIndex);
+    expect(successIndex).toBeGreaterThan(changeIndex);
+    expect(detailsIndex).toBeGreaterThan(successIndex);
+    expect(workTypeIndex).toBeGreaterThan(detailsIndex);
+    expect(handleIndex).toBeGreaterThan(workTypeIndex);
+    expect(scopeHtml).toContain("Code PR");
+    expect(scopeHtml).not.toContain("Boundaries and tests");
+    expect(scopeHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);
   });
 
   it("shows the full public launch setup checklist in maintainer tools", () => {

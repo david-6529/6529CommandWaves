@@ -179,7 +179,7 @@ Default workspace:
 - Current hook task, saved discussion items, visible decision need, recent PR evidence, latest log, and next action.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct chat posting when configured, recent posts, and copyable discussion draft.
-- Folded proposal form for one PR-sized hook change with a Discuss, Decide, Save, Build, Review flow strip.
+- Folded proposal form that asks for title, change, and success criteria before optional work details.
 - Builder profiles with profile links, visible chat and repo activity, and informational contribution signals.
 - Collapsed build reference: who can join, activity-report boundaries, and hook guardrails.
 

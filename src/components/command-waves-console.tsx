@@ -95,7 +95,7 @@ const proposalTypeOptions: ProposalTypeOption[] = [
     request: defaultProposalRequest,
     limits: defaultProposalLimits,
     requestLabel: "Change",
-    limitsLabel: "Boundaries and tests",
+    limitsLabel: "Boundaries and success criteria",
     requestPlaceholder: "Describe the exact hook change.",
     limitsPlaceholder: "Name caps, tests, and anything out of scope.",
   },
@@ -2703,35 +2703,6 @@ export function CommandWavesConsole() {
               ))}
             </div>
             <div className="mt-4 grid gap-3">
-              <div className="grid gap-3 sm:grid-cols-[1fr_14rem]">
-                <div>
-                  <p className="mb-2 text-base font-semibold text-zinc-100">Work type</p>
-                  <div className="flex flex-wrap gap-2">
-                    {proposalTypeOptions.map((option) => {
-                      const selected = option.kind === kind;
-
-                      return (
-                        <button
-                          key={option.kind}
-                          type="button"
-                          aria-pressed={selected}
-                          className={`inline-flex h-11 cursor-pointer items-center justify-center rounded-md border px-4 text-base font-semibold transition ${
-                            selected
-                              ? "border-zinc-950 bg-zinc-950 text-white"
-                              : "border-zinc-700 bg-zinc-950 text-zinc-50 hover:bg-zinc-900"
-                          }`}
-                          onClick={() => chooseProposalType(option)}
-                        >
-                          {option.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <Field label="Your handle">
-                  <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
-                </Field>
-              </div>
               <Field label="Title">
                 <Input
                   value={title}
@@ -2757,6 +2728,41 @@ export function CommandWavesConsole() {
                   className="min-h-24"
                 />
               </Field>
+              <details className="border-y border-zinc-800 py-3">
+                <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
+                  <span>Details</span>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{selectedProposalType.label}</Badge>
+                </summary>
+                <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_14rem]">
+                  <div>
+                    <p className="mb-2 text-base font-semibold text-zinc-100">Work type</p>
+                    <div className="flex flex-wrap gap-2">
+                      {proposalTypeOptions.map((option) => {
+                        const selected = option.kind === kind;
+
+                        return (
+                          <button
+                            key={option.kind}
+                            type="button"
+                            aria-pressed={selected}
+                            className={`inline-flex h-11 cursor-pointer items-center justify-center rounded-md border px-4 text-base font-semibold transition ${
+                              selected
+                                ? "border-zinc-950 bg-zinc-950 text-white"
+                                : "border-zinc-700 bg-zinc-950 text-zinc-50 hover:bg-zinc-900"
+                            }`}
+                            onClick={() => chooseProposalType(option)}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <Field label="Your handle">
+                    <Input value={proposer} onChange={(event) => setProposer(event.target.value)} />
+                  </Field>
+                </div>
+              </details>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <Button
