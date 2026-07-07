@@ -4,32 +4,33 @@ import {
   resolveVerificationTargetUrl,
   writeJsonResult,
 } from "./launch-audit-source";
-import { verifyLaunchAuditPayload } from "../src/lib/launch-audit-verifier";
+import { verifyChatLaunchAuditPayload } from "../src/lib/chat-launch-verifier";
 
 async function main() {
   const { payload, sourceUrl } = await loadLaunchAuditPayload();
-  const stateUrl = resolveVerificationTargetUrl(payload, sourceUrl, "LAUNCH_AUDIT_STATE_URL", "commandWaveStateUrl");
+  const stateUrl = resolveVerificationTargetUrl(payload, sourceUrl, "CHAT_LAUNCH_STATE_URL", "commandWaveStateUrl");
   const projectIndexUrl = resolveVerificationTargetUrl(
     payload,
     sourceUrl,
-    "LAUNCH_AUDIT_PROJECT_INDEX_URL",
+    "CHAT_LAUNCH_PROJECT_INDEX_URL",
     "projectIndexUrl",
   );
   const [commandWaveState, projectIndex] = await Promise.all([
     stateUrl ? readOptionalJsonUrl(stateUrl) : undefined,
     projectIndexUrl ? readOptionalJsonUrl(projectIndexUrl) : undefined,
   ]);
-  const result = verifyLaunchAuditPayload(payload, {
+  const result = verifyChatLaunchAuditPayload(payload, {
     commandWaveState,
     requirePublicState: Boolean(stateUrl),
     projectIndex,
     requireProjectIndex: Boolean(projectIndexUrl),
   });
 
-  writeJsonResult(process.env.LAUNCH_AUDIT_VERIFICATION_PATH, result);
+  writeJsonResult(process.env.CHAT_LAUNCH_VERIFICATION_PATH, result);
 
-  console.log(`Launch audit verification: ${result.status}`);
-  console.log(`Launch status: ${result.launchStatus}`);
+  console.log(`Chat launch verification: ${result.status}`);
+  console.log(`Chat launch status: ${result.chatLaunchStatus}`);
+  console.log(`Full PR loop status: ${result.launchStatus}`);
   console.log(`Project: ${result.projectName ?? "unknown"}`);
   console.log(`Generated: ${result.generatedAt ?? "unknown"}`);
   if (stateUrl) {
@@ -40,29 +41,8 @@ async function main() {
   }
 
   if (result.nextAction) {
-    console.log(`Next action: ${result.nextAction.title}`);
+    console.log(`Chat next action: ${result.nextAction.title}`);
     console.log(result.nextAction.detail);
-  }
-
-  if (result.statusDraft) {
-    console.log("Status draft:");
-    console.log(result.statusDraft);
-  }
-
-  if (result.stateEvidence) {
-    console.log("State evidence:");
-    console.log(`Wave state hash: ${result.stateEvidence.waveStateHash}`);
-    console.log(`Rules hash: ${result.stateEvidence.rulesHash}`);
-    console.log(
-      `Records: ${result.stateEvidence.proposalCount} proposals, ${result.stateEvidence.reviewCount} reviews, ${result.stateEvidence.ledgerEventCount} ledger events.`,
-    );
-  }
-
-  if (result.publicState) {
-    console.log(`State snapshot hash: ${result.publicState.stateHash}`);
-  }
-  if (result.publicProjectIndex) {
-    console.log(`Project index hash: ${result.publicProjectIndex.projectsHash}`);
   }
 
   for (const item of result.checks) {
@@ -70,23 +50,16 @@ async function main() {
   }
 
   if (result.blockers.length) {
-    console.log("Blockers:");
+    console.log("Chat launch blockers:");
     for (const item of result.blockers) {
       console.log(`- ${item}`);
     }
   }
 
   if (result.openItems.length) {
-    console.log("Open items:");
+    console.log("Chat launch open items:");
     for (const item of result.openItems) {
       console.log(`- ${item}`);
-    }
-  }
-
-  if (result.operatorChecklist.length) {
-    console.log("Operator checklist:");
-    for (const item of result.operatorChecklist) {
-      console.log(item);
     }
   }
 

@@ -54,4 +54,13 @@ describe("launch docs", () => {
     expect(docs).toContain("Reviewer checks are placeholders for this phase");
     expect(docs).not.toContain("production reviewer service is wired");
   });
+
+  it("documents the chat launch verifier separately from the full PR-loop audit", () => {
+    const docs = [readRepoFile("README.md"), readRepoFile("docs/first-hook-launch-playbook.md")].join("\n");
+
+    expect(readRepoFile("package.json")).toContain("\"chat:launch\"");
+    expect(docs).toContain("npm run chat:launch");
+    expect(docs).toContain("npm run launch:audit");
+    expect(docs).toContain("reviewed PR loop");
+  });
 });

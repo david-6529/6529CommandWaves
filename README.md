@@ -197,6 +197,7 @@ Audit and launch:
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
 - Public launch audit separates chat launch readiness from the full reviewed PR loop.
+- `npm run chat:launch` verifies the chat launch track while the GitHub repo is still a placeholder.
 - Public command-wave state includes the informational contribution report method and notes.
 - Public launch audit includes the hashed wave state, rules, and full audit bundle it checked.
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
@@ -404,13 +405,20 @@ Verify the first-loop launch audit:
 LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=1' npm run launch:audit
 ```
 
+Verify the chat launch before inviting builders into discussion:
+
+```bash
+LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=1' npm run chat:launch
+```
+
 If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
 `$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit?remote=1`. Set `LAUNCH_AUDIT_REMOTE=0` only for local shape checks.
 Without an explicit path, URL, or app URL, `npm run launch:audit` uses the local dev app at `http://localhost:5001` and
 runs a shape-only audit.
 
-The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
-`LAUNCH_AUDIT_PATH`. The verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
+`npm run chat:launch` exits nonzero until the chat launch track is ready and generated with remote setup checks. The full
+`npm run launch:audit` command exits nonzero until the reviewed PR loop is also ready. For offline verification, set
+`LAUNCH_AUDIT_PATH`. The full verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
 When it can resolve the command-wave state target, it also checks that the public state snapshot hash matches the launch
 audit evidence. When it can resolve the project index target, it checks that the active project list includes the launch
 project and has a valid hash. Set `LAUNCH_AUDIT_STATE_URL` or `LAUNCH_AUDIT_PROJECT_INDEX_URL` to override those targets
@@ -421,13 +429,14 @@ Against a running local dev server on the default port:
 ```bash
 SMOKE_BASE_URL=http://localhost:5001 npm run smoke:app
 npm run setup:verify
+npm run chat:launch
 npm run launch:audit
 ```
 
-If Next is running on another port, set `LOCAL_APP_URL` to that app URL before `setup:verify` or `launch:audit`.
-The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero until production
-env, live 6529 mode, durable storage, and daemon posting are configured. PR-loop readiness also needs a selected repo,
-GitHub PR adapter, guardian state, guardian workflow, and the required guardian check.
+If Next is running on another port, set `LOCAL_APP_URL` to that app URL before `setup:verify`, `chat:launch`, or
+`launch:audit`. The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero
+until production env, live 6529 mode, durable storage, and daemon posting are configured. PR-loop readiness also needs a
+selected repo, GitHub PR adapter, guardian state, guardian workflow, and the required guardian check.
 
 Expose the current project state to the guardian with:
 

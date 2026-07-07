@@ -1,0 +1,96 @@
+import { describe, expect, it } from "vitest";
+import { githubRepoPlaceholder } from "./agent-identities";
+import { demoWave } from "./demo-wave";
+import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
+import { verifyChatLaunchAuditPayload } from "./chat-launch-verifier";
+import type { SetupValidation } from "./setup-validation";
+
+const chatReadyEnv = {
+  NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
+  DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
+  ADMIN_API_KEY: "strong-admin-key-for-launch",
+  COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/6529-hook-builder",
+  COMMAND_WAVE_INITIAL_REPO_URL: githubRepoPlaceholder.url,
+  "6529_MOCK_MODE": "false",
+  NODE_ENV: "production",
+  COMMAND_WAVE_STORE: "postgres",
+  "6529_BOT_BEARER_TOKEN": "6529-live-bot-token",
+  "6529_BOT_WALLET_ADDRESS": "0x1234567890abcdef1234567890abcdef12345678",
+};
+
+const chatReadySetupValidation: SetupValidation = {
+  waveId: "6529-hook-builder",
+  repo: {
+    owner: "your-org",
+    repo: "your-hook-repo",
+    htmlUrl: githubRepoPlaceholder.url,
+  },
+  repoMetadata: null,
+  repoRequiredFiles: [],
+  checks: [
+    { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
+    {
+      id: "repo_placeholder",
+      label: "GitHub repo placeholder",
+      status: "warn",
+      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+    },
+  ],
+  canSave: true,
+  canRunCode: false,
+};
+
+describe("chat launch verifier", () => {
+  it("passes when the project chat is ready and the GitHub repo is still a placeholder", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+      checkSetupRemote: true,
+      setupValidation: chatReadySetupValidation,
+    });
+    const result = verifyChatLaunchAuditPayload(snapshot);
+
+    expect(snapshot.launchAudit.status).not.toBe("ready");
+    expect(snapshot.launchAudit.chatLaunch.status).toBe("ready");
+    expect(result.status).toBe("pass");
+    expect(result.chatLaunchStatus).toBe("ready");
+    expect(result.launchStatus).not.toBe("ready");
+    expect(result.nextAction?.title).toBe("Open project chat");
+    expect(result.checks.find((item) => item.id === "launch_status")).toBeUndefined();
+    expect(result.checks.find((item) => item.id === "chat_launch_ready")).toMatchObject({
+      status: "pass",
+    });
+  });
+
+  it("fails when the chat launch track is blocked", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: {},
+      checkSetupRemote: true,
+      setupValidation: chatReadySetupValidation,
+    });
+    const result = verifyChatLaunchAuditPayload(snapshot);
+
+    expect(result.status).toBe("fail");
+    expect(result.chatLaunchStatus).toBe("blocked");
+    expect(result.checks.find((item) => item.id === "chat_launch_ready")).toMatchObject({
+      status: "fail",
+      message: "Project chat launch is blocked.",
+    });
+  });
+
+  it("fails until remote setup checks are run", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+      setupValidation: chatReadySetupValidation,
+    });
+    const result = verifyChatLaunchAuditPayload(snapshot);
+
+    expect(snapshot.launchAudit.chatLaunch.status).toBe("ready");
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
+      status: "fail",
+    });
+  });
+});

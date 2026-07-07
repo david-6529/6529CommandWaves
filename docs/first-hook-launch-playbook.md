@@ -114,6 +114,9 @@ admin key, durable storage, live 6529 mode, and daemon chat posting credentials.
 until PR work starts. A ready PR loop also requires the GitHub PR adapter, guardian workflow, guardian wave-state URL, and
 required guardian check. Failed checks block broad participation.
 
+Use `npm run chat:launch` against the remote launch audit before inviting builders into discussion. Use
+`npm run launch:audit` before claiming the full reviewed PR loop is ready.
+
 The launch audit includes a human-readable status draft with the next action, operator checklist, verification links, and
 guardrails. Use it as the short update for reviewers or builders.
 
