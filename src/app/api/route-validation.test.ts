@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as previewContext } from "./6529/context/preview/route";
 import { POST as postChatMessage } from "./6529/chat-post/route";
+import { POST as postLegacyRoomMessage } from "./6529/room-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
 import { POST as recordDecision } from "./command-wave/decision/route";
@@ -153,6 +154,29 @@ describe("API route validation", () => {
     });
   });
 
+  it("marks the legacy room-post route as deprecated", async () => {
+    const response = await postLegacyRoomMessage(
+      request("https://command-waves.example.com/api/6529/room-post", {
+        method: "POST",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/mock-command-wave",
+          content: "Route compatibility check.",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Deprecation")).toBe("true");
+    expect(response.headers.get("Link")).toBe('</api/6529/chat-post>; rel="successor-version"');
+    expect(response.headers.get("X-Command-Waves-Canonical-Route")).toBe("/api/6529/chat-post");
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      post: {
+        waveId: "mock-command-wave",
+        mode: "mock",
+      },
+    });
+  });
+
   it("rejects non-JSON mutation bodies at the route", async () => {
     const response = await submitProposalRoute(
       request("https://command-waves.example.com/api/command-wave/proposals", {
@@ -181,6 +205,7 @@ describe("API route validation", () => {
     ["review record", reviewCommand, "/api/command-wave/review", "POST"],
     ["Codex packet", createCodexPacket, "/api/command-wave/codex-packet", "POST"],
     ["chat post", postChatMessage, "/api/6529/chat-post", "POST"],
+    ["legacy chat post", postLegacyRoomMessage, "/api/6529/room-post", "POST"],
   ] satisfies [string, RouteHandler, string, string][])(
     "requires admin auth for %s routes when configured",
     async (_label, handler, path, method) => {
