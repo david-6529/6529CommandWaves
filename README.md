@@ -71,8 +71,8 @@ What remains manual or MVP-only:
 - Wallet connection is identity context for access drafts. Reputation, token, holder, allowlist, and QnA requirements are
   manual notes until live wallet, session, and score checks exist.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
-- Codex execution prepares a branch, commits a bounded work packet, and opens a draft PR record. It does not yet run an
-  isolated code-writing worker.
+- Codex execution prepares a branch, commits a bounded work packet plus optional approved text files, and opens a draft PR
+  record. It does not yet run an isolated code-writing worker.
 - The GitHub repo is a placeholder in the default project state. No PR work can run until the pilot repo is selected.
 - The GitHub adapter can prepare branches, commit bounded text files, open draft PRs, post bounded PR comments, and
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
@@ -151,7 +151,7 @@ First launch tasks:
 Hardening tasks after the first public loop:
 
 1. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
-2. Replace packet-only PR setup with a controlled Codex harness that writes bounded code patches.
+2. Replace approved-file PR setup with a controlled Codex harness that writes bounded code patches in an isolated worker.
 3. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
 
 ## Lessons Reused From `6529arena`
@@ -188,6 +188,8 @@ Safety and review:
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
+- Approved PR execution files are path, size, secret, deployment, governance, upgradeability, delegatecall, destructive
+  opcode, and hook-parameter checked before they are committed with the work packet.
 - Reviewer output is written back to the PR as a bounded comment and check run.
 - PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, parameter writes, and bound-test evidence when patch records exist.
 
@@ -480,7 +482,8 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
 - `POST /api/command-wave/decision`: record a manual project decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from project chat.
 - `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded project decision receipt.
-- `POST /api/command-wave/execute`: prepare the target branch, commit the Codex work packet, and open a draft PR record.
+- `POST /api/command-wave/execute`: prepare the target branch, commit the Codex work packet plus optional approved
+  `{ path, content }` files, and open a draft PR record.
 - `POST /api/command-wave/review`: run the reviewer adapter, record a PR comment, create a check run, and save reviewer proof.
 
 Command-wave mutation routes and chat posting are open only for local demo mode when `ADMIN_API_KEY` is blank. Once

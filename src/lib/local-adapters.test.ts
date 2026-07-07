@@ -118,6 +118,41 @@ describe("local command adapters", () => {
     ]);
   });
 
+  it("commits approved files with the work packet", async () => {
+    const committedPaths: string[] = [];
+    const orchestrator = createLocalOrchestratorAdapter({
+      repoAdapter: {
+        ...localRepoAdapter,
+        async commitFiles(input) {
+          committedPaths.push(...input.files.map((file) => file.path));
+
+          return {
+            branchName: input.branchName,
+            commitSha: "commit-sha",
+            url: "https://github.com/6529-Collections/6529-hook/commit/commit-sha",
+            changedPaths: input.files.map((file) => file.path),
+          };
+        },
+      },
+    });
+
+    const execution = await orchestrator.execute({
+      wave: configuredWave,
+      proposal: configuredWave.proposals[0],
+      poll: configuredWave.polls[0],
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+
+    expect(committedPaths).toEqual([".command-waves/commands/cmd-001.md", "test/FeeCap.t.sol"]);
+    expect(execution.artifacts).toContain("approved file test/FeeCap.t.sol");
+    expect(execution.artifacts).toContain("changed .command-waves/commands/cmd-001.md, test/FeeCap.t.sol");
+  });
+
   it("requires branch and commit support before opening PR work", async () => {
     const orchestrator = createLocalOrchestratorAdapter({
       async openPullRequest() {

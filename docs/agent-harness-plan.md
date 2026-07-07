@@ -28,7 +28,8 @@ Current local adapter status:
 - Includes proposal ID, command kind, risk, rules version/hash, permissions, budget, prompt/spec hashes, target branch, max runtime, and max cost.
 - Generates a deterministic Codex handoff packet for PR commands.
 - Generates a copyable manual Codex work packet for PR commands with a recorded wave decision receipt.
-- Prepares the target branch, commits the bounded Codex work packet under `.command-waves/commands/`, and opens a draft PR record.
+- Prepares the target branch, commits the bounded Codex work packet under `.command-waves/commands/`, optionally commits
+  approved bounded text files, and opens a draft PR record.
 - The handoff packet records the target branch, permission set, budget, required evidence, forbidden actions, run manifest hash, and PR manifest hash.
 - The handoff packet names the controlled adapter sequence: prepare branch, commit bounded text files, open draft PR,
   post bounded PR comment, and create bounded check-run state.
@@ -38,6 +39,13 @@ Current local adapter status:
 - Can opt into the GitHub adapter with `COMMAND_WAVE_REPO_ADAPTER=github` after the pilot repo is selected.
 - Reviewer adapter requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
 - Review records a bounded PR comment and check run before saving reviewer proof.
+
+Approved file bundle guardrails:
+
+- Paths must be relative text files with unique names and bounded size.
+- Secret files, repo control files, guardian files, setup-proof files, deployments, governance changes, upgradeability
+  patterns, delegatecall, destructive opcodes, and uncapped parameter writes are rejected before commit.
+- Parameter writes need an explicit approved cap and changed bound-focused tests.
 
 Still missing:
 

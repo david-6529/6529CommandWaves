@@ -93,6 +93,7 @@ export type OrchestratorRunInput = {
   wave: CommandWave;
   proposal: CommandProposal;
   poll: PollState | null;
+  files?: RepoCommitFile[];
 };
 
 export type GuardianReviewInput = {

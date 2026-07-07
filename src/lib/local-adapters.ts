@@ -125,6 +125,16 @@ function codexPacketPath(proposalId: string) {
   return `.command-waves/commands/${proposalId}.md`;
 }
 
+function changedPathsFromExecutionArtifacts(artifacts: string[]) {
+  const paths = artifacts
+    .filter((artifact) => artifact.startsWith("changed "))
+    .flatMap((artifact) => artifact.slice("changed ".length).split(","))
+    .map((path) => path.trim())
+    .filter(Boolean);
+
+  return [...new Set(paths)].sort((left, right) => left.localeCompare(right));
+}
+
 export function createLocalOrchestratorAdapter(
   repoAdapterOrOptions: RepoAdapter | LocalOrchestratorOptions = localRepoAdapter,
 ): OrchestratorAdapter {
@@ -160,6 +170,7 @@ export function createLocalOrchestratorAdapter(
               baseBranch,
             })
           : null;
+      const approvedFiles = input.files ?? [];
       const wavePost = [
         formatProposalForWave(input.proposal, input.poll),
         ...(prManifest ? ["", formatCommandPrManifestForPullRequest(prManifest)] : []),
@@ -173,18 +184,23 @@ export function createLocalOrchestratorAdapter(
             })
           : null;
       const packetFilePath = input.proposal.kind === "open_pr" ? codexPacketPath(input.proposal.id) : null;
+      const commitFiles =
+        input.proposal.kind === "open_pr" && codexPacket && packetFilePath
+          ? [
+              {
+                path: packetFilePath,
+                content: `${codexPacket.text}\n`,
+              },
+              ...approvedFiles,
+            ]
+          : [];
       const commit =
         input.proposal.kind === "open_pr" && codexPacket && packetFilePath
           ? await assertRepoMethod(repoAdapter.commitFiles, "commitFiles")({
               repoUrl: input.wave.repoUrl,
               branchName: manifest.targetBranch,
               message: `Add Command Waves work packet for ${input.proposal.id}`,
-              files: [
-                {
-                  path: packetFilePath,
-                  content: `${codexPacket.text}\n`,
-                },
-              ],
+              files: commitFiles,
             })
           : null;
       const pr =
@@ -221,6 +237,7 @@ export function createLocalOrchestratorAdapter(
           ...(commit
             ? [
                 `packet path ${packetFilePath}`,
+                ...approvedFiles.map((file) => `approved file ${file.path}`),
                 `packet commit ${commit.commitSha}`,
                 `packet hash ${codexPacket?.packetHash}`,
                 commit.url,
@@ -250,6 +267,7 @@ export const localGuardianAdapter: GuardianAdapter = {
     const poll = input.wave.polls.find((item) => item.proposalId === input.proposal.id) ?? null;
     const repository = configuredGitHubRepo(input.wave.repoUrl);
     const actualHandoff = findAgentHandoffArtifact(input.execution.artifacts);
+    const changedPaths = changedPathsFromExecutionArtifacts(input.execution.artifacts);
     const expectedHandoff =
       input.proposal.kind === "open_pr"
         ? createAgentHandoffPacket({
@@ -274,9 +292,10 @@ export const localGuardianAdapter: GuardianAdapter = {
     const proposalText = `${input.proposal.prompt}\n${input.proposal.spec}`;
     const dangerousFlags = findDangerousPromptFlags(proposalText);
     const touchesDangerousSurface = dangerousFlags.length > 0;
-    const hookSignals = findHookContractSignals({ proposalText });
+    const hookSignals = findHookContractSignals({ changedPaths, proposalText });
     const hookParameterChecks = evaluateHookParameterPolicy({
       proposalText,
+      changedPaths,
       hookSignals,
     });
     const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
@@ -296,7 +315,7 @@ export const localGuardianAdapter: GuardianAdapter = {
             proposal: input.proposal,
             poll,
             manifest: createCommandPrManifest({ wave: input.wave, proposal: input.proposal, poll }),
-            changedPaths: [],
+            changedPaths,
             ...(repository ? { repository } : {}),
           })
         : null;

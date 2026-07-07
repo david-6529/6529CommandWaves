@@ -512,6 +512,121 @@ describe("Command wave store", () => {
     expect(reviewed.reviews[0]?.proof?.inputs.repositoryHash).toHaveLength(64);
   });
 
+  it("commits bounded approved files with the PR work packet", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({
+      proposalId: "cmd-001",
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+
+    expect(executed.executions[0]?.artifacts).toContain("approved file test/FeeCap.t.sol");
+    expect(executed.executions[0]?.artifacts).toContain(
+      "changed .command-waves/commands/cmd-001.md, test/FeeCap.t.sol",
+    );
+
+    const reviewed = await reviewProposal({ proposalId: "cmd-001" });
+
+    expect(reviewed.reviews[0]?.status).toBe("pass");
+    expect(reviewed.reviews[0]?.proof?.inputs.changedPathsHash).toHaveLength(64);
+  });
+
+  it("rejects approved file paths outside the repo", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    await expect(
+      executeProposal({
+        proposalId: "cmd-001",
+        files: [{ path: "../contracts/Hook.sol", content: "contract Hook {}" }],
+      }),
+    ).rejects.toThrow("Approved file paths must be relative paths without empty or parent segments.");
+  });
+
+  it("rejects approved secret files", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    await expect(
+      executeProposal({
+        proposalId: "cmd-001",
+        files: [{ path: ".env.production", content: "PRIVATE_KEY=abc" }],
+      }),
+    ).rejects.toThrow("Approved files cannot include secrets or credential files.");
+  });
+
+  it("rejects approved deployment files", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    await expect(
+      executeProposal({
+        proposalId: "cmd-001",
+        files: [{ path: "script/Deploy.s.sol", content: "contract DeployScript {}" }],
+      }),
+    ).rejects.toThrow("Approved files touch blocked hook surfaces: deployment.");
+  });
+
+  it("rejects approved files that add delegatecall", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    await expect(
+      executeProposal({
+        proposalId: "cmd-001",
+        files: [
+          {
+            path: "contracts/Hook.sol",
+            content: "contract Hook { function run(address target) external { target.delegatecall(\"\"); } }",
+          },
+        ],
+      }),
+    ).rejects.toThrow("Approved files add blocked hook code: delegatecall.");
+  });
+
+  it("rejects hook parameter writes without changed bound tests", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    await expect(
+      executeProposal({
+        proposalId: "cmd-001",
+        files: [
+          {
+            path: "contracts/HookParameters.sol",
+            content:
+              "contract HookParameters { uint256 public feeBps; function setFeeBps(uint256 nextFeeBps) external { feeBps = nextFeeBps; } }",
+          },
+        ],
+      }),
+    ).rejects.toThrow("PR changes that write hook parameters must include a changed bound-focused test file.");
+  });
+
+  it("allows bounded hook parameter writes with changed bound tests", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({
+      proposalId: "cmd-001",
+      files: [
+        {
+          path: "contracts/HookParameters.sol",
+          content:
+            "contract HookParameters { uint256 public feeBps; function setFeeBps(uint256 nextFeeBps) external { require(nextFeeBps <= 100, \"fee cap\"); feeBps = nextFeeBps; } }",
+        },
+        {
+          path: "test/HookParameters.t.sol",
+          content: "contract HookParametersTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+
+    expect(executed.executions[0]?.artifacts).toContain("approved file contracts/HookParameters.sol");
+    expect(executed.executions[0]?.artifacts).toContain("approved file test/HookParameters.t.sol");
+    expect(executed.executions[0]?.artifacts).toContain(
+      "changed .command-waves/commands/cmd-001.md, contracts/HookParameters.sol, test/HookParameters.t.sol",
+    );
+  });
+
   it("records PR review evidence for changes requested reviews", async () => {
     await makeSeedProposalReadyToBuild();
 

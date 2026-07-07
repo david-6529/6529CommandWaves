@@ -334,6 +334,45 @@ describe("API route validation", () => {
     });
   });
 
+  it("executes approved PR proposals with bounded files at the route", async () => {
+    await updateSetup(
+      request("https://command-waves.example.com/api/command-wave", {
+        method: "PATCH",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/6529-hook-builder",
+          repoUrl: "https://github.com/6529-Collections/6529-hook",
+        }),
+      }),
+    );
+
+    const response = await executeCommand(
+      request("https://command-waves.example.com/api/command-wave/execute", {
+        method: "POST",
+        body: JSON.stringify({
+          proposalId: "cmd-001",
+          files: [
+            {
+              path: "test/FeeCap.t.sol",
+              content: "contract FeeCapTest { function testFeeCap100Bps() public {} }",
+            },
+          ],
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      wave: {
+        executions: [
+          {
+            proposalId: "cmd-001",
+            artifacts: expect.arrayContaining(["approved file test/FeeCap.t.sol"]),
+          },
+        ],
+      },
+    });
+  });
+
   it("rejects missing Codex packet proposals at the route", async () => {
     const response = await createCodexPacket(
       request("https://command-waves.example.com/api/command-wave/codex-packet", {

@@ -3,6 +3,7 @@ import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedC
 import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
 import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./command-wave-seed";
 import { demoWave } from "./demo-wave";
+import { parseExecutionFiles } from "./execution-files";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
@@ -686,10 +687,12 @@ export async function executeProposal(input: unknown) {
     throw Object.assign(new Error("A valid GitHub repo is required before opening PR commands can run."), { status: 409 });
   }
 
+  const files = parseExecutionFiles(body.files, proposal);
   const execution = await getConfiguredOrchestratorAdapter().execute({
     wave,
     proposal,
     poll,
+    files,
   });
   const nextWave = appendLedger(
     {
