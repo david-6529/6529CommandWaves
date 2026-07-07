@@ -1088,33 +1088,38 @@ export function CommandWavesConsole() {
       : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
-  const currentBuildStatusLabel = readyForNextHookChange
-    ? "needs discussion"
-    : activeExecution
-      ? "PR logged"
-      : activePollDecisionRecorded
-        ? "decision recorded"
-        : activePollNeedsWaveDecision
-          ? "decision receipt needed"
-          : activePoll?.status === "open"
-            ? "decision open"
-            : activeSupportProposal
-              ? `${activeSupportProposalLabel.toLowerCase()} recorded`
-            : activeProposal
-              ? "proposal ready"
-              : "waiting";
-  const currentBuildStatusClass =
-    readyForNextHookChange
-      ? statusClass("reviewing")
+  const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
+  const currentBuildStatusLabel = currentWorkNeedsRepo
+    ? "repo needed"
+    : readyForNextHookChange
+      ? "needs discussion"
       : activeExecution
-        ? statusClass("complete")
+        ? "PR logged"
         : activePollDecisionRecorded
+          ? "decision recorded"
+          : activePollNeedsWaveDecision
+            ? "decision receipt needed"
+            : activePoll?.status === "open"
+              ? "decision open"
+              : activeSupportProposal
+                ? `${activeSupportProposalLabel.toLowerCase()} recorded`
+                : activeProposal
+                  ? "proposal ready"
+                  : "waiting";
+  const currentBuildStatusClass =
+    currentWorkNeedsRepo
+      ? riskClass("medium")
+      : readyForNextHookChange
+        ? statusClass("reviewing")
+        : activeExecution
           ? statusClass("complete")
-          : activePollNeedsWaveDecision || activePoll?.status === "open"
-            ? riskClass("medium")
-            : activeProposal
-              ? statusClass(activeProposal.status)
-              : "border-zinc-700 bg-zinc-900 text-zinc-400";
+          : activePollDecisionRecorded
+            ? statusClass("complete")
+            : activePollNeedsWaveDecision || activePoll?.status === "open"
+              ? riskClass("medium")
+              : activeProposal
+                ? statusClass(activeProposal.status)
+                : "border-zinc-700 bg-zinc-900 text-zinc-400";
   const currentFocusTitle =
     readyForNextHookChange
       ? title.trim() || "Pick the next change"
