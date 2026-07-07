@@ -30,6 +30,7 @@ const checklistByItemId: Record<string, string[]> = {
   ],
   setup_wave_reachable: ["Pick a reachable 6529 project chat before inviting contributors."],
   setup_repo_reachable: ["Pick a reachable GitHub repo before inviting contributors."],
+  setup_repo_placeholder: ["Select the hook GitHub repo before saving setup or running PR work."],
   setup_project_check: ["Fix the setup check failure for the selected project chat and repo."],
   setup_repo_required_files: ["Add launch repo files before inviting contributors."],
   setup_repo_file_contributing_md: ["Add CONTRIBUTING.md to the hook repo."],

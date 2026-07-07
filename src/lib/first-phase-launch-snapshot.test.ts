@@ -121,7 +121,7 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.statusDraft).toContain("Project launch status");
     expect(snapshot.statusDraft).toContain("Status: blocked");
-    expect(snapshot.statusDraft).toContain("Next action: Fix setup");
+    expect(snapshot.statusDraft).toContain("Next action: Select the repo");
     expect(snapshot.statusDraft).toContain("Replace the GitHub repo placeholder before saving setup or running PR work.");
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");
     expect(snapshot.statusDraft).toContain("- Project index: https://command-waves.example.com/api/command-wave/projects");
@@ -162,8 +162,8 @@ describe("first phase launch snapshot", () => {
       ["log", "waiting"],
     ]);
     expect(snapshot.launchAudit.nextAction).toMatchObject({
-      itemId: "setup_project_check",
-      title: "Fix setup",
+      itemId: "setup_repo_placeholder",
+      title: "Select the repo",
     });
   });
 

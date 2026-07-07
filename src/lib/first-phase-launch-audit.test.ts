@@ -231,6 +231,48 @@ describe("first phase launch audit", () => {
     );
   });
 
+  it("names placeholder repo setup in the next action", () => {
+    const setupValidation: SetupValidation = {
+      ...productionSetupValidation,
+      repo: null,
+      repoMetadata: null,
+      repoRequiredFiles: [],
+      checks: [
+        { id: "wave_format", label: "6529 wave", status: "pass", message: "Using wave 6529-hook-builder." },
+        { id: "repo_format", label: "GitHub repo", status: "pass", message: "Using your-org/your-hook-repo." },
+        {
+          id: "repo_placeholder",
+          label: "GitHub repo placeholder",
+          status: "fail",
+          message: "Replace the GitHub repo placeholder before saving setup or running PR work.",
+        },
+      ],
+      canSave: false,
+      canRunCode: false,
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: productionReadyChecks,
+      setupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.nextAction).toMatchObject({
+      status: "blocked",
+      itemId: "setup_repo_placeholder",
+      title: "Select the repo",
+      detail: "Replace the GitHub repo placeholder before saving setup or running PR work.",
+    });
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "setup_repo_placeholder",
+        label: "GitHub repo",
+        status: "blocked",
+      }),
+    );
+  });
+
   it("keeps launch in setup mode when the PR template is missing", () => {
     const setupValidation: SetupValidation = {
       ...productionSetupValidation,

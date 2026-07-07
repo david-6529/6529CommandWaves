@@ -110,6 +110,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_remote_check: "Run launch setup check",
   setup_wave_reachable: "Pick reachable project chat",
   setup_repo_reachable: "Pick reachable GitHub repo",
+  setup_repo_placeholder: "Select the repo",
   setup_project_check: "Fix setup",
   setup_repo_required_files: "Check launch repo files",
   setup_repo_required_guardian_check: "Require guardian check",
@@ -203,7 +204,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_not_checked",
         label: "Setup check",
         status: "needed",
-    detail: "Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+        detail: "Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
         source: "setup",
       },
     ];
@@ -212,13 +213,13 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
   if (!setupValidation.canSave) {
     const firstFailure = setupValidation.checks.find((item) => item.status === "fail");
     const failureId =
-      firstFailure?.id === "wave_reachable" || firstFailure?.id === "repo_reachable"
+      firstFailure?.id === "wave_reachable" || firstFailure?.id === "repo_reachable" || firstFailure?.id === "repo_placeholder"
         ? `setup_${firstFailure.id}`
         : "setup_project_check";
     const failureLabel =
       firstFailure?.id === "wave_reachable"
         ? "Project chat"
-        : firstFailure?.id === "repo_reachable"
+        : firstFailure?.id === "repo_reachable" || firstFailure?.id === "repo_placeholder"
           ? "GitHub repo"
           : "Setup check";
 
