@@ -227,7 +227,7 @@ describe("API route validation", () => {
       audit: {
         version: "command-wave-chat-launch-v0.1",
         project: {
-          repoUrl: "https://github.com/your-org/your-hook-repo",
+          repoUrl: null,
         },
         prLoop: {
           status: "blocked",

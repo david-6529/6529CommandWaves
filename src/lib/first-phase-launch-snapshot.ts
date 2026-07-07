@@ -8,7 +8,7 @@ import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIden
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
-import { hasProductionValue } from "./env-placeholders";
+import { hasProductionValue, isPlaceholderValue } from "./env-placeholders";
 import { createLaunchAuditHash } from "./launch-audit-hash";
 import { createFirstPhaseLaunchAudit } from "./first-phase-launch-audit";
 import { createLaunchPacket, type LaunchPacket } from "./launch-packet";
@@ -31,7 +31,7 @@ export type FirstPhaseLaunchSnapshot = {
     id: string;
     name: string;
     waveUrl: string;
-    repoUrl: string;
+    repoUrl: string | null;
   };
   setupCheckMode: "shape" | "remote";
   projectSnapshot: CommandWaveStateSnapshot["projectSnapshot"];
@@ -147,6 +147,7 @@ export async function createFirstPhaseLaunchSnapshot(
     launchAuditUrl: appRouteUrl(launchAuditPath, env),
   };
   const contributionReport = createContributionReport(wave, { generatedAt });
+  const publicRepoUrl = isPlaceholderValue(wave.repoUrl) ? null : wave.repoUrl;
   const snapshotWithoutHash = {
     version: "command-wave-launch-audit-v0.1",
     generatedAt,
@@ -154,7 +155,7 @@ export async function createFirstPhaseLaunchSnapshot(
       id: wave.id,
       name: wave.name,
       waveUrl: wave.waveUrl,
-      repoUrl: wave.repoUrl,
+      repoUrl: publicRepoUrl,
     },
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
     projectSnapshot: createPublicProjectSnapshot(wave),

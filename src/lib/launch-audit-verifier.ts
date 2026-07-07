@@ -395,6 +395,7 @@ function collectPublicProjectIndex(
   const expectedWaveUrl = asString(expectedProject?.waveUrl);
   const expectedRepoUrl = asString(expectedProject?.repoUrl);
   const activeProject = projects.find((project) => asString(project.id) === expectedProjectId) ?? null;
+  const repoMatches = expectedRepoUrl ? asString(activeProject?.repoUrl) === expectedRepoUrl : true;
 
   if (
     !record ||
@@ -402,7 +403,6 @@ function collectPublicProjectIndex(
     !expectedProject ||
     !expectedProjectId ||
     !expectedWaveUrl ||
-    !expectedRepoUrl ||
     !activeProjectId ||
     !Number.isInteger(projectCount) ||
     !isSha256Hash(projectsHash) ||
@@ -411,7 +411,7 @@ function collectPublicProjectIndex(
     projectsHash !== hashValue(hookProjectIndexHashInput(record)) ||
     !activeProject ||
     asString(activeProject.waveUrl) !== expectedWaveUrl ||
-    asString(activeProject.repoUrl) !== expectedRepoUrl
+    !repoMatches
   ) {
     return null;
   }

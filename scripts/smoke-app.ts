@@ -180,8 +180,14 @@ async function main() {
   const statusDraft = objectValue(audit, "statusDraft");
   const launchPacket = objectValue(audit, "launchPacket");
   const reports = objectValue(audit, "reports");
+  const launchProject = objectValue(audit, "project");
 
   assertJsonObject("Launch audit state evidence", stateEvidence);
+  assertJsonObject("Launch audit project", launchProject);
+  assert(
+    objectValue(launchProject, "repoUrl") === null,
+    "Launch audit project should not expose the placeholder repo URL as a selected repo.",
+  );
   assertSha256("Launch audit wave state hash", objectValue(stateEvidence, "waveStateHash"));
   assertSha256("Launch audit rules hash", objectValue(stateEvidence, "rulesHash"));
   assertString("Launch audit status draft", statusDraft);

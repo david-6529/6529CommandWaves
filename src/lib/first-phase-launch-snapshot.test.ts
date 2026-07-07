@@ -26,7 +26,7 @@ describe("first phase launch snapshot", () => {
       id: demoWave.id,
       name: demoWave.name,
       waveUrl: demoWave.waveUrl,
-      repoUrl: demoWave.repoUrl,
+      repoUrl: null,
     });
     expect(snapshot.setupCheckMode).toBe("shape");
     expect(snapshot.projectSnapshot).toMatchObject({

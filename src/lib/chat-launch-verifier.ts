@@ -179,6 +179,7 @@ function projectIndexMatches(value: unknown, project: Record<string, unknown> | 
   const expectedWaveUrl = asString(project?.waveUrl);
   const expectedRepoUrl = asString(project?.repoUrl);
   const activeProject = projects.find((item) => asString(item.id) === expectedProjectId) ?? null;
+  const repoMatches = expectedRepoUrl ? asString(activeProject?.repoUrl) === expectedRepoUrl : true;
 
   return Boolean(
     record &&
@@ -186,7 +187,6 @@ function projectIndexMatches(value: unknown, project: Record<string, unknown> | 
       project &&
       expectedProjectId &&
       expectedWaveUrl &&
-      expectedRepoUrl &&
       activeProjectId === expectedProjectId &&
       Number.isInteger(projectCount) &&
       projectCount === projects.length &&
@@ -194,7 +194,7 @@ function projectIndexMatches(value: unknown, project: Record<string, unknown> | 
       projectsHash === hashValue(hookProjectIndexHashInput(record)) &&
       activeProject &&
       asString(activeProject.waveUrl) === expectedWaveUrl &&
-      asString(activeProject.repoUrl) === expectedRepoUrl,
+      repoMatches,
   );
 }
 

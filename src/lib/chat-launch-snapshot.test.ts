@@ -17,7 +17,7 @@ describe("chat launch snapshot", () => {
       sourceAuditHash: launchSnapshot.auditHash,
       project: {
         id: demoWave.id,
-        repoUrl: demoWave.repoUrl,
+        repoUrl: null,
       },
       setupCheckMode: "shape",
       stateEvidence: launchSnapshot.stateEvidence,
