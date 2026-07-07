@@ -215,10 +215,12 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "configuredUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectIndexUrl");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "contributionReportUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "verificationManifestUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "chatLaunchUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/projects");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/reports/contribution");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/launch/chat");
   assertIncludes(
     "Launch audit response",
@@ -313,6 +315,38 @@ async function main() {
   );
   assertNoEmDash("Projects response", JSON.stringify(projectsPayload));
 
+  const contributionReportPayload = await fetchJson("/api/command-wave/reports/contribution");
+
+  assert(
+    objectValue(contributionReportPayload, "version") === "command-wave-contribution-report-v0.1",
+    "Contribution report returned the wrong version.",
+  );
+  assertSha256("Contribution report hash", objectValue(contributionReportPayload, "reportHash"));
+  assert(
+    objectValue(contributionReportPayload, "reportHash") ===
+      hashValue(Object.fromEntries(Object.entries(contributionReportPayload).filter(([key]) => key !== "reportHash"))),
+    "Contribution report hash did not match payload.",
+  );
+  const contributionProject = objectValue(contributionReportPayload, "project");
+  const contributionAuthority = objectValue(contributionReportPayload, "authority");
+  const contributionReport = objectValue(contributionReportPayload, "report");
+
+  assertJsonObject("Contribution report project", contributionProject);
+  assertJsonObject("Contribution report authority", contributionAuthority);
+  assertJsonObject("Contribution report body", contributionReport);
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "daemon");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "review-agent");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "GitHub repo placeholder");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "informational");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "Visible activity report");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "Merge rights");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "Token weight");
+  assert(
+    !JSON.stringify(contributionReportPayload).includes("https://github.com/6529-Collections/6529-hook"),
+    "Contribution report still includes the old concrete hook repo.",
+  );
+  assertNoEmDash("Contribution report", JSON.stringify(contributionReportPayload));
+
   const verificationManifestPayload = await fetchJson("/api/command-wave/verification/manifest");
   const verificationManifest = objectValue(verificationManifestPayload, "manifest");
 
@@ -336,10 +370,30 @@ async function main() {
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/state");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/projects");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/reports/contribution");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/audit");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/chat");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "reportHash");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "chatLaunchHash");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "sourceAuditHash");
+  const manifestEndpoints = objectValue(verificationManifest, "endpoints");
+
+  assert(Array.isArray(manifestEndpoints), "Verification manifest endpoints are missing.");
+  const contributionEndpoint = manifestEndpoints.find(
+    (endpoint): endpoint is JsonObject =>
+      typeof endpoint === "object" &&
+      endpoint !== null &&
+      objectValue(endpoint as JsonObject, "id") === "contribution_report",
+  );
+
+  assertJsonObject("Verification manifest contribution endpoint", contributionEndpoint);
+  const contributionEndpointHashes = objectValue(contributionEndpoint, "hashes");
+
+  assertJsonObject("Verification manifest contribution hashes", contributionEndpointHashes);
+  assert(
+    objectValue(contributionEndpointHashes, "generated") === objectValue(contributionReportPayload, "reportHash"),
+    "Verification manifest contribution report hash does not match report endpoint.",
+  );
   assertNoEmDash("Verification manifest", JSON.stringify(verificationManifestPayload));
 
   const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");

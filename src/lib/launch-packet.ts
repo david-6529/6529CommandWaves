@@ -23,6 +23,7 @@ export type LaunchPacketVerificationTargets = {
   verificationManifestUrl?: string;
   setupProofUrl: string;
   projectIndexUrl?: string;
+  contributionReportUrl?: string;
   commandWaveStateUrl: string;
   chatLaunchUrl?: string;
   launchAuditUrl?: string;
@@ -292,6 +293,7 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
     ...(targets.verificationManifestUrl ? [`- Verification manifest: ${targets.verificationManifestUrl}`] : []),
     `- Setup proof: ${targets.setupProofUrl}`,
     ...(targets.projectIndexUrl ? [`- Project index: ${targets.projectIndexUrl}`] : []),
+    ...(targets.contributionReportUrl ? [`- Contribution report: ${targets.contributionReportUrl}`] : []),
     `- Command-wave state: ${targets.commandWaveStateUrl}`,
     ...(targets.chatLaunchUrl ? [`- Chat launch audit: ${targets.chatLaunchUrl}`] : []),
     ...(targets.launchAuditUrl ? [`- Launch audit: ${targets.launchAuditUrl}`] : []),

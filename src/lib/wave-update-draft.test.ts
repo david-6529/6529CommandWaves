@@ -43,6 +43,7 @@ describe("wave update draft", () => {
         verificationManifestUrl: "https://hooks.example/api/command-wave/verification/manifest",
         setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
         projectIndexUrl: "https://hooks.example/api/command-wave/projects",
+        contributionReportUrl: "https://hooks.example/api/command-wave/reports/contribution",
         commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
         chatLaunchUrl: "https://hooks.example/api/command-wave/launch/chat",
         launchAuditUrl: "https://hooks.example/api/command-wave/launch/audit",
@@ -58,6 +59,7 @@ describe("wave update draft", () => {
     expect(draft).toContain("Verification: setup proof https://hooks.example/api/command-wave/setup/proof");
     expect(draft).toContain("verification manifest https://hooks.example/api/command-wave/verification/manifest");
     expect(draft).toContain("project index https://hooks.example/api/command-wave/projects");
+    expect(draft).toContain("contribution report https://hooks.example/api/command-wave/reports/contribution");
     expect(draft).toContain("state https://hooks.example/api/command-wave/state");
     expect(draft).toContain("chat launch https://hooks.example/api/command-wave/launch/chat");
     expect(draft).toContain("launch audit https://hooks.example/api/command-wave/launch/audit.");

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { publicGithubRepoPlaceholder } from "./agent-identities";
 import { demoWave } from "./demo-wave";
+import { createPublicContributionReport } from "./public-contribution-report";
 import { createPublicVerificationManifest, publicVerificationManifestHashInput } from "./public-verification-manifest";
 import { hashValue } from "./run-manifest";
 
@@ -76,6 +77,12 @@ describe("public verification manifest", () => {
         requiredHashFields: ["projectsHash"],
       }),
       expect.objectContaining({
+        id: "contribution_report",
+        url: "https://command-waves.example.com/api/command-wave/reports/contribution",
+        requiredHashFields: ["reportHash"],
+        verifierCommand: null,
+      }),
+      expect.objectContaining({
         id: "launch_audit",
         url: "https://command-waves.example.com/api/command-wave/launch/audit",
         requiredHashFields: ["auditHash"],
@@ -92,6 +99,12 @@ describe("public verification manifest", () => {
       generated: expect.stringMatching(/^[a-f0-9]{64}$/),
       source: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
+    expect(manifest.endpoints.find((endpoint) => endpoint.id === "contribution_report")?.hashes).toMatchObject({
+      generated: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
+    expect(manifest.endpoints.find((endpoint) => endpoint.id === "contribution_report")?.hashes.generated).toBe(
+      createPublicContributionReport(demoWave).reportHash,
+    );
     expect(JSON.stringify(manifest)).not.toContain("\u2014");
   });
 

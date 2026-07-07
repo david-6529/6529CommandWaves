@@ -122,6 +122,7 @@ describe("first phase launch snapshot", () => {
       verificationManifestUrl: "https://command-waves.example.com/api/command-wave/verification/manifest",
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       projectIndexUrl: "https://command-waves.example.com/api/command-wave/projects",
+      contributionReportUrl: "https://command-waves.example.com/api/command-wave/reports/contribution",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
       chatLaunchUrl: "https://command-waves.example.com/api/command-wave/launch/chat",
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
@@ -135,6 +136,9 @@ describe("first phase launch snapshot", () => {
     );
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");
     expect(snapshot.statusDraft).toContain("- Project index: https://command-waves.example.com/api/command-wave/projects");
+    expect(snapshot.statusDraft).toContain(
+      "- Contribution report: https://command-waves.example.com/api/command-wave/reports/contribution",
+    );
     expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
     expect(snapshot.statusDraft).toContain("- Chat launch audit: https://command-waves.example.com/api/command-wave/launch/chat");
     expect(snapshot.statusDraft).toContain("- Launch audit: https://command-waves.example.com/api/command-wave/launch/audit");
@@ -157,6 +161,9 @@ describe("first phase launch snapshot", () => {
     );
     expect(snapshot.launchPacket.text).toContain(
       "Project index: https://command-waves.example.com/api/command-wave/projects",
+    );
+    expect(snapshot.launchPacket.text).toContain(
+      "Contribution report: https://command-waves.example.com/api/command-wave/reports/contribution",
     );
     expect(snapshot.launchPacket.text).toContain(
       "Command-wave state: https://command-waves.example.com/api/command-wave/state",
@@ -242,6 +249,7 @@ describe("first phase launch snapshot", () => {
       verificationManifestUrl: "/api/command-wave/verification/manifest",
       setupProofUrl: "/api/command-wave/setup/proof",
       projectIndexUrl: "/api/command-wave/projects",
+      contributionReportUrl: "/api/command-wave/reports/contribution",
       commandWaveStateUrl: "/api/command-wave/state",
       chatLaunchUrl: "/api/command-wave/launch/chat",
       launchAuditUrl: "/api/command-wave/launch/audit",

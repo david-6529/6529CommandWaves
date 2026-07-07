@@ -52,6 +52,7 @@ export type FirstPhaseLaunchSnapshot = {
     verificationManifestUrl: string;
     setupProofUrl: string;
     projectIndexUrl: string;
+    contributionReportUrl: string;
     commandWaveStateUrl: string;
     chatLaunchUrl: string;
     launchAuditUrl: string;
@@ -140,6 +141,7 @@ export async function createFirstPhaseLaunchSnapshot(
     verificationManifestUrl: appRouteUrl("/api/command-wave/verification/manifest", env),
     setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
     projectIndexUrl: appRouteUrl("/api/command-wave/projects", env),
+    contributionReportUrl: appRouteUrl("/api/command-wave/reports/contribution", env),
     commandWaveStateUrl,
     chatLaunchUrl: appRouteUrl(chatLaunchPath, env),
     launchAuditUrl: appRouteUrl(launchAuditPath, env),

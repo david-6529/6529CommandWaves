@@ -10,6 +10,7 @@ const verificationTargets = {
   verificationManifestUrl: "https://command-waves.example.com/api/command-wave/verification/manifest",
   setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
   projectIndexUrl: "https://command-waves.example.com/api/command-wave/projects",
+  contributionReportUrl: "https://command-waves.example.com/api/command-wave/reports/contribution",
   commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
   chatLaunchUrl: "https://command-waves.example.com/api/command-wave/launch/chat",
   launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
@@ -68,6 +69,7 @@ describe("launch status draft", () => {
     expect(draft).toContain(`- Verification manifest: ${verificationTargets.verificationManifestUrl}`);
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Project index: ${verificationTargets.projectIndexUrl}`);
+    expect(draft).toContain(`- Contribution report: ${verificationTargets.contributionReportUrl}`);
     expect(draft).toContain(`- Command-wave state: ${verificationTargets.commandWaveStateUrl}`);
     expect(draft).toContain(`- Chat launch audit: ${verificationTargets.chatLaunchUrl}`);
     expect(draft).toContain(`- Launch audit: ${verificationTargets.launchAuditUrl}`);

@@ -196,6 +196,8 @@ Audit and launch:
 - Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public verification manifest with stable anchors, required hash fields, and a self endpoint for third-party checks.
+- Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
+  rights, reputation, or token weight.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
 - Public launch audit separates chat launch readiness from the full reviewed PR loop.
@@ -461,6 +463,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
 - `GET /api/command-wave/projects`: public active hook project index with a stable project-list hash.
+- `GET /api/command-wave/reports/contribution`: public informational contribution report with a `reportHash`.
 - `GET /api/command-wave/verification/manifest`: public map of verification endpoints, required hash fields, stable anchors, and its own manifest URL.
 - `GET /api/command-wave/launch/audit`: public first-loop launch audit with authority boundary. Add `?remote=1` to run remote wave and repo setup checks.
 - `GET /api/command-wave/launch/chat`: public chat launch audit with `chatLaunchHash`. Add `?remote=1` before inviting builders into discussion.

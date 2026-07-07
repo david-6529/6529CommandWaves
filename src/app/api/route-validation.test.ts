@@ -7,6 +7,7 @@ import { POST as recordDecision } from "./command-wave/decision/route";
 import { POST as executeCommand } from "./command-wave/execute/route";
 import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
 import { POST as submitProposalRoute } from "./command-wave/proposals/route";
+import { GET as getContributionReport } from "./command-wave/reports/contribution/route";
 import { POST as reviewCommand } from "./command-wave/review/route";
 import { DELETE as resetWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
@@ -264,9 +265,43 @@ describe("API route validation", () => {
             id: "chat_launch",
             requiredHashFields: ["chatLaunchHash", "sourceAuditHash"],
           }),
+          expect.objectContaining({
+            id: "contribution_report",
+            requiredHashFields: ["reportHash"],
+          }),
         ]),
         manifestHash: expect.stringMatching(/^[a-f0-9]{64}$/),
       },
+    });
+  });
+
+  it("publishes the public contribution report without requiring a selected repo", async () => {
+    const response = await getContributionReport(
+      request("https://command-waves.example.com/api/command-wave/reports/contribution"),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      version: "command-wave-contribution-report-v0.1",
+      project: {
+        repo: {
+          status: "placeholder",
+          url: null,
+        },
+      },
+      agents: {
+        orchestrator: {
+          handle: "daemon",
+        },
+        reviewer: {
+          status: "placeholder",
+        },
+      },
+      authority: {
+        mode: "informational",
+        doesNotGrant: expect.arrayContaining(["Access", "Payouts", "Merge rights", "Reputation", "Token weight"]),
+      },
+      reportHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
   });
 

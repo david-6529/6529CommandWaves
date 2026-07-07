@@ -4,11 +4,19 @@ import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { createHookProjectIndex } from "./hook-project-index";
+import { createPublicContributionReport } from "./public-contribution-report";
 import { hashValue } from "./run-manifest";
 import { createSetupProof, setupProofOptionsFromEnv } from "./setup-proof";
 
 type VerificationEndpoint = {
-  id: "verification_manifest" | "setup_proof" | "command_wave_state" | "project_index" | "launch_audit" | "chat_launch";
+  id:
+    | "verification_manifest"
+    | "setup_proof"
+    | "command_wave_state"
+    | "project_index"
+    | "contribution_report"
+    | "launch_audit"
+    | "chat_launch";
   label: string;
   url: string;
   payloadVersion: string;
@@ -81,6 +89,7 @@ export async function createPublicVerificationManifest(
   const chatLaunchSnapshot = createChatLaunchSnapshot(launchSnapshot);
   const stateSnapshot = createCommandWaveStateSnapshot(wave, { generatedAt });
   const projectIndex = createHookProjectIndex(wave, { generatedAt });
+  const contributionReport = createPublicContributionReport(wave);
   const setupProof = createSetupProof(wave, {
     ...setupProofOptionsFromEnv(env),
     generatedAt,
@@ -153,6 +162,18 @@ export async function createPublicVerificationManifest(
         },
         verifierCommand: null,
         note: "projectsHash is stable across generatedAt changes.",
+      },
+      {
+        id: "contribution_report",
+        label: "Contribution report",
+        url: launchSnapshot.verificationTargets.contributionReportUrl,
+        payloadVersion: contributionReport.version,
+        requiredHashFields: ["reportHash"],
+        hashes: {
+          generated: contributionReport.reportHash,
+        },
+        verifierCommand: null,
+        note: "reportHash verifies an informational activity report. It does not grant access, payouts, or merge rights.",
       },
       {
         id: "launch_audit",

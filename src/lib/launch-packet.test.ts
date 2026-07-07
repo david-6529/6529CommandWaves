@@ -54,6 +54,7 @@ describe("launch packet", () => {
         verificationManifestUrl: "https://hooks.example/api/command-wave/verification/manifest",
         setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
         projectIndexUrl: "https://hooks.example/api/command-wave/projects",
+        contributionReportUrl: "https://hooks.example/api/command-wave/reports/contribution",
         commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
         chatLaunchUrl: "https://hooks.example/api/command-wave/launch/chat",
         launchAuditUrl: "https://hooks.example/api/command-wave/launch/audit",
@@ -113,6 +114,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Verification manifest: https://hooks.example/api/command-wave/verification/manifest");
     expect(packet.text).toContain("Setup proof: https://hooks.example/api/command-wave/setup/proof");
     expect(packet.text).toContain("Project index: https://hooks.example/api/command-wave/projects");
+    expect(packet.text).toContain("Contribution report: https://hooks.example/api/command-wave/reports/contribution");
     expect(packet.text).toContain("Command-wave state: https://hooks.example/api/command-wave/state");
     expect(packet.text).toContain("Chat launch audit: https://hooks.example/api/command-wave/launch/chat");
     expect(packet.text).toContain("Launch audit: https://hooks.example/api/command-wave/launch/audit");

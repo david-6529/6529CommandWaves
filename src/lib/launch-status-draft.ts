@@ -6,6 +6,7 @@ export type LaunchStatusVerificationTargets = {
   verificationManifestUrl?: string;
   setupProofUrl: string;
   projectIndexUrl?: string;
+  contributionReportUrl?: string;
   commandWaveStateUrl: string;
   chatLaunchUrl?: string;
   launchAuditUrl?: string;
@@ -129,6 +130,9 @@ export function createLaunchStatusDraft({
       : []),
     `- Setup proof: ${verificationTargets.setupProofUrl}`,
     ...(verificationTargets.projectIndexUrl ? [`- Project index: ${verificationTargets.projectIndexUrl}`] : []),
+    ...(verificationTargets.contributionReportUrl
+      ? [`- Contribution report: ${verificationTargets.contributionReportUrl}`]
+      : []),
     `- Command-wave state: ${verificationTargets.commandWaveStateUrl}`,
     ...(verificationTargets.chatLaunchUrl ? [`- Chat launch audit: ${verificationTargets.chatLaunchUrl}`] : []),
     ...(verificationTargets.launchAuditUrl ? [`- Launch audit: ${verificationTargets.launchAuditUrl}`] : []),

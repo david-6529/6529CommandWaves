@@ -1273,6 +1273,7 @@ export function CommandWavesConsole() {
       verificationManifestUrl: appUrlFromOrigin("/api/command-wave/verification/manifest", publicAppOrigin),
       setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
       projectIndexUrl: appUrlFromOrigin(projectIndexPath, publicAppOrigin),
+      contributionReportUrl: appUrlFromOrigin("/api/command-wave/reports/contribution", publicAppOrigin),
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
       chatLaunchUrl: appUrlFromOrigin("/api/command-wave/launch/chat?remote=1", publicAppOrigin),
       launchAuditUrl: appUrlFromOrigin(remoteLaunchAuditPath, publicAppOrigin),
