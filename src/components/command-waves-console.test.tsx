@@ -25,9 +25,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon managed");
-    expect(text).toContain("Builders use the chat below to decide what to build and which PRs to review.");
-    expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
-    expect(text).toContain("Next: Select repo.");
+    expect(text).toContain("This page is the working snapshot for the 6529 AMM hook build.");
+    expect(text).toContain("Builders use chat to shape ideas, record decisions, attach pull requests, and review the result.");
+    expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
+    expect(text).toContain("Next step: Select the GitHub repo before PR work can run.");
+    expect(text).toContain("PR work waits until the repo is selected.");
     expect(text).toContain("daemon keeps this summary and changelog current.");
     expect(text).toContain("Review agent is a placeholder for this phase.");
     expect(text).toContain("GitHub repo is a placeholder until the hook repo is selected.");

@@ -8,7 +8,7 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "Builders use the chat below to decide what to build and which PRs to review. Current work: Draft the non-upgradeable hook scaffold. Next: Select repo. The GitHub repo is still a placeholder.",
+        "This page is the working snapshot for the 6529 AMM hook build. Builders use chat to shape ideas, record decisions, attach pull requests, and review the result. Current focus: Draft the non-upgradeable hook scaffold. Next step: Select the GitHub repo before PR work can run. The GitHub repo is still a placeholder, so PR work waits until the repo is selected.",
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
@@ -50,8 +50,10 @@ describe("public project snapshot", () => {
       repoUrl: "https://github.com/builders/hook",
     };
 
-    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Current work: Choose one hook change.");
+    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Current focus: Choose one hook change.");
     expect(createPublicProjectSnapshot(emptyWave).updatedAt).toBeNull();
-    expect(createPublicProjectSnapshot(configuredWave).summary).toContain("The GitHub repo is connected.");
+    expect(createPublicProjectSnapshot(configuredWave).summary).toContain(
+      "The GitHub repo is connected, so approved changes can move into PR review.",
+    );
   });
 });
