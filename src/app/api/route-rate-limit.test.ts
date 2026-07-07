@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as postRoomMessage } from "./6529/room-post/route";
 import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
+import { GET as getHookProjects } from "./command-wave/projects/route";
 import { GET as getSetupProof } from "./command-wave/setup/proof/route";
 import { GET as getCommandWaveState } from "./command-wave/state/route";
 import { GET as getReadiness } from "./readiness/route";
@@ -59,6 +60,7 @@ describe("API route rate limits", () => {
 
   it.each([
     ["launch audit", getLaunchAudit, "/api/command-wave/launch/audit", 30],
+    ["hook projects", getHookProjects, "/api/command-wave/projects", 60],
     ["setup proof", getSetupProof, "/api/command-wave/setup/proof", 30],
     ["command-wave state", getCommandWaveState, "/api/command-wave/state", 60],
     ["readiness", getReadiness, "/api/readiness", 30],

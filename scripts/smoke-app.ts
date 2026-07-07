@@ -246,6 +246,20 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "Auto-merge PRs");
   assertNoEmDash("State response", JSON.stringify(statePayload));
 
+  const projectsPayload = await fetchJson("/api/command-wave/projects");
+
+  assert(objectValue(projectsPayload, "version") === "command-wave-projects-v0.1", "Projects endpoint returned the wrong version.");
+  assertSha256("Projects response hash", objectValue(projectsPayload, "projectsHash"));
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Hook Build");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Placeholder repo");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Connect the repo");
+  assert(
+    !JSON.stringify(projectsPayload).includes("https://github.com/6529-Collections/6529-hook"),
+    "Projects response still includes the old concrete hook repo.",
+  );
+  assertNoEmDash("Projects response", JSON.stringify(projectsPayload));
+
   const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");
   const proof = objectValue(setupProofPayload, "proof");
 
