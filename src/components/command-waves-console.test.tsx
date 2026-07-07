@@ -25,11 +25,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon managed");
-    expect(text).toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
+    expect(text).toContain("Builders use the chat below to decide what to build and which PRs to review.");
     expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next: Select repo.");
-    expect(text).toContain("daemon, a 6529 account, keeps this summary");
-    expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
+    expect(text).toContain("daemon keeps this summary and changelog current.");
+    expect(text).toContain("Review agent is a placeholder for this phase.");
     expect(text).toContain("GitHub repo is a placeholder until the hook repo is selected.");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
@@ -97,6 +97,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Participation gate is not set yet.");
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("orchestrator managed");
+    expect(text).not.toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
+    expect(text).not.toContain("production reviewer service is wired");
     expect(text).not.toContain("Add real repo before PR build.");
     expect(text).not.toContain("Set a real GitHub repo");
   });

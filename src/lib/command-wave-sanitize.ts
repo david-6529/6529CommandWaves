@@ -6,7 +6,7 @@ const builtInHookProposalId = "cmd-001";
 const builtInHookWaveId = "cw-6529-hook-builder";
 const builtInHookWavePath = "/waves/6529-hook-builder";
 const oldConcretePilotRepo = "6529-collections/6529-hook";
-const builtInHookPrompt = "Use Codex to draft a non-upgradeable 6529 hook scaffold with fee parameters capped at 100 bps and tests.";
+const builtInHookPrompt = "Use Codex to draft a non-upgradeable AMM hook scaffold with fee parameters capped at 100 bps and tests.";
 const builtInHookSpec =
   "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.";
 

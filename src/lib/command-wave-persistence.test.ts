@@ -257,7 +257,7 @@ describe("command wave persistence", () => {
       proposals: [
         {
           ...demoWave.proposals[0],
-          prompt: "Use Codex to draft a non-upgradeable 6529 hook scaffold with bounded fee parameters and tests.",
+          prompt: "Use Codex to draft a non-upgradeable AMM hook scaffold with bounded fee parameters and tests.",
           spec:
             "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for parameter bounds.",
         },

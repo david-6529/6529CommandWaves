@@ -2124,8 +2124,7 @@ export function CommandWavesConsole() {
                 {publicProjectSnapshot.summary}
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-400">
-                {orchestratorAgentIdentity.handle}, a {orchestratorAgentIdentity.accountType}, keeps this summary and
-                changelog current as chat, decisions, and repo activity change. {reviewAgentIdentity.description}{" "}
+                {orchestratorAgentIdentity.handle} keeps this summary and changelog current. {reviewAgentIdentity.description}{" "}
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
                     Open the GitHub repo

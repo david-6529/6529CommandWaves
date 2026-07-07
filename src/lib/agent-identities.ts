@@ -11,7 +11,7 @@ export const reviewAgentIdentity = {
   accountType: "placeholder",
   status: "placeholder",
   role: "Review agent",
-  description: "Review agent is a placeholder until the production reviewer service is wired.",
+  description: "Review agent is a placeholder for this phase.",
 } as const;
 
 export const githubRepoPlaceholder = {

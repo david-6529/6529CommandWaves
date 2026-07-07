@@ -8,7 +8,7 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log. Current work: Draft the non-upgradeable hook scaffold. Next: Select repo. GitHub repo is a placeholder.",
+        "Builders use the chat below to decide what to build and which PRs to review. Current work: Draft the non-upgradeable hook scaffold. Next: Select repo. The GitHub repo is still a placeholder.",
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
@@ -52,6 +52,6 @@ describe("public project snapshot", () => {
 
     expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Current work: Choose one hook change.");
     expect(createPublicProjectSnapshot(emptyWave).updatedAt).toBeNull();
-    expect(createPublicProjectSnapshot(configuredWave).summary).toContain("GitHub repo configured.");
+    expect(createPublicProjectSnapshot(configuredWave).summary).toContain("The GitHub repo is connected.");
   });
 });

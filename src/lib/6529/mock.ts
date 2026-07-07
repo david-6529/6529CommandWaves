@@ -28,7 +28,7 @@ const mockDropsFixture = {
       id: "drop-001",
       serial_no: 1,
       created_at: "2026-06-20T12:00:00.000Z",
-      content: "Proposal cmd-001: draft the non-upgradeable 6529 hook scaffold.",
+      content: "Proposal cmd-001: draft the non-upgradeable AMM hook scaffold.",
       author: { handle: "david" },
       drop_type: "CHAT",
     },

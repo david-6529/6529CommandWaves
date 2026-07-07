@@ -13,7 +13,7 @@ const proposal: CommandProposal = {
   proposer: "david",
   kind: "open_pr",
   risk: "high",
-  prompt: "Use Codex to draft a non-upgradeable 6529 hook scaffold with fee parameters capped at 100 bps and tests.",
+  prompt: "Use Codex to draft a non-upgradeable AMM hook scaffold with fee parameters capped at 100 bps and tests.",
   spec:
     "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.",
   budgetUsd: 10,

@@ -125,11 +125,14 @@ function projectSummary({
   repo: ReturnType<typeof repoSnapshot>;
   nextStep: ReturnType<typeof nextStepSnapshot>;
 }) {
+  const repoLine =
+    repo.status === "placeholder" ? "The GitHub repo is still a placeholder." : "The GitHub repo is connected.";
+
   return [
-    "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.",
+    "Builders use the chat below to decide what to build and which PRs to review.",
     `Current work: ${currentWork.title}.`,
     `Next: ${nextStep.label}.`,
-    repo.label,
+    repoLine,
   ].join(" ");
 }
 

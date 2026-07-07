@@ -4,7 +4,7 @@ import { createHookProposalPreflight } from "./hook-proposal-preflight";
 describe("hook proposal preflight", () => {
   it("passes the first hook scaffold command", () => {
     const preflight = createHookProposalPreflight({
-      command: "Use Codex to draft a non-upgradeable 6529 hook scaffold with fee parameters capped at 100 bps and tests.",
+      command: "Use Codex to draft a non-upgradeable AMM hook scaffold with fee parameters capped at 100 bps and tests.",
       criteria:
         "Smart contract work only. No proxy, no delegatecall, no deploy script, no payments, and no governance changes. Include tests for the 100 bps fee cap.",
     });
