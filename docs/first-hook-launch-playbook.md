@@ -30,6 +30,7 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 - Copyable chat launch brief for the first public post.
 - Reviewer checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
 - Launch check during setup and again before inviting broad participation.
+- Guardian workflow check for the selected hook repo.
 - Public command-wave state URL for guardian PR checks.
 - Contribution report as activity evidence.
 - Manual developer fee plan as payout evidence.
@@ -86,11 +87,11 @@ COMMAND_WAVE_REPO_ADAPTER=github
 COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
-1. Pick the builder chat. Keep the repo placeholder until the pilot repo is selected.
+1. Pick the builder chat. Keep the GitHub repo placeholder until the pilot repo is selected.
 2. Open Maintainer tools, run Launch readiness, and use the launch check to expose setup blockers.
-3. Select the hook repo before PR work, then confirm it has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, and the required guardian check.
+3. Select the hook repo before PR work, then confirm it has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, the guardian workflow, and the required guardian check.
 4. Copy the chat launch brief from setup.
-5. Post the brief with the chat, repo link, participation notes, and hook scope.
+5. Post the brief with the chat, repo status, participation notes, and hook scope.
 6. Copy the participation guide and share it where new contributors will see it.
 7. Invite ideas in the general chat or thread.
 8. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
@@ -108,9 +109,10 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 20. Keep the launch packet with the PR so later contributors can audit the loop.
 21. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
 
-The launch check focuses on the first public loop. A ready launch audit now requires the deployed app URL, first hook chat
-and repo seed, admin key, durable storage, live 6529 mode, daemon chat posting credentials, GitHub PR adapter, guardian
-wave-state URL, and required guardian check. Failed checks block broad participation.
+The launch check focuses on the first public loop. The chat-first launch requires the deployed app URL, first hook chat,
+admin key, durable storage, live 6529 mode, and daemon chat posting credentials. The GitHub repo can stay as a placeholder
+until PR work starts. A ready PR loop also requires the GitHub PR adapter, guardian workflow, guardian wave-state URL, and
+required guardian check. Failed checks block broad participation.
 
 The launch audit includes a human-readable status draft with the next action, operator checklist, verification links, and
 guardrails. Use it as the short update for reviewers or builders.

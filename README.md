@@ -54,6 +54,7 @@ What exists now:
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
   contract signal checks.
 - Setup proof omits placeholder GitHub repo values and blocks required-check verification until the real repo is selected.
+- Setup validation checks the selected hook repo for contributor rules, the PR template, the guardian workflow, and the required guardian check.
 - Launch audit, workflow proof, checklists, launch packets, update drafts, and contribution reports reject stale PR or review evidence unless the PR link and review proof are bound to the configured repo.
 - Review cannot record guardian proof unless the current execution includes a PR link for the configured repo.
 - GitHub guardian PR evidence includes the target repo and fails when it does not match the configured hook repo.
@@ -78,11 +79,13 @@ What remains manual or MVP-only:
 
 What we are working on next:
 
-1. Pick the first real public project chat and hook repo.
-2. Configure launch env, durable storage, and the required guardian check.
-3. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
-4. Wire live wallet/session access checks when the manual access process is proven.
-5. Expand contribution analysis after the workflow is useful and understandable.
+1. Pick the first real public project chat.
+2. Keep the GitHub repo as a placeholder until the hook repo is selected for PR work.
+3. Configure launch env, durable storage, and daemon chat posting.
+4. Add the selected hook repo, guardian workflow, and required guardian check before the first PR.
+5. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
+6. Wire live wallet/session access checks when the manual access process is proven.
+7. Expand contribution analysis after the workflow is useful and understandable.
 
 ## Why This Exists
 
@@ -200,8 +203,9 @@ Audit and launch:
 - Public launch audit publishes the same human-readable launch packet builders can share back to chat, with a packet hash.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The copyable launch packet includes the same workflow proof chain for chat share-back.
-- The local demo separates current work status from launch readiness. Launch readiness still fails until production env,
-  durable storage, live 6529 mode, GitHub PR adapter, guardian state, and required checks are configured.
+- The local demo separates current work status from launch readiness. Chat launch readiness still needs production env,
+  durable storage, live 6529 mode, and daemon posting. PR-loop readiness also needs a selected repo, GitHub PR adapter,
+  guardian state, guardian workflow, and required checks.
 
 Maintainer setup:
 
@@ -259,16 +263,17 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
 `COMMAND_WAVE_INITIAL_WAVE_URL` seeds the first project chat. `COMMAND_WAVE_INITIAL_REPO_URL` stays as a placeholder
-until the pilot repo is selected, and PR work stays blocked while it is unchanged. Launch readiness fails production
-placeholder or invalid first-hook values. `ADMIN_API_KEY` protects setup,
+until the pilot repo is selected, and PR work stays blocked while it is unchanged. Launch readiness fails a placeholder
+project chat, warns on a placeholder repo, and blocks PR work until a real repo is selected. `ADMIN_API_KEY` protects setup,
 proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
-The ready launch audit requires daemon chat posting credentials, durable storage, the GitHub PR adapter, and the required
-guardian check so the public workflow can survive restarts, post from the app, and record draft PRs predictably.
+The chat-first launch requires daemon chat posting credentials and durable storage. A ready PR loop also requires the
+GitHub PR adapter, the guardian workflow in the selected hook repo, and the required guardian check so the public workflow
+can record draft PRs predictably.
 
-The local demo still reports launch gaps until the first hook chat and repo are reachable, `ADMIN_API_KEY`,
-`NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode, daemon chat posting credentials, GitHub PR adapter, guardian state,
-setup validation, and the required guardian check are configured.
+The local demo still reports launch gaps until the first hook chat is reachable, `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`,
+durable storage, live 6529 mode, daemon chat posting credentials, and setup validation are configured. PR-loop readiness
+also requires the selected repo, GitHub PR adapter, guardian state, guardian workflow, and required guardian check.
 
 ## Durable Storage
 
@@ -347,7 +352,8 @@ The setup proof can advertise the production guardian by setting:
 - `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK=<external app check name>`
 - `COMMAND_WAVE_GUARDIAN_PROOF_ARTIFACT=<artifact name>`
 
-Before making `Command Waves Guardian` a required GitHub check, configure one real wave-state source for the workflow:
+Before making `Command Waves Guardian` a required GitHub check, copy `.github/workflows/guardian-review.yml` into the
+selected hook repo and configure one real wave-state source for the workflow:
 
 - `COMMAND_WAVE_STATE_URL`, usually `https://your-app.example/api/command-wave/state`
 - `COMMAND_WAVE_STATE_PATH`
@@ -419,7 +425,8 @@ npm run launch:audit
 
 If Next is running on another port, set `LOCAL_APP_URL` to that app URL before `setup:verify` or `launch:audit`.
 The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero until production
-env, live 6529 mode, durable storage, GitHub PR adapter, guardian state, and the required guardian check are configured.
+env, live 6529 mode, durable storage, and daemon posting are configured. PR-loop readiness also needs a selected repo,
+GitHub PR adapter, guardian state, guardian workflow, and the required guardian check.
 
 Expose the current project state to the guardian with:
 

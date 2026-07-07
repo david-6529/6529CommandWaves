@@ -55,7 +55,7 @@ describe("launch status draft", () => {
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain(
-      "- Setup check: Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+      "- Setup check: Verify the project chat, repo, contributor rules, PR template, guardian workflow, and required guardian check before inviting contributors.",
     );
     expect(draft).toContain("Operator checklist:");
     expect(draft).toContain("- Run the setup check against the selected project chat and current repo setting.");
@@ -95,7 +95,32 @@ describe("launch status draft", () => {
           htmlUrl: "https://github.com/6529-Collections/6529-hook",
         },
         repoMetadata: null,
-        repoRequiredFiles: [],
+        repoRequiredFiles: [
+          {
+            path: "CONTRIBUTING.md",
+            label: "Contributor rules",
+            exists: true,
+            valid: true,
+            status: 200,
+            message: "CONTRIBUTING.md is present.",
+          },
+          {
+            path: ".github/PULL_REQUEST_TEMPLATE.md",
+            label: "PR template",
+            exists: true,
+            valid: true,
+            status: 200,
+            message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+          },
+          {
+            path: ".github/workflows/guardian-review.yml",
+            label: "Guardian workflow",
+            exists: true,
+            valid: true,
+            status: 200,
+            message: ".github/workflows/guardian-review.yml is present.",
+          },
+        ],
         checks: [
           { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
           { id: "repo_reachable", label: "Repo reachable", status: "pass", message: "GitHub repo exists." },
@@ -105,6 +130,12 @@ describe("launch status draft", () => {
             label: "PR template",
             status: "pass",
             message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+          },
+          {
+            id: "repo_file_github_workflows_guardian_review_yml",
+            label: "Guardian workflow",
+            status: "pass",
+            message: ".github/workflows/guardian-review.yml is present.",
           },
           {
             id: "repo_required_guardian_check",

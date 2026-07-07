@@ -11,6 +11,19 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
   });
 }
 
+const validPrTemplate = [
+  "## Command Waves Manifest",
+  "<!-- command-waves:manifest:start -->",
+  "{}",
+  "<!-- command-waves:manifest:end -->",
+].join("\n");
+
+const validGuardianWorkflow = [
+  "name: Command Waves Guardian",
+  "run: npm run guardian:pr-check",
+  "run: npm run guardian:verify-proof",
+].join("\n");
+
 describe("setup validation", () => {
   it("normalizes 6529 wave links and GitHub repo URLs", () => {
     const validation = validateSetupShape({
@@ -41,20 +54,46 @@ describe("setup validation", () => {
     expect(validation.canSave).toBe(true);
   });
 
-  it("fails GitHub repo placeholders before PR work can run", () => {
+  it("warns on GitHub repo placeholders before PR work can run", () => {
     const validation = validateSetupShape({
       waveUrl: "mock-command-wave",
       repoUrl: "https://github.com/your-org/your-hook-repo",
     });
 
-    expect(validation.canSave).toBe(false);
+    expect(validation.canSave).toBe(true);
     expect(validation.canRunCode).toBe(false);
     expect(validation.checks).toContainEqual({
       id: "repo_placeholder",
       label: "GitHub repo placeholder",
-      status: "fail",
-      message: "Replace the GitHub repo placeholder before saving setup or running PR work.",
+      status: "warn",
+      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
     });
+    expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");
+  });
+
+  it("skips remote repo checks while the GitHub repo is a placeholder", async () => {
+    let fetchCalls = 0;
+    const validation = await validateCommandWaveSetup(
+      {
+        waveUrl: "mock-command-wave",
+        repoUrl: "https://github.com/your-org/your-hook-repo",
+      },
+      {
+        checkRepoRemote: true,
+        githubApi: {
+          apiBaseUrl: "https://api.example.test",
+          fetchImpl: async () => {
+            fetchCalls += 1;
+            return jsonResponse({});
+          },
+        },
+      },
+    );
+
+    expect(fetchCalls).toBe(0);
+    expect(validation.canSave).toBe(true);
+    expect(validation.canRunCode).toBe(false);
+    expect(validation.repoRequiredFiles).toEqual([]);
   });
 
   it("fails invalid setup values", () => {
@@ -94,6 +133,10 @@ describe("setup validation", () => {
               return new Response("not found", { status: 404, statusText: "Not Found" });
             }
 
+            if (url.includes("guardian-review.yml")) {
+              return new Response(validGuardianWorkflow, { status: 200 });
+            }
+
             if (url.endsWith("/rulesets")) {
               return jsonResponse([
                 {
@@ -116,6 +159,7 @@ describe("setup validation", () => {
     expect(validation.repoRequiredFiles.map((file) => [file.path, file.exists, file.valid])).toEqual([
       ["CONTRIBUTING.md", true, true],
       [".github/PULL_REQUEST_TEMPLATE.md", false, false],
+      [".github/workflows/guardian-review.yml", true, true],
     ]);
     expect(validation.checks).toEqual(
       expect.arrayContaining([
@@ -158,6 +202,10 @@ describe("setup validation", () => {
 
             if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
               return new Response("## Hook PR", { status: 200 });
+            }
+
+            if (url.includes("guardian-review.yml")) {
+              return new Response(validGuardianWorkflow, { status: 200 });
             }
 
             if (url.endsWith("/rulesets")) {
@@ -217,12 +265,6 @@ describe("setup validation", () => {
   });
 
   it("warns when the required guardian check is not enforced by GitHub", async () => {
-    const template = [
-      "## Command Waves Manifest",
-      "<!-- command-waves:manifest:start -->",
-      "{}",
-      "<!-- command-waves:manifest:end -->",
-    ].join("\n");
     const validation = await validateCommandWaveSetup(
       {
         waveUrl: "mock-command-wave",
@@ -244,7 +286,11 @@ describe("setup validation", () => {
             }
 
             if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
-              return jsonResponse({ content: btoa(template), encoding: "base64" });
+              return jsonResponse({ content: btoa(validPrTemplate), encoding: "base64" });
+            }
+
+            if (url.includes("guardian-review.yml")) {
+              return new Response(validGuardianWorkflow, { status: 200 });
             }
 
             if (url.endsWith("/rulesets")) {
@@ -268,6 +314,67 @@ describe("setup validation", () => {
         label: "Required guardian check",
         status: "warn",
         message: "Command Waves Guardian was not found in GitHub required status checks. Add it before inviting contributors.",
+      }),
+    );
+    expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");
+  });
+
+  it("warns when the guardian workflow is missing", async () => {
+    const validation = await validateCommandWaveSetup(
+      {
+        waveUrl: "mock-command-wave",
+        repoUrl: "6529-Collections/6529-hook",
+      },
+      {
+        checkRepoRemote: true,
+        githubApi: {
+          apiBaseUrl: "https://api.example.test",
+          fetchImpl: async (input) => {
+            const url = String(input);
+
+            if (url.endsWith("/repos/6529-Collections/6529-hook")) {
+              return jsonResponse({
+                default_branch: "main",
+                private: false,
+                archived: false,
+              });
+            }
+
+            if (url.includes("PULL_REQUEST_TEMPLATE.md")) {
+              return jsonResponse({ content: btoa(validPrTemplate), encoding: "base64" });
+            }
+
+            if (url.includes("guardian-review.yml")) {
+              return new Response("not found", { status: 404, statusText: "Not Found" });
+            }
+
+            if (url.endsWith("/rulesets")) {
+              return jsonResponse([
+                {
+                  type: "required_status_checks",
+                  parameters: {
+                    required_status_checks: [{ context: "Command Waves Guardian" }],
+                  },
+                },
+              ]);
+            }
+
+            return jsonResponse({});
+          },
+        },
+      },
+    );
+
+    expect(validation.repoRequiredFiles.find((file) => file.path === ".github/workflows/guardian-review.yml")).toMatchObject({
+      exists: false,
+      valid: false,
+    });
+    expect(validation.checks).toContainEqual(
+      expect.objectContaining({
+        id: "repo_file_github_workflows_guardian_review_yml",
+        label: "Guardian workflow",
+        status: "warn",
+        message: "Missing .github/workflows/guardian-review.yml. Fix it before inviting contributors.",
       }),
     );
     expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");

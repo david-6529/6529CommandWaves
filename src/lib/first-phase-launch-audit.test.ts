@@ -77,6 +77,14 @@ const productionSetupValidation: SetupValidation = {
       status: 200,
       message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
     },
+    {
+      path: ".github/workflows/guardian-review.yml",
+      label: "Guardian workflow",
+      exists: true,
+      valid: true,
+      status: 200,
+      message: "Found .github/workflows/guardian-review.yml with guardian check and proof replay commands.",
+    },
   ],
   checks: [
     { id: "wave_format", label: "6529 wave", status: "pass", message: "Using wave 6529-hook-builder." },
@@ -89,6 +97,12 @@ const productionSetupValidation: SetupValidation = {
       label: "PR template",
       status: "pass",
       message: "Found .github/PULL_REQUEST_TEMPLATE.md with Command Waves manifest markers.",
+    },
+    {
+      id: "repo_file_github_workflows_guardian_review_yml",
+      label: "Guardian workflow",
+      status: "pass",
+      message: "Found .github/workflows/guardian-review.yml with guardian check and proof replay commands.",
     },
     {
       id: "repo_required_guardian_check",
@@ -167,7 +181,7 @@ describe("first phase launch audit", () => {
       status: "needs_setup",
       itemId: "setup_not_checked",
       title: "Run launch setup check",
-      detail: "Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+      detail: "Verify the project chat, repo, contributor rules, PR template, guardian workflow, and required guardian check before inviting contributors.",
     });
   });
 
@@ -236,7 +250,11 @@ describe("first phase launch audit", () => {
   it("names placeholder repo setup in the next action", () => {
     const setupValidation: SetupValidation = {
       ...productionSetupValidation,
-      repo: null,
+      repo: {
+        owner: "your-org",
+        repo: "your-hook-repo",
+        htmlUrl: "https://github.com/your-org/your-hook-repo",
+      },
       repoMetadata: null,
       repoRequiredFiles: [],
       checks: [
@@ -245,11 +263,11 @@ describe("first phase launch audit", () => {
         {
           id: "repo_placeholder",
           label: "GitHub repo placeholder",
-          status: "fail",
-          message: "Replace the GitHub repo placeholder before saving setup or running PR work.",
+          status: "warn",
+          message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
         },
       ],
-      canSave: false,
+      canSave: true,
       canRunCode: false,
     };
     const audit = createFirstPhaseLaunchAudit({
@@ -259,18 +277,19 @@ describe("first phase launch audit", () => {
       wave: demoWave,
     });
 
-    expect(audit.status).toBe("blocked");
+    expect(audit.status).toBe("needs_setup");
     expect(audit.nextAction).toMatchObject({
-      status: "blocked",
-      itemId: "setup_repo_placeholder",
+      status: "needs_setup",
+      itemId: "flow_project",
       title: "Select the repo",
-      detail: "Replace the GitHub repo placeholder before saving setup or running PR work.",
+      detail: "Select the GitHub repo before PR work can run.",
     });
-    expect(audit.blockers).toContainEqual(
+    expect(audit.blockers).toEqual([]);
+    expect(audit.openItems).toContainEqual(
       expect.objectContaining({
         id: "setup_repo_placeholder",
-        label: "GitHub repo",
-        status: "blocked",
+        label: "GitHub repo placeholder",
+        status: "needed",
       }),
     );
   });
@@ -348,6 +367,47 @@ describe("first phase launch audit", () => {
         label: "Required guardian check",
         status: "needed",
         detail: "Command Waves Guardian was not found in GitHub required status checks. Add it before inviting contributors.",
+      }),
+    );
+  });
+
+  it("keeps launch in setup mode when the guardian workflow is missing", () => {
+    const setupValidation: SetupValidation = {
+      ...productionSetupValidation,
+      repoRequiredFiles: productionSetupValidation.repoRequiredFiles.map((file) =>
+        file.path === ".github/workflows/guardian-review.yml"
+          ? { ...file, exists: false, valid: false, status: 404, message: "Missing .github/workflows/guardian-review.yml." }
+          : file,
+      ),
+      checks: productionSetupValidation.checks.map((check) =>
+        check.id === "repo_file_github_workflows_guardian_review_yml"
+          ? {
+              ...check,
+              status: "warn",
+              message: "Missing .github/workflows/guardian-review.yml. Fix it before inviting contributors.",
+            }
+          : check,
+      ),
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(configuredDemoWave),
+      readinessChecks: productionReadyChecks,
+      setupValidation,
+      wave: configuredDemoWave,
+    });
+
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.nextAction).toMatchObject({
+      status: "needs_setup",
+      itemId: "setup_repo_file_github_workflows_guardian_review_yml",
+      title: "Add guardian workflow",
+    });
+    expect(audit.openItems).toContainEqual(
+      expect.objectContaining({
+        id: "setup_repo_file_github_workflows_guardian_review_yml",
+        label: "Guardian workflow",
+        status: "needed",
+        detail: "Missing .github/workflows/guardian-review.yml. Fix it before inviting contributors.",
       }),
     );
   });
@@ -618,7 +678,7 @@ describe("first phase launch audit", () => {
     );
   });
 
-  it("blocks stale reviewed PR evidence while the repo is still a placeholder", () => {
+  it("keeps stale reviewed PR evidence in setup mode while the repo is still a placeholder", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(demoWave),
       readinessChecks: productionReadyChecks,
@@ -626,12 +686,13 @@ describe("first phase launch audit", () => {
       wave: demoWave,
     });
 
-    expect(audit.status).toBe("blocked");
-    expect(audit.blockers).toContainEqual(
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.blockers).toEqual([]);
+    expect(audit.openItems).toContainEqual(
       expect.objectContaining({
         id: "flow_audit_packet",
-        status: "blocked",
-        detail: "Launch packet needs a configured GitHub repo before contributors audit it.",
+        status: "needed",
+        detail: "Launch packet waits for the selected GitHub repo and matching PR evidence.",
       }),
     );
   });

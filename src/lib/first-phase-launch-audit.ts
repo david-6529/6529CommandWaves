@@ -1,4 +1,5 @@
 import { validateWaveDecisionReference, type CommandWave } from "./command-waves";
+import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { configuredGitHubRepo, gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { participationGateNeedsAdvisoryNote } from "./participation-gates";
@@ -117,6 +118,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_repo_required_guardian_check: "Require guardian check",
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",
+  setup_repo_file_github_workflows_guardian_review_yml: "Add guardian workflow",
   readiness_not_checked: "Run readiness",
   readiness_app_url: "Set NEXT_PUBLIC_APP_URL",
   readiness_initial_hook_project: "Set first hook project",
@@ -130,6 +132,10 @@ const launchActionCopyByItemId: Record<string, string> = {
 };
 
 function launchActionTitle(item: FirstPhaseLaunchAuditItem) {
+  if (item.id === "flow_project" && item.label === "Select repo") {
+    return "Select the repo";
+  }
+
   const explicitTitle = launchActionCopyByItemId[item.id];
 
   if (explicitTitle) {
@@ -206,7 +212,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_not_checked",
         label: "Setup check",
         status: "needed",
-        detail: "Verify the project chat, repo, contributor rules, PR template, and required guardian check before inviting contributors.",
+        detail: "Verify the project chat, repo, contributor rules, PR template, guardian workflow, and required guardian check before inviting contributors.",
         source: "setup",
       },
     ];
@@ -240,6 +246,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
     (item) =>
       item.id === "wave_reachable" ||
       item.id === "repo_reachable" ||
+      item.id === "repo_placeholder" ||
       item.id === "repo_required_files" ||
       item.id === "repo_required_guardian_check" ||
       item.id.startsWith("repo_file_"),
@@ -251,7 +258,7 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
         id: "setup_remote_check",
         label: "Setup check",
         status: "needed",
-        detail: "Run setup check to verify the project chat, repo, contributor rules, PR template, and required guardian check.",
+        detail: "Run setup check to verify the project chat, repo, contributor rules, PR template, guardian workflow, and required guardian check.",
         source: "setup",
       },
     ];
@@ -364,6 +371,18 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
 
   if (review?.status === "pass" && execution?.status === "complete") {
     if (!configuredGitHubRepo(wave?.repoUrl)) {
+      if (isPlaceholderValue(wave?.repoUrl)) {
+        return [
+          {
+            id: "flow_audit_packet",
+            label: "Audit packet",
+            status: "needed",
+            detail: "Launch packet waits for the selected GitHub repo and matching PR evidence.",
+            source: "flow",
+          },
+        ];
+      }
+
       return [
         {
           id: "flow_audit_packet",

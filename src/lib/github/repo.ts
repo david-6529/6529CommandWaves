@@ -35,10 +35,12 @@ export type GitHubRepoApiOptions = {
 export const requiredHookRepoFiles = [
   { path: "CONTRIBUTING.md", label: "Contributor rules" },
   { path: ".github/PULL_REQUEST_TEMPLATE.md", label: "PR template" },
+  { path: ".github/workflows/guardian-review.yml", label: "Guardian workflow" },
 ] as const;
 
 const commandPrManifestStart = "<!-- command-waves:manifest:start -->";
 const commandPrManifestEnd = "<!-- command-waves:manifest:end -->";
+const guardianWorkflowSignals = ["Command Waves Guardian", "npm run guardian:pr-check", "npm run guardian:verify-proof"];
 const maxGitHubOwnerLength = 100;
 const maxGitHubRepoLength = 100;
 const githubOwnerPattern = /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/;
@@ -184,6 +186,18 @@ function contentTextFromPayload(rawBody: string) {
 
 async function validateRequiredFile(file: (typeof requiredHookRepoFiles)[number], rawBody: string) {
   if (file.path !== ".github/PULL_REQUEST_TEMPLATE.md") {
+    if (file.path === ".github/workflows/guardian-review.yml") {
+      const content = contentTextFromPayload(rawBody);
+      const hasGuardianSignals = guardianWorkflowSignals.every((signal) => content.includes(signal));
+
+      return {
+        valid: hasGuardianSignals,
+        message: hasGuardianSignals
+          ? `Found ${file.path} with guardian check and proof replay commands.`
+          : `${file.path} is missing the guardian check or proof replay commands.`,
+      };
+    }
+
     return {
       valid: true,
       message: `Found ${file.path}.`,

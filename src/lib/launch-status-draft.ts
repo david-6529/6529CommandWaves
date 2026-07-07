@@ -35,6 +35,9 @@ const checklistByItemId: Record<string, string[]> = {
   setup_repo_required_files: ["Add launch repo files before inviting contributors."],
   setup_repo_file_contributing_md: ["Add CONTRIBUTING.md to the hook repo."],
   setup_repo_file_github_pull_request_template_md: ["Add .github/PULL_REQUEST_TEMPLATE.md to the hook repo."],
+  setup_repo_file_github_workflows_guardian_review_yml: [
+    "Add .github/workflows/guardian-review.yml to the hook repo.",
+  ],
   setup_repo_required_guardian_check: ["Make Command Waves Guardian a required GitHub status check before inviting contributors."],
   readiness_not_checked: ["Run launch readiness from the app or /api/command-wave/launch/audit?remote=1."],
   readiness_app_url: ["Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL."],
@@ -64,7 +67,7 @@ const checklistByItemId: Record<string, string[]> = {
   flow_log: ["Post the reviewed result back to project chat."],
   flow_wave_decision_receipt: ["Record the project decision URL for the approved PR work."],
   flow_participation_notes: ["Keep participation notes advisory until live gating is implemented."],
-  flow_audit_packet: ["Fix launch packet evidence so the PR and review match the configured repo."],
+  flow_audit_packet: ["Finish PR build and review before preparing the launch packet."],
 };
 
 export function launchOperatorChecklistLines(openItems: LaunchStatusOpenItem[]) {

@@ -137,22 +137,30 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
   const hasRepoUrl = hasEnvValue(repoUrl);
   const production = isProductionEnv(env);
 
-  if (!hasWaveUrl || !hasRepoUrl) {
+  if (!hasWaveUrl) {
     return {
       id: "initial_hook_project",
       label: "First hook project",
       status: production ? "fail" : "warn",
-      message:
-        "Set COMMAND_WAVE_INITIAL_WAVE_URL, and set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
+      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL before public launch.",
     };
   }
 
-  if (production && (isPlaceholderValue(waveUrl) || isPlaceholderValue(repoUrl))) {
+  if (!hasRepoUrl) {
+    return {
+      id: "initial_hook_project",
+      label: "First hook project",
+      status: production ? "fail" : "warn",
+      message: "Set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
+    };
+  }
+
+  if (production && isPlaceholderValue(waveUrl)) {
     return {
       id: "initial_hook_project",
       label: "First hook project",
       status: "fail",
-      message: "Replace placeholder first project chat before public launch. Replace the repo placeholder before PR work starts.",
+      message: "Replace placeholder first project chat before public launch.",
     };
   }
 
@@ -173,11 +181,20 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
     };
   }
 
+  if (isPlaceholderValue(repoUrl)) {
+    return {
+      id: "initial_hook_project",
+      label: "First hook project",
+      status: "warn",
+      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+    };
+  }
+
   return {
     id: "initial_hook_project",
     label: "First hook project",
     status: "pass",
-    message: "First project chat and repo setting are configured.",
+    message: "First project chat and repo are configured.",
   };
 }
 

@@ -94,6 +94,7 @@ export function validateSetupShape(input: SetupValidationInput): SetupValidation
   const repoText = asText(input.repoUrl);
   const waveId = waveText ? normalizeWaveId(waveText) : "";
   const repo = parseGitHubRepoUrl(repoText);
+  const repoIsPlaceholder = isPlaceholderValue(repoText);
   const checks: SetupCheck[] = [];
 
   checks.push(
@@ -113,8 +114,8 @@ export function validateSetupShape(input: SetupValidationInput): SetupValidation
       check(
         "repo_placeholder",
         "GitHub repo placeholder",
-        "fail",
-        "Replace the GitHub repo placeholder before saving setup or running PR work.",
+        "warn",
+        "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
       ),
     );
   }
@@ -126,7 +127,7 @@ export function validateSetupShape(input: SetupValidationInput): SetupValidation
     repoRequiredFiles: [],
     checks,
     canSave: !hasFailures(checks),
-    canRunCode: !hasFailures(checks) && Boolean(repo),
+    canRunCode: !hasFailures(checks) && Boolean(repo) && !repoIsPlaceholder,
   };
 }
 
@@ -135,6 +136,7 @@ export async function validateCommandWaveSetup(
   options: ValidationOptions = {},
 ): Promise<SetupValidation> {
   const validation = validateSetupShape(input);
+  const repoIsPlaceholder = isPlaceholderValue(asText(input.repoUrl));
   const checks = [...validation.checks];
   let repoMetadata: GitHubRepoMetadata | null = null;
   let repoRequiredFiles: GitHubRepoRequiredFile[] = [];
@@ -162,7 +164,7 @@ export async function validateCommandWaveSetup(
     }
   }
 
-  if (options.checkRepoRemote && validation.repo) {
+  if (options.checkRepoRemote && validation.repo && !repoIsPlaceholder) {
     try {
       repoMetadata = await getGitHubRepoMetadata(validation.repo.htmlUrl, options.githubApi);
       checks.push(
@@ -198,8 +200,8 @@ export async function validateCommandWaveSetup(
             "Required repo files",
             "warn",
             error instanceof Error
-              ? `Could not verify CONTRIBUTING.md and PR template: ${error.message}`
-              : "Could not verify CONTRIBUTING.md and PR template.",
+              ? `Could not verify contributor rules, PR template, and guardian workflow: ${error.message}`
+              : "Could not verify contributor rules, PR template, and guardian workflow.",
           ),
         );
       }
@@ -252,6 +254,6 @@ export async function validateCommandWaveSetup(
     repoRequiredFiles,
     checks,
     canSave: !hasFailures(checks),
-    canRunCode: !hasFailures(checks) && Boolean(validation.repo),
+    canRunCode: validation.canRunCode && !hasFailures(checks),
   };
 }

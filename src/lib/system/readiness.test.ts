@@ -40,8 +40,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "warn",
-      message:
-        "Set COMMAND_WAVE_INITIAL_WAVE_URL, and set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
+      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL before public launch.",
     });
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
       status: "fail",
@@ -87,7 +86,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "pass",
-      message: "First project chat and repo setting are configured.",
+      message: "First project chat and repo are configured.",
     });
   });
 
@@ -98,8 +97,20 @@ describe("readiness checks", () => {
 
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
-      message:
-        "Set COMMAND_WAVE_INITIAL_WAVE_URL, and set COMMAND_WAVE_INITIAL_REPO_URL to the placeholder or selected hook repo.",
+      message: "Set COMMAND_WAVE_INITIAL_WAVE_URL before public launch.",
+    });
+  });
+
+  it("warns for a production placeholder repo after the project chat is selected", () => {
+    const checks = getReadinessChecks({
+      NODE_ENV: "production",
+      COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/6529-hook-builder",
+      COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
+    });
+
+    expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
+      status: "warn",
+      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
     });
   });
 
@@ -170,7 +181,7 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
-      message: "Replace placeholder first project chat before public launch. Replace the repo placeholder before PR work starts.",
+      message: "Replace placeholder first project chat before public launch.",
     });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "fail",

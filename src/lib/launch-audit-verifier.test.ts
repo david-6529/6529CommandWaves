@@ -17,7 +17,32 @@ const readySetupValidation: SetupValidation = {
   waveId: "6529-hook-builder",
   repo: configuredRepo,
   repoMetadata: null,
-  repoRequiredFiles: [],
+  repoRequiredFiles: [
+    {
+      path: "CONTRIBUTING.md",
+      label: "Contributor rules",
+      exists: true,
+      valid: true,
+      status: 200,
+      message: "CONTRIBUTING.md is present.",
+    },
+    {
+      path: ".github/PULL_REQUEST_TEMPLATE.md",
+      label: "PR template",
+      exists: true,
+      valid: true,
+      status: 200,
+      message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+    },
+    {
+      path: ".github/workflows/guardian-review.yml",
+      label: "Guardian workflow",
+      exists: true,
+      valid: true,
+      status: 200,
+      message: ".github/workflows/guardian-review.yml is present.",
+    },
+  ],
   checks: [
     { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
     { id: "repo_reachable", label: "Repo reachable", status: "pass", message: "GitHub repo exists." },
@@ -27,6 +52,12 @@ const readySetupValidation: SetupValidation = {
       label: "PR template",
       status: "pass",
       message: ".github/PULL_REQUEST_TEMPLATE.md is present.",
+    },
+    {
+      id: "repo_file_github_workflows_guardian_review_yml",
+      label: "Guardian workflow",
+      status: "pass",
+      message: ".github/workflows/guardian-review.yml is present.",
     },
     {
       id: "repo_required_guardian_check",
@@ -221,9 +252,7 @@ describe("launch audit verifier", () => {
     expect(result.blockers.join("\n")).toContain(
       "Admin API key: Set ADMIN_API_KEY before public launch so protected actions require a key.",
     );
-    expect(result.blockers.join("\n")).toContain(
-      "Audit packet: Launch packet needs a configured GitHub repo before contributors audit it.",
-    );
+    expect(result.blockers.join("\n")).not.toContain("Audit packet:");
     expect(result.openItems.length).toBeGreaterThan(0);
     expect(result.operatorChecklist).toContain("- Set a strong ADMIN_API_KEY before public launch.");
     expect(result.operatorChecklist).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
@@ -231,7 +260,7 @@ describe("launch audit verifier", () => {
     expect(result.operatorChecklist).toContain(
       "- Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
     );
-    expect(result.nextAction?.title).toBe("Fix launch packet evidence");
+    expect(result.nextAction?.title).toBe("Set ADMIN_API_KEY");
   });
 
   it("fails when the authority boundary is missing", async () => {

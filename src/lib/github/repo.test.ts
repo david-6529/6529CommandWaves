@@ -18,9 +18,16 @@ function response(body: string, init: ResponseInit = {}) {
   });
 }
 
+const validGuardianWorkflow = [
+  "name: Command Waves Guardian",
+  "run: npm run guardian:pr-check",
+  "run: npm run guardian:verify-proof",
+].join("\n");
+
 describe("GitHub repo helpers", () => {
   it("keeps the local PR template launch-ready", () => {
     const template = readFileSync(".github/PULL_REQUEST_TEMPLATE.md", "utf8");
+    const workflow = readFileSync(".github/workflows/guardian-review.yml", "utf8");
 
     expect(template).toContain("Decision receipt URL:");
     expect(template).toContain("Command Waves review request copied from the app:");
@@ -28,6 +35,10 @@ describe("GitHub repo helpers", () => {
     expect(template).toContain("<!-- command-waves:manifest:start -->");
     expect(template).toContain("<!-- command-waves:manifest:end -->");
     expect(template).not.toContain("\u2014");
+    expect(workflow).toContain("name: Command Waves Guardian");
+    expect(workflow).toContain("npm run guardian:pr-check");
+    expect(workflow).toContain("npm run guardian:verify-proof");
+    expect(workflow).not.toContain("\u2014");
   });
 
   it("parses HTTPS, SSH, and owner/repo GitHub references", () => {
@@ -78,6 +89,10 @@ describe("GitHub repo helpers", () => {
           return response("not found", { status: 404, statusText: "Not Found" });
         }
 
+        if (url.includes("guardian-review.yml")) {
+          return response(validGuardianWorkflow);
+        }
+
         return response("{}");
       },
     });
@@ -85,6 +100,7 @@ describe("GitHub repo helpers", () => {
     expect(calls).toEqual([
       "https://api.example.test/repos/6529-Collections/6529-hook/contents/CONTRIBUTING.md?ref=main",
       "https://api.example.test/repos/6529-Collections/6529-hook/contents/.github/PULL_REQUEST_TEMPLATE.md?ref=main",
+      "https://api.example.test/repos/6529-Collections/6529-hook/contents/.github/workflows/guardian-review.yml?ref=main",
     ]);
     expect(files).toEqual([
       expect.objectContaining({
@@ -98,6 +114,12 @@ describe("GitHub repo helpers", () => {
         label: "PR template",
         exists: false,
         valid: false,
+      }),
+      expect.objectContaining({
+        path: ".github/workflows/guardian-review.yml",
+        label: "Guardian workflow",
+        exists: true,
+        valid: true,
       }),
     ]);
   });
@@ -120,6 +142,27 @@ describe("GitHub repo helpers", () => {
       exists: true,
       valid: false,
       message: ".github/PULL_REQUEST_TEMPLATE.md is missing Command Waves manifest markers.",
+    });
+  });
+
+  it("validates guardian workflow commands", async () => {
+    const files = await getGitHubRepoRequiredFiles("6529-Collections/6529-hook", {
+      apiBaseUrl: "https://api.example.test",
+      fetchImpl: async (input) => {
+        const url = String(input);
+
+        if (url.includes("guardian-review.yml")) {
+          return response("name: Other workflow");
+        }
+
+        return response("{}");
+      },
+    });
+
+    expect(files.find((file) => file.path === ".github/workflows/guardian-review.yml")).toMatchObject({
+      exists: true,
+      valid: false,
+      message: ".github/workflows/guardian-review.yml is missing the guardian check or proof replay commands.",
     });
   });
 

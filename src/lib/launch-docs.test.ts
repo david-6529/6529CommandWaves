@@ -42,7 +42,9 @@ describe("launch docs", () => {
     const playbook = readRepoFile("docs/first-hook-launch-playbook.md");
 
     expect(readme).toContain("must be required in GitHub branch protection or rulesets");
+    expect(readme).toContain("copy `.github/workflows/guardian-review.yml` into the");
     expect(playbook).toContain("Make `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` required in GitHub branch protection or rulesets.");
+    expect(playbook).toContain("the guardian workflow, and the required guardian check");
   });
 
   it("keeps reviewer placeholder docs aligned with this phase", () => {
