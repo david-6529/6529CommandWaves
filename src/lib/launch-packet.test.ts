@@ -54,6 +54,7 @@ describe("launch packet", () => {
         setupProofUrl: "https://hooks.example/api/command-wave/setup/proof",
         projectIndexUrl: "https://hooks.example/api/command-wave/projects",
         commandWaveStateUrl: "https://hooks.example/api/command-wave/state",
+        chatLaunchUrl: "https://hooks.example/api/command-wave/launch/chat",
         launchAuditUrl: "https://hooks.example/api/command-wave/launch/audit",
       },
       generatedAt: "2026-06-21T12:00:00.000Z",
@@ -111,6 +112,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Setup proof: https://hooks.example/api/command-wave/setup/proof");
     expect(packet.text).toContain("Project index: https://hooks.example/api/command-wave/projects");
     expect(packet.text).toContain("Command-wave state: https://hooks.example/api/command-wave/state");
+    expect(packet.text).toContain("Chat launch audit: https://hooks.example/api/command-wave/launch/chat");
     expect(packet.text).toContain("Launch audit: https://hooks.example/api/command-wave/launch/audit");
     expect(packet.text).toContain("SETUP_PROOF_URL=https://hooks.example/api/command-wave/setup/proof npm run setup:verify");
     expect(packet.text).toContain("Run manifest recorded.");

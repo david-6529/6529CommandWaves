@@ -120,6 +120,7 @@ describe("first phase launch snapshot", () => {
       setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
       projectIndexUrl: "https://command-waves.example.com/api/command-wave/projects",
       commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
+      chatLaunchUrl: "https://command-waves.example.com/api/command-wave/launch/chat",
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
     expect(snapshot.statusDraft).toContain("Project launch status");
@@ -129,6 +130,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.statusDraft).toContain("- Setup proof: https://command-waves.example.com/api/command-wave/setup/proof");
     expect(snapshot.statusDraft).toContain("- Project index: https://command-waves.example.com/api/command-wave/projects");
     expect(snapshot.statusDraft).toContain("- Command-wave state: https://command-waves.example.com/api/command-wave/state");
+    expect(snapshot.statusDraft).toContain("- Chat launch audit: https://command-waves.example.com/api/command-wave/launch/chat");
     expect(snapshot.statusDraft).toContain("- Launch audit: https://command-waves.example.com/api/command-wave/launch/audit");
     expect(snapshot.statusDraft).toContain("does not approve work or move funds");
     expect(snapshot.launchPacket).toMatchObject({
@@ -149,6 +151,9 @@ describe("first phase launch snapshot", () => {
     );
     expect(snapshot.launchPacket.text).toContain(
       "Command-wave state: https://command-waves.example.com/api/command-wave/state",
+    );
+    expect(snapshot.launchPacket.text).toContain(
+      "Chat launch audit: https://command-waves.example.com/api/command-wave/launch/chat",
     );
     expect(snapshot.launchPacket.text).toContain(
       "Launch audit: https://command-waves.example.com/api/command-wave/launch/audit",
@@ -206,6 +211,9 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.verificationTargets.launchAuditUrl).toBe(
       "https://command-waves.example.com/api/command-wave/launch/audit?remote=1",
     );
+    expect(snapshot.verificationTargets.chatLaunchUrl).toBe(
+      "https://command-waves.example.com/api/command-wave/launch/chat?remote=1",
+    );
   });
 
   it("does not publish placeholder app URLs as production verification targets", async () => {
@@ -222,6 +230,7 @@ describe("first phase launch snapshot", () => {
       setupProofUrl: "/api/command-wave/setup/proof",
       projectIndexUrl: "/api/command-wave/projects",
       commandWaveStateUrl: "/api/command-wave/state",
+      chatLaunchUrl: "/api/command-wave/launch/chat",
       launchAuditUrl: "/api/command-wave/launch/audit",
     });
   });

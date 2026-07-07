@@ -23,6 +23,7 @@ export type LaunchPacketVerificationTargets = {
   setupProofUrl: string;
   projectIndexUrl?: string;
   commandWaveStateUrl: string;
+  chatLaunchUrl?: string;
   launchAuditUrl?: string;
 };
 
@@ -290,6 +291,7 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
     `- Setup proof: ${targets.setupProofUrl}`,
     ...(targets.projectIndexUrl ? [`- Project index: ${targets.projectIndexUrl}`] : []),
     `- Command-wave state: ${targets.commandWaveStateUrl}`,
+    ...(targets.chatLaunchUrl ? [`- Chat launch audit: ${targets.chatLaunchUrl}`] : []),
     ...(targets.launchAuditUrl ? [`- Launch audit: ${targets.launchAuditUrl}`] : []),
     `- Verify setup: SETUP_PROOF_URL=${targets.setupProofUrl} npm run setup:verify`,
   ];

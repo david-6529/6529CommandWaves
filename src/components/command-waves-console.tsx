@@ -1249,6 +1249,7 @@ export function CommandWavesConsole() {
       setupProofUrl: appUrlFromOrigin(setupProofPath, publicAppOrigin),
       projectIndexUrl: appUrlFromOrigin(projectIndexPath, publicAppOrigin),
       commandWaveStateUrl: appUrlFromOrigin(commandWaveStatePath, publicAppOrigin),
+      chatLaunchUrl: appUrlFromOrigin("/api/command-wave/launch/chat?remote=1", publicAppOrigin),
       launchAuditUrl: appUrlFromOrigin(remoteLaunchAuditPath, publicAppOrigin),
     }),
     [publicAppOrigin],
@@ -4099,6 +4100,14 @@ export function CommandWavesConsole() {
                       rel="noreferrer"
                     >
                       {launchVerificationTargets.commandWaveStateUrl}
+                    </a>
+                    <a
+                      className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"
+                      href={launchVerificationTargets.chatLaunchUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {launchVerificationTargets.chatLaunchUrl}
                     </a>
                     <a
                       className="break-all text-xs font-semibold leading-5 text-cyan-300 hover:text-cyan-200"

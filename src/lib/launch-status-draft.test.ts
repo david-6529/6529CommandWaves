@@ -10,6 +10,7 @@ const verificationTargets = {
   setupProofUrl: "https://command-waves.example.com/api/command-wave/setup/proof",
   projectIndexUrl: "https://command-waves.example.com/api/command-wave/projects",
   commandWaveStateUrl: "https://command-waves.example.com/api/command-wave/state",
+  chatLaunchUrl: "https://command-waves.example.com/api/command-wave/launch/chat",
   launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
 };
 
@@ -66,6 +67,7 @@ describe("launch status draft", () => {
     expect(draft).toContain(`- Setup proof: ${verificationTargets.setupProofUrl}`);
     expect(draft).toContain(`- Project index: ${verificationTargets.projectIndexUrl}`);
     expect(draft).toContain(`- Command-wave state: ${verificationTargets.commandWaveStateUrl}`);
+    expect(draft).toContain(`- Chat launch audit: ${verificationTargets.chatLaunchUrl}`);
     expect(draft).toContain(`- Launch audit: ${verificationTargets.launchAuditUrl}`);
     expect(draft).toContain("does not approve work or move funds");
     expect(draft).not.toContain("\u2014");

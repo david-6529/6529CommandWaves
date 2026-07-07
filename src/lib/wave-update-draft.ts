@@ -8,6 +8,7 @@ export type WaveUpdateVerificationTargets = {
   setupProofUrl: string;
   projectIndexUrl?: string;
   commandWaveStateUrl: string;
+  chatLaunchUrl?: string;
   launchAuditUrl?: string;
 };
 
@@ -94,6 +95,7 @@ function verificationLine(targets: WaveUpdateVerificationTargets | null | undefi
         `Verification: setup proof ${targets.setupProofUrl}`,
         ...(targets.projectIndexUrl ? [`project index ${targets.projectIndexUrl}`] : []),
         `state ${targets.commandWaveStateUrl}`,
+        ...(targets.chatLaunchUrl ? [`chat launch ${targets.chatLaunchUrl}`] : []),
         ...(targets.launchAuditUrl ? [`launch audit ${targets.launchAuditUrl}`] : []),
       ].join("; ") + "."
     : null;

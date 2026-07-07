@@ -52,6 +52,7 @@ export type FirstPhaseLaunchSnapshot = {
     setupProofUrl: string;
     projectIndexUrl: string;
     commandWaveStateUrl: string;
+    chatLaunchUrl: string;
     launchAuditUrl: string;
   };
   setupValidation: SetupValidation;
@@ -133,10 +134,12 @@ export async function createFirstPhaseLaunchSnapshot(
   });
   const commandWaveStateUrl = commandWaveStateUrlFromEnv(env) ?? appRouteUrl("/api/command-wave/state", env);
   const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
+  const chatLaunchPath = options.checkSetupRemote ? "/api/command-wave/launch/chat?remote=1" : "/api/command-wave/launch/chat";
   const verificationTargets = {
     setupProofUrl: appRouteUrl("/api/command-wave/setup/proof", env),
     projectIndexUrl: appRouteUrl("/api/command-wave/projects", env),
     commandWaveStateUrl,
+    chatLaunchUrl: appRouteUrl(chatLaunchPath, env),
     launchAuditUrl: appRouteUrl(launchAuditPath, env),
   };
   const contributionReport = createContributionReport(wave, { generatedAt });

@@ -6,6 +6,7 @@ export type LaunchStatusVerificationTargets = {
   setupProofUrl: string;
   projectIndexUrl?: string;
   commandWaveStateUrl: string;
+  chatLaunchUrl?: string;
   launchAuditUrl?: string;
 };
 
@@ -125,6 +126,7 @@ export function createLaunchStatusDraft({
     `- Setup proof: ${verificationTargets.setupProofUrl}`,
     ...(verificationTargets.projectIndexUrl ? [`- Project index: ${verificationTargets.projectIndexUrl}`] : []),
     `- Command-wave state: ${verificationTargets.commandWaveStateUrl}`,
+    ...(verificationTargets.chatLaunchUrl ? [`- Chat launch audit: ${verificationTargets.chatLaunchUrl}`] : []),
     ...(verificationTargets.launchAuditUrl ? [`- Launch audit: ${verificationTargets.launchAuditUrl}`] : []),
     "",
     "Guardrails: humans keep merge, deploy, payment, and governance authority. This status note does not approve work or move funds.",

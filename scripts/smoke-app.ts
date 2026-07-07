@@ -208,7 +208,9 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "githubRepo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectIndexUrl");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "chatLaunchUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/projects");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "/api/command-wave/launch/chat");
   assertIncludes(
     "Launch audit response",
     JSON.stringify(launchPayload),
