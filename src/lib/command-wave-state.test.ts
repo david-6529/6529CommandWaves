@@ -18,6 +18,7 @@ describe("command wave state snapshot", () => {
         currentWork: {
           title: "Draft the non-upgradeable hook scaffold",
         },
+        updatedAt: "2026-06-20T12:50:00.000Z",
         repo: {
           status: "placeholder",
         },

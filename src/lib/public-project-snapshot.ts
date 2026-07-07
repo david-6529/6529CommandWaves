@@ -147,6 +147,7 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
 
   return {
     summary: projectSummary({ currentWork, repo, nextStep }),
+    updatedAt: latestChanges[0]?.at ?? null,
     currentWork,
     decision: decisionSnapshot(wave),
     repo,

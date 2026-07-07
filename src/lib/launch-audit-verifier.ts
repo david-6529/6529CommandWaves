@@ -179,6 +179,7 @@ function projectSnapshotReady(value: unknown) {
   return Boolean(
     record &&
       asString(record.summary) &&
+      ("updatedAt" in record && (record.updatedAt === null || Boolean(asString(record.updatedAt)))) &&
       currentWork &&
       asString(currentWork.title) &&
       asString(currentWork.status) &&

@@ -189,6 +189,7 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "currentWork");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "nextStep");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "latestChanges");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "updatedAt");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "productContract");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Ask in chat to join. Access is reviewed manually for now.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "daemon");
@@ -224,6 +225,7 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
   assertIncludes("State response", JSON.stringify(statePayload), "nextStep");
   assertIncludes("State response", JSON.stringify(statePayload), "latestChanges");
+  assertIncludes("State response", JSON.stringify(statePayload), "updatedAt");
   assertIncludes("State response", JSON.stringify(statePayload), "productContract");
   assertIncludes("State response", JSON.stringify(statePayload), "Ask in chat to join. Access is reviewed manually for now.");
   assertIncludes("State response", JSON.stringify(statePayload), "daemon");
