@@ -142,6 +142,8 @@ async function main() {
     "Project log",
     "Visible activity report",
     "Maintainer tools",
+    "Server key needed before launch",
+    "Set ADMIN_API_KEY on the server.",
   ]) {
     assertIncludes("Home page", renderedHtml, label);
   }

@@ -3019,6 +3019,12 @@ export function CommandWavesConsole() {
               <p className="text-sm leading-6 text-zinc-400">
                 Set the first hook source and GitHub repo. More hook projects can use the same shape later.
               </p>
+              <div className="rounded-md border border-amber-800 bg-amber-950/20 p-3">
+                <p className="text-sm font-semibold text-amber-100">Server key needed before launch</p>
+                <p className="mt-1 text-xs leading-5 text-amber-100/80">
+                  Set ADMIN_API_KEY on the server. Then paste the same key below when saving setup or running protected actions.
+                </p>
+              </div>
               <Field label="Project source">
                 <Input
                   value={waveUrl}
