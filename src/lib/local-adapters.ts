@@ -9,6 +9,7 @@ import {
 } from "./adapters";
 import type { ExecutionRecord, GuardianReview, LedgerEvent } from "./command-waves";
 import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
+import { createCodexWorkPacket } from "./codex-work-packet";
 import {
   createCommandPrManifest,
   createGuardianAttestation,
@@ -112,6 +113,18 @@ function agentHandoffHashMatches(packet: ReturnType<typeof findAgentHandoffArtif
   return hashValue(packetWithoutHash) === packetHash;
 }
 
+function assertRepoMethod<T>(method: T | undefined, label: string): T {
+  if (!method) {
+    throw Object.assign(new Error(`Repo adapter must support ${label} for PR work.`), { status: 503 });
+  }
+
+  return method;
+}
+
+function codexPacketPath(proposalId: string) {
+  return `.command-waves/commands/${proposalId}.md`;
+}
+
 export function createLocalOrchestratorAdapter(
   repoAdapterOrOptions: RepoAdapter | LocalOrchestratorOptions = localRepoAdapter,
 ): OrchestratorAdapter {
@@ -137,10 +150,43 @@ export function createLocalOrchestratorAdapter(
               baseBranch,
             })
           : null;
+      const codexPacket =
+        input.proposal.kind === "open_pr"
+          ? createCodexWorkPacket({
+              wave: input.wave,
+              proposal: input.proposal,
+              poll: input.poll,
+              runManifest: manifest,
+              baseBranch,
+            })
+          : null;
       const wavePost = [
         formatProposalForWave(input.proposal, input.poll),
         ...(prManifest ? ["", formatCommandPrManifestForPullRequest(prManifest)] : []),
       ].join("\n");
+      const branch =
+        input.proposal.kind === "open_pr"
+          ? await assertRepoMethod(repoAdapter.prepareBranch, "prepareBranch")({
+              repoUrl: input.wave.repoUrl,
+              branchName: manifest.targetBranch,
+              baseBranch,
+            })
+          : null;
+      const packetFilePath = input.proposal.kind === "open_pr" ? codexPacketPath(input.proposal.id) : null;
+      const commit =
+        input.proposal.kind === "open_pr" && codexPacket && packetFilePath
+          ? await assertRepoMethod(repoAdapter.commitFiles, "commitFiles")({
+              repoUrl: input.wave.repoUrl,
+              branchName: manifest.targetBranch,
+              message: `Add Command Waves work packet for ${input.proposal.id}`,
+              files: [
+                {
+                  path: packetFilePath,
+                  content: `${codexPacket.text}\n`,
+                },
+              ],
+            })
+          : null;
       const pr =
         input.proposal.kind === "open_pr"
           ? await repoAdapter.openPullRequest({
@@ -159,11 +205,28 @@ export function createLocalOrchestratorAdapter(
         status: "complete",
         summary:
           input.proposal.kind === "open_pr"
-            ? "Agent adapter opened a deterministic PR record for the approved command."
+            ? "Agent adapter prepared a branch with the Codex work packet and opened a draft PR record."
             : "Agent adapter recorded the approved command without external side effects.",
         artifacts: [
           formatRunManifestArtifact(manifest),
           ...(handoff ? [formatAgentHandoffArtifact(handoff), "Codex handoff packet recorded"] : []),
+          ...(branch
+            ? [
+                `prepared branch ${branch.branchName}`,
+                `base ${branch.baseBranch}`,
+                `base sha ${branch.baseSha}`,
+                ...(branch.url ? [branch.url] : []),
+              ]
+            : []),
+          ...(commit
+            ? [
+                `packet path ${packetFilePath}`,
+                `packet commit ${commit.commitSha}`,
+                `packet hash ${codexPacket?.packetHash}`,
+                commit.url,
+                `changed ${commit.changedPaths.join(", ")}`,
+              ]
+            : []),
           "approved prompt snapshot",
           `rules ${manifest.rulesVersion}/${manifest.rulesHash}`,
           `permissions ${manifest.allowedPermissions.join(", ")}`,

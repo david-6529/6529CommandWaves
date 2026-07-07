@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
+import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { demoWave } from "./demo-wave";
 import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter, localRepoAdapter } from "./local-adapters";
 import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
-import { findRunManifestArtifact } from "./run-manifest";
+import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact } from "./run-manifest";
 
 describe("local command adapters", () => {
   const configuredWave = {
@@ -12,35 +12,115 @@ describe("local command adapters", () => {
   };
 
   it("includes run manifest evidence in local agent executions", async () => {
-    const proposal = demoWave.proposals[0];
+    const proposal = configuredWave.proposals[0];
     const execution = await localOrchestratorAdapter.execute({
-      wave: demoWave,
+      wave: configuredWave,
       proposal,
-      poll: demoWave.polls[0],
+      poll: configuredWave.polls[0],
     });
 
     expect(findRunManifestArtifact(execution.artifacts)).toMatchObject({
       proposalId: proposal.id,
-      rulesVersion: demoWave.rules.version,
+      rulesVersion: configuredWave.rules.version,
       allowedPermissions: ["wave.read", "repo.read", "repo.open_pr"],
       maxCostUsd: proposal.budgetUsd,
     });
     expect(findAgentHandoffArtifact(execution.artifacts)).toMatchObject({
       proposalId: proposal.id,
-      repoUrl: demoWave.repoUrl,
+      repoUrl: configuredWave.repoUrl,
       allowedPermissions: ["wave.read", "repo.read", "repo.open_pr"],
       maxCostUsd: proposal.budgetUsd,
     });
     expect(execution.artifacts).toContain("PR body includes Command Waves manifest");
     expect(execution.artifacts).toContain("Codex handoff packet recorded");
+    expect(execution.artifacts).toContain("prepared branch command/cmd-001-draft-the-non-upgradeable-hook-scaffold");
+    expect(execution.artifacts).toContain("packet path .command-waves/commands/cmd-001.md");
+    expect(execution.artifacts).toContain("changed .command-waves/commands/cmd-001.md");
+    expect(execution.artifacts.some((artifact) => artifact.startsWith("packet commit local-"))).toBe(true);
+    expect(execution.summary).toBe("Agent adapter prepared a branch with the Codex work packet and opened a draft PR record.");
   });
 
   it("passes the command manifest into the PR body", async () => {
     let prBody = "";
     const orchestrator = createLocalOrchestratorAdapter({
-      async openPullRequest(input) {
-        prBody = input.body;
+      repoAdapter: {
+        ...localRepoAdapter,
+        async openPullRequest(input) {
+          prBody = input.body;
 
+          return {
+            prNumber: 12,
+            url: "https://github.com/6529-Collections/6529-hook/pull/12",
+            headSha: "abc123",
+          };
+        },
+      },
+    });
+
+    await orchestrator.execute({
+      wave: configuredWave,
+      proposal: configuredWave.proposals[0],
+      poll: configuredWave.polls[0],
+    });
+
+    expect(prBody).toContain(COMMAND_PR_MANIFEST_START);
+    expect(prBody).toContain(configuredWave.proposals[0].id);
+  });
+
+  it("prepares a branch and commits the work packet before opening the PR", async () => {
+    const calls: string[] = [];
+    const orchestrator = createLocalOrchestratorAdapter({
+      repoAdapter: {
+        async prepareBranch(input) {
+          calls.push(`prepare:${input.branchName}:${input.baseBranch}`);
+
+          return {
+            branchName: input.branchName,
+            baseBranch: input.baseBranch ?? "main",
+            baseSha: "base-sha",
+            ref: `refs/heads/${input.branchName}`,
+            url: `https://github.com/6529-Collections/6529-hook/tree/${input.branchName}`,
+          };
+        },
+        async commitFiles(input) {
+          calls.push(`commit:${input.branchName}:${input.files[0]?.path}`);
+          expect(input.files[0]?.content).toContain("Command Waves Codex work packet");
+
+          return {
+            branchName: input.branchName,
+            commitSha: "commit-sha",
+            url: `https://github.com/6529-Collections/6529-hook/commit/commit-sha`,
+            changedPaths: input.files.map((file) => file.path),
+          };
+        },
+        async openPullRequest(input) {
+          calls.push(`pr:${input.branchName}:${input.draft}`);
+
+          return {
+            prNumber: 12,
+            url: "https://github.com/6529-Collections/6529-hook/pull/12",
+            headSha: "abc123",
+          };
+        },
+      },
+    });
+
+    await orchestrator.execute({
+      wave: configuredWave,
+      proposal: configuredWave.proposals[0],
+      poll: configuredWave.polls[0],
+    });
+
+    expect(calls).toEqual([
+      "prepare:command/cmd-001-draft-the-non-upgradeable-hook-scaffold:main",
+      "commit:command/cmd-001-draft-the-non-upgradeable-hook-scaffold:.command-waves/commands/cmd-001.md",
+      "pr:command/cmd-001-draft-the-non-upgradeable-hook-scaffold:true",
+    ]);
+  });
+
+  it("requires branch and commit support before opening PR work", async () => {
+    const orchestrator = createLocalOrchestratorAdapter({
+      async openPullRequest() {
         return {
           prNumber: 12,
           url: "https://github.com/6529-Collections/6529-hook/pull/12",
@@ -49,14 +129,13 @@ describe("local command adapters", () => {
       },
     });
 
-    await orchestrator.execute({
-      wave: demoWave,
-      proposal: demoWave.proposals[0],
-      poll: demoWave.polls[0],
-    });
-
-    expect(prBody).toContain(COMMAND_PR_MANIFEST_START);
-    expect(prBody).toContain(demoWave.proposals[0].id);
+    await expect(
+      orchestrator.execute({
+        wave: configuredWave,
+        proposal: configuredWave.proposals[0],
+        poll: configuredWave.polls[0],
+      }),
+    ).rejects.toThrow("Repo adapter must support prepareBranch for PR work.");
   });
 
   it("can create local pull request comment records", async () => {
@@ -132,6 +211,7 @@ describe("local command adapters", () => {
     const orchestrator = createLocalOrchestratorAdapter({
       baseBranch: "develop",
       repoAdapter: {
+        ...localRepoAdapter,
         async openPullRequest(input) {
           prBaseBranch = input.baseBranch ?? "";
 
@@ -145,13 +225,13 @@ describe("local command adapters", () => {
     });
 
     const execution = await orchestrator.execute({
-      wave: demoWave,
-      proposal: demoWave.proposals[0],
-      poll: demoWave.polls[0],
+      wave: configuredWave,
+      proposal: configuredWave.proposals[0],
+      poll: configuredWave.polls[0],
     });
     const review = await localGuardianAdapter.review({
-      wave: demoWave,
-      proposal: demoWave.proposals[0],
+      wave: configuredWave,
+      proposal: configuredWave.proposals[0],
       execution,
     });
 
@@ -161,13 +241,13 @@ describe("local command adapters", () => {
   });
 
   it("lets the reviewer pass execution only when manifest evidence matches", async () => {
-    const proposal = demoWave.proposals[0];
+    const proposal = configuredWave.proposals[0];
     const execution = await localOrchestratorAdapter.execute({
-      wave: demoWave,
+      wave: configuredWave,
       proposal,
-      poll: demoWave.polls[0],
+      poll: configuredWave.polls[0],
     });
-    const review = await localGuardianAdapter.review({ wave: demoWave, proposal, execution });
+    const review = await localGuardianAdapter.review({ wave: configuredWave, proposal, execution });
 
     expect(review.status).toBe("pass");
     expect(review.checks).toContain("Run manifest matches approved command, rules hash, permissions, and budget.");
@@ -218,17 +298,26 @@ describe("local command adapters", () => {
       },
     };
     const wave = {
-      ...demoWave,
+      ...configuredWave,
       proposals: [proposal],
       polls: [poll],
       executions: [],
       reviews: [],
     };
-    const execution = await localOrchestratorAdapter.execute({
-      wave,
-      proposal,
-      poll,
-    });
+    const runManifest = createCommandRunManifest({ wave, proposal });
+    const handoff = createAgentHandoffPacket({ wave, proposal, poll, runManifest });
+    const execution = {
+      proposalId: proposal.id,
+      harness: "codex" as const,
+      status: "complete" as const,
+      summary: "Manual reviewer evidence for a PR command without a project decision URL.",
+      artifacts: [
+        formatRunManifestArtifact(runManifest),
+        formatAgentHandoffArtifact(handoff),
+        "PR #12",
+        "https://github.com/6529-Collections/6529-hook/pull/12",
+      ],
+    };
     const review = await localGuardianAdapter.review({ wave, proposal, execution });
 
     expect(review.status).toBe("changes_requested");
@@ -243,7 +332,7 @@ describe("local command adapters", () => {
       spec: "Include tests for parameter behavior.",
     };
     const wave = {
-      ...demoWave,
+      ...configuredWave,
       proposals: [proposal],
       polls: [{ ...demoWave.polls[0], proposalId: proposal.id }],
     };
@@ -280,14 +369,14 @@ describe("local command adapters", () => {
   });
 
   it("asks for changes when a PR command has no Codex handoff packet", async () => {
-    const proposal = demoWave.proposals[0];
+    const proposal = configuredWave.proposals[0];
     const execution = await localOrchestratorAdapter.execute({
-      wave: demoWave,
+      wave: configuredWave,
       proposal,
-      poll: demoWave.polls[0],
+      poll: configuredWave.polls[0],
     });
     const review = await localGuardianAdapter.review({
-      wave: demoWave,
+      wave: configuredWave,
       proposal,
       execution: {
         ...execution,
@@ -302,11 +391,11 @@ describe("local command adapters", () => {
   });
 
   it("asks for changes when a PR command handoff packet is changed", async () => {
-    const proposal = demoWave.proposals[0];
+    const proposal = configuredWave.proposals[0];
     const execution = await localOrchestratorAdapter.execute({
-      wave: demoWave,
+      wave: configuredWave,
       proposal,
-      poll: demoWave.polls[0],
+      poll: configuredWave.polls[0],
     });
     const handoff = findAgentHandoffArtifact(execution.artifacts);
 
@@ -319,7 +408,7 @@ describe("local command adapters", () => {
       repoUrl: "https://github.com/6529-Collections/other-hook",
     };
     const review = await localGuardianAdapter.review({
-      wave: demoWave,
+      wave: configuredWave,
       proposal,
       execution: {
         ...execution,

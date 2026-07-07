@@ -70,8 +70,8 @@ What remains manual or MVP-only:
 - Wallet connection is identity context for access drafts. Reputation, token, holder, allowlist, and QnA requirements are
   manual notes until live wallet, session, and score checks exist.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
-- Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation. PR work packets
-  require the GitHub repo to be selected.
+- Codex execution prepares a branch, commits a bounded work packet, and opens a draft PR record. It does not yet run an
+  isolated code-writing worker.
 - The GitHub repo is a placeholder in the default project state. No PR work can run until the pilot repo is selected.
 - The GitHub adapter can prepare branches, commit bounded text files, open draft PRs, post bounded PR comments, and
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
@@ -150,7 +150,7 @@ First launch tasks:
 Hardening tasks after the first public loop:
 
 1. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
-2. Replace local PR adapter execution with a controlled Codex harness that prepares branches.
+2. Replace packet-only PR setup with a controlled Codex harness that writes bounded code patches.
 3. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
 
 ## Lessons Reused From `6529arena`
@@ -372,8 +372,9 @@ To open real GitHub PRs from prepared agent branches, configure:
 - `COMMAND_WAVE_GITHUB_TOKEN` or `GITHUB_TOKEN`
 - `COMMAND_WAVE_GITHUB_BASE_BRANCH`, optional, defaults to `main`
 
-The GitHub adapter only opens draft PRs from an existing same-repo branch name. It rejects fork refs, raw SHAs, tags, and
-ambiguous refs. It does not create branches, merge PRs, deploy contracts, or spend funds.
+The GitHub adapter prepares same-repo branches, commits bounded text files, and opens draft PRs from those branches. It
+rejects fork refs, raw SHAs, tags, and ambiguous refs. It does not merge PRs, deploy contracts, change repo settings, or
+spend funds.
 
 Verify a published setup proof against GitHub required-check payloads:
 
@@ -477,7 +478,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `POST /api/command-wave/votes`: record a yes/no vote. Body requires `proposalId`, `voterIdentity`, and `vote`.
 - `POST /api/command-wave/decision`: record a manual project decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from project chat.
 - `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded project decision receipt.
-- `POST /api/command-wave/execute`: run the local agent adapter.
+- `POST /api/command-wave/execute`: prepare the target branch, commit the Codex work packet, and open a draft PR record.
 - `POST /api/command-wave/review`: run the local reviewer adapter.
 
 Command-wave mutation routes and chat posting are open only for local demo mode when `ADMIN_API_KEY` is blank. Once
@@ -495,7 +496,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
 2. Set the initial hook wave, keep the repo placeholder until selection, then run the remote launch audit until setup is reachable.
-3. Wire controlled Codex execution to the GitHub branch, text commit, draft PR, comment, and check-run adapter primitives.
+3. Add an isolated Codex worker that produces bounded patch files before the existing branch, commit, and draft PR sequence.
 4. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 5. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.
 6. Add production auth, secrets, distributed rate limits, job queue controls, and required GitHub branch protection.

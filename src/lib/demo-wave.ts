@@ -106,7 +106,7 @@ function createDemoExecution(wave: CommandWave): ExecutionRecord {
     proposalId: reviewingProposal.id,
     harness: "codex",
     status: "complete",
-    summary: "Agent adapter opened a deterministic PR record for the approved hook scaffold command.",
+    summary: "Agent adapter prepared a branch with the Codex work packet and opened a draft PR record.",
     artifacts: [
       formatRunManifestArtifact(runManifest),
       formatAgentHandoffArtifact(handoff),

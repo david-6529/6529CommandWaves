@@ -97,11 +97,11 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 8. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
 9. Vote or approve through builder chat.
 10. Record the decision URL as the manual approval receipt.
-11. Copy the Codex work packet and use it in a prepared branch.
-12. Run the agent only inside that approved packet.
+11. Use the build step to prepare the branch, commit the Codex work packet, and open a draft PR record.
+12. Run any code-writing agent only inside that approved packet and branch.
 13. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
 14. Make `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` required in GitHub branch protection or rulesets.
-15. Open a draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
+15. Continue the draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
 16. Review the PR manifest, tests, parameter-cap evidence, and changed files.
 17. Humans merge only after review passes.
 18. Use the contribution report and fee plan as evidence for any separate payout vote.

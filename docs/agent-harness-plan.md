@@ -4,7 +4,7 @@ Command Waves should not let a wave directly run arbitrary tools. The agent shou
 
 ## First Harness: Codex
 
-MVP execution path:
+Target execution path:
 
 1. Proposal has a recorded builder wave decision receipt.
 2. Backend creates a `command_job` with the approved prompt, spec, rules version, repo URL, and budget cap.
@@ -28,14 +28,20 @@ Current local adapter status:
 - Includes proposal ID, command kind, risk, rules version/hash, permissions, budget, prompt/spec hashes, target branch, max runtime, and max cost.
 - Generates a deterministic Codex handoff packet for PR commands.
 - Generates a copyable manual Codex work packet for PR commands with a recorded wave decision receipt.
+- Prepares the target branch, commits the bounded Codex work packet under `.command-waves/commands/`, and opens a draft PR record.
 - The handoff packet records the target branch, permission set, budget, required evidence, forbidden actions, run manifest hash, and PR manifest hash.
 - The handoff packet names the controlled adapter sequence: prepare branch, commit bounded text files, open draft PR,
   post bounded PR comment, and create bounded check-run state.
 - The work packet gives a human operator the approved prompt, target branch, adapter sequence, required evidence,
   forbidden actions, and PR manifest text to use in a prepared branch.
 - Includes the Command Waves PR manifest in the PR body for `open_pr` commands.
-- Can opt into a real GitHub draft PR adapter with `COMMAND_WAVE_REPO_ADAPTER=github` once a controlled harness has prepared the branch.
+- Can opt into the GitHub adapter with `COMMAND_WAVE_REPO_ADAPTER=github` after the pilot repo is selected.
 - Reviewer adapter requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
+
+Still missing:
+
+- An isolated worker that lets Codex write bounded code patches before the packet commit and draft PR.
+- Review-result PR comments and check runs wired from the reviewer step.
 
 Current GitHub PR adapter status:
 

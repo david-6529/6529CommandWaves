@@ -56,8 +56,8 @@ This means the CI/GitHub App layer only has to gather:
 
 Then it calls the deterministic verifier.
 
-The opt-in GitHub PR adapter opens draft PRs with this manifest in the body after a controlled harness has prepared the
-branch.
+The opt-in GitHub PR adapter prepares the branch, commits bounded text evidence, and opens draft PRs with this manifest in
+the body.
 
 The workflow also has a PR evidence check:
 

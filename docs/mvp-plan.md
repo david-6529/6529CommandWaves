@@ -115,15 +115,15 @@ The external app should be the control panel for setup, rules, queue status, and
 Initial adapters:
 
 1. 6529 API adapter for wave search, reading, and human-reviewed update drafts.
-2. GitHub adapter for repo metadata and draft PR creation from prepared branches.
+2. GitHub adapter for repo metadata, branch preparation, bounded text commits, and draft PR creation.
 3. Agent adapter for Codex runs.
 4. Reviewer adapter for PR diff review, rule compliance, and smart contract safety checks.
 5. Contribution report adapter that summarizes activity without granting permissions.
 6. Ledger persistence with rule/version hashes.
 
-The GitHub PR adapter is intentionally narrow. It opens a draft PR only after a controlled harness has prepared the branch,
-and it includes the Command Waves manifest in the PR body. It does not create merges, deploys, payments, or governance
-changes.
+The GitHub PR adapter is intentionally narrow. It prepares same-repo branches, commits bounded text files, opens draft PRs,
+and includes the Command Waves manifest in the PR body. It does not create merges, deploys, payments, repo setting changes,
+or governance changes.
 
 The first public loop sequence is in [first-hook-launch-playbook.md](first-hook-launch-playbook.md).
 
