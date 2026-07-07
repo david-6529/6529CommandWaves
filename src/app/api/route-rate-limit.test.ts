@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { POST as postRoomMessage } from "./6529/room-post/route";
+import { POST as postChatMessage } from "./6529/chat-post/route";
 import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
 import { GET as getHookProjects } from "./command-wave/projects/route";
 import { GET as getSetupProof } from "./command-wave/setup/proof/route";
@@ -82,21 +82,21 @@ describe("API route rate limits", () => {
     },
   );
 
-  it("rate limits room posting after admin auth", async () => {
+  it("rate limits chat posting after admin auth", async () => {
     const adminKey = "strong-admin-key-for-route-tests";
 
     process.env.ADMIN_API_KEY = adminKey;
 
     for (let index = 0; index < 10; index += 1) {
-      const response = await postRoomMessage(
-        request("https://command-waves.example.com/api/6529/room-post", {
+      const response = await postChatMessage(
+        request("https://command-waves.example.com/api/6529/chat-post", {
           method: "POST",
           headers: {
             "x-admin-api-key": adminKey,
           },
           body: JSON.stringify({
             waveUrl: "https://6529.io/waves/mock-command-wave",
-            content: `Room post ${index}`,
+            content: `Chat post ${index}`,
           }),
         }),
       );
@@ -104,15 +104,15 @@ describe("API route rate limits", () => {
       expect(response.status).toBe(200);
     }
 
-    const limited = await postRoomMessage(
-      request("https://command-waves.example.com/api/6529/room-post", {
+    const limited = await postChatMessage(
+      request("https://command-waves.example.com/api/6529/chat-post", {
         method: "POST",
         headers: {
           "x-admin-api-key": adminKey,
         },
         body: JSON.stringify({
           waveUrl: "https://6529.io/waves/mock-command-wave",
-          content: "Room post over limit",
+          content: "Chat post over limit",
         }),
       }),
     );

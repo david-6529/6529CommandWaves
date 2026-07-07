@@ -438,7 +438,7 @@ async function requestRoomPost(waveUrl: string, content: string, accessKey?: str
   headers.set("content-type", "application/json");
   attachAdminApiKey(headers, accessKey);
 
-  const response = await fetchWithClientTimeout("/api/6529/room-post", {
+  const response = await fetchWithClientTimeout("/api/6529/chat-post", {
     method: "POST",
     headers,
     body: JSON.stringify({

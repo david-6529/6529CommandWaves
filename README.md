@@ -423,7 +423,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
-- `POST /api/6529/room-post`: post a human-triggered chat message when the bot wallet is configured.
+- `POST /api/6529/chat-post`: post a human-triggered chat message when the bot wallet is configured.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.

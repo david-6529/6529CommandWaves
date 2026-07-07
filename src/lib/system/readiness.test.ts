@@ -136,7 +136,7 @@ describe("readiness checks", () => {
       NEXT_PUBLIC_APP_URL: "https://your-app.example",
       DATABASE_URL: "postgresql://user:password@host:5432/command_waves",
       ADMIN_API_KEY: "replace-with-a-strong-random-key",
-      COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/your-hook-room",
+      COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/your-hook-project",
       COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
       COMMAND_WAVE_REPO_ADAPTER: "github",
       COMMAND_WAVE_GITHUB_TOKEN: "replace-with-github-token",

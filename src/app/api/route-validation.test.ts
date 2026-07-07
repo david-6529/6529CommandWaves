@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as previewContext } from "./6529/context/preview/route";
-import { POST as postRoomMessage } from "./6529/room-post/route";
+import { POST as postChatMessage } from "./6529/chat-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
 import { POST as recordDecision } from "./command-wave/decision/route";
@@ -136,9 +136,9 @@ describe("API route validation", () => {
     });
   });
 
-  it("rejects oversized room posts at the route", async () => {
-    const response = await postRoomMessage(
-      request("https://command-waves.example.com/api/6529/room-post", {
+  it("rejects oversized chat posts at the route", async () => {
+    const response = await postChatMessage(
+      request("https://command-waves.example.com/api/6529/chat-post", {
         method: "POST",
         body: JSON.stringify({
           waveUrl: "https://6529.io/waves/mock-command-wave",
@@ -180,7 +180,7 @@ describe("API route validation", () => {
     ["PR build", executeCommand, "/api/command-wave/execute", "POST"],
     ["review record", reviewCommand, "/api/command-wave/review", "POST"],
     ["Codex packet", createCodexPacket, "/api/command-wave/codex-packet", "POST"],
-    ["room post", postRoomMessage, "/api/6529/room-post", "POST"],
+    ["chat post", postChatMessage, "/api/6529/chat-post", "POST"],
   ] satisfies [string, RouteHandler, string, string][])(
     "requires admin auth for %s routes when configured",
     async (_label, handler, path, method) => {

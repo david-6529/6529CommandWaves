@@ -50,12 +50,12 @@ describe("6529 chat posting", () => {
     expect(result.url).toContain("/waves/6529-hook-builder/drops/mock-post-");
   });
 
-  it("makes mock posts visible in later room context", async () => {
+  it("makes mock posts visible in later project chat context", async () => {
     process.env["6529_MOCK_MODE"] = "true";
 
     await postRoomMessage({
       waveId: "mock-command-wave",
-      content: "Fresh room note for the hook builders.",
+      content: "Fresh chat note for the hook builders.",
     });
 
     const preview = await previewWaveContext({
@@ -67,7 +67,7 @@ describe("6529 chat posting", () => {
     expect(preview.sampleDrops.at(-1)).toMatchObject({
       id: "mock-post-4",
       author: "chat-builder",
-      preview: "Fresh room note for the hook builders.",
+      preview: "Fresh chat note for the hook builders.",
     });
   });
 
@@ -87,7 +87,7 @@ describe("6529 chat posting", () => {
     });
   });
 
-  it("requires a room and message", async () => {
+  it("requires a project chat and message", async () => {
     await expect(postRoomMessage({ content: "hello" })).rejects.toMatchObject({
       message: "Choose project chat before posting.",
       status: 400,
