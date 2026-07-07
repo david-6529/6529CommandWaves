@@ -98,6 +98,8 @@ async function main() {
     "GitHub repo placeholder",
     "Changelog",
     "Rules",
+    "Flow",
+    "Project, Discuss, Decide, PR, Review, Log",
     "Who can join?",
     "How do I join?",
     "How does work start?",

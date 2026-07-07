@@ -36,6 +36,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
+    expect(text).toContain("Flow");
+    expect(text).toContain("Project, Discuss, Decide, PR, Review, Log");
+    expect(text).toContain("Discuss");
+    expect(text).toContain("PR");
+    expect(text).toContain("Log");
     expect(text).toContain("Who can join?");
     expect(text).toContain("How do I join?");
     expect(text).toContain("How does work start?");

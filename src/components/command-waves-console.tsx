@@ -42,7 +42,7 @@ import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
 import { createParticipationAccessSnapshot, normalizeParticipationGates } from "@/lib/participation-gates";
-import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
+import { createPhaseChecklist, type PhaseChecklistItem, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
@@ -617,6 +617,19 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
   }
 
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
+}
+
+function flowStepLabel(item: PhaseChecklistItem) {
+  const labels: Record<PhaseChecklistItem["id"], string> = {
+    project: "Project",
+    proposal: "Discuss",
+    decision: "Decide",
+    build: "PR",
+    review: "Review",
+    log: "Log",
+  };
+
+  return labels[item.id];
 }
 
 function progressStatusClass(status: BuildTimelineStatus) {
@@ -2276,6 +2289,26 @@ export function CommandWavesConsole() {
                 )}
               </div>
             </details>
+          </section>
+
+          <section className="mt-5 border-t border-zinc-800 pt-4" aria-label="Build flow">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</p>
+              <p className="text-sm leading-6 text-zinc-500">{commandWaveProductCopy.simpleFlow}</p>
+            </div>
+            <ol className="mt-3 flex gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-6 lg:gap-2 lg:overflow-visible lg:pb-0">
+              {phaseChecklist.map((item) => (
+                <li key={item.id} className="min-w-32 border-t border-zinc-800 pt-2 lg:min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-semibold text-zinc-100">{flowStepLabel(item)}</p>
+                    <Badge className={phaseStatusClass(item.status)}>{item.status}</Badge>
+                  </div>
+                  {item.status === "active" ? (
+                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">{item.detail}</p>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
           </section>
         </header>
 
