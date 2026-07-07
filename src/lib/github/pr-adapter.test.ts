@@ -367,6 +367,7 @@ describe("GitHub pull request adapter", () => {
 
   it("opens a draft pull request from a prepared branch", async () => {
     const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
+    const headSha = "5555555555555555555555555555555555555555";
     const adapter = createGitHubPullRequestAdapter({
       apiBaseUrl: "https://api.example.test",
       token: "token",
@@ -378,7 +379,7 @@ describe("GitHub pull request adapter", () => {
           number: 42,
           html_url: "https://github.com/6529-Collections/6529-hook/pull/42",
           head: {
-            sha: "abc123",
+            sha: headSha,
           },
         });
       },
@@ -394,7 +395,7 @@ describe("GitHub pull request adapter", () => {
     expect(result).toEqual({
       prNumber: 42,
       url: "https://github.com/6529-Collections/6529-hook/pull/42",
-      headSha: "abc123",
+      headSha,
     });
     expect(String(calls[0]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/pulls");
     expect(calls[0]?.init?.method).toBe("POST");
@@ -410,6 +411,28 @@ describe("GitHub pull request adapter", () => {
       draft: true,
       maintainer_can_modify: false,
     });
+  });
+
+  it("rejects pull request creation responses without a full head SHA", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () =>
+        jsonResponse({
+          number: 42,
+          head: {
+            sha: "abc123",
+          },
+        }),
+    });
+
+    await expect(
+      adapter.openPullRequest({
+        repoUrl: "6529-Collections/6529-hook",
+        title: "Bad head",
+        body: "Bad head",
+        branchName: "command/bad-head",
+      }),
+    ).rejects.toThrow("GitHub PR creation response did not include a full head SHA.");
   });
 
   it("requires a GitHub token before opening pull requests", async () => {

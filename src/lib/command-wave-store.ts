@@ -1,4 +1,4 @@
-import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter } from "./configured-adapters";
+import { getConfiguredGuardianAdapter, getConfiguredOrchestratorAdapter, getConfiguredRepoAdapter } from "./configured-adapters";
 import { getCommandWavePersistencePath, loadPersistedCommandWave, savePersistedCommandWave } from "./command-wave-persistence";
 import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
 import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./command-wave-seed";
@@ -20,9 +20,13 @@ import {
   type CommandProposal,
   type CommandVote,
   type CommandWave,
+  type GuardianReview,
   type LedgerEvent,
   type PollState,
 } from "./command-waves";
+
+const guardianCheckRunName = "Command Waves Guardian";
+const maxReviewCommentLength = 8000;
 
 type Store = {
   wave: CommandWave;
@@ -57,6 +61,112 @@ function cloneDemoWave(): CommandWave {
 
 function initialCommandWave() {
   return applyInitialCommandWaveProject(cloneDemoWave());
+}
+
+function pullRequestNumberFromUrl(value: string) {
+  const match = value.match(/^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/(\d+)(?:[?#][^\s]*)?$/);
+  const prNumber = Number(match?.[1]);
+
+  return Number.isInteger(prNumber) && prNumber > 0 ? prNumber : null;
+}
+
+function headShaFromExecution(execution: { artifacts: string[] }) {
+  const value = execution.artifacts.find((artifact) => artifact.startsWith("head "))?.slice("head ".length).trim();
+
+  return value || null;
+}
+
+function boundedReviewComment(review: GuardianReview) {
+  const proofLine = review.proof ? `Proof: ${review.proof.attestationHash}` : "Proof: not recorded";
+  const lines = [
+    `Command Waves review for ${review.proposalId}: ${review.status}`,
+    "",
+    review.summary,
+    "",
+    proofLine,
+    "",
+    "Checks:",
+    ...review.checks.map((check) => `- ${check}`),
+  ];
+  const body = lines.join("\n");
+
+  return body.length <= maxReviewCommentLength ? body : `${body.slice(0, maxReviewCommentLength - 24)}\n\nTruncated for length.`;
+}
+
+function checkRunConclusion(status: GuardianReview["status"]) {
+  if (status === "pass") {
+    return "success" as const;
+  }
+
+  if (status === "changes_requested") {
+    return "action_required" as const;
+  }
+
+  return "failure" as const;
+}
+
+function checkRunSummary(review: GuardianReview) {
+  return [
+    review.summary,
+    review.proof ? `Proof: ${review.proof.attestationHash}` : "Proof: not recorded",
+    "",
+    ...review.checks.slice(0, 12).map((check) => `- ${check}`),
+  ].join("\n");
+}
+
+async function annotatePullRequestReview({
+  execution,
+  review,
+  wave,
+}: {
+  execution: { artifacts: string[] };
+  review: GuardianReview;
+  wave: CommandWave;
+}) {
+  const prUrl = gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl)[0] ?? null;
+  const prNumber = prUrl ? pullRequestNumberFromUrl(prUrl) : null;
+  const headSha = headShaFromExecution(execution);
+
+  if (!prUrl || !prNumber) {
+    throw Object.assign(new Error("A GitHub PR link for the configured repo is required before recording review evidence."), {
+      status: 409,
+    });
+  }
+
+  if (!headSha) {
+    throw Object.assign(new Error("A PR head SHA is required before recording review evidence."), { status: 409 });
+  }
+
+  const repoAdapter = getConfiguredRepoAdapter();
+
+  if (!repoAdapter.commentOnPullRequest) {
+    throw Object.assign(new Error("Repo adapter must support commentOnPullRequest for review evidence."), { status: 503 });
+  }
+
+  if (!repoAdapter.createCheckRun) {
+    throw Object.assign(new Error("Repo adapter must support createCheckRun for review evidence."), { status: 503 });
+  }
+
+  const comment = await repoAdapter.commentOnPullRequest({
+    repoUrl: wave.repoUrl,
+    prNumber,
+    body: boundedReviewComment(review),
+  });
+  const checkRun = await repoAdapter.createCheckRun({
+    repoUrl: wave.repoUrl,
+    name: guardianCheckRunName,
+    headSha,
+    status: "completed",
+    conclusion: checkRunConclusion(review.status),
+    summary: checkRunSummary(review),
+    detailsUrl: prUrl,
+    externalId: review.proof?.attestationHash ?? `${review.proposalId}:${review.status}`,
+  });
+
+  return {
+    ...review,
+    checks: [...review.checks, `PR review comment recorded: ${comment.url}.`, `Review check run recorded: ${checkRun.url}.`],
+  };
 }
 
 function isStaleBuiltInHookDemo(wave: CommandWave) {
@@ -628,7 +738,15 @@ export async function reviewProposal(input: unknown) {
     }
   }
 
-  const review = await getConfiguredGuardianAdapter().review({ wave, proposal, execution });
+  const rawReview = await getConfiguredGuardianAdapter().review({ wave, proposal, execution });
+  const review =
+    proposal.kind === "open_pr"
+      ? await annotatePullRequestReview({
+          execution,
+          review: rawReview,
+          wave,
+        })
+      : rawReview;
   const nextWave = appendLedger(
     {
       ...wave,

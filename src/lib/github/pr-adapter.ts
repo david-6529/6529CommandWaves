@@ -469,10 +469,12 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         throw Object.assign(new Error("GitHub PR creation response did not include a PR number."), { status: 502 });
       }
 
+      const prHeadSha = payloadFullSha(headSha, "GitHub PR creation response did not include a full head SHA.");
+
       return {
         prNumber,
         url: htmlUrl ?? pullRequestUrl(repo.htmlUrl, prNumber) ?? `${repo.htmlUrl}/pull/${prNumber}`,
-        headSha: headSha ?? "unknown",
+        headSha: prHeadSha,
       };
     },
     async commentOnPullRequest(input: RepoPullRequestCommentInput) {

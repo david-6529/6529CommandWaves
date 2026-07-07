@@ -507,7 +507,53 @@ describe("Command wave store", () => {
       proposalId: "cmd-001",
       status: "pass",
     });
+    expect(reviewed.reviews[0]?.checks.some((check) => check.startsWith("PR review comment recorded: "))).toBe(true);
+    expect(reviewed.reviews[0]?.checks.some((check) => check.startsWith("Review check run recorded: "))).toBe(true);
     expect(reviewed.reviews[0]?.proof?.inputs.repositoryHash).toHaveLength(64);
+  });
+
+  it("records PR review evidence for changes requested reviews", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({ proposalId: "cmd-001" });
+
+    await replaceCommandWave({
+      ...executed,
+      executions: executed.executions.map((execution) => ({
+        ...execution,
+        artifacts: execution.artifacts.filter(
+          (artifact) => !artifact.startsWith("agent-handoff:") && artifact !== "Codex handoff packet recorded",
+        ),
+      })),
+    });
+
+    const reviewed = await reviewProposal({ proposalId: "cmd-001" });
+
+    expect(reviewed.proposals[0].status).toBe("reviewing");
+    expect(reviewed.reviews[0]).toMatchObject({
+      proposalId: "cmd-001",
+      status: "changes_requested",
+    });
+    expect(reviewed.reviews[0]?.checks.some((check) => check.startsWith("PR review comment recorded: "))).toBe(true);
+    expect(reviewed.reviews[0]?.checks.some((check) => check.startsWith("Review check run recorded: "))).toBe(true);
+  });
+
+  it("rejects review when execution has no head SHA for review evidence", async () => {
+    await makeSeedProposalReadyToBuild();
+
+    const executed = await executeProposal({ proposalId: "cmd-001" });
+
+    await replaceCommandWave({
+      ...executed,
+      executions: executed.executions.map((execution) => ({
+        ...execution,
+        artifacts: execution.artifacts.filter((artifact) => !artifact.startsWith("head ")),
+      })),
+    });
+
+    await expect(reviewProposal({ proposalId: "cmd-001" })).rejects.toThrow(
+      "A PR head SHA is required before recording review evidence.",
+    );
   });
 
   it("rejects review when the repo is no longer configured", async () => {

@@ -58,6 +58,7 @@ What exists now:
 - Setup validation checks the selected hook repo for contributor rules, the PR template, the guardian workflow, and the required guardian check.
 - Launch audit, workflow proof, checklists, launch packets, update drafts, and contribution reports reject stale PR or review evidence unless the PR link and review proof are bound to the configured repo.
 - Review cannot record guardian proof unless the current execution includes a PR link for the configured repo.
+- Review records a bounded PR comment and check run before saving reviewer proof.
 - GitHub guardian PR evidence includes the target repo and fails when it does not match the configured hook repo.
 - The GitHub adapter can prepare branches from a selected base, commit bounded text files, open draft PRs, post bounded PR
   comments, and create bounded check runs. It still does not merge, deploy, or change repo settings.
@@ -187,6 +188,7 @@ Safety and review:
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
+- Reviewer output is written back to the PR as a bounded comment and check run.
 - PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, parameter writes, and bound-test evidence when patch records exist.
 
 Audit and launch:
@@ -479,7 +481,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `POST /api/command-wave/decision`: record a manual project decision receipt. Body requires `proposalId` and `reference`. PR commands require a decision URL from project chat.
 - `POST /api/command-wave/codex-packet`: create a copyable manual Codex work packet for a PR command with a recorded project decision receipt.
 - `POST /api/command-wave/execute`: prepare the target branch, commit the Codex work packet, and open a draft PR record.
-- `POST /api/command-wave/review`: run the local reviewer adapter.
+- `POST /api/command-wave/review`: run the reviewer adapter, record a PR comment, create a check run, and save reviewer proof.
 
 Command-wave mutation routes and chat posting are open only for local demo mode when `ADMIN_API_KEY` is blank. Once
 `ADMIN_API_KEY` is set, send it as either `x-admin-api-key: <key>` or `Authorization: Bearer <key>`. In production,

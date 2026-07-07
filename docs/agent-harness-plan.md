@@ -37,11 +37,11 @@ Current local adapter status:
 - Includes the Command Waves PR manifest in the PR body for `open_pr` commands.
 - Can opt into the GitHub adapter with `COMMAND_WAVE_REPO_ADAPTER=github` after the pilot repo is selected.
 - Reviewer adapter requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
+- Review records a bounded PR comment and check run before saving reviewer proof.
 
 Still missing:
 
 - An isolated worker that lets Codex write bounded code patches before the packet commit and draft PR.
-- Review-result PR comments and check runs wired from the reviewer step.
 
 Current GitHub PR adapter status:
 
