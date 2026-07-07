@@ -3001,14 +3001,24 @@ export function CommandWavesConsole() {
 
             <div className="border-t border-zinc-800 pt-3 lg:border-t-0 lg:pl-3">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Launch</p>
-                <Badge className={launchAuditStatusClass(launchAudit.nextAction.status)}>
-                  {launchAudit.nextAction.statusLabel}
+                <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Chat launch</p>
+                <Badge className={launchAuditStatusClass(launchAudit.chatLaunch.status)}>
+                  {launchAudit.chatLaunch.statusLabel}
                 </Badge>
-                <Badge className="border-zinc-700 bg-black text-zinc-300">First loop</Badge>
               </div>
-              <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
-              <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
+              <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.chatLaunch.nextAction.title}</h3>
+              <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.chatLaunch.nextAction.detail}</p>
+              <div className="mt-3 border-t border-zinc-800 pt-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">PR loop</p>
+                  <Badge className={launchAuditStatusClass(launchAudit.nextAction.status)}>
+                    {launchAudit.nextAction.statusLabel}
+                  </Badge>
+                  <Badge className="border-zinc-700 bg-black text-zinc-300">First loop</Badge>
+                </div>
+                <h3 className="mt-2 text-base font-semibold text-zinc-50">{launchAudit.nextAction.title}</h3>
+                <p className="mt-1 text-sm leading-6 text-zinc-400">{launchAudit.nextAction.detail}</p>
+              </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {launchAudit.status !== "ready" ? (
                   <Button type="button" variant="secondary" disabled={isBusy} onClick={runLaunchNextAction}>

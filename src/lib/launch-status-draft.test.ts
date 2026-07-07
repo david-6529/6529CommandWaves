@@ -52,6 +52,8 @@ describe("launch status draft", () => {
     expect(draft).toContain("Project launch status");
     expect(draft).toContain(`Project chat: ${configuredDemoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${configuredDemoWave.repoUrl}`);
+    expect(draft).toContain("Chat launch: checks needed");
+    expect(draft).toContain("Chat next action: Run project chat check");
     expect(draft).toContain("Status: checks needed");
     expect(draft).toContain("Next action: Run launch setup check");
     expect(draft).toContain(
@@ -152,6 +154,8 @@ describe("launch status draft", () => {
     const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
 
     expect(audit.status).toBe("ready");
+    expect(draft).toContain("Chat launch: ready");
+    expect(draft).toContain("Chat next action: Open project chat");
     expect(draft).toContain("Status: ready");
     expect(draft).toContain("Next action: Start the first public loop");
     expect(draft).toContain("- No launch gaps found in the checked records.");

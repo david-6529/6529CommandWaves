@@ -166,6 +166,69 @@ describe("first phase launch audit", () => {
         status: "ready",
       }),
     );
+    expect(audit.chatLaunch).toMatchObject({
+      status: "ready",
+      statusLabel: "ready",
+      summary: "The project chat workspace is ready to invite builders.",
+      nextAction: {
+        title: "Open project chat",
+      },
+    });
+  });
+
+  it("can mark chat launch ready while PR work waits for the repo", () => {
+    const chatReadyChecks = getReadinessChecks({
+      NEXT_PUBLIC_APP_URL: "https://command-waves.6529.io",
+      DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
+      ADMIN_API_KEY: "strong-admin-key-for-launch",
+      COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/6529-hook-builder",
+      COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
+      "6529_MOCK_MODE": "false",
+      NODE_ENV: "production",
+      COMMAND_WAVE_STORE: "postgres",
+      COMMAND_WAVE_STATE_URL: "https://command-waves.6529.io/api/command-wave/state",
+      "6529_BOT_BEARER_TOKEN": "6529-live-bot-token",
+      "6529_BOT_WALLET_ADDRESS": "0x1234567890abcdef1234567890abcdef12345678",
+    });
+    const setupValidation: SetupValidation = {
+      ...productionSetupValidation,
+      repo: {
+        owner: "your-org",
+        repo: "your-hook-repo",
+        htmlUrl: "https://github.com/your-org/your-hook-repo",
+      },
+      repoMetadata: null,
+      repoRequiredFiles: [],
+      checks: [
+        { id: "wave_format", label: "6529 wave", status: "pass", message: "Using wave 6529-hook-builder." },
+        { id: "repo_format", label: "GitHub repo", status: "pass", message: "Using your-org/your-hook-repo." },
+        { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
+        {
+          id: "repo_placeholder",
+          label: "GitHub repo placeholder",
+          status: "warn",
+          message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+        },
+      ],
+      canSave: true,
+      canRunCode: false,
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: chatReadyChecks,
+      setupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.chatLaunch.status).toBe("ready");
+    expect(audit.chatLaunch.openItems).toEqual([]);
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.openItems).toContainEqual(
+      expect.objectContaining({
+        id: "flow_project",
+        label: "Select repo",
+      }),
+    );
   });
 
   it("keeps launch in setup mode until setup is checked", () => {

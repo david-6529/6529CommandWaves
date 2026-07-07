@@ -277,6 +277,27 @@ function workflowProofComplete(value: unknown) {
   );
 }
 
+function launchTrackReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const status = asString(record?.status);
+  const nextAction = isRecord(record?.nextAction) ? record.nextAction : null;
+
+  return Boolean(
+    record &&
+      (status === "ready" || status === "needs_setup" || status === "blocked") &&
+      asString(record.statusLabel) &&
+      asString(record.summary) &&
+      nextAction &&
+      asString(nextAction.status) &&
+      asString(nextAction.title) &&
+      asString(nextAction.detail) &&
+      Array.isArray(record.items) &&
+      Array.isArray(record.readyItems) &&
+      Array.isArray(record.blockers) &&
+      Array.isArray(record.openItems),
+  );
+}
+
 function stateEvidenceReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const proposalCount = asNumber(record?.proposalCount);
@@ -407,6 +428,8 @@ function statusDraftReady(value: unknown) {
   return Boolean(
     draft &&
       draft.includes("Project launch status") &&
+      draft.includes("Chat launch:") &&
+      draft.includes("Chat next action:") &&
       draft.includes("Status:") &&
       draft.includes("Operator checklist:") &&
       draft.includes("Verification:") &&
@@ -498,6 +521,7 @@ export function verifyLaunchAuditPayload(
 ): LaunchAuditVerificationResult {
   const snapshot = unwrapSnapshot(payload);
   const launchAudit = isRecord(snapshot?.launchAudit) ? snapshot.launchAudit : null;
+  const chatLaunch = isRecord(launchAudit?.chatLaunch) ? launchAudit.chatLaunch : null;
   const project = isRecord(snapshot?.project) ? snapshot.project : null;
   const nextAction = isRecord(launchAudit?.nextAction) ? launchAudit.nextAction : null;
   const setupCheckMode = asString(snapshot?.setupCheckMode);
@@ -522,6 +546,7 @@ export function verifyLaunchAuditPayload(
   const hasContributionReport = contributionReportReady(reports?.contribution);
   const hasDeveloperFeePlan = developerFeePlanReady(reports?.developerFee);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
+  const hasChatLaunch = launchTrackReady(chatLaunch);
   const blockers = collectItemSummaries(launchAudit?.blockers);
   const openItemRecords = collectChecklistItems(launchAudit?.openItems);
   const openItems = openItemRecords.map((item) => (item.detail ? `${item.label}: ${item.detail}` : item.label));
@@ -544,6 +569,13 @@ export function verifyLaunchAuditPayload(
       "launch_status",
       launchStatus === "ready" ? "pass" : "fail",
       launchStatus === "ready" ? "First public loop is ready." : `First public loop is ${launchStatus}.`,
+    ),
+    check(
+      "chat_launch_status",
+      hasChatLaunch ? "pass" : "fail",
+      hasChatLaunch
+        ? "Project chat launch status is published."
+        : "Launch audit must publish the chat launch status separately from the PR loop.",
     ),
     check(
       "remote_setup",

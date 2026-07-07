@@ -173,6 +173,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "launch_packet")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "chat_launch_status")).toMatchObject({
+      status: "pass",
+    });
     expect(snapshot.launchPacket.packetHash).toMatch(/^[a-f0-9]{64}$/);
     expect(result.checks.find((item) => item.id === "contribution_report")).toMatchObject({
       status: "pass",

@@ -196,6 +196,7 @@ Audit and launch:
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
+- Public launch audit separates chat launch readiness from the full reviewed PR loop.
 - Public command-wave state includes the informational contribution report method and notes.
 - Public launch audit includes the hashed wave state, rules, and full audit bundle it checked.
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.

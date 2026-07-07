@@ -80,6 +80,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Use GitHub PRs once the repo is connected.");
     expect(text).toContain("Scope work");
     expect(text).toContain("Save scoped work");
+    expect(text).toContain("Chat launch");
+    expect(text).toContain("PR loop");
     expect(text).toContain("Project log");
   });
 

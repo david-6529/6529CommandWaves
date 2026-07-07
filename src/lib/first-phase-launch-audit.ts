@@ -26,7 +26,7 @@ export type FirstPhaseLaunchNextAction = {
   detail: string;
 };
 
-export type FirstPhaseLaunchAudit = {
+export type FirstPhaseLaunchAuditTrack = {
   status: FirstPhaseLaunchAuditStatus;
   statusLabel: string;
   summary: string;
@@ -35,6 +35,10 @@ export type FirstPhaseLaunchAudit = {
   readyItems: FirstPhaseLaunchAuditItem[];
   blockers: FirstPhaseLaunchAuditItem[];
   openItems: FirstPhaseLaunchAuditItem[];
+};
+
+export type FirstPhaseLaunchAudit = FirstPhaseLaunchAuditTrack & {
+  chatLaunch: FirstPhaseLaunchAuditTrack;
 };
 
 const launchReadinessCheckIds = new Set([
@@ -48,6 +52,16 @@ const launchReadinessCheckIds = new Set([
   "github_pr_adapter",
   "guardian_wave_state",
   "guardian_mode",
+]);
+
+const chatLaunchReadinessCheckIds = new Set([
+  "app_url",
+  "initial_hook_project",
+  "database",
+  "command_wave_store",
+  "admin_api_key",
+  "6529_mode",
+  "6529_chat_posting",
 ]);
 
 function phaseItemStatus(status: PhaseChecklistStatus): FirstPhaseLaunchAuditItemStatus {
@@ -78,12 +92,28 @@ function includeLaunchReadinessCheck(check: ReadinessCheck) {
   return launchReadinessCheckIds.has(check.id);
 }
 
+function includeChatLaunchReadinessCheck(check: ReadinessCheck) {
+  return chatLaunchReadinessCheckIds.has(check.id);
+}
+
 function statusLabel(status: FirstPhaseLaunchAuditStatus) {
   if (status === "needs_setup") {
     return "checks needed";
   }
 
   return status;
+}
+
+function chatSummaryFor(status: FirstPhaseLaunchAuditStatus) {
+  if (status === "ready") {
+    return "The project chat workspace is ready to invite builders.";
+  }
+
+  if (status === "blocked") {
+    return "The project chat launch is blocked until failed checks are fixed.";
+  }
+
+  return "The project chat workspace needs setup before inviting builders.";
 }
 
 function summaryFor(status: FirstPhaseLaunchAuditStatus) {
@@ -129,6 +159,10 @@ const launchActionCopyByItemId: Record<string, string> = {
   readiness_6529_chat_posting: "Configure project chat posting",
   readiness_github_pr_adapter: "Configure GitHub PR adapter",
   readiness_guardian_wave_state: "Connect guardian wave state",
+  chat_setup_not_checked: "Run project chat check",
+  chat_setup_remote_check: "Run project chat check",
+  chat_wave_format: "Set project chat",
+  chat_wave_reachable: "Pick reachable project chat",
 };
 
 function launchActionTitle(item: FirstPhaseLaunchAuditItem) {
@@ -153,18 +187,22 @@ function createNextAction({
   status,
   statusLabel,
   openItems,
+  readyTitle = "Start the first public loop",
+  readyDetail = "Post the launch brief, invite contributors, and keep each PR tied to a project decision.",
 }: {
   status: FirstPhaseLaunchAuditStatus;
   statusLabel: string;
   openItems: FirstPhaseLaunchAuditItem[];
+  readyTitle?: string;
+  readyDetail?: string;
 }): FirstPhaseLaunchNextAction {
   if (status === "ready") {
     return {
       status,
       statusLabel,
       itemId: null,
-      title: "Start the first public loop",
-      detail: "Post the launch brief, invite contributors, and keep each PR tied to a project decision.",
+      title: readyTitle,
+      detail: readyDetail,
     };
   }
 
@@ -186,6 +224,32 @@ function createNextAction({
     itemId: item.id,
     title: launchActionTitle(item),
     detail: item.detail,
+  };
+}
+
+function trackFromItems(
+  items: FirstPhaseLaunchAuditItem[],
+  summary: (status: FirstPhaseLaunchAuditStatus) => string,
+  readyTitle?: string,
+  readyDetail?: string,
+): FirstPhaseLaunchAuditTrack {
+  const readyItems = items.filter((item) => item.status === "ready");
+  const blockers = items.filter((item) => item.status === "blocked");
+  const openItems = items
+    .filter((item) => item.status !== "ready")
+    .toSorted((left, right) => openItemWeight(left) - openItemWeight(right));
+  const status: FirstPhaseLaunchAuditStatus = blockers.length ? "blocked" : openItems.length ? "needs_setup" : "ready";
+  const statusText = statusLabel(status);
+
+  return {
+    status,
+    statusLabel: statusText,
+    summary: summary(status),
+    nextAction: createNextAction({ status, statusLabel: statusText, openItems, readyTitle, readyDetail }),
+    items,
+    readyItems,
+    blockers,
+    openItems,
   };
 }
 
@@ -271,6 +335,84 @@ function setupValidationItems(setupValidation: SetupValidation | null | undefine
     detail: item.message,
     source: "setup",
   }));
+}
+
+function chatSetupItems(setupValidation: SetupValidation | null | undefined): FirstPhaseLaunchAuditItem[] {
+  if (!setupValidation) {
+    return [
+      {
+        id: "chat_setup_not_checked",
+        label: "Project chat check",
+        status: "needed",
+        detail: "Run setup check to verify the project chat before inviting builders.",
+        source: "setup",
+      },
+    ];
+  }
+
+  const waveFailure = setupValidation.checks.find(
+    (item) => (item.id === "wave_format" || item.id === "wave_reachable") && item.status === "fail",
+  );
+
+  if (waveFailure) {
+    return [
+      {
+        id: `chat_${waveFailure.id}`,
+        label: "Project chat",
+        status: "blocked",
+        detail: waveFailure.message,
+        source: "setup",
+      },
+    ];
+  }
+
+  const waveReachable = setupValidation.checks.find((item) => item.id === "wave_reachable");
+
+  if (waveReachable) {
+    return [
+      {
+        id: "chat_wave_reachable",
+        label: "Project chat",
+        status: setupItemStatus(waveReachable.status),
+        detail: waveReachable.message,
+        source: "setup",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "chat_setup_remote_check",
+      label: "Project chat check",
+      status: "needed",
+      detail: "Run setup check to verify the project chat before inviting builders.",
+      source: "setup",
+    },
+  ];
+}
+
+function readinessItem(check: ReadinessCheck): FirstPhaseLaunchAuditItem {
+  return {
+    id: `readiness_${check.id}`,
+    label: check.label,
+    status: readinessItemStatus(check.status),
+    detail: check.message,
+    source: "readiness",
+  };
+}
+
+function chatReadinessItem(check: ReadinessCheck): FirstPhaseLaunchAuditItem {
+  if (check.id === "initial_hook_project" && check.message.includes("repo is a placeholder")) {
+    return {
+      id: "readiness_initial_hook_project",
+      label: check.label,
+      status: "ready",
+      detail: "First project chat is configured. The GitHub repo can stay as a placeholder until PR work starts.",
+      source: "readiness",
+    };
+  }
+
+  return readinessItem(check);
 }
 
 function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
@@ -473,13 +615,7 @@ export function createFirstPhaseLaunchAudit({
   const readinessItems: FirstPhaseLaunchAuditItem[] = readinessChecks
     ? readinessChecks
         .filter(includeLaunchReadinessCheck)
-        .map((check) => ({
-          id: `readiness_${check.id}`,
-          label: check.label,
-          status: readinessItemStatus(check.status),
-          detail: check.message,
-          source: "readiness",
-        }))
+        .map(readinessItem)
     : [
         {
           id: "readiness_not_checked",
@@ -489,6 +625,22 @@ export function createFirstPhaseLaunchAudit({
           source: "readiness",
         },
       ];
+  const chatReadinessItems: FirstPhaseLaunchAuditItem[] = readinessChecks
+    ? readinessChecks.filter(includeChatLaunchReadinessCheck).map(chatReadinessItem)
+    : [
+        {
+          id: "readiness_not_checked",
+          label: "Readiness check",
+          status: "needed",
+          detail: "Run readiness before inviting builders.",
+          source: "readiness",
+        },
+      ];
+  const chatLaunchItems = [
+    ...chatSetupItems(setupValidation),
+    ...participationNotesItem(wave),
+    ...chatReadinessItems,
+  ];
 
   const items = [
     ...flowItems,
@@ -498,22 +650,15 @@ export function createFirstPhaseLaunchAudit({
     ...auditPacketItem(wave),
     ...readinessItems,
   ];
-  const readyItems = items.filter((item) => item.status === "ready");
-  const blockers = items.filter((item) => item.status === "blocked");
-  const openItems = items
-    .filter((item) => item.status !== "ready")
-    .toSorted((left, right) => openItemWeight(left) - openItemWeight(right));
-  const status: FirstPhaseLaunchAuditStatus = blockers.length ? "blocked" : openItems.length ? "needs_setup" : "ready";
-  const statusText = statusLabel(status);
+  const fullLaunch = trackFromItems(items, summaryFor);
 
   return {
-    status,
-    statusLabel: statusText,
-    summary: summaryFor(status),
-    nextAction: createNextAction({ status, statusLabel: statusText, openItems }),
-    items,
-    readyItems,
-    blockers,
-    openItems,
+    ...fullLaunch,
+    chatLaunch: trackFromItems(
+      chatLaunchItems,
+      chatSummaryFor,
+      "Open project chat",
+      "Post the launch brief and invite builders to discuss the first hook change.",
+    ),
   };
 }
