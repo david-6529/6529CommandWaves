@@ -122,9 +122,10 @@ async function main() {
     "Builders approved with 5 yes and 1 no.",
     "GitHub repo",
     "id=\"project-repo-url\"",
+    "placeholder=\"Select later, owner/repo or GitHub URL\"",
     "id=\"project-access-key\"",
     "The GitHub repo is a placeholder until the pilot repo is selected.",
-    "This default is only a placeholder. Select the pilot repo before creating PR work.",
+    "No GitHub repo is selected yet. Select the pilot repo before creating PR work.",
     "PR build waits until maintainers select the GitHub repo.",
     "Project chat",
     "id=\"project-chat-tab-general\"",
@@ -172,6 +173,10 @@ async function main() {
   assert(!renderedHtml.includes("Decision receipts"), "Home page should not expose decision receipt labels.");
   assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
+  assert(
+    !renderedHtml.includes("value=\"https://github.com/your-org/your-hook-repo\""),
+    "Home page must not render the placeholder GitHub URL as a selected repo.",
+  );
   assertNoEmDash("Home page", renderedHtml);
 
   const readiness = await fetchJson("/api/readiness");

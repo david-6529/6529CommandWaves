@@ -67,7 +67,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Builders approved with 5 yes and 1 no.");
     expect(text).toContain("GitHub repo");
     expect(text).toContain("The GitHub repo is a placeholder until the pilot repo is selected.");
-    expect(text).toContain("This default is only a placeholder. Select the pilot repo before creating PR work.");
+    expect(text).toContain("No GitHub repo is selected yet. Select the pilot repo before creating PR work.");
     expect(text).toContain("PR build waits until maintainers select the GitHub repo.");
     expect(text).toContain("Project chat");
     expect(text).toContain("General");
@@ -110,6 +110,8 @@ describe("CommandWavesConsole", () => {
 
     expect(html).toContain(">View setup</button>");
     expect(html).toContain('id="project-repo-url"');
+    expect(html).toContain('placeholder="Select later, owner/repo or GitHub URL"');
+    expect(html).not.toContain('value="https://github.com/your-org/your-hook-repo"');
     expect(html).toContain('id="project-access-key"');
     expect(html).toContain('id="who-can-join"');
     expect(html).toContain("Maintainer setup");

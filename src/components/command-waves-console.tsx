@@ -1402,9 +1402,12 @@ export function CommandWavesConsole() {
         ? "Checking"
         : "Check readiness"
       : "Open launch controls";
-  const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
-  const projectRepoIsPlaceholder = isPlaceholderValue(projectRepoHref);
+  const projectRepoHref = primaryHookProject?.repoUrl ?? null;
+  const projectRepoIsPlaceholder = !projectRepoHref;
   const projectRepoLabel = projectRepoIsPlaceholder ? githubRepoPlaceholder.label : "GitHub repo";
+  const projectRepoDraftIsPlaceholder = !repoUrl.trim() || isPlaceholderValue(repoUrl);
+  const projectRepoInputValue = projectRepoDraftIsPlaceholder ? "" : repoUrl;
+  const projectRepoInputLabel = projectRepoDraftIsPlaceholder ? githubRepoPlaceholder.label : "GitHub repo";
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
@@ -3225,19 +3228,22 @@ export function CommandWavesConsole() {
                   </div>
                 ) : null}
               </div>
-              <Field label={projectRepoLabel}>
+              <Field label={projectRepoInputLabel}>
                 <Input
                   id={projectRepoInputId}
-                  value={repoUrl}
+                  value={projectRepoInputValue}
+                  placeholder="Select later, owner/repo or GitHub URL"
                   onChange={(event) => {
-                    setRepoUrl(event.target.value);
+                    const nextRepoUrl = event.target.value;
+
+                    setRepoUrl(nextRepoUrl.trim() ? nextRepoUrl : githubRepoPlaceholder.url);
                     setSetupValidation(null);
                   }}
                 />
               </Field>
-              {projectRepoIsPlaceholder ? (
+              {projectRepoDraftIsPlaceholder ? (
                 <p className="text-xs leading-5 text-zinc-500">
-                  This default is only a placeholder. Select the pilot repo before creating PR work.
+                  No GitHub repo is selected yet. Select the pilot repo before creating PR work.
                 </p>
               ) : null}
               {setupValidation ? (
