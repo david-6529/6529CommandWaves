@@ -29,7 +29,9 @@ describe("GitHub repo helpers", () => {
     const template = readFileSync(".github/PULL_REQUEST_TEMPLATE.md", "utf8");
     const workflow = readFileSync(".github/workflows/guardian-review.yml", "utf8");
 
+    expect(template).toContain("Project chat:");
     expect(template).toContain("Decision link URL:");
+    expect(template).not.toContain("Builder wave:");
     expect(template).toContain("Command Waves review request copied from the app:");
     expect(template).toContain("Launch packet or status link:");
     expect(template).toContain("<!-- command-waves:manifest:start -->");

@@ -4,7 +4,7 @@ import { demoWave } from "./demo-wave";
 
 const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
 
-describe("builder wave review request draft", () => {
+describe("project review request draft", () => {
   it("creates a manual review request from an approved PR record", () => {
     const draft = createBuilderWaveReviewRequestDraft({
       wave: demoWave,

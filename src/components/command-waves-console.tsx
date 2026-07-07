@@ -68,7 +68,7 @@ type ProposalTypeOption = {
 };
 
 const commandKinds: CommandKindOption[] = [
-  { value: "read_context", label: commandKindLabel("read_context"), description: "Summarize or inspect wave/repo state." },
+  { value: "read_context", label: commandKindLabel("read_context"), description: "Summarize or inspect project state." },
   { value: "draft_response", label: commandKindLabel("draft_response"), description: "Draft text without posting it." },
   { value: "post_to_wave", label: commandKindLabel("post_to_wave"), description: "Draft a public update for human posting." },
   { value: "open_pr", label: commandKindLabel("open_pr"), description: "Use an agent harness to change code." },

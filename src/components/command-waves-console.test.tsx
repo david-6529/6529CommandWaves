@@ -70,6 +70,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("No GitHub repo is selected yet. Select the pilot repo before creating PR work.");
     expect(text).toContain("PR build waits until maintainers select the GitHub repo.");
     expect(text).toContain("Project chat");
+    expect(text).toContain("Summarize or inspect project state.");
+    expect(text).not.toContain("wave/repo state");
     expect(text).toContain("General");
     expect(text).toContain("Build");
     expect(text).toContain("Review");

@@ -4,8 +4,8 @@ import { demoWave } from "./demo-wave";
 
 const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
 
-describe("builder wave launch draft", () => {
-  it("creates a concise first post for the hook builder wave", () => {
+describe("project launch draft", () => {
+  it("creates a concise first post for the hook project", () => {
     const draft = createBuilderWaveLaunchDraft(demoWave);
 
     expect(draft).toContain("Project launch brief");

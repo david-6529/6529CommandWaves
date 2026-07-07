@@ -223,7 +223,7 @@ describe("PR reviewer gate", () => {
         url: null,
         recordedBy: "david",
         recordedAt: "2026-06-20T18:00:00.000Z",
-        summary: "Builder wave approved the work.",
+        summary: "Project chat approved the work.",
       },
     };
     const manifest = createCommandPrManifest({ wave, proposal, poll });

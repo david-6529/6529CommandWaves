@@ -1,6 +1,6 @@
 ## Command Waves Link
 
-- Builder wave:
+- Project chat:
 - Approved command id:
 - Decision link URL:
 

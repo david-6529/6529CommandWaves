@@ -5,7 +5,7 @@ import { createParticipationGuideDraft } from "./participation-guide-draft";
 const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
 
 describe("participation guide draft", () => {
-  it("creates a copyable participation guide for the builder wave", () => {
+  it("creates a copyable participation guide for the project chat", () => {
     const draft = createParticipationGuideDraft(demoWave);
 
     expect(draft).toContain("Project participation guide");

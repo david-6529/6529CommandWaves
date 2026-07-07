@@ -44,7 +44,7 @@ const configuredDemoWave = {
 };
 
 describe("launch status draft", () => {
-  it("summarizes open launch items for the builder wave", () => {
+  it("summarizes open launch items for the project chat", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: null,

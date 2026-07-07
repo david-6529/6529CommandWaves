@@ -5,7 +5,7 @@ import { demoWave } from "./demo-wave";
 const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
 
 describe("build project decision draft", () => {
-  it("creates a concise decision request for the builder wave", () => {
+  it("creates a concise decision request for the project chat", () => {
     const draft = createBuilderWaveDecisionDraft({
       wave: demoWave,
       proposal: demoWave.proposals[0],

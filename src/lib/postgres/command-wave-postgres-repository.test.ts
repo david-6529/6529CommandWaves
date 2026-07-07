@@ -121,7 +121,7 @@ describe("Postgres command wave repository", () => {
               url: "https://6529.io/waves/demo-command-wave/drops/drop-approval",
               recordedBy: "david",
               recordedAt: "2026-06-20T12:40:00.000Z",
-              summary: "Builder wave approved cmd-001.",
+              summary: "Project chat approved cmd-001.",
             },
           },
         ];
