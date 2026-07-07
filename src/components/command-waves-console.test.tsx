@@ -145,6 +145,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Participation gate is not set yet.");
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("Build reference");
+    expect(text).not.toContain("Use Codex to draft");
     expect(text).not.toContain("orchestrator managed");
     expect(text).not.toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).not.toContain("production reviewer service is wired");
