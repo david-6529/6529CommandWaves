@@ -180,7 +180,7 @@ describe("launch audit verifier", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
       status: "fail",
-      message: "Launch audit must be generated with remote setup checks.",
+      message: "Run the launch audit with ?remote=1 before broad participation.",
     });
   });
 

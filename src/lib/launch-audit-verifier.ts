@@ -550,7 +550,7 @@ export function verifyLaunchAuditPayload(
       setupCheckMode === "remote" ? "pass" : "fail",
       setupCheckMode === "remote"
         ? "Remote wave and repo setup checks ran."
-        : "Launch audit must be generated with remote setup checks.",
+        : "Run the launch audit with ?remote=1 before broad participation.",
     ),
     check(
       "product_contract",
