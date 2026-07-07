@@ -59,8 +59,8 @@ What exists now:
 - Launch audit, workflow proof, checklists, launch packets, update drafts, and contribution reports reject stale PR or review evidence unless the PR link and review proof are bound to the configured repo.
 - Review cannot record guardian proof unless the current execution includes a PR link for the configured repo.
 - GitHub guardian PR evidence includes the target repo and fails when it does not match the configured hook repo.
-- The GitHub adapter can open draft PRs from prepared branches, post bounded PR comments, and create bounded check runs.
-  It still does not create branches, commit code, merge, deploy, or change repo settings.
+- The GitHub adapter can prepare branches from a selected base, open draft PRs, post bounded PR comments, and create
+  bounded check runs. It still does not commit code, merge, deploy, or change repo settings.
 - Local file storage for the demo flow and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
 What remains manual or MVP-only:
@@ -495,7 +495,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
 2. Set the initial hook wave and repo, then run the remote launch audit until setup is reachable.
-3. Finish controlled GitHub branch and commit operations. Bounded PR comments and check runs are supported by the GitHub adapter.
+3. Finish controlled GitHub commit operations. Branches, bounded PR comments, and check runs are supported by the GitHub adapter.
 4. Add controlled Codex execution using [docs/agent-harness-plan.md](docs/agent-harness-plan.md).
 5. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 6. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.

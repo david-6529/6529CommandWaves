@@ -72,6 +72,22 @@ describe("local command adapters", () => {
     });
   });
 
+  it("can create local branch records", async () => {
+    const branch = await localRepoAdapter.prepareBranch?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      baseBranch: "main",
+      branchName: "command/cmd-001-draft-hook",
+    });
+
+    expect(branch).toMatchObject({
+      branchName: "command/cmd-001-draft-hook",
+      baseBranch: "main",
+      ref: "refs/heads/command/cmd-001-draft-hook",
+      url: "https://github.com/6529-Collections/6529-hook/tree/command/cmd-001-draft-hook",
+    });
+    expect(branch?.baseSha).toMatch(/^local-/);
+  });
+
   it("can create local check run records", async () => {
     const checkRun = await localRepoAdapter.createCheckRun?.({
       repoUrl: "https://github.com/6529-Collections/6529-hook",

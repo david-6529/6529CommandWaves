@@ -12,6 +12,132 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
 }
 
 describe("GitHub pull request adapter", () => {
+  it("prepares a branch from the configured base branch", async () => {
+    const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
+    const baseSha = "0123456789abcdef0123456789abcdef01234567";
+    const adapter = createGitHubPullRequestAdapter({
+      apiBaseUrl: "https://api.example.test",
+      token: "token",
+      defaultBaseBranch: "main",
+      fetchImpl: async (input, init) => {
+        calls.push({ input, init });
+
+        if (String(input).endsWith("/git/ref/heads/main")) {
+          return jsonResponse({
+            ref: "refs/heads/main",
+            object: {
+              sha: baseSha,
+            },
+          });
+        }
+
+        return jsonResponse({
+          ref: "refs/heads/command/cmd-001-draft-hook",
+          object: {
+            sha: baseSha,
+          },
+        });
+      },
+    });
+
+    const result = await adapter.prepareBranch?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      branchName: "command/cmd-001-draft-hook",
+    });
+
+    expect(result).toEqual({
+      branchName: "command/cmd-001-draft-hook",
+      baseBranch: "main",
+      baseSha,
+      ref: "refs/heads/command/cmd-001-draft-hook",
+      url: "https://github.com/6529-Collections/6529-hook/tree/command/cmd-001-draft-hook",
+    });
+    expect(String(calls[0]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/git/ref/heads/main");
+    expect(calls[0]?.init?.method).toBe("GET");
+    expect(calls[0]?.init?.body).toBeUndefined();
+    expect(String(calls[1]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/git/refs");
+    expect(calls[1]?.init?.method).toBe("POST");
+    expect(JSON.parse(String(calls[1]?.init?.body))).toEqual({
+      ref: "refs/heads/command/cmd-001-draft-hook",
+      sha: baseSha,
+    });
+  });
+
+  it("requires a GitHub token before preparing branches", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      env: {},
+      fetchImpl: async () => jsonResponse({}),
+    });
+
+    await expect(
+      adapter.prepareBranch?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/no-token",
+      }),
+    ).rejects.toThrow("Preparing GitHub branches requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN.");
+  });
+
+  it("validates prepared branch requests before calling GitHub", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.prepareBranch?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "refs/heads/command/bad",
+      }),
+    ).rejects.toThrow("Head branch must be a prepared branch name in the target repo.");
+
+    await expect(
+      adapter.prepareBranch?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "main",
+        baseBranch: "main",
+      }),
+    ).rejects.toThrow("Head branch must differ from base branch.");
+    expect(called).toBe(false);
+  });
+
+  it("surfaces GitHub branch preparation API failures", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => new Response("missing base", { status: 404, statusText: "Not Found" }),
+    });
+
+    await expect(
+      adapter.prepareBranch?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/missing-base",
+      }),
+    ).rejects.toThrow("GitHub base branch lookup failed: 404 Not Found - missing base");
+  });
+
+  it("rejects malformed base branch responses", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () =>
+        jsonResponse({
+          object: {
+            sha: "abc123",
+          },
+        }),
+    });
+
+    await expect(
+      adapter.prepareBranch?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/bad-base-response",
+      }),
+    ).rejects.toThrow("GitHub base branch response did not include a full 40-character SHA.");
+  });
+
   it("opens a draft pull request from a prepared branch", async () => {
     const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
     const adapter = createGitHubPullRequestAdapter({

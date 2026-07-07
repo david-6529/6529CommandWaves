@@ -27,6 +27,20 @@ export type RepoPullRequestResult = {
   headSha: string;
 };
 
+export type RepoBranchInput = {
+  repoUrl: string;
+  branchName: string;
+  baseBranch?: string;
+};
+
+export type RepoBranchResult = {
+  branchName: string;
+  baseBranch: string;
+  baseSha: string;
+  ref: string;
+  url: string | null;
+};
+
 export type RepoPullRequestCommentInput = {
   repoUrl: string;
   prNumber: number;
@@ -73,6 +87,7 @@ export type WaveAdapter = {
 };
 
 export type RepoAdapter = {
+  prepareBranch?(input: RepoBranchInput): Promise<RepoBranchResult>;
   openPullRequest(input: RepoPullRequestInput): Promise<RepoPullRequestResult>;
   commentOnPullRequest?(input: RepoPullRequestCommentInput): Promise<RepoPullRequestCommentResult>;
   createCheckRun?(input: RepoCheckRunInput): Promise<RepoCheckRunResult>;

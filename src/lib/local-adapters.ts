@@ -39,6 +39,18 @@ export const localWaveAdapter: WaveAdapter = {
 };
 
 export const localRepoAdapter: RepoAdapter = {
+  async prepareBranch(input) {
+    const baseBranch = input.baseBranch ?? "main";
+    const stable = stableNumber(`${input.repoUrl}:${baseBranch}:${input.branchName}`);
+
+    return {
+      branchName: input.branchName,
+      baseBranch,
+      baseSha: `local-${stable.toString(16)}`,
+      ref: `refs/heads/${input.branchName}`,
+      url: `${input.repoUrl.replace(/\/$/, "")}/tree/${input.branchName}`,
+    };
+  },
   async openPullRequest(input) {
     const stable = stableNumber(`${input.repoUrl}:${input.branchName}:${input.title}`);
     const prNumber = stable % 1000;

@@ -1,4 +1,9 @@
-import type { RepoAdapter, RepoCheckRunInput, RepoPullRequestCommentInput, RepoPullRequestInput } from "../adapters";
+import type {
+  RepoAdapter,
+  RepoBranchInput,
+  RepoCheckRunInput,
+  RepoPullRequestCommentInput,
+} from "../adapters";
 import { fetchTextResponseWithTimeout } from "../http-fetch";
 import { parseGitHubRepoUrl, pullRequestUrl } from "./repo";
 
@@ -20,7 +25,7 @@ function githubToken(options: GitHubPullRequestAdapterOptions) {
   return options.token?.trim() || envValue(options.env ?? process.env, "COMMAND_WAVE_GITHUB_TOKEN") || envValue(options.env ?? process.env, "GITHUB_TOKEN");
 }
 
-function githubBaseBranch(options: GitHubPullRequestAdapterOptions, input: RepoPullRequestInput) {
+function githubBaseBranch(options: GitHubPullRequestAdapterOptions, input: { baseBranch?: string }) {
   return input.baseBranch ?? options.defaultBaseBranch ?? envValue(options.env ?? process.env, "COMMAND_WAVE_GITHUB_BASE_BRANCH") ?? "main";
 }
 
@@ -52,6 +57,12 @@ function validatePreparedBranchName(value: string, label: string) {
   }
 
   return branch;
+}
+
+function validateBranchPair(baseBranch: string, headBranch: string) {
+  if (baseBranch === headBranch) {
+    throw Object.assign(new Error("Head branch must differ from base branch."), { status: 400 });
+  }
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -116,6 +127,16 @@ function validateCheckRunHeadSha(value: string) {
   return headSha;
 }
 
+function payloadFullSha(value: unknown, message: string) {
+  const sha = payloadText(value);
+
+  if (!sha || !/^[0-9a-f]{40}$/i.test(sha)) {
+    throw Object.assign(new Error(message), { status: 502 });
+  }
+
+  return sha;
+}
+
 function validateCheckRunSummary(value: string) {
   const summary = value.trim();
 
@@ -153,20 +174,32 @@ async function requestGitHub(
   repoPath: string,
   token: string,
   fetchImpl: FetchLike,
-  body: unknown,
-  failureLabel: string,
+  {
+    body,
+    failureLabel,
+    method = "POST",
+  }: {
+    body?: unknown;
+    failureLabel: string;
+    method?: "GET" | "POST";
+  },
 ) {
+  const headers: Record<string, string> = {
+    accept: "application/vnd.github+json",
+    authorization: `Bearer ${token}`,
+    "x-github-api-version": "2022-11-28",
+  };
+
+  if (body !== undefined) {
+    headers["content-type"] = "application/json";
+  }
+
   const response = await fetchTextResponseWithTimeout(`${apiBaseUrl.replace(/\/$/, "")}${repoPath}`, {
     allowedStatuses: githubNonOkStatuses,
     fetchImpl,
-    method: "POST",
-    headers: {
-      accept: "application/vnd.github+json",
-      authorization: `Bearer ${token}`,
-      "content-type": "application/json",
-      "x-github-api-version": "2022-11-28",
-    },
-    body: JSON.stringify(body),
+    method,
+    headers,
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 
   if (response.status < 200 || response.status > 299) {
@@ -189,11 +222,55 @@ function repoApiPath(repo: NonNullable<ReturnType<typeof parseGitHubRepoUrl>>, p
   return `/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}${path}`;
 }
 
+function branchRefPath(branchName: string) {
+  return `/git/ref/heads/${branchName.split("/").map(encodeURIComponent).join("/")}`;
+}
+
 export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapterOptions = {}): RepoAdapter {
   const apiBaseUrl = options.apiBaseUrl ?? "https://api.github.com";
   const fetchImpl = options.fetchImpl ?? fetch;
 
   return {
+    async prepareBranch(input: RepoBranchInput) {
+      const repo = parseGitHubRepoUrl(input.repoUrl);
+      const token = githubToken(options);
+
+      if (!repo) {
+        throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
+      }
+
+      const headBranch = validatePreparedBranchName(input.branchName, "Head branch");
+      const baseBranch = validatePreparedBranchName(githubBaseBranch(options, input), "Base branch");
+      validateBranchPair(baseBranch, headBranch);
+
+      if (!token) {
+        throw Object.assign(new Error("Preparing GitHub branches requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN."), {
+          status: 503,
+        });
+      }
+
+      const baseRef = await requestGitHub(apiBaseUrl, repoApiPath(repo, branchRefPath(baseBranch)), token, fetchImpl, {
+        failureLabel: "GitHub base branch lookup",
+        method: "GET",
+      });
+      const baseObject = asRecord(baseRef?.object);
+      const baseSha = payloadFullSha(baseObject?.sha, "GitHub base branch response did not include a full 40-character SHA.");
+      const createdRef = await requestGitHub(apiBaseUrl, repoApiPath(repo, "/git/refs"), token, fetchImpl, {
+        body: {
+          ref: `refs/heads/${headBranch}`,
+          sha: baseSha,
+        },
+        failureLabel: "GitHub branch creation",
+      });
+
+      return {
+        branchName: headBranch,
+        baseBranch,
+        baseSha,
+        ref: payloadText(createdRef?.ref) ?? `refs/heads/${headBranch}`,
+        url: `${repo.htmlUrl}/tree/${headBranch}`,
+      };
+    },
     async openPullRequest(input) {
       const repo = parseGitHubRepoUrl(input.repoUrl);
       const token = githubToken(options);
@@ -204,6 +281,7 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
 
       const headBranch = validatePreparedBranchName(input.branchName, "Head branch");
       const baseBranch = validatePreparedBranchName(githubBaseBranch(options, input), "Base branch");
+      validateBranchPair(baseBranch, headBranch);
       if (!token) {
         throw Object.assign(new Error("Opening GitHub PRs requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN."), {
           status: 503,
@@ -220,14 +298,16 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         token,
         fetchImpl,
         {
-          title: input.title,
-          body: input.body,
-          head: headBranch,
-          base: baseBranch,
-          draft: true,
-          maintainer_can_modify: input.maintainerCanModify ?? false,
+          body: {
+            title: input.title,
+            body: input.body,
+            head: headBranch,
+            base: baseBranch,
+            draft: true,
+            maintainer_can_modify: input.maintainerCanModify ?? false,
+          },
+          failureLabel: "GitHub PR creation",
         },
-        "GitHub PR creation",
       );
 
       const prNumber = payloadNumber(payload);
@@ -266,8 +346,10 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         repoApiPath(repo, `/issues/${prNumber}/comments`),
         token,
         fetchImpl,
-        { body },
-        "GitHub PR comment",
+        {
+          body: { body },
+          failureLabel: "GitHub PR comment",
+        },
       );
 
       return {
@@ -299,18 +381,20 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         token,
         fetchImpl,
         {
-          name,
-          head_sha: headSha,
-          status,
-          ...(input.conclusion ? { conclusion: input.conclusion } : {}),
-          ...(input.detailsUrl?.trim() ? { details_url: input.detailsUrl.trim() } : {}),
-          ...(input.externalId?.trim() ? { external_id: input.externalId.trim() } : {}),
-          output: {
-            title: name,
-            summary,
+          body: {
+            name,
+            head_sha: headSha,
+            status,
+            ...(input.conclusion ? { conclusion: input.conclusion } : {}),
+            ...(input.detailsUrl?.trim() ? { details_url: input.detailsUrl.trim() } : {}),
+            ...(input.externalId?.trim() ? { external_id: input.externalId.trim() } : {}),
+            output: {
+              title: name,
+              summary,
+            },
           },
+          failureLabel: "GitHub check run",
         },
-        "GitHub check run",
       );
 
       return {
