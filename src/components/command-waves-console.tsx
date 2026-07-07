@@ -2193,8 +2193,8 @@ export function CommandWavesConsole() {
             </div>
             <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-50">{humanizeLegacyCommandCopy(currentFocusTitle)}</h2>
             <p className="mt-2 text-base leading-7 text-zinc-400">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
-            <div className="mt-5 grid gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-3">
-              <div>
+            <div className="mt-5 grid gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
                 <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{phaseNextAction.title}</p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">{phaseNextAction.detail}</p>
