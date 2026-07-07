@@ -1630,6 +1630,15 @@ export function CommandWavesConsole() {
     openSetupControls();
   }
 
+  function runWalletAction() {
+    if (walletAddress) {
+      prepareJoinRequest();
+      return;
+    }
+
+    void connectWallet();
+  }
+
   async function copyWaveUpdateDraft() {
     setApiError("");
 
@@ -2094,9 +2103,9 @@ export function CommandWavesConsole() {
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => void connectWallet()}
+                  onClick={runWalletAction}
                 >
-                  {walletAddress ? "Connected" : "Connect wallet"}
+                  {walletAddress ? "Request access" : "Connect wallet"}
                 </Button>
               </div>
               {walletNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{walletNotice}</p> : null}
