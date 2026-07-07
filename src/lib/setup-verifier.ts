@@ -73,7 +73,7 @@ function commandWaveStateFromPayload(payload: unknown) {
 
 function githubRepoCheck(proof: SetupProof) {
   if (!proof.github) {
-    return check("github_repo", "fail", "Setup proof does not name a GitHub repo.");
+    return check("github_repo", "fail", "Select the GitHub repo before verifying required checks.");
   }
 
   if (isPlaceholderValue(proof.github.repoUrl)) {

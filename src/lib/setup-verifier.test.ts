@@ -78,7 +78,7 @@ describe("setup verifier", () => {
     expect(result.requiredChecks).toEqual([]);
     expect(result.checks.find((item) => item.id === "github_repo")).toMatchObject({
       status: "fail",
-      message: "Setup proof does not name a GitHub repo.",
+      message: "Select the GitHub repo before verifying required checks.",
     });
     expect(result.checks.some((item) => item.id === "required_check_Command Waves Guardian")).toBe(false);
   });
