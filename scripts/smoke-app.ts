@@ -104,6 +104,7 @@ async function main() {
     "Everything starts in chat.",
     "Connect wallet if you want, then use Request access in chat.",
     "Current work",
+    "Select the repo",
     "5 yes, 1 no. Decision link recorded.",
     "GitHub repo",
     "Placeholder until selected.",

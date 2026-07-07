@@ -1045,6 +1045,8 @@ export function CommandWavesConsole() {
       ? phaseWork.prReview
       : (wave.reviews.find((review) => review.proposalId === activeProposal.id) ?? null)
     : null;
+  const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
+  const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const repoCanRunCode = Boolean(wave.repoUrl.trim() && !isPlaceholderValue(wave.repoUrl));
   const readyForNextHookChange = activeReview?.status === "pass";
   const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
@@ -1159,9 +1161,7 @@ export function CommandWavesConsole() {
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
-  const phaseChecklist = useMemo(() => createPhaseChecklist(wave), [wave]);
   const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
-  const phaseNextAction = useMemo(() => createPhaseNextAction(phaseChecklist), [phaseChecklist]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
   const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
@@ -2193,7 +2193,12 @@ export function CommandWavesConsole() {
             </div>
             <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-50">{humanizeLegacyCommandCopy(currentFocusTitle)}</h2>
             <p className="mt-2 text-base leading-7 text-zinc-400">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
-            <div className="mt-5 grid gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-2">
+            <div className="mt-5 grid gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-3">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
+                <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{phaseNextAction.title}</p>
+                <p className="mt-1 text-sm leading-6 text-zinc-500">{phaseNextAction.detail}</p>
+              </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
                 <p className="mt-1 text-base leading-7 text-zinc-400">{currentDecisionDetail}</p>

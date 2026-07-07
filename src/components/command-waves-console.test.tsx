@@ -44,6 +44,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Current work");
     expect(text).toContain("repo needed");
+    expect(text).toContain("Next");
+    expect(text).toContain("Select the repo");
     expect(text).toContain("Decision");
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
     expect(text).toContain("GitHub repo");
