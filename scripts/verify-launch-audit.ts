@@ -1,7 +1,11 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fetchJsonWithTimeout, type TimedFetchError } from "../src/lib/http-fetch";
-import { launchAuditRemoteEnabled, launchAuditUrlFromAppUrl } from "../src/lib/launch-audit-url";
+import {
+  defaultLocalAppUrl,
+  launchAuditRemoteEnabled,
+  launchAuditUrlFromAppUrl,
+} from "../src/lib/launch-audit-url";
 import { verifyLaunchAuditPayload } from "../src/lib/launch-audit-verifier";
 
 type LoadedLaunchAudit = {
@@ -47,11 +51,13 @@ async function readOptionalJsonUrl(url: string): Promise<unknown> {
 
 async function loadLaunchAuditPayload(): Promise<LoadedLaunchAudit> {
   const auditPath = process.env.LAUNCH_AUDIT_PATH;
+  const localAppUrl = process.env.LOCAL_APP_URL?.trim() || defaultLocalAppUrl;
   const auditUrl =
     process.env.LAUNCH_AUDIT_URL?.trim() ||
     launchAuditUrlFromAppUrl(process.env.NEXT_PUBLIC_APP_URL, {
       remote: launchAuditRemoteEnabled(process.env.LAUNCH_AUDIT_REMOTE),
-    });
+    }) ||
+    launchAuditUrlFromAppUrl(localAppUrl, { remote: false });
 
   if (auditPath?.trim()) {
     return {
@@ -67,7 +73,9 @@ async function loadLaunchAuditPayload(): Promise<LoadedLaunchAudit> {
     };
   }
 
-  throw new Error("Set LAUNCH_AUDIT_PATH, LAUNCH_AUDIT_URL, or NEXT_PUBLIC_APP_URL before running launch audit verification.");
+  throw new Error(
+    "Set LAUNCH_AUDIT_PATH, LAUNCH_AUDIT_URL, NEXT_PUBLIC_APP_URL, or run the local app before launch audit verification.",
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

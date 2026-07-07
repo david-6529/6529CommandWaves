@@ -395,6 +395,8 @@ LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=
 
 If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
 `$NEXT_PUBLIC_APP_URL/api/command-wave/launch/audit?remote=1`. Set `LAUNCH_AUDIT_REMOTE=0` only for local shape checks.
+Without an explicit path, URL, or app URL, `npm run launch:audit` uses the local dev app at `http://localhost:5001` and
+runs a shape-only audit.
 
 The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
 `LAUNCH_AUDIT_PATH`. The verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
@@ -403,15 +405,15 @@ audit evidence. When it can resolve the project index target, it checks that the
 project and has a valid hash. Set `LAUNCH_AUDIT_STATE_URL` or `LAUNCH_AUDIT_PROJECT_INDEX_URL` to override those targets
 during offline checks.
 
-Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed by Next:
+Against a running local dev server on the default port:
 
 ```bash
-LOCAL_APP_URL=http://localhost:5001
-SMOKE_BASE_URL=$LOCAL_APP_URL npm run smoke:app
-SETUP_PROOF_URL=$LOCAL_APP_URL/api/command-wave/setup/proof npm run setup:verify
-NEXT_PUBLIC_APP_URL=$LOCAL_APP_URL npm run launch:audit
+SMOKE_BASE_URL=http://localhost:5001 npm run smoke:app
+npm run setup:verify
+npm run launch:audit
 ```
 
+If Next is running on another port, set `LOCAL_APP_URL` to that app URL before `setup:verify` or `launch:audit`.
 The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero until production
 env, live 6529 mode, durable storage, GitHub PR adapter, guardian state, and the required guardian check are configured.
 

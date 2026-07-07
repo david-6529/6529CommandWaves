@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { launchAuditRemoteEnabled, launchAuditUrlFromAppUrl } from "./launch-audit-url";
+import {
+  defaultLocalAppUrl,
+  launchAuditRemoteEnabled,
+  launchAuditUrlFromAppUrl,
+  setupProofUrlFromAppUrl,
+} from "./launch-audit-url";
 
 describe("launch audit URL", () => {
   it("uses the remote launch audit path by default", () => {
@@ -24,7 +29,27 @@ describe("launch audit URL", () => {
     expect(launchAuditUrlFromAppUrl(" ")).toBeNull();
   });
 
+  it("defines the local verifier fallback URL", () => {
+    expect(defaultLocalAppUrl).toBe("http://localhost:5001");
+    expect(launchAuditUrlFromAppUrl(defaultLocalAppUrl, { remote: false })).toBe(
+      "http://localhost:5001/api/command-wave/launch/audit",
+    );
+    expect(setupProofUrlFromAppUrl(defaultLocalAppUrl)).toBe("http://localhost:5001/api/command-wave/setup/proof");
+  });
+
+  it("builds setup proof URLs from deployed app URLs", () => {
+    expect(setupProofUrlFromAppUrl("https://command-waves.example.com/")).toBe(
+      "https://command-waves.example.com/api/command-wave/setup/proof",
+    );
+    expect(setupProofUrlFromAppUrl(" ")).toBeNull();
+  });
+
   it("does not emit em dash characters", () => {
-    expect(JSON.stringify(launchAuditUrlFromAppUrl("https://command-waves.example.com/"))).not.toContain("\u2014");
+    expect(
+      JSON.stringify({
+        defaultLocalAppUrl,
+        launchAuditUrl: launchAuditUrlFromAppUrl("https://command-waves.example.com/"),
+      }),
+    ).not.toContain("\u2014");
   });
 });

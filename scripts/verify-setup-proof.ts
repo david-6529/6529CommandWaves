@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fetchJsonWithTimeout, type TimedFetchError } from "../src/lib/http-fetch";
 import { isPlaceholderValue } from "../src/lib/env-placeholders";
+import { defaultLocalAppUrl, setupProofUrlFromAppUrl } from "../src/lib/launch-audit-url";
 import type { SetupProof } from "../src/lib/setup-proof";
 import { verifySetupProofAgainstGitHubPayloads } from "../src/lib/setup-verifier";
 
@@ -44,15 +45,21 @@ async function readOptionalJsonUrl(url: string, token?: string): Promise<unknown
 
 async function loadSetupProof() {
   const proofPath = process.env.SETUP_PROOF_PATH;
-  const proofUrl = process.env.SETUP_PROOF_URL;
+  const localAppUrl = process.env.LOCAL_APP_URL?.trim() || defaultLocalAppUrl;
+  const proofUrl =
+    process.env.SETUP_PROOF_URL?.trim() ||
+    setupProofUrlFromAppUrl(process.env.NEXT_PUBLIC_APP_URL) ||
+    setupProofUrlFromAppUrl(localAppUrl);
   const payload = proofPath?.trim()
     ? readJsonFile<SetupProof | { proof: SetupProof }>(resolve(proofPath))
-    : proofUrl?.trim()
+    : proofUrl
       ? await readJsonUrl<SetupProof | { proof: SetupProof }>(proofUrl)
       : null;
 
   if (!payload) {
-    throw new Error("SETUP_PROOF_PATH or SETUP_PROOF_URL is required.");
+    throw new Error(
+      "Set SETUP_PROOF_PATH, SETUP_PROOF_URL, NEXT_PUBLIC_APP_URL, or run the local app before setup verification.",
+    );
   }
 
   return "proof" in payload ? payload.proof : payload;
