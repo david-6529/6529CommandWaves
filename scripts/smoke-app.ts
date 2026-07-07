@@ -261,6 +261,20 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Visible activity report");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "chatPosts");
   assert(!JSON.stringify(launchPayload).includes("roomPosts"), "Launch audit response still includes roomPosts.");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Project decision link");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "flow_project_decision_link");
+  assert(
+    !JSON.stringify(launchPayload).includes("Project decision receipt"),
+    "Launch audit response still exposes decision receipt labels.",
+  );
+  assert(
+    !JSON.stringify(launchPayload).includes("flow_wave_decision_receipt"),
+    "Launch audit response still exposes the old decision receipt item id.",
+  );
+  assert(
+    !JSON.stringify(launchPayload).includes("Receipt recorded"),
+    "Launch audit response still exposes stale receipt copy.",
+  );
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
 

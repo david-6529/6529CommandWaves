@@ -136,7 +136,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_build: "Build the approved PR",
   flow_review: "Review the PR result",
   flow_log: "Share the result back to chat",
-  flow_wave_decision_receipt: "Record the project decision URL",
+  flow_project_decision_link: "Record the project decision URL",
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Fix launch packet evidence",
   setup_not_checked: "Run launch setup check",
@@ -417,7 +417,7 @@ function chatReadinessItem(check: ReadinessCheck): FirstPhaseLaunchAuditItem {
   return readinessItem(check);
 }
 
-function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
+function decisionLinkItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
   const proposal = wave?.proposals.find((item) => item.kind === "open_pr") ?? null;
 
   if (!proposal) {
@@ -425,11 +425,11 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   }
 
   const poll = wave?.polls.find((item) => item.proposalId === proposal.id) ?? null;
-  const receipt = poll?.decision ?? null;
+  const decision = poll?.decision ?? null;
 
-  if (receipt) {
+  if (decision) {
     const referenceCheck = validateWaveDecisionReference({
-      reference: receipt.url ?? receipt.dropId ?? "",
+      reference: decision.url ?? decision.dropId ?? "",
       waveUrl: wave?.waveUrl ?? "",
       requireUrl: true,
     });
@@ -437,8 +437,8 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
     if (!referenceCheck.ok) {
       return [
         {
-          id: "flow_wave_decision_receipt",
-          label: "Project decision receipt",
+          id: "flow_project_decision_link",
+          label: "Project decision link",
           status: "blocked",
           detail: referenceCheck.message,
           source: "flow",
@@ -448,10 +448,10 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
 
     return [
       {
-        id: "flow_wave_decision_receipt",
-        label: "Project decision receipt",
+        id: "flow_project_decision_link",
+        label: "Project decision link",
         status: "ready",
-        detail: `Decision record exists for ${proposal.id}.`,
+        detail: `Decision link exists for ${proposal.id}.`,
         source: "flow",
       },
     ];
@@ -459,8 +459,8 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
 
   return [
     {
-      id: "flow_wave_decision_receipt",
-      label: "Project decision receipt",
+      id: "flow_project_decision_link",
+      label: "Project decision link",
       status: "needed",
       detail: "Record the project decision URL before the PR work is launch-ready.",
       source: "flow",
@@ -678,7 +678,7 @@ export function createFirstPhaseLaunchAudit({
   const items = [
     ...flowItems,
     ...setupValidationItems(setupValidation),
-    ...decisionReceiptItem(wave),
+    ...decisionLinkItem(wave),
     ...participationNotesItem(wave),
     ...auditPacketItem(wave),
     ...readinessItems,

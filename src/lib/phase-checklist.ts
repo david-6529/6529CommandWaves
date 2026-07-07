@@ -58,7 +58,7 @@ function buildStatus(
     return { status: "active", detail: "Approved work is ready for the PR build step." };
   }
 
-  return { status: "waiting", detail: "Build waits for a recorded project decision." };
+  return { status: "waiting", detail: "Build waits for a recorded project decision link." };
 }
 
 function reviewStatus(
@@ -186,8 +186,8 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
         ? poll
           ? poll.decision
             ? decisionReferenceCheck?.ok
-              ? `Receipt recorded: ${poll.decision.url ?? poll.decision.dropId ?? "wave decision"}.`
-              : (decisionReferenceCheck?.message ?? "Project decision receipt is not valid.")
+              ? `Decision link recorded: ${poll.decision.url ?? poll.decision.dropId ?? "wave decision"}.`
+              : (decisionReferenceCheck?.message ?? "Project decision link is not valid.")
             : poll.status === "passed"
               ? "Vote passed locally. Record the project decision URL."
               : `Vote is ${poll.status}: ${poll.yesVotes} yes, ${poll.noVotes} no.`

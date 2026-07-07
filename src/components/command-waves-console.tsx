@@ -690,7 +690,7 @@ function launchAuditItemClass(status: FirstPhaseLaunchAuditItemStatus) {
 
 function isLaunchAuditEvidenceItem(item: FirstPhaseLaunchAuditItem) {
   return (
-    item.id === "flow_wave_decision_receipt" ||
+    item.id === "flow_project_decision_link" ||
     item.id === "flow_audit_packet" ||
     item.source === "setup" ||
     item.source === "readiness"

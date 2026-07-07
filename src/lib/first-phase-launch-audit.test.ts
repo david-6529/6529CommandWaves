@@ -142,7 +142,7 @@ describe("first phase launch audit", () => {
     expect(audit.readyItems.length).toBeGreaterThan(0);
     expect(audit.items).toContainEqual(
       expect.objectContaining({
-        id: "flow_wave_decision_receipt",
+        id: "flow_project_decision_link",
         status: "ready",
       }),
     );
@@ -601,7 +601,7 @@ describe("first phase launch audit", () => {
     expect(audit.openItems.map((item) => item.label)).toContain("Choose project");
   });
 
-  it("requires a project decision receipt before the first loop", () => {
+  it("requires a project decision link before the first loop", () => {
     const wave = {
       ...configuredDemoWave,
       polls: [{ ...demoWave.polls[0], decision: null }],
@@ -616,23 +616,23 @@ describe("first phase launch audit", () => {
     expect(audit.status).toBe("needs_setup");
     expect(audit.nextAction).toMatchObject({
       status: "needs_setup",
-      itemId: "flow_wave_decision_receipt",
+      itemId: "flow_project_decision_link",
       title: "Record the project decision URL",
     });
     expect(audit.openItems).toContainEqual(
       expect.objectContaining({
-        id: "flow_wave_decision_receipt",
-        label: "Project decision receipt",
+        id: "flow_project_decision_link",
+        label: "Project decision link",
         status: "needed",
       }),
     );
   });
 
-  it("blocks the first loop when a stored receipt points to another wave", () => {
+  it("blocks the first loop when a stored decision link points to another wave", () => {
     const decision = demoWave.polls[0].decision;
 
     if (!decision) {
-      throw new Error("Expected demo decision receipt.");
+      throw new Error("Expected demo decision link.");
     }
 
     const wave = {
@@ -657,18 +657,18 @@ describe("first phase launch audit", () => {
     expect(audit.status).toBe("blocked");
     expect(audit.blockers).toContainEqual(
       expect.objectContaining({
-        id: "flow_wave_decision_receipt",
+        id: "flow_project_decision_link",
         status: "blocked",
         detail: "Project decision URL must match the configured discussion.",
       }),
     );
   });
 
-  it("blocks the first loop when a PR receipt has only a drop id", () => {
+  it("blocks the first loop when a PR decision link has only a drop id", () => {
     const decision = demoWave.polls[0].decision;
 
     if (!decision) {
-      throw new Error("Expected demo decision receipt.");
+      throw new Error("Expected demo decision link.");
     }
 
     const wave = {
@@ -693,7 +693,7 @@ describe("first phase launch audit", () => {
     expect(audit.status).toBe("blocked");
     expect(audit.blockers).toContainEqual(
       expect.objectContaining({
-        id: "flow_wave_decision_receipt",
+        id: "flow_project_decision_link",
         status: "blocked",
         detail: "Project decision URL is required for PR work.",
       }),

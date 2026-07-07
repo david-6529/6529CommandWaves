@@ -69,7 +69,7 @@ const checklistByItemId: Record<string, string[]> = {
   flow_build: ["After the repo is configured, attach the PR record or Codex work packet for the approved change."],
   flow_review: ["Run reviewer checks against the PR before human merge decisions."],
   flow_log: ["Post the reviewed result back to project chat."],
-  flow_wave_decision_receipt: ["Record the project decision URL for the approved PR work."],
+  flow_project_decision_link: ["Record the project decision URL for the approved PR work."],
   flow_participation_notes: ["Keep participation notes advisory until live access checks are implemented."],
   flow_audit_packet: ["Finish PR build and review before preparing the launch packet."],
 };

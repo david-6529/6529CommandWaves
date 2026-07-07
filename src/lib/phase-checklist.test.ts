@@ -151,7 +151,7 @@ describe("phase checklist", () => {
     });
   });
 
-  it("waits for a project decision receipt after local votes pass", () => {
+  it("waits for a project decision link after local votes pass", () => {
     const checklist = createPhaseChecklist({
       ...configuredDemoWave,
       proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
@@ -167,11 +167,11 @@ describe("phase checklist", () => {
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",
-      detail: "Build waits for a recorded project decision.",
+      detail: "Build waits for a recorded project decision link.",
     });
   });
 
-  it("does not treat a PR drop id receipt as a wave decision URL", () => {
+  it("does not treat a PR drop id as a project decision URL", () => {
     const checklist = createPhaseChecklist({
       ...configuredDemoWave,
       proposals: [{ ...demoWave.proposals[0], status: "approved" }],
@@ -195,7 +195,7 @@ describe("phase checklist", () => {
     });
     expect(checklist.find((item) => item.id === "build")).toMatchObject({
       status: "waiting",
-      detail: "Build waits for a recorded project decision.",
+      detail: "Build waits for a recorded project decision link.",
     });
   });
 
