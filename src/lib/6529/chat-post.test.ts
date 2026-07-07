@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { postChatMessage } from "./chat-post";
 import { resetMockDropsForTests } from "./mock";
-import { postRoomMessage } from "./room-post";
 import { previewWaveContext } from "./wave-context";
 
 describe("6529 chat posting", () => {
@@ -37,7 +37,7 @@ describe("6529 chat posting", () => {
   it("posts a chat drop in mock mode", async () => {
     process.env["6529_MOCK_MODE"] = "true";
 
-    const result = await postRoomMessage({
+    const result = await postChatMessage({
       waveUrl: "https://6529.io/waves/6529-hook-builder",
       content: "I can review the fee cap tests.",
     });
@@ -53,7 +53,7 @@ describe("6529 chat posting", () => {
   it("makes mock posts visible in later project chat context", async () => {
     process.env["6529_MOCK_MODE"] = "true";
 
-    await postRoomMessage({
+    await postChatMessage({
       waveId: "mock-command-wave",
       content: "Fresh chat note for the hook builders.",
     });
@@ -77,7 +77,7 @@ describe("6529 chat posting", () => {
     delete process.env["6529_BOT_WALLET_ADDRESS"];
 
     await expect(
-      postRoomMessage({
+      postChatMessage({
         waveId: "6529-hook-builder",
         content: "Please review this hook idea.",
       }),
@@ -88,11 +88,11 @@ describe("6529 chat posting", () => {
   });
 
   it("requires a project chat and message", async () => {
-    await expect(postRoomMessage({ content: "hello" })).rejects.toMatchObject({
+    await expect(postChatMessage({ content: "hello" })).rejects.toMatchObject({
       message: "Choose project chat before posting.",
       status: 400,
     });
-    await expect(postRoomMessage({ waveId: "6529-hook-builder", content: "" })).rejects.toMatchObject({
+    await expect(postChatMessage({ waveId: "6529-hook-builder", content: "" })).rejects.toMatchObject({
       message: "Write a message before posting.",
       status: 400,
     });
@@ -100,7 +100,7 @@ describe("6529 chat posting", () => {
 
   it("rejects oversized chat messages", async () => {
     await expect(
-      postRoomMessage({
+      postChatMessage({
         waveId: "6529-hook-builder",
         content: "x".repeat(4001),
       }),
