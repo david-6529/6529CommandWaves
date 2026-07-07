@@ -143,6 +143,11 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "agent_boundary")).toMatchObject({
       status: "pass",
     });
+    expect(snapshot.agents.githubRepo).toMatchObject({
+      status: "placeholder",
+      configuredUrl: null,
+      nextStep: "Select the hook repo before PR work can run.",
+    });
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",
     });
@@ -364,6 +369,30 @@ describe("launch audit verifier", () => {
         reviewer: {
           ...snapshot.agents.reviewer,
           status: "active",
+        },
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "agent_boundary")).toMatchObject({
+      status: "fail",
+    });
+  });
+
+  it("fails when the GitHub repo placeholder is configured as a real repo", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const result = verifyLaunchAuditPayload({
+      ...snapshot,
+      agents: {
+        ...snapshot.agents,
+        githubRepo: {
+          ...snapshot.agents.githubRepo,
+          configuredUrl: "https://github.com/6529-Collections/6529-hook",
         },
       },
     });

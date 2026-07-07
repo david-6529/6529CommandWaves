@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import {
+  githubRepoPlaceholder,
+  orchestratorAgentIdentity,
+  publicGithubRepoPlaceholder,
+  reviewAgentIdentity,
+} from "./agent-identities";
 
 describe("agent identities", () => {
   it("sets daemon as the 6529 orchestrator account", () => {
@@ -17,9 +22,19 @@ describe("agent identities", () => {
       status: "placeholder",
       label: "GitHub repo placeholder",
       url: "https://github.com/your-org/your-hook-repo",
-      description: "GitHub repo is also a placeholder until the hook repo is selected.",
+      description: "GitHub repo is a placeholder until selected for PR work.",
       nextStep: "Select the hook repo before PR work can run.",
     });
-    expect(JSON.stringify({ reviewAgentIdentity, githubRepoPlaceholder })).not.toContain("\u2014");
+    expect(publicGithubRepoPlaceholder).toMatchObject({
+      status: "placeholder",
+      label: "GitHub repo placeholder",
+      configuredUrl: null,
+      description: "GitHub repo is a placeholder until selected for PR work.",
+      nextStep: "Select the hook repo before PR work can run.",
+    });
+    expect(publicGithubRepoPlaceholder).not.toHaveProperty("url");
+    expect(JSON.stringify({ reviewAgentIdentity, githubRepoPlaceholder, publicGithubRepoPlaceholder })).not.toContain(
+      "\u2014",
+    );
   });
 });

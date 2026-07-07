@@ -90,10 +90,10 @@ async function main() {
     "Builders use chat to shape ideas, record decisions, attach pull requests, and review the result.",
     "Draft the non-upgradeable hook scaffold",
     "Next step: Select the GitHub repo before PR work can run.",
-    "PR work waits until the repo is selected.",
+    "PR work waits.",
     "daemon keeps this summary and changelog current.",
     "Review agent is a placeholder for this phase.",
-    "GitHub repo is also a placeholder until the hook repo is selected.",
+    "GitHub repo is a placeholder until selected for PR work.",
     "GitHub repo placeholder",
     "Changelog",
     "Rules",
@@ -206,6 +206,7 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "daemon");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "review-agent");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "githubRepo");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "configuredUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectIndexUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "chatLaunchUrl");
@@ -253,6 +254,7 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "daemon");
   assertIncludes("State response", JSON.stringify(statePayload), "review-agent");
   assertIncludes("State response", JSON.stringify(statePayload), "githubRepo");
+  assertIncludes("State response", JSON.stringify(statePayload), "configuredUrl");
   assertIncludes("State response", JSON.stringify(statePayload), "https://github.com/your-org/your-hook-repo");
   assert(
     !JSON.stringify(statePayload).includes("https://github.com/6529-Collections/6529-hook"),

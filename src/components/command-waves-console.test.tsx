@@ -29,10 +29,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Builders use chat to shape ideas, record decisions, attach pull requests, and review the result.");
     expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next step: Select the GitHub repo before PR work can run.");
-    expect(text).toContain("PR work waits until the repo is selected.");
+    expect(text).toContain("PR work waits.");
     expect(text).toContain("daemon keeps this summary and changelog current.");
     expect(text).toContain("Review agent is a placeholder for this phase.");
-    expect(text).toContain("GitHub repo is also a placeholder until the hook repo is selected.");
+    expect(text).toContain("GitHub repo is a placeholder until selected for PR work.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");

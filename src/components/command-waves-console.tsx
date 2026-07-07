@@ -3063,7 +3063,7 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                The GitHub repo is also a placeholder until selected. Add the real hook repo only when PR work should start.
+                The GitHub repo is a placeholder until selected. Add the real hook repo only when PR work should start.
               </p>
               <div className="rounded-md border border-amber-800 bg-amber-950/20 p-3">
                 <p className="text-sm font-semibold text-amber-100">Server key needed before launch</p>

@@ -1,4 +1,4 @@
-import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { hookProjectIndexHashInput } from "./hook-project-index";
 import { createLaunchAuditHash } from "./launch-audit-hash";
@@ -172,10 +172,11 @@ function agentBoundaryReady(value: unknown) {
       asString(orchestrator.status) === orchestratorAgentIdentity.status &&
       asString(reviewer.status) === reviewAgentIdentity.status &&
       asString(reviewer.accountType) === reviewAgentIdentity.accountType &&
-      asString(githubRepo.status) === githubRepoPlaceholder.status &&
-      asString(githubRepo.label) === githubRepoPlaceholder.label &&
-      asString(githubRepo.url) === githubRepoPlaceholder.url &&
-      asString(githubRepo.description) === githubRepoPlaceholder.description,
+      asString(githubRepo.status) === publicGithubRepoPlaceholder.status &&
+      asString(githubRepo.label) === publicGithubRepoPlaceholder.label &&
+      githubRepo.configuredUrl === publicGithubRepoPlaceholder.configuredUrl &&
+      asString(githubRepo.description) === publicGithubRepoPlaceholder.description &&
+      asString(githubRepo.nextStep) === publicGithubRepoPlaceholder.nextStep,
   );
 }
 

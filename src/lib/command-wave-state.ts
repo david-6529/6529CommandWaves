@@ -1,4 +1,4 @@
-import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
@@ -33,7 +33,7 @@ export type CommandWaveStateSnapshot = {
   agents: {
     orchestrator: typeof orchestratorAgentIdentity;
     reviewer: typeof reviewAgentIdentity;
-    githubRepo: typeof githubRepoPlaceholder;
+    githubRepo: typeof publicGithubRepoPlaceholder;
   };
   reports: {
     contribution: ContributionReport;
@@ -102,7 +102,7 @@ export function createCommandWaveStateSnapshot(
     agents: {
       orchestrator: orchestratorAgentIdentity,
       reviewer: reviewAgentIdentity,
-      githubRepo: githubRepoPlaceholder,
+      githubRepo: publicGithubRepoPlaceholder,
     },
     reports: {
       contribution: createContributionReport(wave, { generatedAt }),

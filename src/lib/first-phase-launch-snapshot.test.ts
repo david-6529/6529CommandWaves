@@ -36,7 +36,7 @@ describe("first phase launch snapshot", () => {
       updatedAt: "2026-06-20T12:50:00.000Z",
       repo: {
         status: "placeholder",
-        label: "GitHub repo is also a placeholder.",
+        label: "GitHub repo placeholder.",
       },
       nextStep: {
         label: "Select repo",
@@ -89,6 +89,8 @@ describe("first phase launch snapshot", () => {
       },
       githubRepo: {
         status: "placeholder",
+        configuredUrl: null,
+        nextStep: "Select the hook repo before PR work can run.",
       },
     });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");

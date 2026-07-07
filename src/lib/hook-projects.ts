@@ -165,7 +165,7 @@ function orchestrationSnapshotLabel(wave: CommandWave) {
 
 function codeStatus(wave: CommandWave) {
   if (hasPlaceholderRepo(wave)) {
-    return "GitHub repo is also a placeholder until selected.";
+    return "GitHub repo is not selected yet.";
   }
 
   const phaseWork = selectPhaseWork(wave);

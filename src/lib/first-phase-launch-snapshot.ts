@@ -4,7 +4,7 @@ import {
   phaseOneProductContract,
   type CommandWaveStateSnapshot,
 } from "./command-wave-state";
-import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
@@ -162,7 +162,7 @@ export async function createFirstPhaseLaunchSnapshot(
     agents: {
       orchestrator: orchestratorAgentIdentity,
       reviewer: reviewAgentIdentity,
-      githubRepo: githubRepoPlaceholder,
+      githubRepo: publicGithubRepoPlaceholder,
     },
     stateEvidence: {
       waveStateHash: hashValue(wave),
