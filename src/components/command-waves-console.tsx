@@ -842,6 +842,16 @@ function openDiscussionInTab(tab: Window | null, url: string) {
   return true;
 }
 
+function currentWorkDisplayTitle(title: string) {
+  const normalized = humanizeLegacyCommandCopy(title).trim();
+
+  if (normalized === "Draft the non-upgradeable hook scaffold") {
+    return "Draft hook scaffold";
+  }
+
+  return normalized;
+}
+
 function appUrl(path: string) {
   if (typeof window === "undefined") {
     return path;
@@ -1150,6 +1160,7 @@ export function CommandWavesConsole() {
     readyForNextHookChange
       ? title.trim() || "Pick the next change"
       : activeProposal?.title ?? "Pick the next change";
+  const currentFocusDisplayTitle = currentWorkDisplayTitle(currentFocusTitle);
   const currentFocusLabel = readyForNextHookChange ? "Next work" : "Current work";
   const currentFocusDescription =
     readyForNextHookChange
@@ -2274,7 +2285,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{currentFocusLabel}</p>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
             </div>
-            <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-50">{humanizeLegacyCommandCopy(currentFocusTitle)}</h2>
+            <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-50">{currentFocusDisplayTitle}</h2>
             <p className="mt-2 text-base leading-7 text-zinc-400">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
             <div className="mt-5 grid gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
