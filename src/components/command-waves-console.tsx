@@ -1352,7 +1352,7 @@ export function CommandWavesConsole() {
     ["How does work start?", "Post in chat. Good ideas become small work items the group can discuss."],
     [
       "How are PRs approved?",
-      "The group records a project decision before approved PR work starts. Review agent approval is a placeholder until wired.",
+      "The group records a project decision before PR work starts. Review approval is manual in this phase.",
     ],
     ["Who merges?", "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work."],
   ];
@@ -2455,7 +2455,7 @@ export function CommandWavesConsole() {
               <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">optional</Badge>
             </summary>
             <p className="mt-3 text-base leading-7 text-zinc-400">
-              The top Rules accordion is the plain-English source. This drawer keeps access, reports, and code checks available without making them the default view.
+              Access notes, reports, and code checks for builders who want the details.
             </p>
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <section className="border-t border-zinc-800 pt-4 lg:border-t-0 lg:pt-0">
@@ -3042,7 +3042,7 @@ export function CommandWavesConsole() {
                   onChange={(event) => setGateNotes(event.target.value)}
                 />
                 <p className="mt-2 text-xs leading-5 text-zinc-500">
-                  One note per line. Reputation, token, holder, allowlist, and QnA notes are advisory until live enforcement is wired.
+                  One note per line. Reputation, token, holder, allowlist, and QnA notes are manual until live checks exist.
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {wave.gates.map((gate) => (
@@ -3365,7 +3365,7 @@ export function CommandWavesConsole() {
                 </ul>
               </div>
               <details className="rounded-md border border-zinc-800 bg-black p-3">
-                <summary className="text-sm font-semibold text-zinc-100">Show detailed rules and tool access</summary>
+                <summary className="text-sm font-semibold text-zinc-100">Show detailed build rules</summary>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {commandKinds.map((item) => {
                     const rule = wave.rules.rulesByKind[item.value];

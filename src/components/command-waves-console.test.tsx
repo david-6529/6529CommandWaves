@@ -61,9 +61,9 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
     expect(text).toContain("Visible contribution");
     expect(text).toContain("Build reference");
-    expect(text).toContain("The top Rules accordion is the plain-English source.");
-    expect(text).toContain("without making them the default view");
-    expect(text).toContain("The group records a project decision before approved PR work starts.");
+    expect(text).toContain("Access notes, reports, and code checks for builders who want the details.");
+    expect(text).toContain("The group records a project decision before PR work starts.");
+    expect(text).toContain("Review approval is manual in this phase.");
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Start in chat so builders can shape the idea.");
@@ -100,11 +100,14 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("orchestrator managed");
     expect(text).not.toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).not.toContain("production reviewer service is wired");
+    expect(text).not.toContain("Review agent approval is a placeholder until wired");
+    expect(text).not.toContain("The top Rules accordion is the plain-English source");
+    expect(text).not.toContain("tool access");
     expect(text).not.toContain("Add real repo before PR build.");
     expect(text).not.toContain("Set a real GitHub repo");
   });
 
-  it("keeps optional advanced drawers on the dark app surface", () => {
+  it("keeps optional advanced sections on the dark app surface", () => {
     const html = renderedConsoleHtml();
 
     expect(html).toContain('id="more-tools"');

@@ -64,7 +64,7 @@ What remains manual or MVP-only:
 - Chat posting works when a 6529 bot wallet is configured. Without bot credentials, the app drafts text for a human to
   post manually.
 - Wallet connection is identity context for access drafts. Reputation, token, holder, allowlist, and QnA requirements are
-  advisory notes until live wallet/session/score checks are wired.
+  manual notes until live wallet, session, and score checks exist.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation. PR work packets
   require the GitHub repo to be selected.
@@ -86,7 +86,7 @@ What we are working on next:
 
 ## Why This Exists
 
-Agents can help builders move faster, but broad tool access gets risky when a group is moving quickly. In phase 1, agents
+Agents can help builders move faster, but broad agent permissions get risky when a group is moving quickly. In phase 1, agents
 only help with reads, drafts, chat updates, and PR work after the rules allow it.
 
 The app makes the important answers visible:
@@ -105,7 +105,7 @@ The first public phase:
 
 1. Choose one public project chat.
 2. Connect one GitHub smart contract repo for the hook.
-3. Record who-can-join requirements such as reputation, token, allowlists, or QnA as advisory until live enforcement is wired.
+3. Record who-can-join requirements such as reputation, token, allowlists, or QnA as advisory until live enforcement exists.
 4. Propose hook work in plain English with clear limits.
 5. Let orchestration rules classify risk and require votes for important changes.
 6. Let an agent help produce a PR when allowed.
@@ -177,7 +177,7 @@ Default workspace:
 
 Safety and review:
 
-- Rules drawer with plain-English access notes.
+- Rules section with plain-English access notes.
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
@@ -186,9 +186,9 @@ Safety and review:
 Audit and launch:
 
 - Recent activity log with export.
-- Activity report drawer for app records and manual planning context.
+- Activity report section for app records and manual planning context.
 - Launch checklist with setup, readiness, flow checklist, and launch next-action records.
-- Remote launch checks can be run from the maintainer drawer to refresh setup, required guardian check, and readiness blockers.
+- Remote launch checks can be run from maintainer controls to refresh setup, required guardian check, and readiness blockers.
 - Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
