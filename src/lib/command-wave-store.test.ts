@@ -152,7 +152,7 @@ describe("Command wave store", () => {
     expect(wave.repoUrl).toBe("https://github.com/6529-Collections/custom-hook");
   });
 
-  it("saves participation notes without claiming live gate authority", async () => {
+  it("saves participation notes without claiming live access authority", async () => {
     const wave = await updateCommandWaveSetup({
       waveUrl: "https://6529.io/waves/new-command-wave",
       repoUrl: "https://github.com/6529-Collections/new-command-wave",

@@ -20,7 +20,13 @@ function asGateLines(value: unknown): string[] {
 }
 
 function cleanGateLine(value: string) {
-  const trimmed = value.trim().replace(/\s+/g, " ");
+  const trimmed = value
+    .trim()
+    .replace(/\bgates are planned\b/gi, "access checks are planned")
+    .replace(/\bgate is planned\b/gi, "access check is planned")
+    .replace(/\bgates\b/gi, "access notes")
+    .replace(/\bgate\b/gi, "access note")
+    .replace(/\s+/g, " ");
 
   if (!trimmed) {
     return null;

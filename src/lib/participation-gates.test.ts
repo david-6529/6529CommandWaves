@@ -7,8 +7,8 @@ import {
   summarizeParticipationAccess,
 } from "./participation-gates";
 
-describe("participation gates", () => {
-  it("keeps default gate notes advisory", () => {
+describe("participation access notes", () => {
+  it("keeps default access notes advisory", () => {
     expect(normalizeParticipationGates([])).toEqual(defaultParticipationGates);
   });
 
@@ -32,13 +32,22 @@ describe("participation gates", () => {
     ]);
   });
 
+  it("humanizes legacy access note wording", () => {
+    expect(normalizeParticipationGates("REP or TDH gates are planned, not enforced here")).toEqual([
+      "REP or TDH access checks are planned, not enforced here",
+    ]);
+    expect(normalizeParticipationGates("Builder gate is planned, not enforced here")).toEqual([
+      "Builder access check is planned, not enforced here",
+    ]);
+  });
+
   it("detects only authority notes that need advisory wording", () => {
     expect(participationGateNeedsAdvisoryNote("30% of TDH holders can contribute")).toBe(true);
     expect(participationGateNeedsAdvisoryNote("REP or TDH planned, not enforced here")).toBe(false);
     expect(participationGateNeedsAdvisoryNote("Community builders welcome")).toBe(false);
   });
 
-  it("summarizes manual phase 1 access without claiming live gates", () => {
+  it("summarizes manual phase 1 access without claiming live access checks", () => {
     expect(summarizeParticipationAccess(defaultParticipationGates)).toBe(
       "Ask in chat to join. Access is reviewed manually for now.",
     );

@@ -20,8 +20,8 @@ export type ActiveHookProject = {
   participation: string;
   waveRole: string;
   platformRole: string;
-  gateDetails: string[];
-  gateSnapshotLabel: string;
+  accessDetails: string[];
+  accessSnapshotLabel: string;
   orchestrationSnapshotLabel: string;
   codeSnapshotLabel: string;
   nextActionStatus: PhaseNextActionStatus;
@@ -111,28 +111,28 @@ function waveStatus(wave: CommandWave) {
   return "No vote required by current rules.";
 }
 
-function gateSnapshotLabel(wave: CommandWave) {
-  const gates = wave.gates.map((gate) => gate.trim()).filter(Boolean);
+function accessSnapshotLabel(wave: CommandWave) {
+  const accessNotes = wave.gates.map((note) => note.trim()).filter(Boolean);
 
-  if (!gates.length) {
+  if (!accessNotes.length) {
     return "access not set";
   }
 
-  if (gates.some((gate) => /\b(rep|tdh|holder|allowlist|qna|quiz|manual|advisory|not enforced)\b/i.test(gate))) {
+  if (accessNotes.some((note) => /\b(rep|tdh|holder|allowlist|qna|quiz|manual|advisory|not enforced)\b/i.test(note))) {
     return "manual review";
   }
 
   return "open access";
 }
 
-function gateDetails(wave: CommandWave) {
-  const gates = wave.gates.map((gate) => gate.trim()).filter(Boolean);
+function accessDetails(wave: CommandWave) {
+  const accessNotes = wave.gates.map((note) => note.trim()).filter(Boolean);
 
-  if (!gates.length) {
+  if (!accessNotes.length) {
     return ["Who can join is not set yet."];
   }
 
-  return gates.slice(0, 4);
+  return accessNotes.slice(0, 4);
 }
 
 function orchestrationSnapshotLabel(wave: CommandWave) {
@@ -291,8 +291,8 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       participation: "Follow project chat, draft replies for manual posting, and track code work.",
       waveRole: "Where builders talk, propose, decide, and share updates.",
       platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
-      gateDetails: gateDetails(wave),
-      gateSnapshotLabel: gateSnapshotLabel(wave),
+      accessDetails: accessDetails(wave),
+      accessSnapshotLabel: accessSnapshotLabel(wave),
       orchestrationSnapshotLabel: orchestrationSnapshotLabel(wave),
       codeSnapshotLabel: codeSnapshotLabel(wave),
       nextActionStatus: nextAction.status,

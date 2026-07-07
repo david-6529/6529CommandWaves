@@ -2838,7 +2838,7 @@ export function CommandWavesConsole() {
 
                   <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     {[
-                      ["Access", project.gateSnapshotLabel],
+                      ["Access", project.accessSnapshotLabel],
                       ["Decision", project.orchestrationSnapshotLabel],
                       ["PR", project.codeSnapshotLabel],
                       ["Review", project.reviewStatusLabel],
@@ -2858,8 +2858,8 @@ export function CommandWavesConsole() {
                       <div className="mt-3 border-t border-zinc-800 pt-3">
                         <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Who can play</p>
                         <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-400">
-                          {project.gateDetails.map((gate) => (
-                            <li key={gate}>- {gate}</li>
+                          {project.accessDetails.map((note) => (
+                            <li key={note}>- {note}</li>
                           ))}
                         </ul>
                       </div>

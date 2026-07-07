@@ -90,7 +90,7 @@ describe("hook parameter policy", () => {
 
   it("allows REP or TDH text when it is explicitly non-enforced", () => {
     const checks = evaluateHookParameterPolicy({
-      proposalText: "REP or TDH gates are planned, not enforced here.",
+      proposalText: "REP or TDH access checks are planned, not enforced here.",
     });
 
     expect(checks.find((item) => item.id === "hook_parameter_live_holder_authority")?.status).toBe("pass");

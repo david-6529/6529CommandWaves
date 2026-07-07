@@ -47,12 +47,12 @@ describe("active hook projects", () => {
         participation: "Follow project chat, draft replies for manual posting, and track code work.",
         waveRole: "Where builders talk, propose, decide, and share updates.",
         platformRole: "Code state, PR record, review result, launch packet, and contribution report.",
-        gateDetails: [
+        accessDetails: [
           "Manual builder review for phase 1",
           "REP or TDH access checks are planned, not enforced here",
           "AI contribution report scores are not permissions",
         ],
-        gateSnapshotLabel: "manual review",
+        accessSnapshotLabel: "manual review",
         orchestrationSnapshotLabel: "high approved",
         codeSnapshotLabel: "repo placeholder",
         nextActionStatus: "action",
@@ -103,8 +103,8 @@ describe("active hook projects", () => {
       nextActionTitle: "Set the project",
       nextActionDetail: "Confirm one project chat and one GitHub repo before proposals start.",
       waveStatus: "No PR-sized hook change selected yet.",
-      gateSnapshotLabel: "manual review",
-      gateDetails: [
+      accessSnapshotLabel: "manual review",
+      accessDetails: [
         "Manual builder review for phase 1",
         "REP or TDH access checks are planned, not enforced here",
         "AI contribution report scores are not permissions",
@@ -125,7 +125,7 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       waveStatus: "Project decision recorded with 5 yes and 1 no.",
-      gateSnapshotLabel: "manual review",
+      accessSnapshotLabel: "manual review",
       orchestrationSnapshotLabel: "high approved",
       codeStatus: "Approved PR change is ready to build.",
       codeSnapshotLabel: "ready to build",
@@ -182,7 +182,7 @@ describe("active hook projects", () => {
     });
   });
 
-  it("shows unset gates and open orchestration before participation notes exist", () => {
+  it("shows unset access notes and open orchestration before participation notes exist", () => {
     const projects = createActiveHookProjects({
       ...demoWave,
       gates: [],
@@ -193,8 +193,8 @@ describe("active hook projects", () => {
     });
 
     expect(projects[0]).toMatchObject({
-      gateSnapshotLabel: "access not set",
-      gateDetails: ["Who can join is not set yet."],
+      accessSnapshotLabel: "access not set",
+      accessDetails: ["Who can join is not set yet."],
       orchestrationSnapshotLabel: "needs idea",
     });
   });
@@ -269,5 +269,14 @@ describe("active hook projects", () => {
 
   it("does not emit U+2014 characters", () => {
     expect(JSON.stringify(createActiveHookProjects(demoWave))).not.toContain("\u2014");
+  });
+
+  it("does not emit legacy gate field names", () => {
+    const serialized = JSON.stringify(createActiveHookProjects(demoWave));
+
+    expect(serialized).toContain("accessDetails");
+    expect(serialized).toContain("accessSnapshotLabel");
+    expect(serialized).not.toContain("gateDetails");
+    expect(serialized).not.toContain("gateSnapshotLabel");
   });
 });

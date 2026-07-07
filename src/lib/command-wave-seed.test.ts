@@ -8,6 +8,12 @@ const seedEnv = {
   COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/6529-Collections/real-hook",
 };
 
+const placeholderRepoSeedEnv = {
+  COMMAND_WAVE_INITIAL_NAME: "6529 Hook",
+  COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/real-hook-chat",
+  COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
+};
+
 describe("command wave seed", () => {
   it("detects explicit first project seed settings", () => {
     expect(hasInitialCommandWaveProject(seedEnv)).toBe(true);
@@ -36,6 +42,32 @@ describe("command wave seed", () => {
         actor: "Setup",
         type: "wave_created",
         message: "Created the first hook project from environment setup.",
+      },
+    ]);
+  });
+
+  it("allows a placeholder GitHub repo for first project setup", () => {
+    const wave = applyInitialCommandWaveProject(demoWave, placeholderRepoSeedEnv, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+    });
+
+    expect(wave).toMatchObject({
+      id: demoWave.id,
+      name: "6529 Hook",
+      waveUrl: "https://6529.io/waves/real-hook-chat",
+      repoUrl: "https://github.com/your-org/your-hook-repo",
+      proposals: [],
+      polls: [],
+      executions: [],
+      reviews: [],
+    });
+    expect(wave.ledger).toEqual([
+      {
+        id: "evt-001",
+        at: "2026-06-20T13:00:00.000Z",
+        actor: "Setup",
+        type: "wave_created",
+        message: "Created the first hook project from environment setup. GitHub repo setup is still needed.",
       },
     ]);
   });

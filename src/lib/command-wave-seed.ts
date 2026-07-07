@@ -1,6 +1,7 @@
 import { defaultParticipationGates } from "./participation-gates";
 import { validateSetupShape } from "./setup-validation";
 import { defaultRules, type CommandWave } from "./command-waves";
+import { isPlaceholderValue } from "./env-placeholders";
 
 export type CommandWaveSeedEnv = {
   COMMAND_WAVE_INITIAL_NAME?: string;
@@ -30,6 +31,7 @@ export function applyInitialCommandWaveProject(
   const name = envText(env.COMMAND_WAVE_INITIAL_NAME) || fallback.name;
   const waveUrl = envText(env.COMMAND_WAVE_INITIAL_WAVE_URL) || fallback.waveUrl;
   const repoUrl = envText(env.COMMAND_WAVE_INITIAL_REPO_URL) || fallback.repoUrl;
+  const repoIsPlaceholder = isPlaceholderValue(repoUrl);
   let validation: ReturnType<typeof validateSetupShape>;
 
   try {
@@ -46,7 +48,7 @@ export function applyInitialCommandWaveProject(
     };
   }
 
-  if (!validation.waveId || !validation.repo || !validation.canSave) {
+  if (!validation.waveId || !validation.repo || (!validation.canSave && !repoIsPlaceholder)) {
     throw Object.assign(
       new Error("Fix COMMAND_WAVE_INITIAL_WAVE_URL and COMMAND_WAVE_INITIAL_REPO_URL before starting the first project."),
       { status: 500 },
@@ -70,7 +72,9 @@ export function applyInitialCommandWaveProject(
         at: options.generatedAt ?? new Date().toISOString(),
         actor: "Setup",
         type: "wave_created",
-        message: "Created the first hook project from environment setup.",
+        message: repoIsPlaceholder
+          ? "Created the first hook project from environment setup. GitHub repo setup is still needed."
+          : "Created the first hook project from environment setup.",
       },
     ],
   };

@@ -27,6 +27,10 @@ describe("hook project index", () => {
     });
     expect(projectsHash).toMatch(/^[a-f0-9]{64}$/);
     expect(projectsHash).toBe(hashValue(hookProjectIndexHashInput(indexWithoutHash)));
+    expect(JSON.stringify(index.projects)).toContain("accessDetails");
+    expect(JSON.stringify(index.projects)).toContain("accessSnapshotLabel");
+    expect(JSON.stringify(index.projects)).not.toContain("gateDetails");
+    expect(JSON.stringify(index.projects)).not.toContain("gateSnapshotLabel");
     expect(JSON.stringify(index)).not.toContain("\u2014");
   });
 
