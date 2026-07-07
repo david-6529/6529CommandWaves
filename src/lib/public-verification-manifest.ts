@@ -8,7 +8,7 @@ import { hashValue } from "./run-manifest";
 import { createSetupProof, setupProofOptionsFromEnv } from "./setup-proof";
 
 type VerificationEndpoint = {
-  id: "setup_proof" | "command_wave_state" | "project_index" | "launch_audit" | "chat_launch";
+  id: "verification_manifest" | "setup_proof" | "command_wave_state" | "project_index" | "launch_audit" | "chat_launch";
   label: string;
   url: string;
   payloadVersion: string;
@@ -106,6 +106,16 @@ export async function createPublicVerificationManifest(
       ledgerEventCount: launchSnapshot.stateEvidence.ledgerEventCount,
     },
     endpoints: [
+      {
+        id: "verification_manifest",
+        label: "Verification manifest",
+        url: launchSnapshot.verificationTargets.verificationManifestUrl,
+        payloadVersion: "command-wave-verification-manifest-v0.1",
+        requiredHashFields: ["manifestHash"],
+        hashes: {},
+        verifierCommand: null,
+        note: "manifestHash is the top-level hash for this verification manifest.",
+      },
       {
         id: "setup_proof",
         label: "Setup proof",

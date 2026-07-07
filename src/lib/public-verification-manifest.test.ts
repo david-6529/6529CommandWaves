@@ -54,6 +54,12 @@ describe("public verification manifest", () => {
     expect(manifest.stableAnchors.projectIndexHash).toMatch(/^[a-f0-9]{64}$/);
     expect(manifest.endpoints).toEqual([
       expect.objectContaining({
+        id: "verification_manifest",
+        url: "https://command-waves.example.com/api/command-wave/verification/manifest",
+        requiredHashFields: ["manifestHash"],
+        verifierCommand: null,
+      }),
+      expect.objectContaining({
         id: "setup_proof",
         url: "https://command-waves.example.com/api/command-wave/setup/proof",
         requiredHashFields: ["setupHash", "attestationHash"],

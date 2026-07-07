@@ -330,6 +330,7 @@ async function main() {
   assert(objectValue(stableAnchors, "waveStateHash") === objectValue(stateEvidence, "waveStateHash"), "Verification manifest wave hash does not match launch audit.");
   assert(objectValue(stableAnchors, "projectIndexHash") === objectValue(projectsPayload, "projectsHash"), "Verification manifest project hash does not match project index.");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/setup/proof");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/state");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/projects");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/audit");

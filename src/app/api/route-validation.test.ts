@@ -257,6 +257,10 @@ describe("API route validation", () => {
         },
         endpoints: expect.arrayContaining([
           expect.objectContaining({
+            id: "verification_manifest",
+            requiredHashFields: ["manifestHash"],
+          }),
+          expect.objectContaining({
             id: "chat_launch",
             requiredHashFields: ["chatLaunchHash", "sourceAuditHash"],
           }),
