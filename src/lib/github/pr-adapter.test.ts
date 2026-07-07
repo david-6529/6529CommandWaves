@@ -75,6 +75,109 @@ describe("GitHub pull request adapter", () => {
     ).rejects.toThrow("Opening GitHub PRs requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN.");
   });
 
+  it("posts a bounded comment to an existing pull request", async () => {
+    const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
+    const adapter = createGitHubPullRequestAdapter({
+      apiBaseUrl: "https://api.example.test",
+      token: "token",
+      fetchImpl: async (input, init) => {
+        calls.push({ input, init });
+
+        return jsonResponse({
+          id: 101,
+          html_url: "https://github.com/6529-Collections/6529-hook/pull/42#issuecomment-101",
+        });
+      },
+    });
+
+    const result = await adapter.commentOnPullRequest?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      prNumber: 42,
+      body: "Guardian review passed. Attestation hash: abc123.",
+    });
+
+    expect(result).toEqual({
+      id: 101,
+      url: "https://github.com/6529-Collections/6529-hook/pull/42#issuecomment-101",
+    });
+    expect(String(calls[0]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/issues/42/comments");
+    expect(calls[0]?.init?.method).toBe("POST");
+    expect(calls[0]?.init?.headers).toMatchObject({
+      authorization: "Bearer token",
+      "content-type": "application/json",
+    });
+    expect(JSON.parse(String(calls[0]?.init?.body))).toEqual({
+      body: "Guardian review passed. Attestation hash: abc123.",
+    });
+  });
+
+  it("requires a GitHub token before posting pull request comments", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      env: {},
+      fetchImpl: async () => jsonResponse({}),
+    });
+
+    await expect(
+      adapter.commentOnPullRequest?.({
+        repoUrl: "6529-Collections/6529-hook",
+        prNumber: 42,
+        body: "Review note.",
+      }),
+    ).rejects.toThrow("Posting GitHub PR comments requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN.");
+  });
+
+  it("validates pull request comment inputs before calling GitHub", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.commentOnPullRequest?.({
+        repoUrl: "6529-Collections/6529-hook",
+        prNumber: 0,
+        body: "Review note.",
+      }),
+    ).rejects.toThrow("Pull request number must be a positive integer.");
+
+    await expect(
+      adapter.commentOnPullRequest?.({
+        repoUrl: "6529-Collections/6529-hook",
+        prNumber: 42,
+        body: " ",
+      }),
+    ).rejects.toThrow("Pull request comment body is required.");
+
+    await expect(
+      adapter.commentOnPullRequest?.({
+        repoUrl: "6529-Collections/6529-hook",
+        prNumber: 42,
+        body: "x".repeat(65_537),
+      }),
+    ).rejects.toThrow("Pull request comment body must be 65536 characters or less.");
+    expect(called).toBe(false);
+  });
+
+  it("surfaces GitHub PR comment API failures", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => new Response("bad comment", { status: 403, statusText: "Forbidden" }),
+    });
+
+    await expect(
+      adapter.commentOnPullRequest?.({
+        repoUrl: "6529-Collections/6529-hook",
+        prNumber: 42,
+        body: "Review note.",
+      }),
+    ).rejects.toThrow("GitHub PR comment failed: 403 Forbidden - bad comment");
+  });
+
   it("rejects non-draft pull request requests in phase 1", async () => {
     let called = false;
     const adapter = createGitHubPullRequestAdapter({

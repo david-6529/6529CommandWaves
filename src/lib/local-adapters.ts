@@ -49,6 +49,14 @@ export const localRepoAdapter: RepoAdapter = {
       headSha: `local-${stable.toString(16)}`,
     };
   },
+  async commentOnPullRequest(input) {
+    const stable = stableNumber(`${input.repoUrl}:${input.prNumber}:${input.body}`);
+
+    return {
+      id: `local-comment-${stable}`,
+      url: `${input.repoUrl.replace(/\/$/, "")}/pull/${input.prNumber}#issuecomment-${stable}`,
+    };
+  },
 };
 
 export type LocalOrchestratorOptions = {

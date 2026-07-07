@@ -1,4 +1,4 @@
-import type { RepoAdapter, RepoPullRequestInput } from "../adapters";
+import type { RepoAdapter, RepoPullRequestCommentInput, RepoPullRequestInput } from "../adapters";
 import { fetchTextResponseWithTimeout } from "../http-fetch";
 import { parseGitHubRepoUrl, pullRequestUrl } from "./repo";
 
@@ -66,9 +66,76 @@ function payloadText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function payloadId(value: unknown) {
+  return typeof value === "string" || typeof value === "number" ? value : null;
+}
+
+function validatePullRequestNumber(value: number) {
+  if (!Number.isInteger(value) || value <= 0) {
+    throw Object.assign(new Error("Pull request number must be a positive integer."), { status: 400 });
+  }
+
+  return value;
+}
+
+function validateCommentBody(value: string) {
+  const body = value.trim();
+
+  if (!body) {
+    throw Object.assign(new Error("Pull request comment body is required."), { status: 400 });
+  }
+
+  if (body.length > 65_536) {
+    throw Object.assign(new Error("Pull request comment body must be 65536 characters or less."), { status: 400 });
+  }
+
+  return body;
+}
+
 const githubNonOkStatuses = Array.from({ length: 400 }, (_value, index) => index + 200).filter(
   (status) => status < 200 || status > 299,
 );
+
+async function requestGitHub(
+  apiBaseUrl: string,
+  repoPath: string,
+  token: string,
+  fetchImpl: FetchLike,
+  body: unknown,
+  failureLabel: string,
+) {
+  const response = await fetchTextResponseWithTimeout(`${apiBaseUrl.replace(/\/$/, "")}${repoPath}`, {
+    allowedStatuses: githubNonOkStatuses,
+    fetchImpl,
+    method: "POST",
+    headers: {
+      accept: "application/vnd.github+json",
+      authorization: `Bearer ${token}`,
+      "content-type": "application/json",
+      "x-github-api-version": "2022-11-28",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (response.status < 200 || response.status > 299) {
+    const detail = response.text;
+
+    throw Object.assign(
+      new Error(`${failureLabel} failed: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`),
+      { status: response.status },
+    );
+  }
+
+  try {
+    return asRecord(JSON.parse(response.text));
+  } catch {
+    throw Object.assign(new Error(`${failureLabel} response must be valid JSON.`), { status: 502 });
+  }
+}
+
+function repoApiPath(repo: NonNullable<ReturnType<typeof parseGitHubRepoUrl>>, path: string) {
+  return `/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}${path}`;
+}
 
 export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapterOptions = {}): RepoAdapter {
   const apiBaseUrl = options.apiBaseUrl ?? "https://api.github.com";
@@ -95,45 +162,21 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         throw Object.assign(new Error("GitHub PR adapter only opens draft PRs in phase 1."), { status: 400 });
       }
 
-      const response = await fetchTextResponseWithTimeout(
-        `${apiBaseUrl.replace(/\/$/, "")}/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}/pulls`,
+      const payload = await requestGitHub(
+        apiBaseUrl,
+        repoApiPath(repo, "/pulls"),
+        token,
+        fetchImpl,
         {
-          allowedStatuses: githubNonOkStatuses,
-          fetchImpl,
-          method: "POST",
-          headers: {
-            accept: "application/vnd.github+json",
-            authorization: `Bearer ${token}`,
-            "content-type": "application/json",
-            "x-github-api-version": "2022-11-28",
-          },
-          body: JSON.stringify({
-            title: input.title,
-            body: input.body,
-            head: headBranch,
-            base: baseBranch,
-            draft: true,
-            maintainer_can_modify: input.maintainerCanModify ?? false,
-          }),
+          title: input.title,
+          body: input.body,
+          head: headBranch,
+          base: baseBranch,
+          draft: true,
+          maintainer_can_modify: input.maintainerCanModify ?? false,
         },
+        "GitHub PR creation",
       );
-
-      if (response.status < 200 || response.status > 299) {
-        const detail = response.text;
-
-        throw Object.assign(
-          new Error(`GitHub PR creation failed: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`),
-          { status: response.status },
-        );
-      }
-
-      let payload: Record<string, unknown> | null;
-
-      try {
-        payload = asRecord(JSON.parse(response.text));
-      } catch {
-        throw Object.assign(new Error("GitHub PR creation response must be valid JSON."), { status: 502 });
-      }
 
       const prNumber = payloadNumber(payload);
       const head = asRecord(payload?.head);
@@ -148,6 +191,36 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         prNumber,
         url: htmlUrl ?? pullRequestUrl(repo.htmlUrl, prNumber) ?? `${repo.htmlUrl}/pull/${prNumber}`,
         headSha: headSha ?? "unknown",
+      };
+    },
+    async commentOnPullRequest(input: RepoPullRequestCommentInput) {
+      const repo = parseGitHubRepoUrl(input.repoUrl);
+      const token = githubToken(options);
+
+      if (!repo) {
+        throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
+      }
+
+      if (!token) {
+        throw Object.assign(new Error("Posting GitHub PR comments requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN."), {
+          status: 503,
+        });
+      }
+
+      const prNumber = validatePullRequestNumber(input.prNumber);
+      const body = validateCommentBody(input.body);
+      const payload = await requestGitHub(
+        apiBaseUrl,
+        repoApiPath(repo, `/issues/${prNumber}/comments`),
+        token,
+        fetchImpl,
+        { body },
+        "GitHub PR comment",
+      );
+
+      return {
+        id: payloadId(payload?.id),
+        url: payloadText(payload?.html_url) ?? `${repo.htmlUrl}/pull/${prNumber}#issuecomment-unknown`,
       };
     },
   };

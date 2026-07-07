@@ -27,6 +27,17 @@ export type RepoPullRequestResult = {
   headSha: string;
 };
 
+export type RepoPullRequestCommentInput = {
+  repoUrl: string;
+  prNumber: number;
+  body: string;
+};
+
+export type RepoPullRequestCommentResult = {
+  url: string;
+  id: string | number | null;
+};
+
 export type OrchestratorRunInput = {
   wave: CommandWave;
   proposal: CommandProposal;
@@ -45,6 +56,7 @@ export type WaveAdapter = {
 
 export type RepoAdapter = {
   openPullRequest(input: RepoPullRequestInput): Promise<RepoPullRequestResult>;
+  commentOnPullRequest?(input: RepoPullRequestCommentInput): Promise<RepoPullRequestCommentResult>;
 };
 
 export type OrchestratorAdapter = {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { demoWave } from "./demo-wave";
-import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter } from "./local-adapters";
+import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter, localRepoAdapter } from "./local-adapters";
 import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
 import { findRunManifestArtifact } from "./run-manifest";
 
@@ -57,6 +57,19 @@ describe("local command adapters", () => {
 
     expect(prBody).toContain(COMMAND_PR_MANIFEST_START);
     expect(prBody).toContain(demoWave.proposals[0].id);
+  });
+
+  it("can create local pull request comment records", async () => {
+    const localComment = await localRepoAdapter.commentOnPullRequest?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      prNumber: 12,
+      body: "Review note.",
+    });
+
+    expect(localComment).toMatchObject({
+      id: expect.stringMatching(/^local-comment-/),
+      url: expect.stringContaining("https://github.com/6529-Collections/6529-hook/pull/12#issuecomment-"),
+    });
   });
 
   it("passes the configured base branch into the PR adapter and handoff packet", async () => {
