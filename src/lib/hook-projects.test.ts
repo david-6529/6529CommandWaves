@@ -40,7 +40,7 @@ describe("active hook projects", () => {
         name: "Hook Build",
         status: "setup",
         waveUrl: demoWave.waveUrl,
-        repoUrl: demoWave.repoUrl,
+        repoUrl: null,
         waveLabel: "6529-hook-builder",
         repoLabel: "GitHub repo placeholder",
         currentFocus: demoWave.proposals[0].title,
@@ -73,6 +73,7 @@ describe("active hook projects", () => {
 
     expect(projects[0]).toMatchObject({
       status: "active",
+      repoUrl: configuredRepo.htmlUrl,
       repoLabel: "6529-Collections/6529-hook",
       codeSnapshotLabel: "reviewer pending",
       nextActionStatus: "action",
@@ -261,6 +262,7 @@ describe("active hook projects", () => {
     expect(projects[1]).toMatchObject({
       id: "cw-community-hook",
       name: "Community Hook",
+      repoUrl: "https://github.com/6529-Collections/community-hook",
       waveLabel: "community-hook-builder",
       repoLabel: "6529-Collections/community-hook",
       currentFocus: "Choose the first PR-sized hook change.",

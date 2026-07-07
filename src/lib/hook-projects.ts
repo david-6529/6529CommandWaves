@@ -14,7 +14,7 @@ export type ActiveHookProject = {
   status: "active" | "setup";
   statusLabel: string;
   waveUrl: string;
-  repoUrl: string;
+  repoUrl: string | null;
   waveLabel: string;
   repoLabel: string;
   currentFocus: string;
@@ -273,13 +273,15 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
     const hasProject = Boolean(wave.waveUrl.trim() && hasConfiguredRepo(wave));
+    const repoIsPlaceholder = hasPlaceholderRepo(wave);
+    const publicRepoUrl = repoIsPlaceholder ? null : wave.repoUrl;
     const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
     const boundReviewCount = wave.reviews.filter((review) =>
       guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl),
     ).length;
     const reviewEvidenceLabel =
       boundReviewCount > 0 && !reviewerProcessSelected() ? "reviewer pending" : countLabel(boundReviewCount, "review");
-    const evidenceLabel = hasPlaceholderRepo(wave)
+    const evidenceLabel = repoIsPlaceholder
       ? `${countLabel(wave.proposals.length, "proposal")}, repo not set`
       : [
           countLabel(wave.proposals.length, "proposal"),
@@ -293,7 +295,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       status: hasProject ? "active" : "setup",
       statusLabel: hasProject ? "active" : "setup",
       waveUrl: wave.waveUrl,
-      repoUrl: wave.repoUrl,
+      repoUrl: publicRepoUrl,
       waveLabel: waveLabel(wave.waveUrl),
       repoLabel: repoLabel(wave.repoUrl),
       currentFocus,

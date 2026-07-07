@@ -318,6 +318,10 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "Select the repo");
   assert(
+    !JSON.stringify(projectsPayload).includes("https://github.com/your-org/your-hook-repo"),
+    "Projects response should not expose the placeholder repo URL as a selected repo.",
+  );
+  assert(
     !JSON.stringify(projectsPayload).includes("https://github.com/6529-Collections/6529-hook"),
     "Projects response still includes the old concrete hook repo.",
   );
