@@ -172,12 +172,14 @@ async function main() {
   const staleDecisionLabel = "Decision " + "receipt";
   const staleDecisionLabels = "Decision " + "receipts";
   const staleProofRecorded = "Rece" + "ipt recorded";
+  const staleBuilderDecision = "Builder decision required";
 
   assert(!renderedHtml.includes(`6529 ${staleDecisionCopy}`), "Home page should not expose internal decision-link legacy language.");
   assert(!renderedHtml.includes(staleDecisionLabel), "Home page should not expose legacy decision-link labels.");
   assert(!renderedHtml.includes(staleDecisionLabels), "Home page should not expose legacy decision-link labels.");
   assert(!renderedHtml.includes("receipt https://"), "Home page should not expose stale decision proof copy.");
   assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
+  assert(!renderedHtml.includes(staleBuilderDecision), "Home page should not expose stale decision requirement copy.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
   assert(
     !renderedHtml.includes("value=\"https://github.com/your-org/your-hook-repo\""),
@@ -348,6 +350,10 @@ async function main() {
     !JSON.stringify(statePayload).includes("Project decision link recorded"),
     "State response still exposes stale decision link copy.",
   );
+  assert(
+    !JSON.stringify(statePayload).includes(staleBuilderDecision),
+    "State response still exposes stale decision requirement copy.",
+  );
   assertIncludes("State response", JSON.stringify(statePayload), "Visible activity report");
   assertIncludes("State response", JSON.stringify(statePayload), "Informational only");
   assertIncludes("State response", JSON.stringify(statePayload), "chatPosts");
@@ -371,6 +377,10 @@ async function main() {
   assert(
     !JSON.stringify(projectsPayload).includes("https://github.com/6529-Collections/6529-hook"),
     "Projects response still includes the old concrete hook repo.",
+  );
+  assert(
+    !JSON.stringify(projectsPayload).includes(staleBuilderDecision),
+    "Projects response still exposes stale decision requirement copy.",
   );
   assertNoEmDash("Projects response", JSON.stringify(projectsPayload));
 
@@ -403,6 +413,10 @@ async function main() {
   assert(
     !JSON.stringify(contributionReportPayload).includes("https://github.com/6529-Collections/6529-hook"),
     "Contribution report still includes the old concrete hook repo.",
+  );
+  assert(
+    !JSON.stringify(contributionReportPayload).includes(staleBuilderDecision),
+    "Contribution report still exposes stale decision requirement copy.",
   );
   assertNoEmDash("Contribution report", JSON.stringify(contributionReportPayload));
 

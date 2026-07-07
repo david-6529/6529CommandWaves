@@ -35,6 +35,9 @@ describe("legacy command copy", () => {
     expect(humanizeLegacyCommandCopy("Project decision passed for cmd-001 with quorum met.")).toBe(
       "Builders approved the hook scaffold proposal.",
     );
+    expect(
+      humanizeLegacyCommandCopy("Marked the hook scaffold high risk. Builder decision required: quorum 3, yes 60%."),
+    ).toBe("Marked the hook scaffold high risk. Project decision required: quorum 3, yes 60%.");
     expect(humanizeLegacyCommandCopy("Review passed cmd-001. The hook scaffold matched the vote and rules.")).toBe(
       "Review passed the hook scaffold. It matched the builder decision and rules.",
     );

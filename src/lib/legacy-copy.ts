@@ -5,6 +5,10 @@ const copyReplacements: Array<[RegExp, string]> = [
     "Marked the hook scaffold high risk. Project decision required: quorum 3, yes 60%.",
   ],
   [
+    /\bMarked the hook scaffold high risk\. Builder decision required: quorum 3, yes 60%\./g,
+    "Marked the hook scaffold high risk. Project decision required: quorum 3, yes 60%.",
+  ],
+  [
     /\bcmd-001 passed with 5 yes, 1 no, and a (?:project|6529) decision receipt\./g,
     "Builders approved the hook scaffold with 5 yes and 1 no.",
   ],
