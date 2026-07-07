@@ -84,7 +84,7 @@ function decisionSnapshot(wave: CommandWave) {
 
   if (poll?.status === "passed") {
     return {
-      status: "receipt needed",
+      status: "decision link needed",
       detail: "Local vote passed. Record the project decision link before PR work starts.",
       url: null,
     };

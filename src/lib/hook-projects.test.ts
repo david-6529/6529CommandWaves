@@ -137,6 +137,21 @@ describe("active hook projects", () => {
     });
   });
 
+  it("labels a passed local vote as waiting for the decision link", () => {
+    const projects = createActiveHookProjects({
+      ...configuredDemoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
+      polls: [{ ...demoWave.polls[0], decision: null }],
+      executions: [],
+      reviews: [],
+    });
+
+    expect(projects[0]).toMatchObject({
+      orchestrationSnapshotLabel: "needs decision link",
+      waveStatus: "Project decision link needed before PR work starts.",
+    });
+  });
+
   it("shows a readable review state after a PR record exists", () => {
     const projects = createActiveHookProjects({
       ...configuredDemoWave,

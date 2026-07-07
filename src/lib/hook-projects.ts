@@ -106,7 +106,7 @@ function waveStatus(wave: CommandWave) {
   }
 
   if (poll?.status === "passed") {
-    return "Vote passed locally. Add the project decision URL.";
+    return "Project decision link needed before PR work starts.";
   }
 
   if (poll) {
@@ -154,7 +154,7 @@ function orchestrationSnapshotLabel(wave: CommandWave) {
   }
 
   if (poll?.status === "passed") {
-    return "needs receipt";
+    return "needs decision link";
   }
 
   if (poll?.status === "open") {

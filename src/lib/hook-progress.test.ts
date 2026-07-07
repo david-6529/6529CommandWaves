@@ -40,7 +40,7 @@ describe("hook progress", () => {
     ]);
   });
 
-  it("shows decision as current when a proposal needs a 6529 receipt", () => {
+  it("shows decision as current when a proposal needs a decision link", () => {
     const progress = createHookProgress({
       ...demoWave,
       proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
@@ -55,6 +55,7 @@ describe("hook progress", () => {
       ["build", "waiting"],
       ["review", "waiting"],
     ]);
+    expect(progress.find((step) => step.id === "build")?.detail).toBe("Waits for the decision.");
   });
 
   it("shows PR as current after a valid decision is recorded", () => {
@@ -71,6 +72,7 @@ describe("hook progress", () => {
       ["build", "current"],
       ["review", "waiting"],
     ]);
+    expect(progress.find((step) => step.id === "decide")?.detail).toBe("Decision link recorded.");
   });
 
   it("shows review as current after a PR is recorded", () => {

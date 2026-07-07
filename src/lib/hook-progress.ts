@@ -64,7 +64,7 @@ export function createHookProgress(wave: CommandWave, draftTitle = ""): HookProg
       detail: decisionBlocked
         ? "Decision needs attention."
         : decisionDone
-          ? "Decision receipt recorded."
+          ? "Decision link recorded."
           : "Record the project decision.",
     },
     {

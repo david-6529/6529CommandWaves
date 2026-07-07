@@ -168,6 +168,7 @@ async function main() {
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
   assert(!renderedHtml.includes("6529 decision receipt"), "Home page should not expose internal decision receipt language.");
+  assert(!renderedHtml.includes("Decision receipt"), "Home page should not expose decision receipt labels.");
   assert(!renderedHtml.includes("Decision receipts"), "Home page should not expose decision receipt labels.");
   assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
   assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");

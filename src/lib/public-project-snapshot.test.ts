@@ -71,4 +71,19 @@ describe("public project snapshot", () => {
       "Repo is connected. Approved changes can move into PR review.",
     );
   });
+
+  it("labels local approval as waiting for a decision link", () => {
+    const snapshot = createPublicProjectSnapshot({
+      ...demoWave,
+      proposals: [{ ...demoWave.proposals[0], status: "ready_for_vote" }],
+      polls: [{ ...demoWave.polls[0], decision: null }],
+      executions: [],
+      reviews: [],
+    });
+
+    expect(snapshot.decision).toMatchObject({
+      status: "decision link needed",
+      detail: "Local vote passed. Record the project decision link before PR work starts.",
+    });
+  });
 });

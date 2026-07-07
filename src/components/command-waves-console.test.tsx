@@ -84,7 +84,9 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("1 report point");
     expect(text).not.toContain("1 report points");
     expect(text).toContain("Decision links: 2 report points");
+    expect(text).toContain("Decision link");
     expect(text).not.toContain("Decision receipts");
+    expect(text).not.toContain("Decision receipt");
     expect(text).toContain("Builder details");
     expect(text).toContain("Access notes, reports, and code checks for builders who want the details.");
     expect(text).toContain("The group records a project decision before PR work starts.");
@@ -150,6 +152,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Use Codex to draft");
     expect(text).not.toContain("6529 decision receipt");
     expect(text).not.toContain("decision receipt needed");
+    expect(text).not.toContain("Decision receipt needed");
     expect(text).not.toContain("Record the decision receipt before the PR build step.");
     expect(text).not.toContain("cmd-001 passed");
     expect(text).not.toContain("orchestrator managed");

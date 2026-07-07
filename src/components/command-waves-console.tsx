@@ -3870,7 +3870,7 @@ export function CommandWavesConsole() {
                     {activePoll.decision ? (
                       <div className="mt-3 rounded-md border border-zinc-800 bg-zinc-950 p-3">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-100">Decision receipt</p>
+                          <p className="text-sm font-semibold text-zinc-100">Decision link</p>
                           <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{activePoll.decision.source}</Badge>
                         </div>
                         <p className="mt-2 text-xs leading-5 text-zinc-500">
@@ -3954,7 +3954,7 @@ export function CommandWavesConsole() {
                             ? "Repo placeholder"
                             : activePrHasWaveDecision
                               ? "Build approved PR"
-                              : "Decision receipt needed"}
+                              : "Decision link needed"}
                       </Button>
                     ) : null}
                     {canCopyCodexPacket ? (
