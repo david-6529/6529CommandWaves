@@ -62,8 +62,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Review");
     expect(text).toContain("Questions, ideas, risks, and work all start here.");
     expect(text).toContain("Repo setup");
-    expect(text).toContain("Save work item");
-    expect(text).toContain("Post message");
+    expect(text).toContain("Post to chat");
+    expect(text).toContain("Save as work");
     expect(text).toContain("Recent chat");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
@@ -118,8 +118,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Chat with builders");
     expect(text).not.toContain("The same box starts the work.");
     expect(text).not.toContain("Discuss repo setup");
-    expect(text).not.toContain("Save as work");
-    expect(text).not.toContain("Post to chat");
+    expect(text).not.toContain("Save work item");
+    expect(text).not.toContain("Post message");
     expect(text).not.toContain("\u2014");
     expect(text).not.toContain("Gate");
     expect(text).not.toContain("gate unset");

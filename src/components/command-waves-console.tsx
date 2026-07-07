@@ -2412,19 +2412,11 @@ export function CommandWavesConsole() {
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
                   type="button"
-                  variant={canSaveChatWorkItem ? "primary" : "secondary"}
-                  disabled={!canSaveChatWorkItem}
-                  onClick={() => void saveChatWorkItem()}
-                >
-                  {apiBusy === "proposal" ? "Saving" : "Save work item"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
+                  variant={canPostChatMessage ? "primary" : "secondary"}
                   disabled={isBusy || !canPostChatMessage}
                   onClick={() => void postBuilderWaveChatDraft()}
                 >
-                  {apiBusy === "chatPost" ? "Posting" : "Post message"}
+                  {apiBusy === "chatPost" ? "Posting" : "Post to chat"}
                 </Button>
                 <Button
                   type="button"
@@ -2433,6 +2425,14 @@ export function CommandWavesConsole() {
                   onClick={() => void copyBuilderWaveChatDraft()}
                 >
                   Copy draft
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={!canSaveChatWorkItem}
+                  onClick={() => void saveChatWorkItem()}
+                >
+                  {apiBusy === "proposal" ? "Saving" : "Save as work"}
                 </Button>
                 <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
                   Clear
