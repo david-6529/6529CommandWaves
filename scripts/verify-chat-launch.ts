@@ -1,13 +1,13 @@
 import {
-  loadLaunchAuditPayload,
+  loadChatLaunchPayload,
   readOptionalJsonUrl,
   resolveVerificationTargetUrl,
   writeJsonResult,
 } from "./launch-audit-source";
-import { verifyChatLaunchAuditPayload } from "../src/lib/chat-launch-verifier";
+import { verifyChatLaunchPayload } from "../src/lib/chat-launch-verifier";
 
 async function main() {
-  const { payload, sourceUrl } = await loadLaunchAuditPayload();
+  const { payload, sourceUrl } = await loadChatLaunchPayload();
   const stateUrl = resolveVerificationTargetUrl(payload, sourceUrl, "CHAT_LAUNCH_STATE_URL", "commandWaveStateUrl");
   const projectIndexUrl = resolveVerificationTargetUrl(
     payload,
@@ -19,7 +19,7 @@ async function main() {
     stateUrl ? readOptionalJsonUrl(stateUrl) : undefined,
     projectIndexUrl ? readOptionalJsonUrl(projectIndexUrl) : undefined,
   ]);
-  const result = verifyChatLaunchAuditPayload(payload, {
+  const result = verifyChatLaunchPayload(payload, {
     commandWaveState,
     requirePublicState: Boolean(stateUrl),
     projectIndex,

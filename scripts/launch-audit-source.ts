@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fetchJsonWithTimeout, type TimedFetchError } from "../src/lib/http-fetch";
 import {
+  chatLaunchUrlFromAppUrl,
   defaultLocalAppUrl,
   launchAuditRemoteEnabled,
   launchAuditUrlFromAppUrl,
@@ -74,6 +75,36 @@ export async function loadLaunchAuditPayload(): Promise<LoadedLaunchAudit> {
 
   throw new Error(
     "Set LAUNCH_AUDIT_PATH, LAUNCH_AUDIT_URL, NEXT_PUBLIC_APP_URL, or run the local app before launch audit verification.",
+  );
+}
+
+export async function loadChatLaunchPayload(): Promise<LoadedLaunchAudit> {
+  const auditPath = process.env.CHAT_LAUNCH_PATH?.trim() || process.env.LAUNCH_AUDIT_PATH?.trim();
+  const localAppUrl = process.env.LOCAL_APP_URL?.trim() || defaultLocalAppUrl;
+  const auditUrl =
+    process.env.CHAT_LAUNCH_URL?.trim() ||
+    process.env.LAUNCH_AUDIT_URL?.trim() ||
+    chatLaunchUrlFromAppUrl(process.env.NEXT_PUBLIC_APP_URL, {
+      remote: launchAuditRemoteEnabled(process.env.CHAT_LAUNCH_REMOTE ?? process.env.LAUNCH_AUDIT_REMOTE),
+    }) ||
+    chatLaunchUrlFromAppUrl(localAppUrl, { remote: false });
+
+  if (auditPath) {
+    return {
+      payload: readJsonFile<unknown>(resolve(auditPath)),
+      sourceUrl: null,
+    };
+  }
+
+  if (auditUrl) {
+    return {
+      payload: await readJsonUrl<unknown>(auditUrl),
+      sourceUrl: auditUrl,
+    };
+  }
+
+  throw new Error(
+    "Set CHAT_LAUNCH_PATH, CHAT_LAUNCH_URL, NEXT_PUBLIC_APP_URL, or run the local app before chat launch verification.",
   );
 }
 

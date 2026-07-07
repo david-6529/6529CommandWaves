@@ -408,7 +408,7 @@ LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=
 Verify the chat launch before inviting builders into discussion:
 
 ```bash
-LAUNCH_AUDIT_URL='https://your-app.example/api/command-wave/launch/audit?remote=1' npm run chat:launch
+CHAT_LAUNCH_URL='https://your-app.example/api/command-wave/launch/chat?remote=1' npm run chat:launch
 ```
 
 If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
@@ -416,9 +416,15 @@ If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
 Without an explicit path, URL, or app URL, `npm run launch:audit` uses the local dev app at `http://localhost:5001` and
 runs a shape-only audit.
 
+If `NEXT_PUBLIC_APP_URL` is set, `npm run chat:launch` reads
+`$NEXT_PUBLIC_APP_URL/api/command-wave/launch/chat?remote=1`. Set `CHAT_LAUNCH_REMOTE=0` only for local shape checks.
+Without an explicit path, URL, or app URL, `npm run chat:launch` uses the local dev app at `http://localhost:5001` and
+runs a shape-only chat launch check.
+
 `npm run chat:launch` exits nonzero until the chat launch track is ready and generated with remote setup checks. The full
 `npm run launch:audit` command exits nonzero until the reviewed PR loop is also ready. For offline verification, set
-`LAUNCH_AUDIT_PATH`. The full verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
+`CHAT_LAUNCH_PATH` or `LAUNCH_AUDIT_PATH`. The full launch verifier prints the status draft, state hashes, blockers,
+open items, and an operator checklist.
 When it can resolve the command-wave state target, it also checks that the public state snapshot hash matches the launch
 audit evidence. When it can resolve the project index target, it checks that the active project list includes the launch
 project and has a valid hash. Set `LAUNCH_AUDIT_STATE_URL` or `LAUNCH_AUDIT_PROJECT_INDEX_URL` to override those targets

@@ -59,6 +59,8 @@ describe("launch docs", () => {
     const docs = [readRepoFile("README.md"), readRepoFile("docs/first-hook-launch-playbook.md")].join("\n");
 
     expect(readRepoFile("package.json")).toContain("\"chat:launch\"");
+    expect(docs).toContain("CHAT_LAUNCH_URL");
+    expect(docs).toContain("/api/command-wave/launch/chat?remote=1");
     expect(docs).toContain("npm run chat:launch");
     expect(docs).toContain("npm run launch:audit");
     expect(docs).toContain("reviewed PR loop");

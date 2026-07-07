@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { githubRepoPlaceholder } from "./agent-identities";
 import { demoWave } from "./demo-wave";
+import { createChatLaunchSnapshot } from "./chat-launch-snapshot";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
-import { verifyChatLaunchAuditPayload } from "./chat-launch-verifier";
+import { verifyChatLaunchAuditPayload, verifyChatLaunchPayload } from "./chat-launch-verifier";
 import type { SetupValidation } from "./setup-validation";
 
 const chatReadyEnv = {
@@ -58,6 +59,25 @@ describe("chat launch verifier", () => {
     expect(result.nextAction?.title).toBe("Open project chat");
     expect(result.checks.find((item) => item.id === "launch_status")).toBeUndefined();
     expect(result.checks.find((item) => item.id === "chat_launch_ready")).toMatchObject({
+      status: "pass",
+    });
+  });
+
+  it("passes direct chat launch endpoint payloads", async () => {
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+      checkSetupRemote: true,
+      setupValidation: chatReadySetupValidation,
+    });
+    const result = verifyChatLaunchPayload(createChatLaunchSnapshot(launchSnapshot));
+
+    expect(result.status).toBe("pass");
+    expect(result.chatLaunchStatus).toBe("ready");
+    expect(result.launchStatus).not.toBe("ready");
+    expect(result.statusDraft).toBeNull();
+    expect(result.auditHash).toBe(launchSnapshot.auditHash);
+    expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
       status: "pass",
     });
   });

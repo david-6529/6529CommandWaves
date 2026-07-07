@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  chatLaunchUrlFromAppUrl,
   defaultLocalAppUrl,
   launchAuditRemoteEnabled,
   launchAuditUrlFromAppUrl,
@@ -17,6 +18,16 @@ describe("launch audit URL", () => {
     expect(launchAuditUrlFromAppUrl("http://localhost:5001", { remote: false })).toBe(
       "http://localhost:5001/api/command-wave/launch/audit",
     );
+  });
+
+  it("builds chat launch URLs from app URLs", () => {
+    expect(chatLaunchUrlFromAppUrl("https://command-waves.example.com/")).toBe(
+      "https://command-waves.example.com/api/command-wave/launch/chat?remote=1",
+    );
+    expect(chatLaunchUrlFromAppUrl("http://localhost:5001", { remote: false })).toBe(
+      "http://localhost:5001/api/command-wave/launch/chat",
+    );
+    expect(chatLaunchUrlFromAppUrl(" ")).toBeNull();
   });
 
   it("treats LAUNCH_AUDIT_REMOTE=0 as the only opt-out", () => {
@@ -48,6 +59,7 @@ describe("launch audit URL", () => {
     expect(
       JSON.stringify({
         defaultLocalAppUrl,
+        chatLaunchUrl: chatLaunchUrlFromAppUrl("https://command-waves.example.com/"),
         launchAuditUrl: launchAuditUrlFromAppUrl("https://command-waves.example.com/"),
       }),
     ).not.toContain("\u2014");
