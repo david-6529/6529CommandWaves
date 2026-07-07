@@ -185,9 +185,9 @@ const hookGuardrails = [
 const projectWorkRules = [
   "Access is reviewed before someone can change the project.",
   "Ideas and proposals start in chat.",
-  "The orchestration agent labels risk and keeps scope small.",
+  "daemon labels risk and keeps scope small.",
   "Important changes need a visible project decision before PR work.",
-  "The reviewer agent checks each PR before humans merge.",
+  "A reviewer check must pass before humans merge.",
 ];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
@@ -2231,13 +2231,13 @@ export function CommandWavesConsole() {
             <details className="rounded-lg border border-zinc-800 p-4" open>
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
                 <span>Project summary</span>
-                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} managed</Badge>
+                <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} updates</Badge>
               </summary>
               <p className="mt-3 text-base leading-7 text-zinc-400">
                 {publicProjectSnapshot.summary}
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-400">
-                {orchestratorAgentIdentity.handle} keeps the log current. Review agent and GitHub repo are placeholders for this phase.{" "}
+                {orchestratorAgentIdentity.handle} keeps the log current. Reviewer process and GitHub repo are placeholders for this phase.{" "}
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
                     Open the GitHub repo

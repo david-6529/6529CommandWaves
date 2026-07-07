@@ -24,14 +24,14 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Access is manual for now.");
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
-    expect(text).toContain("daemon managed");
+    expect(text).toContain("daemon updates");
     expect(text).toContain("Working snapshot for the 6529 AMM hook build.");
     expect(text).toContain("Builders turn chat into decisions, PRs, reviews, and a public log.");
     expect(text).toContain("Focus: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next: Select the GitHub repo before PR work can run.");
     expect(text).toContain("GitHub repo is a placeholder until selected. PR work waits.");
     expect(text).toContain("daemon keeps the log current.");
-    expect(text).toContain("Review agent and GitHub repo are placeholders for this phase.");
+    expect(text).toContain("Reviewer process and GitHub repo are placeholders for this phase.");
     expect(text).toContain("The GitHub repo is a placeholder until the pilot repo is selected.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
@@ -47,6 +47,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("How are PRs approved?");
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
+    expect(text).toContain("daemon labels risk and keeps scope small.");
+    expect(text).toContain("A reviewer check must pass before humans merge.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Current work");
     expect(text).toContain("repo needed");
