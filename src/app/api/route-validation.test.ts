@@ -5,6 +5,7 @@ import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
 import { POST as recordDecision } from "./command-wave/decision/route";
 import { POST as executeCommand } from "./command-wave/execute/route";
+import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
 import { POST as submitProposalRoute } from "./command-wave/proposals/route";
 import { POST as reviewCommand } from "./command-wave/review/route";
 import { DELETE as resetWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
@@ -213,6 +214,26 @@ describe("API route validation", () => {
     expect(response.status).toBe(409);
     await expect(responsePayload(response)).resolves.toMatchObject({
       error: "Select the GitHub repo before creating a Codex work packet.",
+    });
+  });
+
+  it("publishes chat launch state without requiring a selected repo", async () => {
+    const response = await getChatLaunch(request("https://command-waves.example.com/api/command-wave/launch/chat"));
+
+    expect(response.status).toBe(200);
+    await expect(responsePayload(response)).resolves.toMatchObject({
+      audit: {
+        version: "command-wave-chat-launch-v0.1",
+        project: {
+          repoUrl: "https://github.com/your-org/your-hook-repo",
+        },
+        prLoop: {
+          status: "blocked",
+        },
+        verification: {
+          launchStatus: "blocked",
+        },
+      },
     });
   });
 

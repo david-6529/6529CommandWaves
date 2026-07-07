@@ -454,6 +454,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
 - `GET /api/command-wave/projects`: public active hook project index with a stable project-list hash.
 - `GET /api/command-wave/launch/audit`: public first-loop launch audit with authority boundary. Add `?remote=1` to run remote wave and repo setup checks.
+- `GET /api/command-wave/launch/chat`: public chat launch audit. Add `?remote=1` before inviting builders into discussion.
 - `GET /api/command-wave`: return the current local command wave.
 - `PUT /api/command-wave`: disabled in phase 1. Use scoped setup, proposal, vote, decision, run, and review routes.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.
