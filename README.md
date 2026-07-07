@@ -232,6 +232,8 @@ Before opening a PR, run the local quality check:
 npm run verify
 ```
 
+This regenerates Next route types before TypeScript, runs lint and tests, checks for em dash characters, and builds the app.
+
 ## First Public Launch Env
 
 Before inviting broad participation, set the first-loop launch variables:
