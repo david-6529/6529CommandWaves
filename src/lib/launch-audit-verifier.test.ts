@@ -205,6 +205,9 @@ describe("launch audit verifier", () => {
     expect(result.blockers.join("\n")).toContain(
       "Admin API key: Set ADMIN_API_KEY before public launch so protected actions require a key.",
     );
+    expect(result.blockers.join("\n")).toContain(
+      "Audit packet: Launch packet needs a configured GitHub repo before contributors audit it.",
+    );
     expect(result.openItems.length).toBeGreaterThan(0);
     expect(result.operatorChecklist).toContain("- Set a strong ADMIN_API_KEY before public launch.");
     expect(result.operatorChecklist).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
@@ -212,7 +215,7 @@ describe("launch audit verifier", () => {
     expect(result.operatorChecklist).toContain(
       "- Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
     );
-    expect(result.nextAction?.title).toBe("Set ADMIN_API_KEY");
+    expect(result.nextAction?.title).toBe("Fix launch packet evidence");
   });
 
   it("fails when the authority boundary is missing", async () => {

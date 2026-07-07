@@ -3,6 +3,7 @@ import { commandKindLabel } from "./command-kind-copy";
 import { createCommandOrchestrationSummary } from "./command-orchestration-summary";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, type DeveloperFeePlan } from "./developer-fee-plan";
+import { configuredGitHubRepo, isGitHubPullRequestUrlForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { latestLedgerTimestamp } from "./ledger";
 import { projectRepoLine } from "./project-repo-copy";
@@ -42,7 +43,7 @@ function limitedList(items: string[], limit: number, empty: string) {
   ];
 }
 
-function artifactSummary(artifact: string) {
+function artifactSummary(artifact: string, repoUrl: string) {
   if (artifact.startsWith("run-manifest:")) {
     return "Run manifest recorded.";
   }
@@ -64,7 +65,13 @@ function artifactSummary(artifact: string) {
   }
 
   if (artifact.startsWith("https://github.com/")) {
-    return `PR link: ${artifact}`;
+    if (isGitHubPullRequestUrlForRepo(artifact, repoUrl)) {
+      return `PR link: ${artifact}`;
+    }
+
+    return configuredGitHubRepo(repoUrl)
+      ? "PR link blocked: does not match the configured repo."
+      : "PR link blocked: configure the GitHub repo first.";
   }
 
   if (artifact === "PR body includes Command Waves manifest") {
@@ -118,11 +125,11 @@ function artifactPriority(artifact: string) {
   return 10;
 }
 
-function buildEvidenceItems(artifacts: string[]) {
+function buildEvidenceItems(artifacts: string[], repoUrl: string) {
   return artifacts
     .map((artifact, index) => ({ artifact, index }))
     .toSorted((left, right) => artifactPriority(left.artifact) - artifactPriority(right.artifact) || left.index - right.index)
-    .map((item) => artifactSummary(item.artifact));
+    .map((item) => artifactSummary(item.artifact, repoUrl));
 }
 
 function proposalLines(proposal: CommandProposal | null) {
@@ -173,7 +180,7 @@ function orchestrationLines(wave: CommandWave, proposal: CommandProposal | null,
   ];
 }
 
-function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
+function buildLines(wave: CommandWave, poll: PollState | null, execution: ExecutionRecord | null) {
   if (!execution) {
     if (poll?.status === "passed" && !poll.decision) {
       return ["- Build: waiting for a recorded project decision."];
@@ -182,12 +189,18 @@ function buildLines(poll: PollState | null, execution: ExecutionRecord | null) {
     return ["- Build: waiting for an approved PR change."];
   }
 
+  const repoConfigured = Boolean(configuredGitHubRepo(wave.repoUrl));
+
   return [
-    `- Build: ${execution.status}`,
+    `- Build: ${repoConfigured ? execution.status : "blocked"}`,
     `- Harness: ${execution.harness}`,
-    `- Summary: ${humanizeLegacyCommandCopy(execution.summary)}`,
+    `- Summary: ${
+      repoConfigured
+        ? humanizeLegacyCommandCopy(execution.summary)
+        : "GitHub repo is still a placeholder. Replace it before PR work can run."
+    }`,
     "- Build records:",
-    ...limitedList(buildEvidenceItems(execution.artifacts), 6, "No build artifacts recorded."),
+    ...limitedList(buildEvidenceItems(execution.artifacts, wave.repoUrl), 6, "No build artifacts recorded."),
   ];
 }
 
@@ -271,9 +284,18 @@ function verificationLines(targets: LaunchPacketVerificationTargets | null | und
   ];
 }
 
-function nextStep(proposal: CommandProposal | null, execution: ExecutionRecord | null, review: GuardianReview | null) {
+function nextStep(
+  wave: CommandWave,
+  proposal: CommandProposal | null,
+  execution: ExecutionRecord | null,
+  review: GuardianReview | null,
+) {
   if (!proposal) {
     return "Choose one PR-sized hook change.";
+  }
+
+  if (!configuredGitHubRepo(wave.repoUrl)) {
+    return "Connect the real GitHub repo before PR work can run.";
   }
 
   if (!execution) {
@@ -332,7 +354,7 @@ export function createLaunchPacket({
     ...decisionLines(poll),
     "",
     "## Build",
-    ...buildLines(poll, execution),
+    ...buildLines(wave, poll, execution),
     "",
     "## Review",
     ...reviewLines(review),
@@ -356,7 +378,7 @@ export function createLaunchPacket({
     "- No automatic posting, merging, deploying, spending, or payouts.",
     "",
     "## Next Step",
-    `- ${nextStep(proposal, execution, review)}`,
+    `- ${nextStep(wave, proposal, execution, review)}`,
   ].join("\n");
 
   const packet = {

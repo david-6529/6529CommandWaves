@@ -34,7 +34,7 @@ describe("command wave state snapshot", () => {
         summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
         sourceOfTruth: "project chat",
         codeSurface: "GitHub PR",
-        blockedCount: 2,
+        blockedCount: 3,
       },
       access: {
         label: "manual review",
@@ -101,7 +101,7 @@ describe("command wave state snapshot", () => {
       ["decision", "ready"],
       ["pr", "blocked"],
       ["review", "blocked"],
-      ["log", "ready"],
+      ["log", "blocked"],
     ]);
     expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");

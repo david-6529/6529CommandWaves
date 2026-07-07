@@ -53,6 +53,7 @@ What exists now:
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
   contract signal checks.
+- Launch audit and public workflow proof reject stale PR or review evidence unless the PR link belongs to the configured repo.
 - Local file storage for the demo flow and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
 What remains manual or MVP-only:

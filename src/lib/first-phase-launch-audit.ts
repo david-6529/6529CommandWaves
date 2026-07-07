@@ -1,4 +1,5 @@
 import { validateWaveDecisionReference, type CommandWave } from "./command-waves";
+import { configuredGitHubRepo, gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { participationGateNeedsAdvisoryNote } from "./participation-gates";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
 import type { SetupCheckStatus, SetupValidation } from "./setup-validation";
@@ -103,7 +104,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_log: "Share the result back to chat",
   flow_wave_decision_receipt: "Record the project decision URL",
   flow_participation_notes: "Make participation notes advisory",
-  flow_audit_packet: "Prepare the launch packet",
+  flow_audit_packet: "Fix launch packet evidence",
   setup_not_checked: "Run launch setup check",
   setup_remote_check: "Run launch setup check",
   setup_wave_reachable: "Pick reachable project chat",
@@ -312,10 +313,8 @@ function decisionReceiptItem(wave: CommandWave | null | undefined): FirstPhaseLa
   ];
 }
 
-function hasGithubPrLink(artifacts: string[]) {
-  return artifacts.some((artifact) =>
-    /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
-  );
+function hasGithubPrLinkForRepo(artifacts: string[], repoUrl: string | null | undefined) {
+  return gitHubPullRequestUrlsForRepo(artifacts, repoUrl).length > 0;
 }
 
 function participationNotesItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
@@ -360,13 +359,25 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
   const review = wave?.reviews.find((item) => item.proposalId === proposal.id) ?? null;
 
   if (review?.status === "pass" && execution?.status === "complete") {
-    if (!hasGithubPrLink(execution.artifacts)) {
+    if (!configuredGitHubRepo(wave?.repoUrl)) {
       return [
         {
           id: "flow_audit_packet",
           label: "Audit packet",
           status: "blocked",
-          detail: "Launch packet needs a GitHub PR link before contributors audit it.",
+          detail: "Launch packet needs a configured GitHub repo before contributors audit it.",
+          source: "flow",
+        },
+      ];
+    }
+
+    if (!hasGithubPrLinkForRepo(execution.artifacts, wave?.repoUrl)) {
+      return [
+        {
+          id: "flow_audit_packet",
+          label: "Audit packet",
+          status: "blocked",
+          detail: "Launch packet needs a GitHub PR link for the configured repo before contributors audit it.",
           source: "flow",
         },
       ];

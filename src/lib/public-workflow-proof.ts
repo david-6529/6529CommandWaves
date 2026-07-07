@@ -1,5 +1,6 @@
 import { pollApprovalPassedForWave, validateWaveDecisionReference, type CommandWave } from "./command-waves";
 import { isPlaceholderValue } from "./env-placeholders";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { hashValue } from "./run-manifest";
 import { selectPhaseWork } from "./phase-work";
@@ -31,11 +32,10 @@ function latestPrUrl(wave: CommandWave) {
     return null;
   }
 
-  return (
-    wave.executions
-      .flatMap((execution) => execution.artifacts)
-      .find((artifact) => /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact)) ?? null
-  );
+  return gitHubPullRequestUrlsForRepo(
+    wave.executions.flatMap((execution) => execution.artifacts),
+    wave.repoUrl,
+  )[0] ?? null;
 }
 
 function decisionEvidence(wave: CommandWave) {
@@ -106,22 +106,29 @@ export function createPublicWorkflowProof(wave: CommandWave) {
   const prUrl = latestPrUrl(wave);
   const decision = decisionEvidence(wave);
   const chatReady = hasProjectChat(wave);
+  const missingConfiguredPrLink = Boolean(repoConfigured && execution?.status === "complete" && !prUrl);
   const prStatus: PublicWorkflowProofStepStatus = !repoConfigured
     ? "blocked"
     : execution?.status === "complete"
-      ? "ready"
+      ? prUrl
+        ? "ready"
+        : "blocked"
       : decision.status === "ready"
         ? "needed"
         : "needed";
   const reviewStatus: PublicWorkflowProofStepStatus = !repoConfigured
     ? "blocked"
+    : missingConfiguredPrLink
+      ? "blocked"
     : review?.status === "pass"
       ? "ready"
       : execution?.status === "complete"
         ? "needed"
         : "needed";
   const logReady = Boolean(
-    review?.status === "pass" &&
+    repoConfigured &&
+      prUrl &&
+      review?.status === "pass" &&
       proposal &&
       wave.ledger.some(
         (event) =>
@@ -148,6 +155,8 @@ export function createPublicWorkflowProof(wave: CommandWave) {
       status: prStatus,
       detail: !repoConfigured
         ? "GitHub repo is still a placeholder. Replace it before PR work can run."
+        : missingConfiguredPrLink
+          ? "PR record is complete but no PR link matches the configured repo."
         : execution?.status === "complete"
           ? humanizeLegacyCommandCopy(execution.summary)
           : "Approved work needs a GitHub PR record.",
@@ -160,6 +169,8 @@ export function createPublicWorkflowProof(wave: CommandWave) {
       status: reviewStatus,
       detail: !repoConfigured
         ? "Review waits for a real hook repo and PR record."
+        : missingConfiguredPrLink
+          ? "Review waits for a PR link that matches the configured repo."
         : review?.status === "pass"
           ? humanizeLegacyCommandCopy(review.summary)
           : "Reviewer proof is required before humans merge.",
@@ -169,10 +180,14 @@ export function createPublicWorkflowProof(wave: CommandWave) {
     {
       id: "log",
       label: "Log",
-      status: logReady ? "ready" : "needed",
-      detail: logReady
-        ? "Reviewed result is recorded in the project log."
-        : "Share the reviewed result back to project chat.",
+      status: !repoConfigured || missingConfiguredPrLink ? "blocked" : logReady ? "ready" : "needed",
+      detail: !repoConfigured
+        ? "Log waits for a real hook repo and reviewed PR."
+        : missingConfiguredPrLink
+          ? "Log waits for a PR link that matches the configured repo."
+        : logReady
+          ? "Reviewed result is recorded in the project log."
+          : "Share the reviewed result back to project chat.",
       evidenceUrl: null,
       evidenceHash: logReady ? hashValue(wave.ledger) : null,
     },

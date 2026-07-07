@@ -19,19 +19,24 @@ describe("public workflow proof", () => {
       summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
       sourceOfTruth: "project chat",
       codeSurface: "GitHub PR",
-      blockedCount: 2,
+      blockedCount: 3,
     });
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
       ["chat", "ready"],
       ["decision", "ready"],
       ["pr", "blocked"],
       ["review", "blocked"],
-      ["log", "ready"],
+      ["log", "blocked"],
     ]);
     expect(proof.steps.find((step) => step.id === "pr")).toMatchObject({
       label: "Pull request",
       detail: "GitHub repo is still a placeholder. Replace it before PR work can run.",
       evidenceUrl: null,
+    });
+    expect(proof.steps.find((step) => step.id === "log")).toMatchObject({
+      label: "Log",
+      detail: "Log waits for a real hook repo and reviewed PR.",
+      evidenceHash: null,
     });
   });
 
@@ -54,6 +59,34 @@ describe("public workflow proof", () => {
       "https://github.com/6529-Collections/6529-hook/pull/12",
     );
     expect(proof.steps.find((step) => step.id === "review")?.evidenceHash).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("blocks PR, review, and log proof when the PR link belongs to another repo", () => {
+    const proof = createPublicWorkflowProof({
+      ...configuredDemoWave,
+      executions: configuredDemoWave.executions.map((execution) => ({
+        ...execution,
+        artifacts: execution.artifacts.map((artifact) =>
+          artifact.startsWith("https://github.com/") ? "https://github.com/other-org/other-hook/pull/12" : artifact,
+        ),
+      })),
+    });
+
+    expect(proof.blockedCount).toBe(3);
+    expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
+      ["chat", "ready"],
+      ["decision", "ready"],
+      ["pr", "blocked"],
+      ["review", "blocked"],
+      ["log", "blocked"],
+    ]);
+    expect(proof.steps.find((step) => step.id === "pr")).toMatchObject({
+      detail: "PR record is complete but no PR link matches the configured repo.",
+      evidenceUrl: null,
+    });
+    expect(proof.steps.find((step) => step.id === "review")).toMatchObject({
+      detail: "Review waits for a PR link that matches the configured repo.",
+    });
   });
 
   it("does not emit em dash characters", () => {

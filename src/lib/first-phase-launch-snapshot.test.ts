@@ -53,7 +53,7 @@ describe("first phase launch snapshot", () => {
       summary: "Public proof of the chat, decision, PR, review, and log path for the first hook build.",
       sourceOfTruth: "project chat",
       codeSurface: "GitHub PR",
-      blockedCount: 2,
+      blockedCount: 3,
     });
     expect(snapshot.workflowProof.steps.find((step) => step.id === "pr")).toMatchObject({
       status: "blocked",

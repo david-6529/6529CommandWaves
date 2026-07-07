@@ -521,7 +521,54 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_audit_packet",
         status: "blocked",
-        detail: "Launch packet needs a GitHub PR link before contributors audit it.",
+        detail: "Launch packet needs a GitHub PR link for the configured repo before contributors audit it.",
+      }),
+    );
+  });
+
+  it("blocks the first loop when reviewed PR work points to another repo", () => {
+    const wave = {
+      ...configuredDemoWave,
+      executions: [
+        {
+          ...demoWave.executions[0],
+          artifacts: demoWave.executions[0].artifacts.map((artifact) =>
+            artifact.startsWith("https://github.com/") ? "https://github.com/other-org/other-hook/pull/12" : artifact,
+          ),
+        },
+      ],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
+      wave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_audit_packet",
+        status: "blocked",
+        detail: "Launch packet needs a GitHub PR link for the configured repo before contributors audit it.",
+      }),
+    );
+  });
+
+  it("blocks stale reviewed PR evidence while the repo is still a placeholder", () => {
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(demoWave),
+      readinessChecks: productionReadyChecks,
+      setupValidation: productionSetupValidation,
+      wave: demoWave,
+    });
+
+    expect(audit.status).toBe("blocked");
+    expect(audit.blockers).toContainEqual(
+      expect.objectContaining({
+        id: "flow_audit_packet",
+        status: "blocked",
+        detail: "Launch packet needs a configured GitHub repo before contributors audit it.",
       }),
     );
   });

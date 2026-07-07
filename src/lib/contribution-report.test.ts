@@ -2,9 +2,20 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createContributionReport, createContributionReportDraft } from "./contribution-report";
 
+const configuredDemoWave = {
+  ...demoWave,
+  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) =>
+      artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook"),
+    ),
+  })),
+};
+
 describe("contribution report", () => {
   it("summarizes visible activity without granting authority", () => {
-    const report = createContributionReport(demoWave, {
+    const report = createContributionReport(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
 
@@ -50,6 +61,16 @@ describe("contribution report", () => {
     expect(report.contributors[0].rationale).toContain("Recorded project decision receipt");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
     expect(report.contributors.some((contributor) => contributor.identity === "Decision")).toBe(false);
+  });
+
+  it("does not count stale placeholder repo PR and review evidence", () => {
+    const report = createContributionReport(demoWave, {
+      generatedAt: "2026-06-21T12:00:00.000Z",
+    });
+
+    expect(report.evidence).not.toContain("1 GitHub PR link");
+    expect(report.evidence).not.toContain("1 Guardian review proof");
+    expect(report.notes.join(" ")).toContain("not a permission system");
   });
 
   it("defaults generatedAt to the newest ledger event", () => {
@@ -100,7 +121,7 @@ describe("contribution report", () => {
   });
 
   it("creates a copyable report draft without granting authority", () => {
-    const draft = createContributionReportDraft(demoWave, {
+    const draft = createContributionReportDraft(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
       limit: 2,
     });

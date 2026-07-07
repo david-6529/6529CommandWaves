@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { latestLedgerTimestamp } from "./ledger";
 
 export type ContributionContributor = {
@@ -92,11 +93,7 @@ function addScoreBasis(contributor: ContributionContributor, source: string, poi
 
 function githubPrLinkCount(wave: CommandWave) {
   return wave.executions.reduce(
-    (count, execution) =>
-      count +
-      execution.artifacts.filter((artifact) =>
-        /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
-      ).length,
+    (count, execution) => count + gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl).length,
     0,
   );
 }
@@ -138,7 +135,7 @@ function evidenceSummary(wave: CommandWave, roomPostCount: number) {
   const voteCount = wave.polls.reduce((count, poll) => count + (poll.votes?.length ?? 0), 0);
   const decisionCount = wave.polls.filter((poll) => poll.decision).length;
   const prLinkCount = githubPrLinkCount(wave);
-  const reviewProofCount = wave.reviews.filter((review) => review.proof).length;
+  const reviewProofCount = prLinkCount ? wave.reviews.filter((review) => review.proof).length : 0;
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
