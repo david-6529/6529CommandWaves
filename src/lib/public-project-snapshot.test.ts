@@ -8,7 +8,11 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "Working snapshot for the 6529 AMM hook build. Builders turn chat into decisions, PRs, reviews, and a public log. Focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. GitHub repo is a placeholder until selected. PR work waits.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
+      summaryParagraphs: [
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed cmd-001. The hook scaffold matched the vote and rules.",
+      ],
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
@@ -50,10 +54,11 @@ describe("public project snapshot", () => {
       repoUrl: "https://github.com/builders/hook",
     };
 
-    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Focus: Choose one hook change.");
+    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Current focus: Choose one hook change.");
     expect(createPublicProjectSnapshot(emptyWave).updatedAt).toBeNull();
+    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("No project changes recorded yet.");
     expect(createPublicProjectSnapshot(configuredWave).summary).toContain(
-      "Repo connected. Approved changes can move into PR review.",
+      "Repo is connected. Approved changes can move into PR review.",
     );
   });
 });

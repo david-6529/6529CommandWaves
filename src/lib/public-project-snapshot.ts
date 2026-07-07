@@ -121,23 +121,28 @@ function projectSummary({
   currentWork,
   repo,
   nextStep,
+  latestChange,
 }: {
   currentWork: ReturnType<typeof currentWorkSnapshot>;
   repo: ReturnType<typeof repoSnapshot>;
   nextStep: ReturnType<typeof nextStepSnapshot>;
+  latestChange: string | null;
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "GitHub repo is a placeholder until selected. PR work waits."
-      : "Repo connected. Approved changes can move into PR review.";
-
-  return [
-    "Working snapshot for the 6529 AMM hook build.",
-    "Builders turn chat into decisions, PRs, reviews, and a public log.",
-    `Focus: ${currentWork.title}.`,
+      ? "GitHub repo is still a placeholder, so PR work waits."
+      : "Repo is connected. Approved changes can move into PR review.";
+  const statusParagraph = [
+    `Current focus: ${currentWork.title}.`,
     `Next: ${nextStep.detail}`,
     repoLine,
+    latestChange ? `Latest change: ${latestChange}` : "No project changes recorded yet.",
   ].join(" ");
+
+  return [
+    "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.",
+    statusParagraph,
+  ];
 }
 
 export function createPublicProjectSnapshot(wave: CommandWave) {
@@ -151,9 +156,16 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
       label: eventTypeLabel(event.type),
       message: humanizeLegacyCommandCopy(event.message),
     }));
+  const summaryParagraphs = projectSummary({
+    currentWork,
+    repo,
+    nextStep,
+    latestChange: latestChanges[0]?.message ?? null,
+  });
 
   return {
-    summary: projectSummary({ currentWork, repo, nextStep }),
+    summary: summaryParagraphs.join(" "),
+    summaryParagraphs,
     updatedAt: latestChanges[0]?.at ?? null,
     currentWork,
     decision: decisionSnapshot(wave),

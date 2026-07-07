@@ -204,6 +204,7 @@ Audit and launch:
 - Public verification manifest with stable anchors, required hash fields, and a self endpoint for third-party checks.
 - Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
   rights, reputation, or token weight.
+- Public project summary publishes two state-derived paragraphs: the builder loop, then current focus, next step, repo state, and latest change.
 - Public command-wave state keeps placeholder repo URLs empty while keeping hashes verifiable.
 - Public project index keeps repo URLs empty while projects still use placeholder repos.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.

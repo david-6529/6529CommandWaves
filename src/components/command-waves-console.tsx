@@ -2233,18 +2233,18 @@ export function CommandWavesConsole() {
                 <span>Project summary</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} updates</Badge>
               </summary>
-              <p className="mt-3 text-base leading-7 text-zinc-400">
-                {publicProjectSnapshot.summary}
-              </p>
+              {publicProjectSnapshot.summaryParagraphs.map((paragraph) => (
+                <p key={paragraph} className="mt-3 text-base leading-7 text-zinc-400">
+                  {paragraph}
+                </p>
+              ))}
               <p className="mt-2 text-base leading-7 text-zinc-400">
-                {orchestratorAgentIdentity.handle} keeps the log current. Reviewer process and GitHub repo are placeholders for this phase.{" "}
+                {orchestratorAgentIdentity.handle} keeps the log current. Reviewer process is a placeholder for this phase.{" "}
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
                     Open the GitHub repo
                   </a>
-                ) : (
-                  githubRepoPlaceholder.description
-                )}
+                ) : null}
               </p>
             </details>
 
