@@ -3,13 +3,13 @@ import { commandKindLabel } from "./command-kind-copy";
 import { ledgerEventsByRecency } from "./ledger";
 import { selectPhaseWork } from "./phase-work";
 
-export type RoomFeedDraft = {
+export type ProjectChatFeedDraft = {
   title: string;
   prompt: string;
   proposer: string;
 };
 
-export type RoomFeedItem = {
+export type ProjectChatFeedItem = {
   id: string;
   label: string;
   title: string;
@@ -31,7 +31,7 @@ function prUrl(execution: ExecutionRecord | null) {
   );
 }
 
-function decisionFeedItem(poll: PollState | null): RoomFeedItem | null {
+function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
   if (!poll) {
     return null;
   }
@@ -57,7 +57,7 @@ function decisionFeedItem(poll: PollState | null): RoomFeedItem | null {
   };
 }
 
-function draftDecisionItem(): RoomFeedItem {
+function draftDecisionItem(): ProjectChatFeedItem {
   return {
     id: "draft-decision",
     label: "Draft status",
@@ -83,7 +83,7 @@ function supportProposalLabel(proposal: CommandWave["proposals"][number]) {
   return commandKindLabel(proposal.kind);
 }
 
-function supportProposalFeedItem(proposal: CommandWave["proposals"][number]): RoomFeedItem {
+function supportProposalFeedItem(proposal: CommandWave["proposals"][number]): ProjectChatFeedItem {
   return {
     id: `support-${proposal.id}`,
     label: supportProposalLabel(proposal),
@@ -93,7 +93,7 @@ function supportProposalFeedItem(proposal: CommandWave["proposals"][number]): Ro
   };
 }
 
-function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): RoomFeedItem | null {
+function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): ProjectChatFeedItem | null {
   if (!execution) {
     return null;
   }
@@ -109,7 +109,7 @@ function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): Roo
   };
 }
 
-function reviewFeedItem(review: GuardianReview | null, label = "Review"): RoomFeedItem | null {
+function reviewFeedItem(review: GuardianReview | null, label = "Review"): ProjectChatFeedItem | null {
   if (!review) {
     return null;
   }
@@ -123,7 +123,7 @@ function reviewFeedItem(review: GuardianReview | null, label = "Review"): RoomFe
   };
 }
 
-function activityFeedItem(event: LedgerEvent): RoomFeedItem {
+function activityFeedItem(event: LedgerEvent): ProjectChatFeedItem {
   return {
     id: `activity-${event.id}`,
     label: "Activity",
@@ -133,9 +133,9 @@ function activityFeedItem(event: LedgerEvent): RoomFeedItem {
   };
 }
 
-export function createRoomFeed(wave: CommandWave, draft?: RoomFeedDraft): RoomFeedItem[] {
+export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeedDraft): ProjectChatFeedItem[] {
   const phaseWork = selectPhaseWork(wave);
-  const items: RoomFeedItem[] = [];
+  const items: ProjectChatFeedItem[] = [];
   const draftTitle = clean(draft?.title ?? "", "");
   const isNextDraft = phaseWork.prReview?.status === "pass" && Boolean(draftTitle);
 

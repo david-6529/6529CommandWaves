@@ -6,7 +6,7 @@ import { createPhaseNextAction } from "./phase-next-action";
 
 const placeholderRepoText = "GitHub repo placeholder (Select the hook repo before PR work can run.)";
 
-describe("build room chat draft", () => {
+describe("project chat draft", () => {
   it("creates a concise message for the project chat", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
     const draft = createBuilderWaveChatDraft(demoWave, nextAction, "I can review the fee cap tests.");

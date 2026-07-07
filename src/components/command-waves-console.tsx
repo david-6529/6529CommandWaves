@@ -47,7 +47,7 @@ import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-n
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { createPublicProjectSnapshot } from "@/lib/public-project-snapshot";
-import { createRoomFeed } from "@/lib/room-feed";
+import { createProjectChatFeed } from "@/lib/project-chat-feed";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
 import { setupValidationNotice, type SetupValidation } from "@/lib/setup-validation";
 import { toolPolicyForKind } from "@/lib/safety/tool-policy";
@@ -181,7 +181,7 @@ const hookGuardrails = [
   "Humans control merges, deploys, payments, and governance.",
   "Contribution report scores are not permissions.",
 ];
-const buildRoomRules = [
+const projectWorkRules = [
   "Access is reviewed before someone can change the project.",
   "Ideas and proposals start in chat.",
   "The orchestration agent labels risk and keeps scope small.",
@@ -984,9 +984,9 @@ export function CommandWavesConsole() {
   const [copyNotice, setCopyNotice] = useState("");
   const [contributionReportNotice, setContributionReportNotice] = useState("");
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
-  const [waveRoomNotice, setWaveRoomNotice] = useState("");
+  const [projectChatNotice, setProjectChatNotice] = useState("");
   const [chatPostUrl, setChatPostUrl] = useState("");
-  const [waveRoomMessage, setWaveRoomMessage] = useState("");
+  const [projectChatMessage, setProjectChatMessage] = useState("");
   const [discussionTabId, setDiscussionTabId] = useState<DiscussionTabId>("general");
   const [walletNotice, setWalletNotice] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
@@ -1216,9 +1216,9 @@ export function CommandWavesConsole() {
     [contributionReport, wave],
   );
   const builderRoster = useMemo(() => createBuilderRoster(contributionReport), [contributionReport]);
-  const roomFeed = useMemo(
+  const projectChatFeed = useMemo(
     () =>
-      createRoomFeed(wave, {
+      createProjectChatFeed(wave, {
         title,
         prompt,
         proposer,
@@ -1226,10 +1226,10 @@ export function CommandWavesConsole() {
     [prompt, proposer, title, wave],
   );
   const visibleBuilderProfiles = builderRoster.slice(0, 4);
-  const visibleRoomSnapshotDrops = primaryProjectContextPreview
+  const visibleProjectChatSnapshotDrops = primaryProjectContextPreview
     ? [...primaryProjectContextPreview.sampleDrops].slice(-3).reverse()
     : [];
-  const visibleRoomSnapshotFallback = roomFeed.slice(0, 2);
+  const visibleProjectChatSnapshotFallback = projectChatFeed.slice(0, 2);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -1285,15 +1285,15 @@ export function CommandWavesConsole() {
   const builderWaveLaunchDraft = useMemo(() => createBuilderWaveLaunchDraft(setupDraftWave), [setupDraftWave]);
   const participationGuideDraft = useMemo(() => createParticipationGuideDraft(setupDraftWave), [setupDraftWave]);
   const builderWaveChatDraft = useMemo(
-    () => createBuilderWaveChatDraft(wave, phaseNextAction, waveRoomMessage),
-    [phaseNextAction, wave, waveRoomMessage],
+    () => createBuilderWaveChatDraft(wave, phaseNextAction, projectChatMessage),
+    [phaseNextAction, wave, projectChatMessage],
   );
   const chatPostTargetUrl = primaryHookProject?.waveUrl ?? wave.waveUrl;
-  const hasRoomMessage = Boolean(waveRoomMessage.trim());
-  const canPostChatMessage = Boolean(hasRoomMessage && chatPostTargetUrl);
+  const hasProjectChatMessage = Boolean(projectChatMessage.trim());
+  const canPostChatMessage = Boolean(hasProjectChatMessage && chatPostTargetUrl);
   const chatWorkSpec =
     `Captured from ${selectedDiscussionTab.label.toLowerCase()} chat. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.`;
-  const canSaveChatWorkItem = Boolean(hasRoomMessage && apiBusy === null);
+  const canSaveChatWorkItem = Boolean(hasProjectChatMessage && apiBusy === null);
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -1475,7 +1475,7 @@ export function CommandWavesConsole() {
     setGateNotes(nextWave.gates.join("\n"));
     setContributionReportNotice("");
     setDeveloperFeePlanNotice("");
-    setWaveRoomNotice("");
+    setProjectChatNotice("");
     setChatPostUrl("");
     setProjectContextPreviews({});
     setSetupContextPreview(null);
@@ -1745,8 +1745,8 @@ export function CommandWavesConsole() {
   }
 
   async function copyBuilderWaveChatDraft({ openDiscussion = false } = {}) {
-    if (!waveRoomMessage.trim()) {
-      setWaveRoomNotice("Write a message first.");
+    if (!projectChatMessage.trim()) {
+      setProjectChatNotice("Write a message first.");
       return;
     }
 
@@ -1755,7 +1755,7 @@ export function CommandWavesConsole() {
     try {
       await navigator.clipboard.writeText(builderWaveChatDraft);
       if (openDiscussion && wave.waveUrl) {
-        setWaveRoomNotice(
+        setProjectChatNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
             ? "Message copied for posting."
             : "Message copied. Open the source manually.",
@@ -1763,32 +1763,32 @@ export function CommandWavesConsole() {
         return;
       }
 
-      setWaveRoomNotice("Message copied.");
+      setProjectChatNotice("Message copied.");
     } catch {
       discussionTab?.close();
-      setWaveRoomNotice("Copy failed. Select the message and copy it manually.");
+      setProjectChatNotice("Copy failed. Select the message and copy it manually.");
     }
   }
 
   async function postBuilderWaveChatDraft() {
-    if (!waveRoomMessage.trim()) {
-      setWaveRoomNotice("Write a message first.");
+    if (!projectChatMessage.trim()) {
+      setProjectChatNotice("Write a message first.");
       return;
     }
 
     if (!chatPostTargetUrl) {
-      setWaveRoomNotice("Project chat is not connected yet.");
+      setProjectChatNotice("Project chat is not connected yet.");
       return;
     }
 
     setApiBusy("chatPost");
     setApiError("");
-    setWaveRoomNotice("");
+    setProjectChatNotice("");
     setChatPostUrl("");
 
     try {
       const post = await requestChatPost(chatPostTargetUrl, builderWaveChatDraft, accessKey);
-      let roomPreviewRefreshed = false;
+      let chatPreviewRefreshed = false;
 
       if (primaryHookProject) {
         try {
@@ -1798,31 +1798,31 @@ export function CommandWavesConsole() {
             ...previews,
             [primaryHookProject.id]: preview,
           }));
-          roomPreviewRefreshed = true;
+          chatPreviewRefreshed = true;
         } catch {
-          roomPreviewRefreshed = false;
+          chatPreviewRefreshed = false;
         }
       }
 
-      setWaveRoomMessage("");
+      setProjectChatMessage("");
       setChatPostUrl(post.url ?? "");
-      setWaveRoomNotice(
+      setProjectChatNotice(
         `${post.mode === "mock" ? "Posted to mock chat." : "Posted to project chat."}${
-          roomPreviewRefreshed ? " Chat preview refreshed." : ""
+          chatPreviewRefreshed ? " Chat preview refreshed." : ""
         }`,
       );
     } catch (error) {
-      setWaveRoomNotice(error instanceof Error ? error.message : "Post failed.");
+      setProjectChatNotice(error instanceof Error ? error.message : "Post failed.");
     } finally {
       setApiBusy(null);
     }
   }
 
   async function saveChatWorkItem() {
-    const chatPrompt = waveRoomMessage.trim();
+    const chatPrompt = projectChatMessage.trim();
 
     if (!chatPrompt) {
-      setWaveRoomNotice("Write a message first.");
+      setProjectChatNotice("Write a message first.");
       return;
     }
 
@@ -1830,7 +1830,7 @@ export function CommandWavesConsole() {
 
     setApiBusy("proposal");
     setApiError("");
-    setWaveRoomNotice("");
+    setProjectChatNotice("");
 
     try {
       const nextWave = await requestWave("/api/command-wave/proposals", {
@@ -1850,26 +1850,26 @@ export function CommandWavesConsole() {
       setTitle(nextTitle);
       setPrompt(chatPrompt);
       setSpec(chatWorkSpec);
-      setWaveRoomMessage("");
+      setProjectChatMessage("");
       setApiNotice("Work item saved from chat.");
-      setWaveRoomNotice("Work item saved.");
+      setProjectChatNotice("Work item saved.");
     } catch (error) {
-      setWaveRoomNotice(error instanceof Error ? error.message : "Work item save failed.");
+      setProjectChatNotice(error instanceof Error ? error.message : "Work item save failed.");
     } finally {
       setApiBusy(null);
     }
   }
 
   function resetBuilderWaveChatDraft() {
-    setWaveRoomMessage("");
-    setWaveRoomNotice("Message cleared.");
+    setProjectChatMessage("");
+    setProjectChatNotice("Message cleared.");
     setChatPostUrl("");
   }
 
   function messageMember(identity: string) {
     setDiscussionTabId("general");
-    setWaveRoomMessage(`@${identity} `);
-    setWaveRoomNotice("Message draft ready.");
+    setProjectChatMessage(`@${identity} `);
+    setProjectChatNotice("Message draft ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -1878,16 +1878,16 @@ export function CommandWavesConsole() {
   function preparePrDiscussion() {
     if (!repoCanRunCode) {
       setDiscussionTabId("build");
-      setWaveRoomMessage("Repo setup to discuss: which GitHub repo should hold the hook before PR work starts?");
-      setWaveRoomNotice("Repo setup discussion draft ready.");
+      setProjectChatMessage("Repo setup to discuss: which GitHub repo should hold the hook before PR work starts?");
+      setProjectChatNotice("Repo setup discussion draft ready.");
       return;
     }
 
     const prReference = activeExecutionPrUrl ?? "PR link";
 
     setDiscussionTabId("review");
-    setWaveRoomMessage(`PR to discuss: ${prReference}\n\nWhat should builders review?`);
-    setWaveRoomNotice("PR discussion draft ready.");
+    setProjectChatMessage(`PR to discuss: ${prReference}\n\nWhat should builders review?`);
+    setProjectChatNotice("PR discussion draft ready.");
   }
 
   function proposalTemplateValues() {
@@ -1907,8 +1907,8 @@ export function CommandWavesConsole() {
 
   function prepareJoinRequest() {
     setDiscussionTabId("general");
-    setWaveRoomMessage(createBuilderWaveJoinDraft(proposer, wave.gates, { walletAddress }));
-    setWaveRoomNotice("Access request ready.");
+    setProjectChatMessage(createBuilderWaveJoinDraft(proposer, wave.gates, { walletAddress }));
+    setProjectChatNotice("Access request ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -2386,11 +2386,11 @@ export function CommandWavesConsole() {
               <Field label="Message or work idea">
                 <Textarea
                   rows={4}
-                  value={waveRoomMessage}
+                  value={projectChatMessage}
                   placeholder={selectedDiscussionTab.placeholder}
                   onChange={(event) => {
-                    setWaveRoomMessage(event.target.value);
-                    setWaveRoomNotice("");
+                    setProjectChatMessage(event.target.value);
+                    setProjectChatNotice("");
                   }}
                   className="min-h-24 resize-none"
                 />
@@ -2415,16 +2415,16 @@ export function CommandWavesConsole() {
                 <Button
                   type="button"
                   variant="secondary"
-                  disabled={!hasRoomMessage}
+                  disabled={!hasProjectChatMessage}
                   onClick={() => void copyBuilderWaveChatDraft()}
                 >
                   Copy draft
                 </Button>
-                <Button type="button" variant="secondary" disabled={!hasRoomMessage} onClick={resetBuilderWaveChatDraft}>
+                <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
                   Clear
                 </Button>
               </div>
-              {waveRoomNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{waveRoomNotice}</p> : null}
+              {projectChatNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{projectChatNotice}</p> : null}
               {chatPostUrl ? (
                 <a
                   className="mt-1 inline-flex text-sm font-semibold text-blue-300 hover:text-blue-200"
@@ -2453,7 +2453,7 @@ export function CommandWavesConsole() {
               </div>
               <div className="mt-3 divide-y divide-zinc-800">
                 {hasRecentDiscussionPosts
-                  ? visibleRoomSnapshotDrops.slice(0, 2).map((drop) => (
+                  ? visibleProjectChatSnapshotDrops.slice(0, 2).map((drop) => (
                       <div key={drop.id} className="py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold text-zinc-50">{drop.author}</p>
@@ -2471,7 +2471,7 @@ export function CommandWavesConsole() {
                         <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{drop.preview}</p>
                       </div>
                     ))
-                  : visibleRoomSnapshotFallback.slice(0, 2).map((item) => (
+                  : visibleProjectChatSnapshotFallback.slice(0, 2).map((item) => (
                       <div key={item.id} className="py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
@@ -2778,7 +2778,7 @@ export function CommandWavesConsole() {
             <div>
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Build rules</p>
               <ol className="mt-3 grid gap-2">
-                {buildRoomRules.map((rule, index) => (
+                {projectWorkRules.map((rule, index) => (
                   <li key={rule} className="grid grid-cols-[2rem_1fr] gap-3 border-t border-zinc-800 pt-2">
                     <span className="text-base font-semibold text-cyan-300">{index + 1}</span>
                     <span className="text-base leading-7 text-zinc-300">{rule}</span>

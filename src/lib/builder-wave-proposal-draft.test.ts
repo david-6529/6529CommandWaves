@@ -4,7 +4,7 @@ import { createBuilderWaveProposalDraft } from "./builder-wave-proposal-draft";
 
 const placeholderRepoText = "GitHub repo placeholder (Select the hook repo before PR work can run.)";
 
-describe("build room proposal draft", () => {
+describe("project chat proposal draft", () => {
   it("creates a concise hook proposal post", () => {
     const draft = createBuilderWaveProposalDraft({
       wave: demoWave,

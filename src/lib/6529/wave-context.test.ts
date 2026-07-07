@@ -122,14 +122,14 @@ describe("6529 wave context", () => {
         42,
         { waveId: "" },
         { waveId: "mock-command-wave" },
-        { waveId: "mock-related-wave", label: "  Side room  " },
+        { waveId: "mock-related-wave", label: "  Side chat  " },
       ] as unknown as Parameters<typeof fetchWaveContext>[0]["relatedWaves"],
     });
 
     expect(context.context.sources).toHaveLength(2);
     expect(context.context.sources[1]).toMatchObject({
       waveId: "mock-related-wave",
-      label: "Side room",
+      label: "Side chat",
       primary: false,
     });
   });

@@ -4,7 +4,7 @@ import { demoWave } from "./demo-wave";
 
 const seedEnv = {
   COMMAND_WAVE_INITIAL_NAME: "6529 Hook",
-  COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/real-hook-room",
+  COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/real-hook-chat",
   COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/6529-Collections/real-hook",
 };
 
@@ -22,7 +22,7 @@ describe("command wave seed", () => {
     expect(wave).toMatchObject({
       id: demoWave.id,
       name: "6529 Hook",
-      waveUrl: "https://6529.io/waves/real-hook-room",
+      waveUrl: "https://6529.io/waves/real-hook-chat",
       repoUrl: "https://github.com/6529-Collections/real-hook",
       proposals: [],
       polls: [],

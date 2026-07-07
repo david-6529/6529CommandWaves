@@ -102,14 +102,14 @@ describe("Command wave store", () => {
   });
 
   it("uses environment setup as a clean initial hook project", async () => {
-    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-room";
+    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-chat";
     process.env.COMMAND_WAVE_INITIAL_REPO_URL = "https://github.com/6529-Collections/real-hook";
     clearCommandWaveStoreForTests();
 
     const wave = await resetCommandWave();
 
     expect(wave).toMatchObject({
-      waveUrl: "https://6529.io/waves/real-hook-room",
+      waveUrl: "https://6529.io/waves/real-hook-chat",
       repoUrl: "https://github.com/6529-Collections/real-hook",
       proposals: [],
       polls: [],
@@ -139,16 +139,16 @@ describe("Command wave store", () => {
 
   it("does not replace custom setup with environment setup", async () => {
     await updateCommandWaveSetup({
-      waveUrl: "https://6529.io/waves/custom-room",
+      waveUrl: "https://6529.io/waves/custom-chat",
       repoUrl: "https://github.com/6529-Collections/custom-hook",
     });
 
-    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-room";
+    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-chat";
     process.env.COMMAND_WAVE_INITIAL_REPO_URL = "https://github.com/6529-Collections/real-hook";
 
     const wave = await getCommandWave();
 
-    expect(wave.waveUrl).toBe("https://6529.io/waves/custom-room");
+    expect(wave.waveUrl).toBe("https://6529.io/waves/custom-chat");
     expect(wave.repoUrl).toBe("https://github.com/6529-Collections/custom-hook");
   });
 

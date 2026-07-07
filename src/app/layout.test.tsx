@@ -6,7 +6,7 @@ describe("RootLayout", () => {
   it("forces the app shell to dark mode", () => {
     const html = renderToStaticMarkup(
       <RootLayout>
-        <main>Project room</main>
+        <main>Project chat</main>
       </RootLayout>,
     );
 

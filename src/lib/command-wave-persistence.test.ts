@@ -130,7 +130,7 @@ describe("command wave persistence", () => {
     expect(wave.ledger[0]?.message).toBe("Created the hook build with project chat. GitHub repo setup is still needed.");
   });
 
-  it("normalizes old hook-room copy without replacing custom activity", async () => {
+  it("normalizes old hook chat copy without replacing custom activity", async () => {
     await replaceCommandWave({
       ...demoWave,
       name: "6529 Hook Builder",
@@ -202,7 +202,7 @@ describe("command wave persistence", () => {
   it("does not replace a persisted custom project with environment setup", async () => {
     await replaceCommandWave({
       ...demoWave,
-      waveUrl: "https://6529.io/waves/custom-room",
+      waveUrl: "https://6529.io/waves/custom-chat",
       repoUrl: "https://github.com/6529-Collections/custom-hook",
       proposals: [],
       polls: [],
@@ -210,13 +210,13 @@ describe("command wave persistence", () => {
       reviews: [],
     });
 
-    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-room";
+    process.env.COMMAND_WAVE_INITIAL_WAVE_URL = "https://6529.io/waves/real-hook-chat";
     process.env.COMMAND_WAVE_INITIAL_REPO_URL = "https://github.com/6529-Collections/real-hook";
     clearCommandWaveStoreForTests();
 
     const wave = await getCommandWave();
 
-    expect(wave.waveUrl).toBe("https://6529.io/waves/custom-room");
+    expect(wave.waveUrl).toBe("https://6529.io/waves/custom-chat");
     expect(wave.repoUrl).toBe("https://github.com/6529-Collections/custom-hook");
   });
 

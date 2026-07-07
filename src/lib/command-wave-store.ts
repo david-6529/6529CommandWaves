@@ -129,7 +129,7 @@ function normalizeBuiltInHookGate(gate: string) {
   return humanizeLegacyCommandCopy(gate);
 }
 
-function withCurrentHookRoomCopy(wave: CommandWave) {
+function withCurrentHookChatCopy(wave: CommandWave) {
   if (!isBuiltInHookProject(wave)) {
     return wave;
   }
@@ -221,7 +221,7 @@ async function store() {
     const seededWave = migrated && hasInitialCommandWaveProject() && isBuiltInHookProject(migrated)
       ? applyInitialCommandWaveProject(migrated)
       : baseWave;
-    const wave = withPlaceholderRepoSetupState(withCurrentHookRoomCopy(withFirstPhaseRules(seededWave)));
+    const wave = withPlaceholderRepoSetupState(withCurrentHookChatCopy(withFirstPhaseRules(seededWave)));
 
     if (persisted && wave !== persisted) {
       await savePersistedCommandWave(wave);
@@ -291,7 +291,7 @@ function initialProposalStatus(ruleMode: CommandWave["rules"]["rulesByKind"][Com
 
 export async function getCommandWave() {
   const currentStore = await store();
-  const wave = withPlaceholderRepoSetupState(withCurrentHookRoomCopy(withFirstPhaseRules(currentStore.wave)));
+  const wave = withPlaceholderRepoSetupState(withCurrentHookChatCopy(withFirstPhaseRules(currentStore.wave)));
 
   if (wave !== currentStore.wave) {
     await savePersistedCommandWave(wave);
@@ -306,7 +306,7 @@ export function clearCommandWaveStoreForTests() {
 }
 
 export async function replaceCommandWave(wave: CommandWave) {
-  const nextWave = withPlaceholderRepoSetupState(withCurrentHookRoomCopy(withFirstPhaseRules(wave)));
+  const nextWave = withPlaceholderRepoSetupState(withCurrentHookChatCopy(withFirstPhaseRules(wave)));
 
   await savePersistedCommandWave(nextWave);
   (await store()).wave = nextWave;

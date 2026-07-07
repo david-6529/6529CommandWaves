@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { defaultRules, type CommandWave } from "./command-waves";
 import { demoWave } from "./demo-wave";
-import { createRoomFeed } from "./room-feed";
+import { createProjectChatFeed } from "./project-chat-feed";
 
-describe("room feed", () => {
+describe("project chat feed", () => {
   it("shows the next draft and local hook evidence when live posts are absent", () => {
-    const feed = createRoomFeed(demoWave, {
+    const feed = createProjectChatFeed(demoWave, {
       title: "Add fee cap tests",
       prompt: "Add tests for the fee cap.",
       proposer: "david",
@@ -49,7 +49,7 @@ describe("room feed", () => {
       ledger: [],
     };
 
-    expect(createRoomFeed(emptyWave)).toEqual([
+    expect(createProjectChatFeed(emptyWave)).toEqual([
       {
         id: "start",
         label: "Start",
@@ -87,7 +87,7 @@ describe("room feed", () => {
       ledger: [],
     };
 
-    expect(createRoomFeed(wave)[0]).toMatchObject({
+    expect(createProjectChatFeed(wave)[0]).toMatchObject({
       id: "support-cmd-002",
       label: "Question",
       title: "Clarify fee cap options",
