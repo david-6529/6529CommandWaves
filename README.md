@@ -355,8 +355,8 @@ Verify a published setup proof against GitHub required-check payloads:
 SETUP_PROOF_URL=https://your-app.example/api/command-wave/setup/proof npm run setup:verify
 ```
 
-If GitHub returns 404 for a rules endpoint, the verifier prints `GITHUB_TARGET_UNAVAILABLE` and continues. The audit still
-fails unless the required guardian check is found in another fetched payload or in `SETUP_GITHUB_PAYLOADS_PATH`.
+If GitHub returns 404 for a rules endpoint, the verifier prints `GITHUB_TARGET_UNAVAILABLE` and continues. If another setup
+target cannot be fetched, it prints `SETUP_TARGET_UNAVAILABLE`. The audit still fails unless the required evidence is found.
 
 When the setup proof includes `commandWaveStateUrl`, the same command also checks that the state URL returns a
 `command-wave-state-v0.1` snapshot for the governed project with a matching state hash.

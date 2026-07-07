@@ -78,7 +78,7 @@ async function loadGitHubPayloads(proof: SetupProof) {
 async function loadCommandWaveState(proof: SetupProof) {
   const url = proof.verificationTargets.commandWaveStateUrl;
 
-  return url ? readJsonUrl<unknown>(url) : undefined;
+  return url ? readOptionalJsonUrl(url) : undefined;
 }
 
 function writeResult(path: string | undefined, value: unknown) {
@@ -108,11 +108,19 @@ function setupVerifierFetchError(value: unknown) {
   return url && Number.isFinite(status) ? { url, status, statusText } : null;
 }
 
+function setupVerifierFetchErrorLabel(item: { url: string }) {
+  return item.url.includes("api.github.com") || item.url.includes("/repos/")
+    ? "GITHUB_TARGET_UNAVAILABLE"
+    : "SETUP_TARGET_UNAVAILABLE";
+}
+
 async function main() {
   const proof = await loadSetupProof();
   const payloads = await loadGitHubPayloads(proof);
-  const fetchErrors = payloads.map(setupVerifierFetchError).filter((item): item is NonNullable<typeof item> => Boolean(item));
   const commandWaveState = await loadCommandWaveState(proof);
+  const fetchErrors = [...payloads, commandWaveState]
+    .map(setupVerifierFetchError)
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
   const result = verifySetupProofAgainstGitHubPayloads(proof, payloads, {
     requireExternalGuardian: process.env.SETUP_REQUIRE_EXTERNAL_GUARDIAN === "true",
     requireProductionStorage: process.env.SETUP_REQUIRE_PRODUCTION_STORAGE === "true",
@@ -126,7 +134,7 @@ async function main() {
   console.log(`Observed required checks: ${result.observedRequiredChecks.join(", ") || "none"}`);
 
   for (const item of fetchErrors) {
-    console.log(`GITHUB_TARGET_UNAVAILABLE ${item.status}: ${item.url} ${item.statusText}`.trim());
+    console.log(`${setupVerifierFetchErrorLabel(item)} ${item.status}: ${item.url} ${item.statusText}`.trim());
   }
 
   for (const item of result.checks) {
