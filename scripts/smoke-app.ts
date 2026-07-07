@@ -144,6 +144,7 @@ async function main() {
     "Maintainer tools",
     "Server key needed before launch",
     "Set ADMIN_API_KEY on the server.",
+    "Copy env checklist",
   ]) {
     assertIncludes("Home page", renderedHtml, label);
   }

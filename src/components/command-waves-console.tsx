@@ -201,6 +201,15 @@ const publicLaunchSetupItems = [
   ["COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK", "Name of the required guardian status check."],
   ["GitHub required check", "Make the guardian check required in branch protection or rulesets."],
 ];
+
+function createLaunchEnvChecklistDraft() {
+  return [
+    "Launch env checklist",
+    "Set these before broad participation.",
+    ...publicLaunchSetupItems.map(([name, detail]) => `- ${name}: ${detail}`),
+  ].join("\n");
+}
+
 const hookProposalCheckPriority = [
   "hook_proposal_blocked_language",
   "hook_parameter_explicit_bound",
@@ -983,6 +992,7 @@ export function CommandWavesConsole() {
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
   const [participationGuideNotice, setParticipationGuideNotice] = useState("");
   const [launchStatusNotice, setLaunchStatusNotice] = useState("");
+  const [launchEnvNotice, setLaunchEnvNotice] = useState("");
   const [launchLinkNotice, setLaunchLinkNotice] = useState("");
   const [decisionDraftNotice, setDecisionDraftNotice] = useState("");
   const [proposalDraftNotice, setProposalDraftNotice] = useState("");
@@ -1464,6 +1474,7 @@ export function CommandWavesConsole() {
     setLaunchBriefNotice("");
     setParticipationGuideNotice("");
     setLaunchStatusNotice("");
+    setLaunchEnvNotice("");
     setLaunchLinkNotice("");
     setProposalDraftNotice("");
     setReviewRequestNotice("");
@@ -1689,6 +1700,15 @@ export function CommandWavesConsole() {
       setLaunchBriefNotice("Launch brief copied.");
     } catch {
       setLaunchBriefNotice("Copy failed. Select the launch brief text and copy it manually.");
+    }
+  }
+
+  async function copyLaunchEnvChecklist() {
+    try {
+      await navigator.clipboard.writeText(createLaunchEnvChecklistDraft());
+      setLaunchEnvNotice("Launch env checklist copied.");
+    } catch {
+      setLaunchEnvNotice("Copy failed. Select the launch env checklist manually.");
     }
   }
 
@@ -3024,6 +3044,10 @@ export function CommandWavesConsole() {
                 <p className="mt-1 text-xs leading-5 text-amber-100/80">
                   Set ADMIN_API_KEY on the server. Then paste the same key below when saving setup or running protected actions.
                 </p>
+                <Button type="button" variant="secondary" className="mt-3" onClick={() => void copyLaunchEnvChecklist()}>
+                  Copy env checklist
+                </Button>
+                {launchEnvNotice ? <p className="mt-2 text-xs leading-5 text-amber-100/75">{launchEnvNotice}</p> : null}
               </div>
               <Field label="Project source">
                 <Input

@@ -209,5 +209,6 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("GitHub required check");
     expect(text).toContain("Server key needed before launch");
     expect(text).toContain("Set ADMIN_API_KEY on the server.");
+    expect(text).toContain("Copy env checklist");
   });
 });
