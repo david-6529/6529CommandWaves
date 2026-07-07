@@ -137,6 +137,11 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain('role="tablist"');
     expect(html).toContain('aria-label="Project chat sections"');
     expect(html).toContain('role="tab"');
+    expect(html).toContain('id="project-chat-tab-general"');
+    expect(html).toContain('aria-controls="project-chat-panel-general"');
+    expect(html).toContain('id="project-chat-panel-general"');
+    expect(html).toContain('role="tabpanel"');
+    expect(html).toContain('aria-labelledby="project-chat-tab-general"');
     expect(html).toContain(">General</button>");
     expect(html).toContain(">Build</button>");
     expect(html).toContain(">Review</button>");

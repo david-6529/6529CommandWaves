@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timeline";
@@ -163,6 +163,14 @@ const discussionTabs = [
   },
 ] as const;
 type DiscussionTabId = (typeof discussionTabs)[number]["id"];
+
+function projectChatTabId(id: DiscussionTabId) {
+  return `project-chat-tab-${id}`;
+}
+
+function projectChatPanelId(id: DiscussionTabId) {
+  return `project-chat-panel-${id}`;
+}
 
 const hookGuardrails = [
   "Hook contracts stay immutable by default.",
@@ -1007,6 +1015,7 @@ export function CommandWavesConsole() {
     hookProposalPreflightBlocked,
   );
   const firstHookProposalFailure = hookProposalPreflight.checks.find((check) => check.status === "fail") ?? null;
+  const selectedDiscussionPanelId = projectChatPanelId(selectedDiscussionTab.id);
   const simpleDecisionRoute =
     selectedRule.mode === "poll" ? "Needs a decision" : selectedRule.mode === "auto" ? "Can be logged" : "Parked";
   const simplePreflightMessage =
@@ -1863,6 +1872,35 @@ export function CommandWavesConsole() {
     });
   }
 
+  function focusDiscussionTab(tabId: DiscussionTabId) {
+    setDiscussionTabId(tabId);
+    window.requestAnimationFrame(() => {
+      document.getElementById(projectChatTabId(tabId))?.focus();
+    });
+  }
+
+  function handleDiscussionTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
+    const lastIndex = discussionTabs.length - 1;
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = currentIndex === lastIndex ? 0 : currentIndex + 1;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = currentIndex === 0 ? lastIndex : currentIndex - 1;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = lastIndex;
+    }
+
+    if (nextIndex === null) {
+      return;
+    }
+
+    event.preventDefault();
+    focusDiscussionTab(discussionTabs[nextIndex].id);
+  }
+
   async function connectWallet() {
     const provider = browserWalletProvider();
 
@@ -2266,20 +2304,24 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Project chat sections">
-              {discussionTabs.map((tab) => {
+              {discussionTabs.map((tab, index) => {
                 const selected = tab.id === selectedDiscussionTab.id;
 
                 return (
                   <button
                     key={tab.id}
+                    id={projectChatTabId(tab.id)}
                     type="button"
                     role="tab"
                     aria-selected={selected}
+                    aria-controls={projectChatPanelId(tab.id)}
+                    tabIndex={selected ? 0 : -1}
                     className={`inline-flex h-10 cursor-pointer items-center justify-center rounded-md border px-4 text-sm font-semibold transition ${
                       selected
                         ? "border-zinc-50 bg-zinc-900 text-zinc-50"
                         : "border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
                     }`}
+                    onKeyDown={(event) => handleDiscussionTabKeyDown(event, index)}
                     onClick={() => setDiscussionTabId(tab.id)}
                   >
                     {tab.label}
@@ -2288,7 +2330,12 @@ export function CommandWavesConsole() {
               })}
             </div>
 
-            <div className="mt-5">
+            <div
+              id={selectedDiscussionPanelId}
+              className="mt-5"
+              role="tabpanel"
+              aria-labelledby={projectChatTabId(selectedDiscussionTab.id)}
+            >
               <Field label="Message or work idea">
                 <Textarea
                   rows={4}
