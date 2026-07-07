@@ -127,13 +127,14 @@ function projectSummary({
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "The GitHub repo is not selected yet, so PR work waits."
-      : "The GitHub repo is connected, so approved changes can move into PR review.";
+      ? "Repo not selected yet. PR work waits."
+      : "Repo connected. Approved changes can move into PR review.";
 
   return [
-    "This page is the working snapshot for the 6529 AMM hook build. Builders use chat to shape ideas, record decisions, attach pull requests, and review the result.",
-    `Current focus: ${currentWork.title}.`,
-    `Next step: ${nextStep.detail}`,
+    "Working snapshot for the 6529 AMM hook build.",
+    "Builders turn chat into decisions, PRs, reviews, and a public log.",
+    `Focus: ${currentWork.title}.`,
+    `Next: ${nextStep.detail}`,
     repoLine,
   ].join(" ");
 }

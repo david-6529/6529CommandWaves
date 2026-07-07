@@ -24,7 +24,7 @@ import {
 import { createContributionReport, createContributionReportDraft, reportPointLabel } from "@/lib/contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
-import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "@/lib/agent-identities";
+import { orchestratorAgentIdentity } from "@/lib/agent-identities";
 import { withPlaceholderRepoSetupState } from "@/lib/command-wave-sanitize";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { isPlaceholderValue } from "@/lib/env-placeholders";
@@ -2212,13 +2212,13 @@ export function CommandWavesConsole() {
                 {publicProjectSnapshot.summary}
               </p>
               <p className="mt-2 text-base leading-7 text-zinc-400">
-                {orchestratorAgentIdentity.handle} keeps this summary and changelog current. {reviewAgentIdentity.description}{" "}
+                {orchestratorAgentIdentity.handle} keeps the log current. Review agent and GitHub repo are placeholders for this phase.{" "}
                 {projectRepoHref && !projectRepoIsPlaceholder ? (
                   <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
                     Open the GitHub repo
                   </a>
                 ) : (
-                  githubRepoPlaceholder.description
+                  "Select the repo before PR work starts."
                 )}
               </p>
             </details>
