@@ -33,10 +33,21 @@ const configuredDemoWave = {
 describe("launch packet", () => {
   it("creates a human-reviewed packet for the hook launch", () => {
     const proposal = demoWave.proposals[0];
+    const poll = demoWave.polls[0]
+      ? {
+          ...demoWave.polls[0],
+          decision: demoWave.polls[0].decision
+            ? {
+                ...demoWave.polls[0].decision,
+                summary: "Room approved cmd-001 with 5 yes and 1 no.",
+              }
+            : demoWave.polls[0].decision,
+        }
+      : null;
     const packet = createLaunchPacket({
       wave: demoWave,
       proposal,
-      poll: demoWave.polls[0],
+      poll,
       execution: demoWave.executions[0],
       review: demoWave.reviews[0],
       verificationTargets: {
@@ -72,7 +83,8 @@ describe("launch packet", () => {
     expect(packet.text).toContain("- Decision route: vote required, quorum 3, yes threshold 60%, decision receipt recorded.");
     expect(packet.text).toContain("- Rule reason: Code changes need visible approval before execution.");
     expect(packet.text).toContain("Reviewer CI checks the PR manifest, rules, risk, hook guardrails, and records");
-    expect(packet.text).toContain("Project decision receipt:");
+    expect(packet.text).toContain("Project decision receipt: Project decision approved cmd-001 with 5 yes and 1 no.");
+    expect(packet.text).not.toContain("Room approved");
     expect(packet.text).toContain("Review proof: not bound to the selected GitHub repo.");
     expect(packet.text).toContain("- Build: blocked");
     expect(packet.text).toContain("GitHub repo is still a placeholder. Select it before PR work can run.");

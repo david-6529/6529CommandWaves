@@ -3759,7 +3759,9 @@ export function CommandWavesConsole() {
                           <p className="text-sm font-semibold text-zinc-100">Decision receipt</p>
                           <Badge className="border-cyan-700 bg-cyan-950/45 text-cyan-100">{activePoll.decision.source}</Badge>
                         </div>
-                        <p className="mt-2 text-xs leading-5 text-zinc-500">{activePoll.decision.summary}</p>
+                        <p className="mt-2 text-xs leading-5 text-zinc-500">
+                          {humanizeLegacyCommandCopy(activePoll.decision.summary)}
+                        </p>
                         {activeDecisionReferenceCheck?.ok === false ? (
                           <p className="mt-2 text-xs leading-5 text-amber-200">{activeDecisionReferenceCheck.message}</p>
                         ) : null}

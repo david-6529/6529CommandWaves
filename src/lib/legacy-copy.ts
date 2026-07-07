@@ -2,6 +2,8 @@ const copyReplacements: Array<[RegExp, string]> = [
   [/\b6529 Hook Builder\b/g, "Hook Build"],
   [/\b6529 Hook Project\b/g, "Hook Build"],
   [/\bWave Poll\b/g, "Decision"],
+  [/\bRoom approved\b/g, "Project decision approved"],
+  [/\broom approved\b/g, "project decision approved"],
   [/\broom decision receipt\b/gi, "project decision receipt"],
   [/\bbuilder wave decision receipt\b/gi, "project decision receipt"],
   [/\bbuilder 6529 decision receipt\b/gi, "project decision receipt"],

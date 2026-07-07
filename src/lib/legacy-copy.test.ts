@@ -23,5 +23,8 @@ describe("legacy command copy", () => {
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder wave decision receipt.")).toBe(
       "Decision recorded a project decision receipt.",
     );
+    expect(humanizeLegacyCommandCopy("Room approved cmd-001 with 5 yes and 1 no.")).toBe(
+      "Project decision approved cmd-001 with 5 yes and 1 no.",
+    );
   });
 });

@@ -163,7 +163,7 @@ function decisionLines(poll: PollState | null) {
 
   return [
     voteLine,
-    `- Project decision receipt: ${poll.decision.summary}`,
+    `- Project decision receipt: ${humanizeLegacyCommandCopy(poll.decision.summary)}`,
     `- Receipt source: ${poll.decision.source}`,
     `- Receipt reference: ${poll.decision.url ?? poll.decision.dropId ?? "recorded"}`,
   ];
