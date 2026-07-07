@@ -116,7 +116,7 @@ const productionSetupValidation: SetupValidation = {
 };
 
 describe("first phase launch audit", () => {
-  it("marks the completed demo flow and first-phase production checks ready", () => {
+  it("keeps the completed demo flow pending while reviewer process is a placeholder", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: productionReadyChecks,
@@ -124,15 +124,21 @@ describe("first phase launch audit", () => {
       wave: configuredDemoWave,
     });
 
-    expect(audit.status).toBe("ready");
-    expect(audit.statusLabel).toBe("ready");
+    expect(audit.status).toBe("needs_setup");
+    expect(audit.statusLabel).toBe("checks needed");
     expect(audit.nextAction).toMatchObject({
-      status: "ready",
-      itemId: null,
-      title: "Start the first public loop",
+      status: "needs_setup",
+      itemId: "setup_review_agent_placeholder",
+      title: "Select reviewer process",
     });
     expect(audit.blockers).toHaveLength(0);
-    expect(audit.openItems).toHaveLength(0);
+    expect(audit.openItems).toEqual([
+      expect.objectContaining({
+        id: "setup_review_agent_placeholder",
+        label: "Review agent",
+        status: "needed",
+      }),
+    ]);
     expect(audit.readyItems.length).toBeGreaterThan(0);
     expect(audit.items).toContainEqual(
       expect.objectContaining({
@@ -267,6 +273,11 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "readiness_not_checked",
         label: "Readiness check",
+        status: "needed",
+      }),
+      expect.objectContaining({
+        id: "setup_review_agent_placeholder",
+        label: "Review agent",
         status: "needed",
       }),
     ]);
@@ -536,6 +547,10 @@ describe("first phase launch audit", () => {
       }),
       expect.objectContaining({
         id: "readiness_guardian_wave_state",
+        status: "needed",
+      }),
+      expect.objectContaining({
+        id: "setup_review_agent_placeholder",
         status: "needed",
       }),
     ]);

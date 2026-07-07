@@ -111,8 +111,8 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 
 The launch check focuses on the first public loop. The chat-first launch requires the deployed app URL, first hook chat,
 admin key, durable storage, live 6529 mode, and daemon chat posting credentials. The GitHub repo can stay as a placeholder
-until PR work starts. A ready PR loop also requires the GitHub PR adapter, guardian workflow, guardian wave-state URL, and
-required guardian check. Failed checks block broad participation.
+until PR work starts. A ready PR loop also requires the selected reviewer process, GitHub PR adapter, guardian workflow,
+guardian wave-state URL, and required guardian check. Failed checks block broad participation.
 
 Use `npm run chat:launch` against the remote chat launch audit before inviting builders into discussion. Use
 `npm run launch:audit` before claiming the full reviewed PR loop is ready.

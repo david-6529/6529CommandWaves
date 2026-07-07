@@ -42,6 +42,7 @@ const checklistByItemId: Record<string, string[]> = {
     "Add .github/workflows/guardian-review.yml to the hook repo.",
   ],
   setup_repo_required_guardian_check: ["Make Command Waves Guardian a required GitHub status check before inviting contributors."],
+  setup_review_agent_placeholder: ["Select the reviewer process before claiming the reviewed PR loop is ready."],
   readiness_not_checked: ["Run launch readiness from the app or /api/command-wave/launch/audit?remote=1."],
   readiness_app_url: ["Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL."],
   readiness_initial_hook_project: [

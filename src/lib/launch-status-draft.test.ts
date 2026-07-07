@@ -77,7 +77,7 @@ describe("launch status draft", () => {
     expect(draft).not.toContain("\u2014");
   });
 
-  it("states when checked records have no launch gaps", () => {
+  it("states the reviewer process gap when checked records otherwise pass", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(configuredDemoWave),
       readinessChecks: getReadinessChecks({
@@ -159,13 +159,15 @@ describe("launch status draft", () => {
     });
     const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
 
-    expect(audit.status).toBe("ready");
+    expect(audit.status).toBe("needs_setup");
     expect(draft).toContain("Chat launch: ready");
     expect(draft).toContain("Chat next action: Open project chat");
-    expect(draft).toContain("Status: ready");
-    expect(draft).toContain("Next action: Start the first public loop");
-    expect(draft).toContain("- No launch gaps found in the checked records.");
-    expect(draft).toContain("- Start the first public loop with one small reviewed hook change.");
+    expect(draft).toContain("Status: checks needed");
+    expect(draft).toContain("Next action: Select reviewer process");
+    expect(draft).toContain(
+      "- Review agent: Review agent is a placeholder. Select the reviewer process before claiming the reviewed PR loop is ready.",
+    );
+    expect(draft).toContain("- Select the reviewer process before claiming the reviewed PR loop is ready.");
     expect(draft).not.toContain("\u2014");
   });
 

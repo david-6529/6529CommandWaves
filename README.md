@@ -86,7 +86,7 @@ What we are working on next:
 1. Pick the first real public project chat.
 2. Keep the GitHub repo as a placeholder until the pilot repo is selected for PR work.
 3. Configure launch env, durable storage, and daemon chat posting.
-4. Add the selected hook repo, guardian workflow, and required guardian check before the first PR.
+4. Add the selected hook repo, reviewer process, guardian workflow, and required guardian check before the first PR.
 5. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
 6. Wire live wallet/session access checks when the manual access process is proven.
 7. Expand contribution analysis after the workflow is useful and understandable.
@@ -280,12 +280,13 @@ project chat, warns on a placeholder repo, and blocks PR work until a real repo 
 proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
 The chat-first launch requires daemon chat posting credentials and durable storage. A ready PR loop also requires the
-GitHub PR adapter, the guardian workflow in the selected hook repo, and the required guardian check so the public workflow
-can record draft PRs predictably.
+selected reviewer process, GitHub PR adapter, guardian workflow in the selected hook repo, and the required guardian check
+so the public workflow can record draft PRs predictably.
 
 The local demo still reports launch gaps until the first hook chat is reachable, `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`,
 durable storage, live 6529 mode, daemon chat posting credentials, and setup validation are configured. PR-loop readiness
-also requires the selected repo, GitHub PR adapter, guardian state, guardian workflow, and required guardian check.
+also requires the selected repo, selected reviewer process, GitHub PR adapter, guardian state, guardian workflow, and
+required guardian check.
 
 ## Durable Storage
 

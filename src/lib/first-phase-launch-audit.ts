@@ -3,6 +3,7 @@ import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { configuredGitHubRepo, gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { participationGateNeedsAdvisoryNote } from "./participation-gates";
+import { reviewAgentIdentity } from "./agent-identities";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
 import type { SetupCheckStatus, SetupValidation } from "./setup-validation";
 import type { ReadinessCheck } from "./system/readiness";
@@ -149,6 +150,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   setup_repo_file_contributing_md: "Add contributor rules",
   setup_repo_file_github_pull_request_template_md: "Add PR template",
   setup_repo_file_github_workflows_guardian_review_yml: "Add guardian workflow",
+  setup_review_agent_placeholder: "Select reviewer process",
   readiness_not_checked: "Run readiness",
   readiness_app_url: "Set NEXT_PUBLIC_APP_URL",
   readiness_initial_hook_project: "Set first hook project",
@@ -594,6 +596,30 @@ function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunch
   ];
 }
 
+function reviewerReadinessItem(): FirstPhaseLaunchAuditItem[] {
+  if (reviewAgentIdentity.status === "placeholder") {
+    return [
+      {
+        id: "setup_review_agent_placeholder",
+        label: "Review agent",
+        status: "needed",
+        detail: "Review agent is a placeholder. Select the reviewer process before claiming the reviewed PR loop is ready.",
+        source: "setup",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "setup_review_agent",
+      label: "Review agent",
+      status: "ready",
+      detail: "Review agent is selected for the reviewed PR loop.",
+      source: "setup",
+    },
+  ];
+}
+
 export function createFirstPhaseLaunchAudit({
   phaseChecklist,
   readinessChecks,
@@ -649,6 +675,7 @@ export function createFirstPhaseLaunchAudit({
     ...participationNotesItem(wave),
     ...auditPacketItem(wave),
     ...readinessItems,
+    ...reviewerReadinessItem(),
   ];
   const fullLaunch = trackFromItems(items, summaryFor);
 

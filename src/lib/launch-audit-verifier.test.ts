@@ -108,7 +108,7 @@ const configuredDemoWave = {
 };
 
 describe("launch audit verifier", () => {
-  it("passes a ready first loop audit", async () => {
+  it("verifies a complete audit shape while the reviewer placeholder keeps full launch pending", async () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: readyEnv,
@@ -124,12 +124,19 @@ describe("launch audit verifier", () => {
     const result = verifyLaunchAuditPayload(snapshot, { commandWaveState, projectIndex });
 
     expect(result).toMatchObject({
-      status: "pass",
-      launchStatus: "ready",
+      status: "fail",
+      launchStatus: "needs_setup",
       generatedAt: "2026-06-20T13:00:00.000Z",
       projectName: configuredDemoWave.name,
       auditHash: snapshot.auditHash,
       blockers: [],
+    });
+    expect(result.openItems).toContain(
+      "Review agent: Review agent is a placeholder. Select the reviewer process before claiming the reviewed PR loop is ready.",
+    );
+    expect(result.checks.find((item) => item.id === "launch_status")).toMatchObject({
+      status: "fail",
+      message: "First public loop is needs_setup.",
     });
     expect(result.checks.find((item) => item.id === "audit_hash")).toMatchObject({
       status: "pass",
@@ -188,9 +195,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "developer_fee_plan")).toMatchObject({
       status: "pass",
     });
-    expect(result.nextAction?.title).toBe("Start the first public loop");
+    expect(result.nextAction?.title).toBe("Select reviewer process");
     expect(result.statusDraft).toContain("Project launch status");
-    expect(result.statusDraft).toContain("Status: ready");
+    expect(result.statusDraft).toContain("Status: checks needed");
     expect(result.stateEvidence).toEqual({
       waveStateHash: hashValue(configuredDemoWave),
       rulesHash: hashValue(configuredDemoWave.rules),
@@ -207,7 +214,7 @@ describe("launch audit verifier", () => {
       activeProjectId: configuredDemoWave.id,
       projectCount: 1,
     });
-    expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
+    expect(result.operatorChecklist).toContain("- Select the reviewer process before claiming the reviewed PR loop is ready.");
   });
 
   it("fails a shape-only setup audit before public launch", async () => {
@@ -488,6 +495,19 @@ describe("launch audit verifier", () => {
     });
     const result = verifyLaunchAuditPayload({
       ...snapshot,
+      launchAudit: {
+        ...snapshot.launchAudit,
+        status: "ready",
+        statusLabel: "ready",
+        blockers: [],
+        openItems: [],
+        nextAction: {
+          ...snapshot.launchAudit.nextAction,
+          status: "ready",
+          statusLabel: "ready",
+          title: "Start the first public loop",
+        },
+      },
       workflowProof: {
         ...snapshot.workflowProof,
         readyCount: 4,
