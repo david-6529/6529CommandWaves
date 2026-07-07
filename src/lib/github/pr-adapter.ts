@@ -2,6 +2,8 @@ import type {
   RepoAdapter,
   RepoBranchInput,
   RepoCheckRunInput,
+  RepoCommitFile,
+  RepoCommitInput,
   RepoPullRequestCommentInput,
 } from "../adapters";
 import { fetchTextResponseWithTimeout } from "../http-fetch";
@@ -63,6 +65,79 @@ function validateBranchPair(baseBranch: string, headBranch: string) {
   if (baseBranch === headBranch) {
     throw Object.assign(new Error("Head branch must differ from base branch."), { status: 400 });
   }
+}
+
+function validateCommitMessage(value: string) {
+  const message = value.trim();
+
+  if (!message) {
+    throw Object.assign(new Error("GitHub commit message is required."), { status: 400 });
+  }
+
+  if (message.length > 500) {
+    throw Object.assign(new Error("GitHub commit message must be 500 characters or less."), { status: 400 });
+  }
+
+  return message;
+}
+
+function validateCommitPath(value: string) {
+  const path = value.trim();
+  const segments = path.split("/");
+  const invalid =
+    !path ||
+    path.length > 240 ||
+    path.startsWith("/") ||
+    path.endsWith("/") ||
+    path.includes("\\") ||
+    segments.some((segment) => !segment || segment === "." || segment === "..");
+
+  if (invalid) {
+    throw Object.assign(new Error("GitHub commit file paths must be relative paths without empty or parent segments."), {
+      status: 400,
+    });
+  }
+
+  return path;
+}
+
+function validateCommitFiles(files: RepoCommitFile[]) {
+  if (!Array.isArray(files) || files.length === 0) {
+    throw Object.assign(new Error("At least one file is required for a GitHub commit."), { status: 400 });
+  }
+
+  if (files.length > 20) {
+    throw Object.assign(new Error("GitHub commits are limited to 20 files in phase 1."), { status: 400 });
+  }
+
+  const seen = new Set<string>();
+  let totalSize = 0;
+
+  return files.map((file) => {
+    const path = validateCommitPath(file.path);
+    const content = file.content;
+
+    if (seen.has(path)) {
+      throw Object.assign(new Error("GitHub commit file paths must be unique."), { status: 400 });
+    }
+
+    if (content.includes("\0")) {
+      throw Object.assign(new Error("GitHub commit file content must be text."), { status: 400 });
+    }
+
+    if (content.length > 200_000) {
+      throw Object.assign(new Error("Each GitHub commit file must be 200000 characters or less."), { status: 400 });
+    }
+
+    seen.add(path);
+    totalSize += content.length;
+
+    if (totalSize > 500_000) {
+      throw Object.assign(new Error("GitHub commit payload must be 500000 characters or less."), { status: 400 });
+    }
+
+    return { path, content };
+  });
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -181,7 +256,7 @@ async function requestGitHub(
   }: {
     body?: unknown;
     failureLabel: string;
-    method?: "GET" | "POST";
+    method?: "GET" | "PATCH" | "POST";
   },
 ) {
   const headers: Record<string, string> = {
@@ -222,8 +297,8 @@ function repoApiPath(repo: NonNullable<ReturnType<typeof parseGitHubRepoUrl>>, p
   return `/repos/${encodeURIComponent(repo.owner)}/${encodeURIComponent(repo.repo)}${path}`;
 }
 
-function branchRefPath(branchName: string) {
-  return `/git/ref/heads/${branchName.split("/").map(encodeURIComponent).join("/")}`;
+function branchRefPath(branchName: string, plural = false) {
+  return `/git/${plural ? "refs" : "ref"}/heads/${branchName.split("/").map(encodeURIComponent).join("/")}`;
 }
 
 export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapterOptions = {}): RepoAdapter {
@@ -269,6 +344,81 @@ export function createGitHubPullRequestAdapter(options: GitHubPullRequestAdapter
         baseSha,
         ref: payloadText(createdRef?.ref) ?? `refs/heads/${headBranch}`,
         url: `${repo.htmlUrl}/tree/${headBranch}`,
+      };
+    },
+    async commitFiles(input: RepoCommitInput) {
+      const repo = parseGitHubRepoUrl(input.repoUrl);
+      const token = githubToken(options);
+
+      if (!repo) {
+        throw Object.assign(new Error("GitHub repo must be a github.com URL or owner/repo shorthand."), { status: 400 });
+      }
+
+      const branchName = validatePreparedBranchName(input.branchName, "Branch");
+      const message = validateCommitMessage(input.message);
+      const files = validateCommitFiles(input.files);
+
+      if (!token) {
+        throw Object.assign(new Error("Creating GitHub commits requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN."), {
+          status: 503,
+        });
+      }
+
+      const refPayload = await requestGitHub(apiBaseUrl, repoApiPath(repo, branchRefPath(branchName)), token, fetchImpl, {
+        failureLabel: "GitHub branch lookup",
+        method: "GET",
+      });
+      const refObject = asRecord(refPayload?.object);
+      const parentSha = payloadFullSha(refObject?.sha, "GitHub branch response did not include a full 40-character SHA.");
+      const parentCommit = await requestGitHub(apiBaseUrl, repoApiPath(repo, `/git/commits/${parentSha}`), token, fetchImpl, {
+        failureLabel: "GitHub parent commit lookup",
+        method: "GET",
+      });
+      const parentTree = asRecord(parentCommit?.tree);
+      const parentTreeSha = payloadFullSha(
+        parentTree?.sha,
+        "GitHub parent commit response did not include a full 40-character tree SHA.",
+      );
+      const treePayload = await requestGitHub(apiBaseUrl, repoApiPath(repo, "/git/trees"), token, fetchImpl, {
+        body: {
+          base_tree: parentTreeSha,
+          tree: files.map((file) => ({
+            path: file.path,
+            mode: "100644",
+            type: "blob",
+            content: file.content,
+          })),
+        },
+        failureLabel: "GitHub tree creation",
+      });
+      const treeSha = payloadFullSha(treePayload?.sha, "GitHub tree creation response did not include a full 40-character SHA.");
+      const commitPayload = await requestGitHub(apiBaseUrl, repoApiPath(repo, "/git/commits"), token, fetchImpl, {
+        body: {
+          message,
+          tree: treeSha,
+          parents: [parentSha],
+        },
+        failureLabel: "GitHub commit creation",
+      });
+      const commitSha = payloadFullSha(
+        commitPayload?.sha,
+        "GitHub commit creation response did not include a full 40-character SHA.",
+      );
+
+      await requestGitHub(apiBaseUrl, repoApiPath(repo, branchRefPath(branchName, true)), token, fetchImpl, {
+        body: {
+          sha: commitSha,
+          force: false,
+        },
+        failureLabel: "GitHub branch update",
+        method: "PATCH",
+      });
+
+      return {
+        branchName,
+        commitSha,
+        url: payloadText(commitPayload?.html_url) ?? `${repo.htmlUrl}/commit/${commitSha}`,
+        changedPaths: files.map((file) => file.path),
       };
     },
     async openPullRequest(input) {

@@ -138,6 +138,233 @@ describe("GitHub pull request adapter", () => {
     ).rejects.toThrow("GitHub base branch response did not include a full 40-character SHA.");
   });
 
+  it("commits bounded text files to a prepared branch", async () => {
+    const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
+    const parentSha = "1111111111111111111111111111111111111111";
+    const parentTreeSha = "2222222222222222222222222222222222222222";
+    const newTreeSha = "3333333333333333333333333333333333333333";
+    const commitSha = "4444444444444444444444444444444444444444";
+    const adapter = createGitHubPullRequestAdapter({
+      apiBaseUrl: "https://api.example.test",
+      token: "token",
+      fetchImpl: async (input, init) => {
+        calls.push({ input, init });
+        const url = String(input);
+
+        if (url.endsWith("/git/ref/heads/command/cmd-001-draft-hook")) {
+          return jsonResponse({
+            object: {
+              sha: parentSha,
+            },
+          });
+        }
+
+        if (url.endsWith(`/git/commits/${parentSha}`)) {
+          return jsonResponse({
+            tree: {
+              sha: parentTreeSha,
+            },
+          });
+        }
+
+        if (url.endsWith("/git/trees")) {
+          return jsonResponse({
+            sha: newTreeSha,
+          });
+        }
+
+        if (url.endsWith("/git/commits")) {
+          return jsonResponse({
+            sha: commitSha,
+            html_url: "https://github.com/6529-Collections/6529-hook/commit/4444444",
+          });
+        }
+
+        return jsonResponse({
+          ref: "refs/heads/command/cmd-001-draft-hook",
+        });
+      },
+    });
+
+    const result = await adapter.commitFiles?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      branchName: "command/cmd-001-draft-hook",
+      message: "Add fee cap tests",
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest {}",
+        },
+        {
+          path: "README.md",
+          content: "Hook notes\n",
+        },
+      ],
+    });
+
+    expect(result).toEqual({
+      branchName: "command/cmd-001-draft-hook",
+      commitSha,
+      url: "https://github.com/6529-Collections/6529-hook/commit/4444444",
+      changedPaths: ["test/FeeCap.t.sol", "README.md"],
+    });
+    expect(String(calls[0]?.input)).toBe(
+      "https://api.example.test/repos/6529-Collections/6529-hook/git/ref/heads/command/cmd-001-draft-hook",
+    );
+    expect(calls[0]?.init?.method).toBe("GET");
+    expect(String(calls[1]?.input)).toBe(`https://api.example.test/repos/6529-Collections/6529-hook/git/commits/${parentSha}`);
+    expect(calls[1]?.init?.method).toBe("GET");
+    expect(String(calls[2]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/git/trees");
+    expect(JSON.parse(String(calls[2]?.init?.body))).toEqual({
+      base_tree: parentTreeSha,
+      tree: [
+        {
+          path: "test/FeeCap.t.sol",
+          mode: "100644",
+          type: "blob",
+          content: "contract FeeCapTest {}",
+        },
+        {
+          path: "README.md",
+          mode: "100644",
+          type: "blob",
+          content: "Hook notes\n",
+        },
+      ],
+    });
+    expect(String(calls[3]?.input)).toBe("https://api.example.test/repos/6529-Collections/6529-hook/git/commits");
+    expect(JSON.parse(String(calls[3]?.init?.body))).toEqual({
+      message: "Add fee cap tests",
+      tree: newTreeSha,
+      parents: [parentSha],
+    });
+    expect(String(calls[4]?.input)).toBe(
+      "https://api.example.test/repos/6529-Collections/6529-hook/git/refs/heads/command/cmd-001-draft-hook",
+    );
+    expect(calls[4]?.init?.method).toBe("PATCH");
+    expect(JSON.parse(String(calls[4]?.init?.body))).toEqual({
+      sha: commitSha,
+      force: false,
+    });
+  });
+
+  it("requires a GitHub token before committing files", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      env: {},
+      fetchImpl: async () => jsonResponse({}),
+    });
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/no-token",
+        message: "No token",
+        files: [{ path: "README.md", content: "No token" }],
+      }),
+    ).rejects.toThrow("Creating GitHub commits requires COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN.");
+  });
+
+  it("validates commit inputs before calling GitHub", async () => {
+    let called = false;
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async () => {
+        called = true;
+
+        return jsonResponse({});
+      },
+    });
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "refs/heads/command/bad",
+        message: "Bad branch",
+        files: [{ path: "README.md", content: "Bad branch" }],
+      }),
+    ).rejects.toThrow("Branch must be a prepared branch name in the target repo.");
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/no-files",
+        message: "No files",
+        files: [],
+      }),
+    ).rejects.toThrow("At least one file is required for a GitHub commit.");
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/bad-path",
+        message: "Bad path",
+        files: [{ path: "../README.md", content: "Bad path" }],
+      }),
+    ).rejects.toThrow("GitHub commit file paths must be relative paths without empty or parent segments.");
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/duplicate",
+        message: "Duplicate",
+        files: [
+          { path: "README.md", content: "One" },
+          { path: "README.md", content: "Two" },
+        ],
+      }),
+    ).rejects.toThrow("GitHub commit file paths must be unique.");
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/binary",
+        message: "Binary",
+        files: [{ path: "README.md", content: "bad\0content" }],
+      }),
+    ).rejects.toThrow("GitHub commit file content must be text.");
+    expect(called).toBe(false);
+  });
+
+  it("surfaces GitHub commit API failures", async () => {
+    const adapter = createGitHubPullRequestAdapter({
+      token: "token",
+      fetchImpl: async (input) => {
+        if (String(input).includes("/git/ref/heads/command/bad-commit")) {
+          return jsonResponse({
+            object: {
+              sha: "1111111111111111111111111111111111111111",
+            },
+          });
+        }
+
+        if (String(input).includes("/git/commits/1111111111111111111111111111111111111111")) {
+          return jsonResponse({
+            tree: {
+              sha: "2222222222222222222222222222222222222222",
+            },
+          });
+        }
+
+        if (String(input).endsWith("/git/trees")) {
+          return jsonResponse({
+            sha: "3333333333333333333333333333333333333333",
+          });
+        }
+
+        return new Response("bad commit", { status: 422, statusText: "Unprocessable Entity" });
+      },
+    });
+
+    await expect(
+      adapter.commitFiles?.({
+        repoUrl: "6529-Collections/6529-hook",
+        branchName: "command/bad-commit",
+        message: "Bad commit",
+        files: [{ path: "README.md", content: "Bad commit" }],
+      }),
+    ).rejects.toThrow("GitHub commit creation failed: 422 Unprocessable Entity - bad commit");
+  });
+
   it("opens a draft pull request from a prepared branch", async () => {
     const calls: Array<{ input: string | URL; init?: RequestInit }> = [];
     const adapter = createGitHubPullRequestAdapter({

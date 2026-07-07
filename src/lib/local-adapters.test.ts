@@ -88,6 +88,27 @@ describe("local command adapters", () => {
     expect(branch?.baseSha).toMatch(/^local-/);
   });
 
+  it("can create local commit records", async () => {
+    const commit = await localRepoAdapter.commitFiles?.({
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+      branchName: "command/cmd-001-draft-hook",
+      message: "Add fee cap tests",
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest {}",
+        },
+      ],
+    });
+
+    expect(commit).toMatchObject({
+      branchName: "command/cmd-001-draft-hook",
+      url: expect.stringContaining("https://github.com/6529-Collections/6529-hook/commit/local-"),
+      changedPaths: ["test/FeeCap.t.sol"],
+    });
+    expect(commit?.commitSha).toMatch(/^local-/);
+  });
+
   it("can create local check run records", async () => {
     const checkRun = await localRepoAdapter.createCheckRun?.({
       repoUrl: "https://github.com/6529-Collections/6529-hook",

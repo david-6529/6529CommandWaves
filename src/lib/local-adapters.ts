@@ -51,6 +51,18 @@ export const localRepoAdapter: RepoAdapter = {
       url: `${input.repoUrl.replace(/\/$/, "")}/tree/${input.branchName}`,
     };
   },
+  async commitFiles(input) {
+    const stable = stableNumber(
+      `${input.repoUrl}:${input.branchName}:${input.message}:${input.files.map((file) => `${file.path}:${file.content}`).join("|")}`,
+    );
+
+    return {
+      branchName: input.branchName,
+      commitSha: `local-${stable.toString(16)}`,
+      url: `${input.repoUrl.replace(/\/$/, "")}/commit/local-${stable.toString(16)}`,
+      changedPaths: input.files.map((file) => file.path),
+    };
+  },
   async openPullRequest(input) {
     const stable = stableNumber(`${input.repoUrl}:${input.branchName}:${input.title}`);
     const prNumber = stable % 1000;

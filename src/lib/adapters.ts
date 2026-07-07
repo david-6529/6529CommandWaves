@@ -41,6 +41,25 @@ export type RepoBranchResult = {
   url: string | null;
 };
 
+export type RepoCommitFile = {
+  path: string;
+  content: string;
+};
+
+export type RepoCommitInput = {
+  repoUrl: string;
+  branchName: string;
+  message: string;
+  files: RepoCommitFile[];
+};
+
+export type RepoCommitResult = {
+  branchName: string;
+  commitSha: string;
+  url: string;
+  changedPaths: string[];
+};
+
 export type RepoPullRequestCommentInput = {
   repoUrl: string;
   prNumber: number;
@@ -88,6 +107,7 @@ export type WaveAdapter = {
 
 export type RepoAdapter = {
   prepareBranch?(input: RepoBranchInput): Promise<RepoBranchResult>;
+  commitFiles?(input: RepoCommitInput): Promise<RepoCommitResult>;
   openPullRequest(input: RepoPullRequestInput): Promise<RepoPullRequestResult>;
   commentOnPullRequest?(input: RepoPullRequestCommentInput): Promise<RepoPullRequestCommentResult>;
   createCheckRun?(input: RepoCheckRunInput): Promise<RepoCheckRunResult>;
