@@ -1,13 +1,15 @@
 import type { FirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import type { FirstPhaseLaunchAuditTrack, FirstPhaseLaunchNextAction } from "./first-phase-launch-audit";
 import { verifyChatLaunchAuditPayload, type ChatLaunchVerificationResult } from "./chat-launch-verifier";
+import { hashValue } from "./run-manifest";
 
-type ChatLaunchSnapshotVerification = Omit<ChatLaunchVerificationResult, "statusDraft">;
+type ChatLaunchSnapshotVerification = Omit<ChatLaunchVerificationResult, "statusDraft" | "chatLaunchHash">;
 
 export type ChatLaunchSnapshot = {
   version: "command-wave-chat-launch-v0.1";
   generatedAt: string;
   sourceAuditHash: string;
+  chatLaunchHash: string;
   project: FirstPhaseLaunchSnapshot["project"];
   setupCheckMode: FirstPhaseLaunchSnapshot["setupCheckMode"];
   stateEvidence: FirstPhaseLaunchSnapshot["stateEvidence"];
@@ -37,7 +39,7 @@ export function createChatLaunchSnapshot(snapshot: FirstPhaseLaunchSnapshot): Ch
     checks: verificationResult.checks,
   };
 
-  return {
+  const snapshotWithoutHash = {
     version: "command-wave-chat-launch-v0.1",
     generatedAt: snapshot.generatedAt,
     sourceAuditHash: snapshot.auditHash,
@@ -53,5 +55,10 @@ export function createChatLaunchSnapshot(snapshot: FirstPhaseLaunchSnapshot): Ch
     },
     verificationTargets: snapshot.verificationTargets,
     verification,
+  } satisfies Omit<ChatLaunchSnapshot, "chatLaunchHash">;
+
+  return {
+    ...snapshotWithoutHash,
+    chatLaunchHash: hashValue(snapshotWithoutHash),
   };
 }

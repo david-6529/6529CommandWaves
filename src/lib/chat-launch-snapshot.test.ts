@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createChatLaunchSnapshot } from "./chat-launch-snapshot";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
+import { hashValue } from "./run-manifest";
 
 describe("chat launch snapshot", () => {
   it("publishes the chat launch track without claiming the PR loop is ready", async () => {
@@ -28,6 +29,10 @@ describe("chat launch snapshot", () => {
         launchStatus: launchSnapshot.launchAudit.status,
       },
     });
+    const { chatLaunchHash, ...hashInput } = snapshot;
+
+    expect(chatLaunchHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(chatLaunchHash).toBe(hashValue(hashInput));
     expect(snapshot.prLoop.status).not.toBe("ready");
   });
 });

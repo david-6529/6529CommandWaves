@@ -1,5 +1,6 @@
 import { fetchJsonWithTimeout, fetchTextWithTimeout } from "../src/lib/http-fetch";
 import { commandWaveProductCopy } from "../src/lib/product-copy";
+import { hashValue } from "../src/lib/run-manifest";
 
 type JsonObject = Record<string, unknown>;
 
@@ -231,6 +232,23 @@ async function main() {
   assert(!JSON.stringify(launchPayload).includes("roomPosts"), "Launch audit response still includes roomPosts.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
   assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
+
+  const chatLaunchPayload = await fetchJson("/api/command-wave/launch/chat");
+  const chatLaunchAudit = objectValue(chatLaunchPayload, "audit");
+
+  assertJsonObject("Chat launch response audit", chatLaunchAudit);
+  assert(objectValue(chatLaunchAudit, "version") === "command-wave-chat-launch-v0.1", "Chat launch returned the wrong version.");
+  assertSha256("Chat launch hash", objectValue(chatLaunchAudit, "chatLaunchHash"));
+  assertSha256("Chat launch source audit hash", objectValue(chatLaunchAudit, "sourceAuditHash"));
+  assert(
+    objectValue(chatLaunchAudit, "chatLaunchHash") ===
+      hashValue(Object.fromEntries(Object.entries(chatLaunchAudit).filter(([key]) => key !== "chatLaunchHash"))),
+    "Chat launch hash did not match payload.",
+  );
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "stateEvidence");
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "chatLaunch");
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "prLoop");
+  assertNoEmDash("Chat launch response", JSON.stringify(chatLaunchPayload));
 
   const statePayload = await fetchJson("/api/command-wave/state");
 

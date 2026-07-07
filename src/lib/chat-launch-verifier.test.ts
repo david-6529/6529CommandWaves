@@ -58,6 +58,7 @@ describe("chat launch verifier", () => {
     expect(result.status).toBe("pass");
     expect(result.chatLaunchStatus).toBe("ready");
     expect(result.launchStatus).not.toBe("ready");
+    expect(result.chatLaunchHash).toBeNull();
     expect(result.nextAction?.title).toBe("Open project chat");
     expect(result.checks.find((item) => item.id === "launch_status")).toBeUndefined();
     expect(result.checks.find((item) => item.id === "chat_launch_ready")).toMatchObject({
@@ -72,7 +73,8 @@ describe("chat launch verifier", () => {
       checkSetupRemote: true,
       setupValidation: chatReadySetupValidation,
     });
-    const result = verifyChatLaunchPayload(createChatLaunchSnapshot(launchSnapshot), {
+    const chatSnapshot = createChatLaunchSnapshot(launchSnapshot);
+    const result = verifyChatLaunchPayload(chatSnapshot, {
       commandWaveState: createCommandWaveStateSnapshot(demoWave, {
         generatedAt: "2026-06-20T13:01:00.000Z",
       }),
@@ -86,6 +88,10 @@ describe("chat launch verifier", () => {
     expect(result.launchStatus).not.toBe("ready");
     expect(result.statusDraft).toBeNull();
     expect(result.auditHash).toBe(launchSnapshot.auditHash);
+    expect(result.chatLaunchHash).toBe(chatSnapshot.chatLaunchHash);
+    expect(result.checks.find((item) => item.id === "chat_launch_hash")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "remote_setup")).toMatchObject({
       status: "pass",
     });
@@ -94,6 +100,26 @@ describe("chat launch verifier", () => {
     });
     expect(result.checks.find((item) => item.id === "project_index_endpoint")).toMatchObject({
       status: "pass",
+    });
+  });
+
+  it("fails direct chat launch endpoint payloads when their hash is stale", async () => {
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+      checkSetupRemote: true,
+      setupValidation: chatReadySetupValidation,
+    });
+    const chatSnapshot = createChatLaunchSnapshot(launchSnapshot);
+    const result = verifyChatLaunchPayload({
+      ...chatSnapshot,
+      chatLaunchHash: "0".repeat(64),
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "chat_launch_hash")).toMatchObject({
+      status: "fail",
+      message: "Chat launch payload must publish a valid hash for this payload.",
     });
   });
 

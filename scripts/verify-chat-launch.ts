@@ -33,6 +33,9 @@ async function main() {
   console.log(`Full PR loop status: ${result.launchStatus}`);
   console.log(`Project: ${result.projectName ?? "unknown"}`);
   console.log(`Generated: ${result.generatedAt ?? "unknown"}`);
+  if (result.chatLaunchHash) {
+    console.log(`Chat launch hash: ${result.chatLaunchHash}`);
+  }
   if (stateUrl) {
     console.log(`Public state target: ${stateUrl}`);
   }

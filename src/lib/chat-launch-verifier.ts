@@ -15,6 +15,7 @@ export type ChatLaunchVerificationResult = {
   } | null;
   statusDraft: string | null;
   auditHash: string | null;
+  chatLaunchHash: string | null;
   blockers: string[];
   openItems: string[];
   checks: LaunchAuditVerificationCheck[];
@@ -83,6 +84,16 @@ function launchStatusReady(value: unknown) {
   const status = asString(value);
 
   return status === "ready" || status === "needs_setup" || status === "blocked";
+}
+
+function chatLaunchHashInput(value: unknown) {
+  const record = isRecord(value) ? value : null;
+
+  if (!record) {
+    return null;
+  }
+
+  return Object.fromEntries(Object.entries(record).filter(([key]) => key !== "chatLaunchHash"));
 }
 
 type ChatLaunchVerificationOptions = Parameters<typeof verifyLaunchAuditPayload>[1];
@@ -202,6 +213,11 @@ function verifyChatLaunchSnapshotPayload(
   const openItems = collectItemSummaries(chatLaunch?.openItems);
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const sourceAuditHash = asString(snapshot?.sourceAuditHash);
+  const chatLaunchHash = asString(snapshot?.chatLaunchHash);
+  const hashInput = chatLaunchHashInput(snapshot);
+  const hasChatLaunchHash = Boolean(
+    hashInput && isSha256Hash(chatLaunchHash) && chatLaunchHash === hashValue(hashInput),
+  );
   const stateEvidence = collectStateEvidence(snapshot?.stateEvidence);
   const shouldVerifyPublicState = options.requirePublicState === true || typeof options.commandWaveState !== "undefined";
   const shouldVerifyProjectIndex = options.requireProjectIndex === true || typeof options.projectIndex !== "undefined";
@@ -224,6 +240,13 @@ function verifyChatLaunchSnapshotPayload(
       isSha256Hash(sourceAuditHash)
         ? "Source launch audit hash is present."
         : "Chat launch payload must include the source launch audit hash.",
+    ),
+    check(
+      "chat_launch_hash",
+      hasChatLaunchHash ? "pass" : "fail",
+      hasChatLaunchHash
+        ? "Chat launch payload hash is valid."
+        : "Chat launch payload must publish a valid hash for this payload.",
     ),
     check(
       "state_evidence",
@@ -298,6 +321,7 @@ function verifyChatLaunchSnapshotPayload(
       : null,
     statusDraft: null,
     auditHash: sourceAuditHash,
+    chatLaunchHash,
     blockers,
     openItems,
     checks,
@@ -348,6 +372,7 @@ export function verifyChatLaunchAuditPayload(
       : null,
     statusDraft: fullAudit.statusDraft,
     auditHash: fullAudit.auditHash,
+    chatLaunchHash: null,
     blockers,
     openItems,
     checks,
