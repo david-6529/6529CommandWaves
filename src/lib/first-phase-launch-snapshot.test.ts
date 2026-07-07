@@ -36,7 +36,7 @@ describe("first phase launch snapshot", () => {
       updatedAt: "2026-06-20T12:50:00.000Z",
       repo: {
         status: "placeholder",
-        label: "GitHub repo is a placeholder.",
+        label: "GitHub repo is also a placeholder.",
       },
       nextStep: {
         label: "Select repo",

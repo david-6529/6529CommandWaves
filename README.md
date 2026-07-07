@@ -243,6 +243,7 @@ DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_INITIAL_NAME="Hook Build"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
+# Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
@@ -253,8 +254,9 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
-`COMMAND_WAVE_INITIAL_WAVE_URL` and `COMMAND_WAVE_INITIAL_REPO_URL` seed a clean first project for fresh/default state
-or local reset. Launch readiness fails production placeholder or invalid first-hook values. `ADMIN_API_KEY` protects setup,
+`COMMAND_WAVE_INITIAL_WAVE_URL` seeds the first project chat. `COMMAND_WAVE_INITIAL_REPO_URL` stays as a placeholder
+until the pilot repo is selected, and PR work stays blocked while it is unchanged. Launch readiness fails production
+placeholder or invalid first-hook values. `ADMIN_API_KEY` protects setup,
 proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
 The ready launch audit requires durable storage, the GitHub PR adapter, and the required guardian check so the public

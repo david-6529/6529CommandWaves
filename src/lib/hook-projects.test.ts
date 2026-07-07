@@ -60,7 +60,7 @@ describe("active hook projects", () => {
         nextActionTitle: "Select the repo",
         nextActionDetail: "Select the GitHub repo before PR work can run.",
         waveStatus: "Project decision recorded with 5 yes and 1 no.",
-        codeStatus: "GitHub repo is a placeholder until selected.",
+        codeStatus: "GitHub repo is also a placeholder until selected.",
         latestPrUrl: null,
         reviewStatusLabel: "not ready",
         evidenceLabel: "1 proposal, repo not set",

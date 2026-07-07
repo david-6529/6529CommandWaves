@@ -93,7 +93,7 @@ async function main() {
     "PR work waits until the repo is selected.",
     "daemon keeps this summary and changelog current.",
     "Review agent is a placeholder for this phase.",
-    "GitHub repo is a placeholder until the hook repo is selected.",
+    "GitHub repo is also a placeholder until the hook repo is selected.",
     "GitHub repo placeholder",
     "Changelog",
     "Rules",

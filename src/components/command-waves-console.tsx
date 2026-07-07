@@ -191,7 +191,7 @@ const buildRoomRules = [
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public project source."],
-  ["COMMAND_WAVE_INITIAL_REPO_URL", "Reachable GitHub hook repo."],
+  ["COMMAND_WAVE_INITIAL_REPO_URL", "Placeholder now. Select the real hook repo before PR work."],
   ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
   ["DATABASE_URL", "Production Postgres connection."],
   ["ADMIN_API_KEY", "Protects setup and mutation routes."],
@@ -3051,7 +3051,7 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                The GitHub repo is a placeholder until selected. Add the real hook repo only when PR work should start.
+                The GitHub repo is also a placeholder until selected. Add the real hook repo only when PR work should start.
               </p>
               <div className="rounded-md border border-amber-800 bg-amber-950/20 p-3">
                 <p className="text-sm font-semibold text-amber-100">Server key needed before launch</p>

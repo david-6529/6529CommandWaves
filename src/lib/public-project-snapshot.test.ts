@@ -20,7 +20,7 @@ describe("public project snapshot", () => {
       },
       repo: {
         status: "placeholder",
-        label: "GitHub repo is a placeholder.",
+        label: "GitHub repo is also a placeholder.",
         url: null,
       },
       nextStep: {

@@ -32,7 +32,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("PR work waits until the repo is selected.");
     expect(text).toContain("daemon keeps this summary and changelog current.");
     expect(text).toContain("Review agent is a placeholder for this phase.");
-    expect(text).toContain("GitHub repo is a placeholder until the hook repo is selected.");
+    expect(text).toContain("GitHub repo is also a placeholder until the hook repo is selected.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
