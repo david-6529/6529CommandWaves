@@ -3,7 +3,7 @@ import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "./developer-fee-plan";
 import { demoWave } from "./demo-wave";
 
-const placeholderRepoText = "GitHub repo placeholder (No real GitHub repo is connected yet.)";
+const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
 
 describe("developer fee plan", () => {
   it("summarizes reviewed work without creating payment authority", () => {

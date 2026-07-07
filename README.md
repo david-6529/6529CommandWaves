@@ -33,7 +33,7 @@ protocol.
 What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
-- One active hook project with project chat and a placeholder GitHub repo. No real repo is connected by default.
+- One active hook project with project chat and a placeholder GitHub repo. The pilot repo is selected later.
 - A top-right wallet connection control that can add a connected address to the access request draft.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.

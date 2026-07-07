@@ -1,4 +1,5 @@
 import { pollApprovalPassedForWave, type CommandWave } from "./command-waves";
+import { githubRepoPlaceholder } from "./agent-identities";
 import { isPlaceholderValue } from "./env-placeholders";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { ledgerEventsByRecency } from "./ledger";
@@ -29,7 +30,7 @@ function repoSnapshot(wave: CommandWave) {
   if (!repoUrl || isPlaceholderValue(repoUrl)) {
     return {
       status: "placeholder",
-      label: "GitHub repo placeholder. No real repo is connected yet.",
+      label: `${githubRepoPlaceholder.label}. ${githubRepoPlaceholder.description}`,
       url: null,
     };
   }
@@ -127,7 +128,7 @@ function projectSummary({
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "No GitHub repo is connected yet. PR work waits."
+      ? "GitHub repo is a placeholder until selected. PR work waits."
       : "Repo connected. Approved changes can move into PR review.";
 
   return [

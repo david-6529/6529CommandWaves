@@ -5,9 +5,11 @@ describe("project repo copy", () => {
   it("labels placeholder repos without making them look active", () => {
     const placeholder = "https://github.com/your-org/your-hook-repo";
 
-    expect(projectRepoText(placeholder)).toBe("GitHub repo placeholder (No real GitHub repo is connected yet.)");
+    expect(projectRepoText(placeholder)).toBe(
+      "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)",
+    );
     expect(projectRepoLine("GitHub repo", placeholder)).toBe(
-      "GitHub repo: GitHub repo placeholder (No real GitHub repo is connected yet.)",
+      "GitHub repo: GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)",
     );
     expect(contributorRulesReferenceLine(placeholder)).toBeNull();
   });

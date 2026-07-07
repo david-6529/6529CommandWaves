@@ -24,7 +24,7 @@ import {
 import { createContributionReport, createContributionReportDraft, reportPointLabel } from "@/lib/contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
-import { orchestratorAgentIdentity } from "@/lib/agent-identities";
+import { githubRepoPlaceholder, orchestratorAgentIdentity } from "@/lib/agent-identities";
 import { withPlaceholderRepoSetupState } from "@/lib/command-wave-sanitize";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { isPlaceholderValue } from "@/lib/env-placeholders";
@@ -192,7 +192,7 @@ const projectWorkRules = [
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public project source."],
-  ["COMMAND_WAVE_INITIAL_REPO_URL", "Placeholder now. Select the real hook repo before PR work."],
+  ["COMMAND_WAVE_INITIAL_REPO_URL", "Placeholder now. Select the pilot repo before PR work."],
   ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
   ["DATABASE_URL", "Production Postgres connection."],
   ["ADMIN_API_KEY", "Protects setup and mutation routes."],
@@ -1403,7 +1403,7 @@ export function CommandWavesConsole() {
       : "Open launch controls";
   const projectRepoHref = primaryHookProject?.repoUrl ?? repoUrl;
   const projectRepoIsPlaceholder = isPlaceholderValue(projectRepoHref);
-  const projectRepoLabel = projectRepoIsPlaceholder ? "GitHub repo placeholder" : "GitHub repo";
+  const projectRepoLabel = "GitHub repo";
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
@@ -2243,7 +2243,7 @@ export function CommandWavesConsole() {
                     Open the GitHub repo
                   </a>
                 ) : (
-                  "No real repo is connected yet."
+                  githubRepoPlaceholder.description
                 )}
               </p>
             </details>
@@ -2348,7 +2348,7 @@ export function CommandWavesConsole() {
                     Open repo
                   </a>
                 ) : projectRepoIsPlaceholder ? (
-                  <p className="mt-1 text-base leading-7 text-zinc-400">No real repo is connected yet.</p>
+                  <p className="mt-1 text-base leading-7 text-zinc-400">{githubRepoPlaceholder.description}</p>
                 ) : (
                   <p className="mt-1 text-base leading-7 text-zinc-400">Repo not set yet.</p>
                 )}
@@ -3109,7 +3109,7 @@ export function CommandWavesConsole() {
             <Panel title="Project setup" eyebrow="Setup">
             <div className="grid gap-3">
               <p className="text-sm leading-6 text-zinc-400">
-                The GitHub repo stays as a placeholder for now. Add the real hook repo only when PR work should start.
+                The GitHub repo stays as a placeholder for now. Select the pilot repo only when PR work should start.
               </p>
               <div className="rounded-md border border-amber-800 bg-amber-950/20 p-3">
                 <p className="text-sm font-semibold text-amber-100">Server key needed before launch</p>
@@ -3181,7 +3181,7 @@ export function CommandWavesConsole() {
               </Field>
               {projectRepoIsPlaceholder ? (
                 <p className="text-xs leading-5 text-zinc-500">
-                  This default is only a placeholder. Select the real hook repo before creating PR work.
+                  This default is only a placeholder. Select the pilot repo before creating PR work.
                 </p>
               ) : null}
               {setupValidation ? (
