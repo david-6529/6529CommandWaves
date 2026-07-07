@@ -221,7 +221,10 @@ async function main() {
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "review-agent");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "githubRepo");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "configuredUrl");
-  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "https://github.com/your-org/your-hook-repo");
+  assert(
+    !JSON.stringify(launchPayload).includes("https://github.com/your-org/your-hook-repo"),
+    "Launch audit response should not expose the placeholder repo URL as a selected repo.",
+  );
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "projectIndexUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "contributionReportUrl");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "verificationManifestUrl");

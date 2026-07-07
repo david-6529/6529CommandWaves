@@ -212,7 +212,7 @@ Audit and launch:
 - `npm run chat:launch` verifies the chat launch track while the GitHub repo is still a placeholder.
 - Public command-wave state includes the informational contribution report method and notes.
 - Public launch audit includes the hashed wave state, rules, and full audit bundle it checked.
-- Public launch audit keeps the top-level project repo URL empty while the GitHub repo is still a placeholder.
+- Public launch audit keeps project and setup repo URLs empty while the GitHub repo is still a placeholder.
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
   The proof and checklist keep review and log pending while the reviewer process is still a placeholder.
 - Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.

@@ -29,6 +29,9 @@ describe("first phase launch snapshot", () => {
       waveUrl: demoWave.waveUrl,
       repoUrl: null,
     });
+    expect(snapshot.setupValidation.repo).toBeNull();
+    expect(snapshot.setupValidation.checks.map((check) => check.id)).toContain("repo_placeholder");
+    expect(JSON.stringify(snapshot.setupValidation)).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(snapshot.setupCheckMode).toBe("shape");
     expect(snapshot.projectSnapshot).toMatchObject({
       currentWork: {
@@ -206,6 +209,7 @@ describe("first phase launch snapshot", () => {
       "repo_format",
       "repo_placeholder",
     ]);
+    expect(JSON.stringify(snapshot)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
 
   it("marks the snapshot as remote when remote setup checks are requested", async () => {

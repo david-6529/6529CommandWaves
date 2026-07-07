@@ -89,6 +89,21 @@ function appRouteUrl(path: string, env: Record<string, string | undefined>) {
   return appUrl ? `${appUrl}${path}` : path;
 }
 
+function createPublicSetupValidation(setupValidation: SetupValidation): SetupValidation {
+  const repoUrl = setupValidation.repo?.htmlUrl ?? "";
+
+  if (!repoUrl || !isPlaceholderValue(repoUrl)) {
+    return setupValidation;
+  }
+
+  return {
+    ...setupValidation,
+    repo: null,
+    repoMetadata: null,
+    repoRequiredFiles: [],
+  };
+}
+
 export async function createFirstPhaseLaunchSnapshot(
   wave: CommandWave,
   options: FirstPhaseLaunchSnapshotOptions = {},
@@ -149,6 +164,7 @@ export async function createFirstPhaseLaunchSnapshot(
   };
   const contributionReport = createContributionReport(wave, { generatedAt });
   const publicRepoUrl = isPlaceholderValue(wave.repoUrl) ? null : wave.repoUrl;
+  const publicSetupValidation = createPublicSetupValidation(setupValidation);
   const snapshotWithoutHash = {
     version: "command-wave-launch-audit-v0.1",
     generatedAt,
@@ -178,7 +194,7 @@ export async function createFirstPhaseLaunchSnapshot(
       ledgerEventCount: wave.ledger.length,
     },
     verificationTargets,
-    setupValidation,
+    setupValidation: publicSetupValidation,
     statusDraft: createLaunchStatusDraft({
       wave,
       audit: launchAudit,
