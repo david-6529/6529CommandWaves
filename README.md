@@ -33,7 +33,7 @@ protocol.
 What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
-- One active hook project with project chat and a placeholder GitHub repo until the first repo is selected.
+- One active hook project with project chat and a placeholder GitHub repo. No real repo is connected by default.
 - A top-right wallet connection control that can add a connected address to the access request draft.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
@@ -72,9 +72,9 @@ What remains manual or MVP-only:
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution is a controlled packet and local/demo adapter today, not autonomous branch creation. PR work packets
   require the GitHub repo to be selected.
-- The GitHub repo is a placeholder in the default project state and must be selected before PR work can run.
-- The GitHub adapter only opens draft PRs from existing branches when configured. It does not create branches, merge,
-  deploy, or spend funds.
+- The GitHub repo is a placeholder in the default project state. No PR work can run until the pilot repo is selected.
+- The GitHub adapter can prepare branches, commit bounded text files, open draft PRs, post bounded PR comments, and
+  create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting uses visible app activity and project chat posts pulled into the app. Full scoring across GitHub commits,
   reviews, merges, and off-app activity is still future work.
@@ -83,7 +83,7 @@ What remains manual or MVP-only:
 What we are working on next:
 
 1. Pick the first real public project chat.
-2. Keep the GitHub repo as a placeholder until the hook repo is selected for PR work.
+2. Keep the GitHub repo as a placeholder until the pilot repo is selected for PR work.
 3. Configure launch env, durable storage, and daemon chat posting.
 4. Add the selected hook repo, guardian workflow, and required guardian check before the first PR.
 5. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
@@ -494,7 +494,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 ## Next Production Steps
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
-2. Set the initial hook wave and repo, then run the remote launch audit until setup is reachable.
+2. Set the initial hook wave, keep the repo placeholder until selection, then run the remote launch audit until setup is reachable.
 3. Wire controlled Codex execution to the GitHub branch, text commit, draft PR, comment, and check-run adapter primitives.
 4. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 5. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.

@@ -94,6 +94,13 @@ export function createCodexWorkPacket({
       "Return the required evidence so the reviewer can verify the work.",
     ]),
     "",
+    "Adapter sequence:",
+    ...numbered(
+      handoff.repoOperations.map(
+        (operation) => `${operation.label}. Method: ${operation.adapterMethod}. Evidence: ${operation.evidence}`,
+      ),
+    ),
+    "",
     "Constraints:",
     ...bulleted(handoff.constraints),
     "",

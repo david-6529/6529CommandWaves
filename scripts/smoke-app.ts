@@ -91,10 +91,10 @@ async function main() {
     "Builders turn chat into decisions, PRs, reviews, and a public log.",
     "Draft the non-upgradeable hook scaffold",
     "Next: Select the GitHub repo before PR work can run.",
-    "Repo not selected yet. PR work waits.",
+    "No GitHub repo is connected yet. PR work waits.",
     "daemon keeps the log current.",
     "Review agent and GitHub repo are placeholders for this phase.",
-    "Select the repo before PR work starts.",
+    "No real repo is connected yet.",
     "GitHub repo placeholder",
     "Changelog",
     "Rules",
@@ -115,7 +115,7 @@ async function main() {
     "GitHub repo",
     "id=\"project-repo-url\"",
     "id=\"project-access-key\"",
-    "Placeholder until selected.",
+    "No real repo is connected yet.",
     "This default is only a placeholder. Select the real hook repo before creating PR work.",
     "Select the GitHub repo before the PR build step.",
     "Repo setup needed",
@@ -225,7 +225,7 @@ async function main() {
   assertIncludes(
     "Launch audit response",
     JSON.stringify(launchPayload),
-    "Repo: GitHub repo placeholder (Select the hook repo before PR work can run.)",
+    "Repo: GitHub repo placeholder (No real GitHub repo is connected yet.)",
   );
   assert(
     !JSON.stringify(launchPayload).includes("https://github.com/6529-Collections/6529-hook"),

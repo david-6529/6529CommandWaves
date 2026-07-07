@@ -22,9 +22,17 @@ export type AgentHandoffPacket = {
   maxRuntimeSeconds: number;
   maxCostUsd: number;
   constraints: string[];
+  repoOperations: AgentHandoffRepoOperation[];
   requiredEvidence: string[];
   forbiddenActions: string[];
   packetHash: string;
+};
+
+export type AgentHandoffRepoOperation = {
+  id: "prepare_branch" | "commit_files" | "open_draft_pr" | "post_review_comment" | "create_check_run";
+  label: string;
+  adapterMethod: "prepareBranch" | "commitFiles" | "openPullRequest" | "commentOnPullRequest" | "createCheckRun";
+  evidence: string;
 };
 
 function handoffWithoutHash(packet: Omit<AgentHandoffPacket, "packetHash">) {
@@ -46,6 +54,39 @@ function contractEvidence(proposal: CommandProposal) {
     "Short note explaining explicit parameter caps, governance surfaces, and deployment files touched.",
   ];
 }
+
+const repoOperations: AgentHandoffRepoOperation[] = [
+  {
+    id: "prepare_branch",
+    label: "Prepare the target branch from the approved base branch",
+    adapterMethod: "prepareBranch",
+    evidence: "Branch name, base branch, and base SHA.",
+  },
+  {
+    id: "commit_files",
+    label: "Commit bounded text file changes to the target branch",
+    adapterMethod: "commitFiles",
+    evidence: "Commit SHA and changed file list.",
+  },
+  {
+    id: "open_draft_pr",
+    label: "Open a draft PR with the Command Waves manifest",
+    adapterMethod: "openPullRequest",
+    evidence: "Draft PR URL and head SHA.",
+  },
+  {
+    id: "post_review_comment",
+    label: "Post bounded review context after the reviewer result exists",
+    adapterMethod: "commentOnPullRequest",
+    evidence: "PR comment URL.",
+  },
+  {
+    id: "create_check_run",
+    label: "Create or update bounded reviewer check-run state",
+    adapterMethod: "createCheckRun",
+    evidence: "Check-run URL, status, and conclusion.",
+  },
+];
 
 export function createAgentHandoffPacket({
   wave,
@@ -84,6 +125,7 @@ export function createAgentHandoffPacket({
       "Leave merges, deploys, payments, and governance changes to humans.",
       ...hookParameterPolicySummary,
     ],
+    repoOperations,
     requiredEvidence: [
       "Prepared branch name.",
       "Head commit SHA for the prepared branch.",

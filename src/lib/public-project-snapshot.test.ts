@@ -8,7 +8,7 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "Working snapshot for the 6529 AMM hook build. Builders turn chat into decisions, PRs, reviews, and a public log. Focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. Repo not selected yet. PR work waits.",
+        "Working snapshot for the 6529 AMM hook build. Builders turn chat into decisions, PRs, reviews, and a public log. Focus: Draft the non-upgradeable hook scaffold. Next: Select the GitHub repo before PR work can run. No GitHub repo is connected yet. PR work waits.",
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
@@ -20,7 +20,7 @@ describe("public project snapshot", () => {
       },
       repo: {
         status: "placeholder",
-        label: "GitHub repo placeholder.",
+        label: "GitHub repo placeholder. No real repo is connected yet.",
         url: null,
       },
       nextStep: {

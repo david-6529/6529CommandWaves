@@ -29,6 +29,13 @@ describe("agent handoff packet", () => {
       maxCostUsd: proposal.budgetUsd,
     });
     expect(packet.prManifestHash).toBe(hashValue(createCommandPrManifest({ wave: demoWave, proposal, poll })));
+    expect(packet.repoOperations.map((operation) => [operation.id, operation.adapterMethod])).toEqual([
+      ["prepare_branch", "prepareBranch"],
+      ["commit_files", "commitFiles"],
+      ["open_draft_pr", "openPullRequest"],
+      ["post_review_comment", "commentOnPullRequest"],
+      ["create_check_run", "createCheckRun"],
+    ]);
     expect(packet.requiredEvidence).toContain("Command Waves PR manifest in the PR body.");
     expect(packet.requiredEvidence).toContain(
       "Short note explaining explicit parameter caps, governance surfaces, and deployment files touched.",

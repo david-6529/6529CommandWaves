@@ -27,6 +27,10 @@ describe("Codex work packet", () => {
     expect(packet.text).toContain("Command Waves Codex work packet");
     expect(packet.text).toContain("Repo: https://github.com/6529-Collections/6529-hook");
     expect(packet.text).toContain("Work in an isolated clone or worktree");
+    expect(packet.text).toContain("Adapter sequence:");
+    expect(packet.text).toContain("Prepare the target branch from the approved base branch. Method: prepareBranch.");
+    expect(packet.text).toContain("Commit bounded text file changes to the target branch. Method: commitFiles.");
+    expect(packet.text).toContain("Open a draft PR with the Command Waves manifest. Method: openPullRequest.");
     expect(packet.text).toContain("Put the Command Waves manifest below in the PR body.");
     expect(packet.text).toContain("Do not merge PRs.");
     expect(packet.text).toContain("Do not deploy contracts.");

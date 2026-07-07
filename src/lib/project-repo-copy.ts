@@ -10,7 +10,7 @@ export function projectRepoText(repoUrl: string) {
   }
 
   if (isPlaceholderValue(trimmed)) {
-    return `${githubRepoPlaceholder.label} (${githubRepoPlaceholder.nextStep})`;
+    return `${githubRepoPlaceholder.label} (${githubRepoPlaceholder.description})`;
   }
 
   return trimmed;

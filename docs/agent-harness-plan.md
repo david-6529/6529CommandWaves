@@ -29,18 +29,24 @@ Current local adapter status:
 - Generates a deterministic Codex handoff packet for PR commands.
 - Generates a copyable manual Codex work packet for PR commands with a recorded wave decision receipt.
 - The handoff packet records the target branch, permission set, budget, required evidence, forbidden actions, run manifest hash, and PR manifest hash.
-- The work packet gives a human operator the approved prompt, target branch, required evidence, forbidden actions, and PR manifest text to use in a prepared branch.
+- The handoff packet names the controlled adapter sequence: prepare branch, commit bounded text files, open draft PR,
+  post bounded PR comment, and create bounded check-run state.
+- The work packet gives a human operator the approved prompt, target branch, adapter sequence, required evidence,
+  forbidden actions, and PR manifest text to use in a prepared branch.
 - Includes the Command Waves PR manifest in the PR body for `open_pr` commands.
 - Can opt into a real GitHub draft PR adapter with `COMMAND_WAVE_REPO_ADAPTER=github` once a controlled harness has prepared the branch.
 - Reviewer adapter requests changes if the run manifest is missing, the handoff packet is missing for a PR command, or either artifact does not match the approved command.
 
 Current GitHub PR adapter status:
 
-- Opens draft PRs through the GitHub API from an existing prepared same-repo branch.
+- Prepares same-repo branches from a selected base branch through the GitHub API.
+- Commits bounded text files to a prepared branch through Git tree and commit APIs.
+- Opens draft PRs through the GitHub API from a prepared same-repo branch.
+- Posts bounded PR comments and creates bounded check runs.
 - Rejects fork refs, raw SHAs, tags, and ambiguous refs before calling GitHub.
 - Requires `COMMAND_WAVE_GITHUB_TOKEN` or `GITHUB_TOKEN`.
 - Uses `COMMAND_WAVE_GITHUB_BASE_BRANCH` when set, otherwise `main`.
-- Does not create branches, commit changes, merge PRs, deploy contracts, or spend funds.
+- Does not merge PRs, deploy contracts, change repo settings, or spend funds.
 
 ## Safety Defaults
 

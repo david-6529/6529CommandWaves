@@ -36,7 +36,7 @@ describe("first phase launch snapshot", () => {
       updatedAt: "2026-06-20T12:50:00.000Z",
       repo: {
         status: "placeholder",
-        label: "GitHub repo placeholder.",
+        label: "GitHub repo placeholder. No real repo is connected yet.",
       },
       nextStep: {
         label: "Select repo",
@@ -90,7 +90,7 @@ describe("first phase launch snapshot", () => {
       githubRepo: {
         status: "placeholder",
         configuredUrl: null,
-        nextStep: "Select the hook repo before PR work can run.",
+        nextStep: "Keep PR work blocked until the pilot repo is selected.",
       },
     });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
@@ -151,7 +151,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.launchPacket.packetHash).toMatch(/^[a-f0-9]{64}$/);
     expect(snapshot.launchPacket.text).toContain("# Project launch packet");
     expect(snapshot.launchPacket.text).toContain(
-      "Repo: GitHub repo placeholder (Select the hook repo before PR work can run.)",
+      "Repo: GitHub repo placeholder (No real GitHub repo is connected yet.)",
     );
     expect(snapshot.launchPacket.text).toContain("## Workflow Proof");
     expect(snapshot.launchPacket.text).toContain("## Verification");

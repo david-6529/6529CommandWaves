@@ -29,7 +29,7 @@ function repoSnapshot(wave: CommandWave) {
   if (!repoUrl || isPlaceholderValue(repoUrl)) {
     return {
       status: "placeholder",
-      label: "GitHub repo placeholder.",
+      label: "GitHub repo placeholder. No real repo is connected yet.",
       url: null,
     };
   }
@@ -127,7 +127,7 @@ function projectSummary({
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "Repo not selected yet. PR work waits."
+      ? "No GitHub repo is connected yet. PR work waits."
       : "Repo connected. Approved changes can move into PR review.";
 
   return [

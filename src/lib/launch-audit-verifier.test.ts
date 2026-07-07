@@ -146,7 +146,7 @@ describe("launch audit verifier", () => {
     expect(snapshot.agents.githubRepo).toMatchObject({
       status: "placeholder",
       configuredUrl: null,
-      nextStep: "Select the hook repo before PR work can run.",
+      nextStep: "Keep PR work blocked until the pilot repo is selected.",
     });
     expect(result.checks.find((item) => item.id === "product_contract")).toMatchObject({
       status: "pass",

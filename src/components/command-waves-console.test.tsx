@@ -29,10 +29,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Builders turn chat into decisions, PRs, reviews, and a public log.");
     expect(text).toContain("Focus: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next: Select the GitHub repo before PR work can run.");
-    expect(text).toContain("Repo not selected yet. PR work waits.");
+    expect(text).toContain("No GitHub repo is connected yet. PR work waits.");
     expect(text).toContain("daemon keeps the log current.");
     expect(text).toContain("Review agent and GitHub repo are placeholders for this phase.");
-    expect(text).toContain("Select the repo before PR work starts.");
+    expect(text).toContain("No real repo is connected yet.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("Rules");
@@ -57,7 +57,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Decision");
     expect(text).toContain("5 yes, 1 no. Decision link recorded.");
     expect(text).toContain("GitHub repo");
-    expect(text).toContain("Placeholder until selected.");
+    expect(text).toContain("No real repo is connected yet.");
     expect(text).toContain("This default is only a placeholder. Select the real hook repo before creating PR work.");
     expect(text).toContain("Select the GitHub repo before the PR build step.");
     expect(text).toContain("Repo setup needed");

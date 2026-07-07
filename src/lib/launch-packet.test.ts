@@ -77,7 +77,7 @@ describe("launch packet", () => {
     );
     expect(packet.text).toContain("# Project launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
-    expect(packet.text).toContain("Repo: GitHub repo placeholder (Select the hook repo before PR work can run.)");
+    expect(packet.text).toContain("Repo: GitHub repo placeholder (No real GitHub repo is connected yet.)");
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("Manual builder review for phase 1");
     expect(packet.text).toContain("## Orchestration");

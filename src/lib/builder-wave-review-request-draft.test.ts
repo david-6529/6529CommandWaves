@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createBuilderWaveReviewRequestDraft } from "./builder-wave-review-request-draft";
 import { demoWave } from "./demo-wave";
 
-const placeholderRepoText = "GitHub repo placeholder (Select the hook repo before PR work can run.)";
+const placeholderRepoText = "GitHub repo placeholder (No real GitHub repo is connected yet.)";
 
 describe("builder wave review request draft", () => {
   it("creates a manual review request from an approved PR record", () => {

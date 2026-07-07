@@ -72,7 +72,7 @@ describe("command wave state snapshot", () => {
           status: "placeholder",
           label: "GitHub repo placeholder",
           configuredUrl: null,
-          nextStep: "Select the hook repo before PR work can run.",
+          nextStep: "Keep PR work blocked until the pilot repo is selected.",
         },
       },
       reports: {
