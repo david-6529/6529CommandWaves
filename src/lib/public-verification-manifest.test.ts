@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { publicGithubRepoPlaceholder } from "./agent-identities";
+import { publicCommandWaveHash } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createPublicContributionReport } from "./public-contribution-report";
 import { createPublicVerificationManifest, publicVerificationManifestHashInput } from "./public-verification-manifest";
@@ -28,7 +29,7 @@ describe("public verification manifest", () => {
         repoStatus: "placeholder",
       },
       stableAnchors: {
-        waveStateHash: hashValue(demoWave),
+        waveStateHash: publicCommandWaveHash(demoWave),
         rulesHash: hashValue(demoWave.rules),
         proposalCount: demoWave.proposals.length,
         reviewCount: demoWave.reviews.length,

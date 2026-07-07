@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { publicCommandWaveHash } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { createLaunchAuditHash } from "./launch-audit-hash";
@@ -95,7 +96,7 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
     expect(snapshot.stateEvidence).toEqual({
-      waveStateHash: hashValue(demoWave),
+      waveStateHash: publicCommandWaveHash(demoWave),
       rulesHash: hashValue(demoWave.rules),
       proposalCount: demoWave.proposals.length,
       reviewCount: demoWave.reviews.length,

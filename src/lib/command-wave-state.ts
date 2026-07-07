@@ -2,7 +2,7 @@ import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIden
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
-import { hasProductionValue } from "./env-placeholders";
+import { hasProductionValue, isPlaceholderValue } from "./env-placeholders";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { commandWaveProductCopy } from "./product-copy";
 import { publicHookSafety, type PublicHookSafety } from "./public-hook-safety";
@@ -13,7 +13,7 @@ import { hashValue } from "./run-manifest";
 export type CommandWaveStateSnapshot = {
   version: "command-wave-state-v0.1";
   generatedAt: string;
-  wave: CommandWave;
+  wave: PublicCommandWave;
   waveStateHash: string;
   stateHash: string;
   projectSnapshot: PublicProjectSnapshot;
@@ -42,6 +42,10 @@ export type CommandWaveStateSnapshot = {
     envVar: "COMMAND_WAVE_STATE_URL";
     expectedPayload: "command-wave-state-v0.1 snapshot";
   };
+};
+
+export type PublicCommandWave = Omit<CommandWave, "repoUrl"> & {
+  repoUrl: string | null;
 };
 
 export type PhaseOneProductContract = {
@@ -88,11 +92,12 @@ export function createCommandWaveStateSnapshot(
   options: { generatedAt?: string } = {},
 ): CommandWaveStateSnapshot {
   const generatedAt = options.generatedAt ?? new Date().toISOString();
+  const publicWave = createPublicCommandWave(wave);
   const snapshotWithoutHash = {
     version: "command-wave-state-v0.1",
     generatedAt,
-    wave,
-    waveStateHash: hashValue(wave),
+    wave: publicWave,
+    waveStateHash: publicCommandWaveHash(wave),
     projectSnapshot: createPublicProjectSnapshot(wave),
     hookSafety: publicHookSafety,
     workflowProof: createPublicWorkflowProof(wave),
@@ -117,6 +122,17 @@ export function createCommandWaveStateSnapshot(
     ...snapshotWithoutHash,
     stateHash: createCommandWaveStateHash(snapshotWithoutHash),
   };
+}
+
+export function createPublicCommandWave(wave: CommandWave): PublicCommandWave {
+  return {
+    ...wave,
+    repoUrl: isPlaceholderValue(wave.repoUrl) ? null : wave.repoUrl,
+  };
+}
+
+export function publicCommandWaveHash(wave: CommandWave) {
+  return hashValue(createPublicCommandWave(wave));
 }
 
 export function commandWaveStateUrlFromEnv(env: Record<string, string | undefined> = process.env) {

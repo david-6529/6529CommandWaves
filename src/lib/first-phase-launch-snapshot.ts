@@ -2,6 +2,7 @@ import {
   commandWaveStateUrlFromEnv,
   phaseOneAuthorityBoundary,
   phaseOneProductContract,
+  publicCommandWaveHash,
   type CommandWaveStateSnapshot,
 } from "./command-wave-state";
 import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
@@ -170,7 +171,7 @@ export async function createFirstPhaseLaunchSnapshot(
       githubRepo: publicGithubRepoPlaceholder,
     },
     stateEvidence: {
-      waveStateHash: hashValue(wave),
+      waveStateHash: publicCommandWaveHash(wave),
       rulesHash: hashValue(wave.rules),
       proposalCount: wave.proposals.length,
       reviewCount: wave.reviews.length,

@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
-import { commandWaveStateUrlFromEnv, createCommandWaveStateSnapshot } from "./command-wave-state";
-import { hashValue } from "./run-manifest";
+import {
+  commandWaveStateUrlFromEnv,
+  createCommandWaveStateSnapshot,
+  createPublicCommandWave,
+  publicCommandWaveHash,
+} from "./command-wave-state";
 
 describe("command wave state snapshot", () => {
   it("publishes the current wave in guardian-readable shape", () => {
@@ -13,7 +17,7 @@ describe("command wave state snapshot", () => {
     expect(snapshot).toMatchObject({
       version: "command-wave-state-v0.1",
       generatedAt: "2026-06-21T12:00:00.000Z",
-      wave: demoWave,
+      wave: createPublicCommandWave(demoWave),
       projectSnapshot: {
         currentWork: {
           title: "Draft the non-upgradeable hook scaffold",
@@ -95,7 +99,8 @@ describe("command wave state snapshot", () => {
 
     expect(stateHash).toMatch(/^[a-f0-9]{64}$/);
     expect(stateHash).toBe(createCommandWaveStateHash(snapshotWithoutStateHash));
-    expect(snapshot.waveStateHash).toBe(hashValue(demoWave));
+    expect(snapshot.wave.repoUrl).toBeNull();
+    expect(snapshot.waveStateHash).toBe(publicCommandWaveHash(demoWave));
     expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("review recorded");
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
     expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("delegatecall");

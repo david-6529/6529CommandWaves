@@ -292,7 +292,10 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "review-agent");
   assertIncludes("State response", JSON.stringify(statePayload), "githubRepo");
   assertIncludes("State response", JSON.stringify(statePayload), "configuredUrl");
-  assertIncludes("State response", JSON.stringify(statePayload), "https://github.com/your-org/your-hook-repo");
+  assert(
+    !JSON.stringify(statePayload).includes("https://github.com/your-org/your-hook-repo"),
+    "State response should not expose the placeholder repo URL as a selected repo.",
+  );
   assert(
     !JSON.stringify(statePayload).includes("https://github.com/6529-Collections/6529-hook"),
     "State response still includes the old concrete hook repo.",
