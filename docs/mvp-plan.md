@@ -86,7 +86,7 @@ Later phases can add stricter approval paths for parked command kinds after the 
 - No spending.
 - No automatic merges.
 - No automatic payouts.
-- No token-weighted voting until manual gating works.
+- No token-weighted voting until manual access review works.
 - No broad multi-agent swarm marketplace.
 - No upgradeable hook contracts by default.
 - No parameter work without an explicit cap and bound-focused tests.

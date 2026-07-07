@@ -43,6 +43,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("PR");
     expect(text).toContain("Log");
     expect(text).toContain("Who can join?");
+    expect(text).toContain("Who can join");
     expect(text).toContain("How do I join?");
     expect(text).toContain("How does work start?");
     expect(text).toContain("How are PRs approved?");
@@ -101,6 +102,7 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain(">Select repo</button>");
     expect(html).toContain('id="project-repo-url"');
     expect(html).toContain('id="project-access-key"');
+    expect(html).toContain('id="who-can-join"');
     expect(html).toContain("Maintainer setup");
   });
 
@@ -131,6 +133,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("\u2014");
     expect(text).not.toContain("Gate");
     expect(text).not.toContain("gate unset");
+    expect(text).not.toContain("Who can play");
     expect(text).not.toContain("Participation gate is not set yet.");
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("orchestrator managed");

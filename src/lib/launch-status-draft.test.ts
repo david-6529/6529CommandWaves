@@ -171,6 +171,22 @@ describe("launch status draft", () => {
     expect(draft).not.toContain("\u2014");
   });
 
+  it("uses access-check wording for advisory participation notes", () => {
+    const wave = {
+      ...configuredDemoWave,
+      gates: ["30% of TDH holders can contribute"],
+    };
+    const audit = createFirstPhaseLaunchAudit({
+      phaseChecklist: createPhaseChecklist(wave),
+      readinessChecks: null,
+      wave,
+    });
+    const draft = createLaunchStatusDraft({ wave, audit, verificationTargets });
+
+    expect(draft).toContain("- Keep participation notes advisory until live access checks are implemented.");
+    expect(draft).not.toContain("live gating");
+  });
+
   it("names production env work in copied launch status", () => {
     const audit = createFirstPhaseLaunchAudit({
       phaseChecklist: createPhaseChecklist(configuredDemoWave),

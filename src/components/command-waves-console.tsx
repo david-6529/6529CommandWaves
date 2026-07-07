@@ -2834,7 +2834,7 @@ export function CommandWavesConsole() {
                 ))}
               </ol>
             </div>
-            <div id="who-can-play">
+            <div id="who-can-join">
               <p className="text-sm font-semibold uppercase tracking-normal text-cyan-300">Who can join</p>
               <div className="mt-3 divide-y divide-zinc-800 border-y border-zinc-800">
                 {participationGateNotes.map((gate) => (
@@ -2904,7 +2904,7 @@ export function CommandWavesConsole() {
                       <p className="mt-2 text-sm leading-6 text-zinc-300">{project.waveRole}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-400">{project.waveStatus}</p>
                       <div className="mt-3 border-t border-zinc-800 pt-3">
-                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Who can play</p>
+                        <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Who can join</p>
                         <ul className="mt-2 grid gap-1 text-xs leading-5 text-zinc-400">
                           {project.accessDetails.map((note) => (
                             <li key={note}>- {note}</li>
