@@ -9,8 +9,8 @@ type LoadedLaunchAudit = {
   sourceUrl: string | null;
 };
 
-type LaunchAuditStateFetchErrorPayload = {
-  launchAuditStateFetchError: {
+type LaunchAuditTargetFetchErrorPayload = {
+  launchAuditTargetFetchError: {
     url: string;
     status: number;
     statusText: string;
@@ -36,12 +36,12 @@ async function readOptionalJsonUrl(url: string): Promise<unknown> {
     const fetchError = error as TimedFetchError;
 
     return {
-      launchAuditStateFetchError: {
+      launchAuditTargetFetchError: {
         url: fetchError.url ?? url,
         status: fetchError.status ?? 0,
         statusText: fetchError.statusText ?? (error instanceof Error ? error.message : "Fetch failed"),
       },
-    } satisfies LaunchAuditStateFetchErrorPayload;
+    } satisfies LaunchAuditTargetFetchErrorPayload;
   }
 }
 
@@ -84,8 +84,13 @@ function unwrapAudit(payload: unknown) {
   return isRecord(record?.audit) ? record.audit : record;
 }
 
-function resolveCommandWaveStateUrl(payload: unknown, sourceUrl: string | null) {
-  const explicitUrl = process.env.LAUNCH_AUDIT_STATE_URL?.trim();
+function resolveVerificationTargetUrl(
+  payload: unknown,
+  sourceUrl: string | null,
+  envName: string,
+  targetName: string,
+) {
+  const explicitUrl = process.env[envName]?.trim();
 
   if (explicitUrl) {
     return explicitUrl;
@@ -93,7 +98,7 @@ function resolveCommandWaveStateUrl(payload: unknown, sourceUrl: string | null) 
 
   const audit = unwrapAudit(payload);
   const targets = isRecord(audit?.verificationTargets) ? audit.verificationTargets : null;
-  const targetUrl = asString(targets?.commandWaveStateUrl);
+  const targetUrl = asString(targets?.[targetName]);
 
   if (!targetUrl) {
     return null;
@@ -125,11 +130,22 @@ function writeResult(path: string | undefined, value: unknown) {
 
 async function main() {
   const { payload, sourceUrl } = await loadLaunchAuditPayload();
-  const stateUrl = resolveCommandWaveStateUrl(payload, sourceUrl);
-  const commandWaveState = stateUrl ? await readOptionalJsonUrl(stateUrl) : undefined;
+  const stateUrl = resolveVerificationTargetUrl(payload, sourceUrl, "LAUNCH_AUDIT_STATE_URL", "commandWaveStateUrl");
+  const projectIndexUrl = resolveVerificationTargetUrl(
+    payload,
+    sourceUrl,
+    "LAUNCH_AUDIT_PROJECT_INDEX_URL",
+    "projectIndexUrl",
+  );
+  const [commandWaveState, projectIndex] = await Promise.all([
+    stateUrl ? readOptionalJsonUrl(stateUrl) : undefined,
+    projectIndexUrl ? readOptionalJsonUrl(projectIndexUrl) : undefined,
+  ]);
   const result = verifyLaunchAuditPayload(payload, {
     commandWaveState,
     requirePublicState: Boolean(stateUrl),
+    projectIndex,
+    requireProjectIndex: Boolean(projectIndexUrl),
   });
 
   writeResult(process.env.LAUNCH_AUDIT_VERIFICATION_PATH, result);
@@ -140,6 +156,9 @@ async function main() {
   console.log(`Generated: ${result.generatedAt ?? "unknown"}`);
   if (stateUrl) {
     console.log(`Public state target: ${stateUrl}`);
+  }
+  if (projectIndexUrl) {
+    console.log(`Project index target: ${projectIndexUrl}`);
   }
 
   if (result.nextAction) {
@@ -163,6 +182,9 @@ async function main() {
 
   if (result.publicState) {
     console.log(`State snapshot hash: ${result.publicState.stateHash}`);
+  }
+  if (result.publicProjectIndex) {
+    console.log(`Project index hash: ${result.publicProjectIndex.projectsHash}`);
   }
 
   for (const item of result.checks) {

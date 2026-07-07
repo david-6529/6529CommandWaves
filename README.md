@@ -392,7 +392,9 @@ If `NEXT_PUBLIC_APP_URL` is set, `npm run launch:audit` reads
 The command exits nonzero until the launch audit is ready and generated with remote setup checks. For offline verification, set
 `LAUNCH_AUDIT_PATH`. The verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
 When it can resolve the command-wave state target, it also checks that the public state snapshot hash matches the launch
-audit evidence. Set `LAUNCH_AUDIT_STATE_URL` to override that state target during offline checks.
+audit evidence. When it can resolve the project index target, it checks that the active project list includes the launch
+project and has a valid hash. Set `LAUNCH_AUDIT_STATE_URL` or `LAUNCH_AUDIT_PROJECT_INDEX_URL` to override those targets
+during offline checks.
 
 Against a running local dev server, replace `LOCAL_APP_URL` with the URL printed by Next:
 

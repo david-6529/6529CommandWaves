@@ -1,5 +1,6 @@
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
+import { hookProjectIndexHashInput } from "./hook-project-index";
 import { createLaunchAuditHash } from "./launch-audit-hash";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { commandWaveProductCopy } from "./product-copy";
@@ -23,9 +24,17 @@ export type LaunchAuditPublicState = LaunchAuditStateEvidence & {
   stateHash: string;
 };
 
+export type LaunchAuditPublicProjectIndex = {
+  projectsHash: string;
+  activeProjectId: string;
+  projectCount: number;
+};
+
 export type LaunchAuditVerificationOptions = {
   commandWaveState?: unknown;
   requirePublicState?: boolean;
+  projectIndex?: unknown;
+  requireProjectIndex?: boolean;
 };
 
 export type LaunchAuditVerificationResult = {
@@ -40,6 +49,7 @@ export type LaunchAuditVerificationResult = {
   statusDraft: string | null;
   stateEvidence: LaunchAuditStateEvidence | null;
   publicState: LaunchAuditPublicState | null;
+  publicProjectIndex: LaunchAuditPublicProjectIndex | null;
   auditHash: string | null;
   blockers: string[];
   openItems: string[];
@@ -350,6 +360,47 @@ function collectPublicState(value: unknown, expected: LaunchAuditStateEvidence |
     : null;
 }
 
+function collectPublicProjectIndex(
+  value: unknown,
+  expectedProject: Record<string, unknown> | null,
+): LaunchAuditPublicProjectIndex | null {
+  const record = isRecord(value) ? value : null;
+  const projects = Array.isArray(record?.projects) ? record.projects.filter(isRecord) : [];
+  const projectsHash = asString(record?.projectsHash);
+  const activeProjectId = asString(record?.activeProjectId);
+  const projectCount = asNumber(record?.projectCount);
+  const expectedProjectId = asString(expectedProject?.id);
+  const expectedWaveUrl = asString(expectedProject?.waveUrl);
+  const expectedRepoUrl = asString(expectedProject?.repoUrl);
+  const activeProject = projects.find((project) => asString(project.id) === expectedProjectId) ?? null;
+
+  if (
+    !record ||
+    record.version !== "command-wave-projects-v0.1" ||
+    !expectedProject ||
+    !expectedProjectId ||
+    !expectedWaveUrl ||
+    !expectedRepoUrl ||
+    !activeProjectId ||
+    !Number.isInteger(projectCount) ||
+    !isSha256Hash(projectsHash) ||
+    projectCount !== projects.length ||
+    activeProjectId !== expectedProjectId ||
+    projectsHash !== hashValue(hookProjectIndexHashInput(record)) ||
+    !activeProject ||
+    asString(activeProject.waveUrl) !== expectedWaveUrl ||
+    asString(activeProject.repoUrl) !== expectedRepoUrl
+  ) {
+    return null;
+  }
+
+  return {
+    projectsHash,
+    activeProjectId,
+    projectCount,
+  };
+}
+
 function statusDraftReady(value: unknown) {
   const draft = asString(value);
 
@@ -463,6 +514,8 @@ export function verifyLaunchAuditPayload(
   const hasStateEvidence = Boolean(stateEvidence);
   const shouldVerifyPublicState = options.requirePublicState === true || typeof options.commandWaveState !== "undefined";
   const publicState = shouldVerifyPublicState ? collectPublicState(options.commandWaveState, stateEvidence) : null;
+  const shouldVerifyProjectIndex = options.requireProjectIndex === true || typeof options.projectIndex !== "undefined";
+  const publicProjectIndex = shouldVerifyProjectIndex ? collectPublicProjectIndex(options.projectIndex, project) : null;
   const hasStatusDraft = statusDraftReady(snapshot?.statusDraft);
   const hasLaunchPacket = launchPacketReady(snapshot?.launchPacket);
   const reports = isRecord(snapshot?.reports) ? snapshot.reports : null;
@@ -575,6 +628,17 @@ export function verifyLaunchAuditPayload(
           ),
         ]
       : []),
+    ...(shouldVerifyProjectIndex
+      ? [
+          check(
+            "project_index_endpoint",
+            publicProjectIndex ? "pass" : "fail",
+            publicProjectIndex
+              ? "Public project index includes the launch project and has a valid hash."
+              : "Public project index must return a valid project list hash and include the launch project.",
+          ),
+        ]
+      : []),
     check(
       "status_draft",
       hasStatusDraft ? "pass" : "fail",
@@ -624,6 +688,7 @@ export function verifyLaunchAuditPayload(
     statusDraft: asString(snapshot?.statusDraft),
     stateEvidence,
     publicState,
+    publicProjectIndex,
     auditHash: asString(snapshot?.auditHash),
     blockers,
     openItems,

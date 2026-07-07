@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
+import { createHookProjectIndex } from "./hook-project-index";
 import { verifyLaunchAuditPayload } from "./launch-audit-verifier";
 import { hashValue } from "./run-manifest";
 import type { SetupValidation } from "./setup-validation";
@@ -70,7 +71,10 @@ describe("launch audit verifier", () => {
     const commandWaveState = createCommandWaveStateSnapshot(configuredDemoWave, {
       generatedAt: "2026-06-20T13:01:00.000Z",
     });
-    const result = verifyLaunchAuditPayload(snapshot, { commandWaveState });
+    const projectIndex = createHookProjectIndex(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:02:00.000Z",
+    });
+    const result = verifyLaunchAuditPayload(snapshot, { commandWaveState, projectIndex });
 
     expect(result).toMatchObject({
       status: "pass",
@@ -113,6 +117,9 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
       status: "pass",
     });
+    expect(result.checks.find((item) => item.id === "project_index_endpoint")).toMatchObject({
+      status: "pass",
+    });
     expect(result.checks.find((item) => item.id === "status_draft")).toMatchObject({
       status: "pass",
     });
@@ -139,6 +146,11 @@ describe("launch audit verifier", () => {
     expect(result.publicState).toMatchObject({
       stateHash: commandWaveState.stateHash,
       waveStateHash: hashValue(configuredDemoWave),
+    });
+    expect(result.publicProjectIndex).toMatchObject({
+      projectsHash: projectIndex.projectsHash,
+      activeProjectId: configuredDemoWave.id,
+      projectCount: 1,
     });
     expect(result.operatorChecklist).toContain("- Start the first public loop with one small reviewed hook change.");
   });
@@ -487,6 +499,27 @@ describe("launch audit verifier", () => {
     });
   });
 
+  it("fails when the public project index points to another project", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const projectIndex = createHookProjectIndex({
+      ...configuredDemoWave,
+      id: "other-hook",
+    });
+    const result = verifyLaunchAuditPayload(snapshot, { projectIndex });
+
+    expect(result.status).toBe("fail");
+    expect(result.publicProjectIndex).toBeNull();
+    expect(result.checks.find((item) => item.id === "project_index_endpoint")).toMatchObject({
+      status: "fail",
+      message: "Public project index must return a valid project list hash and include the launch project.",
+    });
+  });
+
   it("fails when the human-readable status draft is missing", async () => {
     const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
@@ -618,6 +651,7 @@ describe("launch audit verifier", () => {
     expect(result.launchStatus).toBe("unknown");
     expect(result.stateEvidence).toBeNull();
     expect(result.publicState).toBeNull();
+    expect(result.publicProjectIndex).toBeNull();
     expect(result.auditHash).toBeNull();
     expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "payload_shape")).toMatchObject({
