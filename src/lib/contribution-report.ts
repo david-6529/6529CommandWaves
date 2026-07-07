@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { orchestratorAgentIdentity } from "./agent-identities";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { latestLedgerTimestamp } from "./ledger";
@@ -113,6 +114,7 @@ function isSystemRoomAuthor(identity: string) {
   return (
     !normalized ||
     normalized === "unknown" ||
+    normalized === orchestratorAgentIdentity.handle ||
     normalized === "wave-poll" ||
     normalized === "agent" ||
     normalized === "reviewer" ||

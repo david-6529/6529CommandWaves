@@ -163,6 +163,26 @@ describe("contribution report", () => {
     expect(report.notes.join(" ")).toContain("not a permission system");
   });
 
+  it("does not count daemon or system authors as builder contribution", () => {
+    const report = createContributionReport(demoWave, {
+      roomPosts: [
+        { author: "daemon", preview: "Repo setup needed before PR work." },
+        { author: "reviewer-agent", preview: "Review placeholder note." },
+        { author: "wave-poll", preview: "Decision passed." },
+        { author: "chat-builder", preview: "I can review the next hook PR." },
+      ],
+    });
+
+    expect(report.contributors.some((contributor) => contributor.identity === "daemon")).toBe(false);
+    expect(report.contributors.some((contributor) => contributor.identity === "reviewer-agent")).toBe(false);
+    expect(report.contributors.some((contributor) => contributor.identity === "wave-poll")).toBe(false);
+    expect(report.contributors.find((contributor) => contributor.identity === "chat-builder")).toMatchObject({
+      score: 1,
+      scoreBasis: ["Chat posts: 1 report point"],
+      roomPosts: 1,
+    });
+  });
+
   it("creates a copyable report draft without granting authority", () => {
     const draft = createContributionReportDraft(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
