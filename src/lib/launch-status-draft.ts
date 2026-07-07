@@ -46,6 +46,9 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_command_wave_store: ["Set COMMAND_WAVE_STORE=postgres for production state."],
   readiness_admin_api_key: ["Set a strong ADMIN_API_KEY before public launch."],
   readiness_6529_mode: ["Set 6529_MOCK_MODE=false before public launch."],
+  readiness_6529_chat_posting: [
+    "Set 6529_BOT_BEARER_TOKEN and 6529_BOT_WALLET_ADDRESS for daemon chat posting.",
+  ],
   readiness_github_pr_adapter: [
     "Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.",
     "Set COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN with repo access.",

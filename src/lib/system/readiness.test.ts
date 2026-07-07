@@ -28,8 +28,11 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 1, warn: 7, fail: 1 });
-    expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
+    expect(summary).toEqual({ pass: 1, warn: 8, fail: 1 });
+    expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
+      status: "warn",
+      message: "Local chat posting is active. Set 6529_MOCK_MODE=false and configure the 6529 bot wallet before public launch.",
+    });
     expect(checks.some((check) => check.id === "cron_secret")).toBe(false);
     expect(checks.some((check) => check.id === "rate_limit_salt")).toBe(false);
     expect(checks.find((check) => check.id === "database")).toMatchObject({
@@ -55,7 +58,7 @@ describe("readiness checks", () => {
     });
   });
 
-  it("passes configured production basics without requiring posting credentials", () => {
+  it("fails configured production basics without posting credentials", () => {
     const checks = getReadinessChecks({
       NEXT_PUBLIC_APP_URL: "https://command-waves.6529.io",
       DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
@@ -67,8 +70,12 @@ describe("readiness checks", () => {
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 7, warn: 1, fail: 1 });
-    expect(checks.some((check) => check.id === "6529_posting")).toBe(false);
+    expect(summary).toEqual({ pass: 7, warn: 1, fail: 2 });
+    expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
+      status: "fail",
+      message:
+        "Configure 6529_BOT_BEARER_TOKEN and 6529_BOT_WALLET_ADDRESS so builders can post to project chat from the app.",
+    });
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({
       status: "fail",
       message:
@@ -173,6 +180,10 @@ describe("readiness checks", () => {
       status: "fail",
       message: "Replace placeholder COMMAND_WAVE_STATE_URL with the deployed state URL before guardian PR checks run.",
     });
+    expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
+      status: "fail",
+      message: "Local chat posting is active. Set 6529_MOCK_MODE=false and configure the 6529 bot wallet before public launch.",
+    });
   });
 
   it("keeps the production env example from passing unchanged", () => {
@@ -184,6 +195,20 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({ status: "fail" });
+  });
+
+  it("passes chat posting readiness when live bot credentials are configured", () => {
+    const checks = getReadinessChecks({
+      "6529_MOCK_MODE": "false",
+      "6529_BOT_BEARER_TOKEN": "6529-live-bot-token",
+      "6529_BOT_WALLET_ADDRESS": "0x1234567890abcdef1234567890abcdef12345678",
+    });
+
+    expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
+      status: "pass",
+      message: "6529 bot posting is configured.",
+    });
   });
 
   it("passes guardian wave-state readiness when a source is configured", () => {

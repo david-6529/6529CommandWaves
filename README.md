@@ -246,6 +246,8 @@ COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
 # Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
+6529_BOT_BEARER_TOKEN=<6529 bot token>
+6529_BOT_WALLET_ADDRESS=<6529 bot wallet address>
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK="Command Waves Guardian"
 COMMAND_WAVE_REPO_ADAPTER=github
@@ -259,12 +261,12 @@ until the pilot repo is selected, and PR work stays blocked while it is unchange
 placeholder or invalid first-hook values. `ADMIN_API_KEY` protects setup,
 proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
-The ready launch audit requires durable storage, the GitHub PR adapter, and the required guardian check so the public
-workflow can survive restarts and record draft PRs predictably.
+The ready launch audit requires daemon chat posting credentials, durable storage, the GitHub PR adapter, and the required
+guardian check so the public workflow can survive restarts, post from the app, and record draft PRs predictably.
 
 The local demo still reports launch gaps until the first hook chat and repo are reachable, `ADMIN_API_KEY`,
-`NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode, GitHub PR adapter, guardian state, setup validation, and the
-required guardian check are configured.
+`NEXT_PUBLIC_APP_URL`, durable storage, live 6529 mode, daemon chat posting credentials, GitHub PR adapter, guardian state,
+setup validation, and the required guardian check are configured.
 
 ## Durable Storage
 

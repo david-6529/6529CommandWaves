@@ -43,6 +43,7 @@ const launchReadinessCheckIds = new Set([
   "command_wave_store",
   "admin_api_key",
   "6529_mode",
+  "6529_chat_posting",
   "github_pr_adapter",
   "guardian_wave_state",
   "guardian_mode",
@@ -123,6 +124,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   readiness_command_wave_store: "Use durable storage",
   readiness_admin_api_key: "Set ADMIN_API_KEY",
   readiness_6529_mode: "Use live 6529 mode",
+  readiness_6529_chat_posting: "Configure project chat posting",
   readiness_github_pr_adapter: "Configure GitHub PR adapter",
   readiness_guardian_wave_state: "Connect guardian wave state",
 };

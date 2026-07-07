@@ -51,6 +51,8 @@ const readyEnv = {
   COMMAND_WAVE_REPO_ADAPTER: "github",
   COMMAND_WAVE_GITHUB_TOKEN: "ghp_launch_readiness_token_1234567890",
   COMMAND_WAVE_STATE_URL: "https://command-waves.example.com/api/command-wave/state",
+  "6529_BOT_BEARER_TOKEN": "6529-live-bot-token",
+  "6529_BOT_WALLET_ADDRESS": "0x1234567890abcdef1234567890abcdef12345678",
 };
 
 const configuredDemoWave = {

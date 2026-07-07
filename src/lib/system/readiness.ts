@@ -212,6 +212,37 @@ function githubPrToken(env: Record<string, string | undefined>) {
   return env.COMMAND_WAVE_GITHUB_TOKEN?.trim() || env.GITHUB_TOKEN?.trim() || "";
 }
 
+function chatPostingCredentialsConfigured(env: Record<string, string | undefined>) {
+  return hasProductionValue(env["6529_BOT_BEARER_TOKEN"], env) && hasProductionValue(env["6529_BOT_WALLET_ADDRESS"], env);
+}
+
+function chatPostingCheck(env: Record<string, string | undefined>, mockMode: boolean): ReadinessCheck {
+  if (mockMode) {
+    return {
+      id: "6529_chat_posting",
+      label: "Project chat posting",
+      status: isProductionEnv(env) ? "fail" : "warn",
+      message: "Local chat posting is active. Set 6529_MOCK_MODE=false and configure the 6529 bot wallet before public launch.",
+    };
+  }
+
+  if (!chatPostingCredentialsConfigured(env)) {
+    return {
+      id: "6529_chat_posting",
+      label: "Project chat posting",
+      status: isProductionEnv(env) ? "fail" : "warn",
+      message: "Configure 6529_BOT_BEARER_TOKEN and 6529_BOT_WALLET_ADDRESS so builders can post to project chat from the app.",
+    };
+  }
+
+  return {
+    id: "6529_chat_posting",
+    label: "Project chat posting",
+    status: "pass",
+    message: "6529 bot posting is configured.",
+  };
+}
+
 function githubPrAdapterCheck(env: Record<string, string | undefined>, enabled: boolean): ReadinessCheck {
   const token = githubPrToken(env);
 
@@ -283,6 +314,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
       status: mockMode ? "warn" : "pass",
       message: mockMode ? "Set 6529_MOCK_MODE=false before public launch." : "Live 6529 API mode.",
     },
+    chatPostingCheck(env, mockMode),
     githubPrAdapterCheck(env, hasGithubPrAdapter),
     {
       id: "guardian_wave_state",

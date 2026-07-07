@@ -78,6 +78,8 @@ COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
 # Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
+6529_BOT_BEARER_TOKEN=<6529 bot token>
+6529_BOT_WALLET_ADDRESS=<6529 bot wallet address>
 COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK="Command Waves Guardian"
 COMMAND_WAVE_REPO_ADAPTER=github
@@ -107,8 +109,8 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 21. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
 
 The launch check focuses on the first public loop. A ready launch audit now requires the deployed app URL, first hook chat
-and repo seed, admin key, durable storage, live 6529 mode, GitHub PR adapter, guardian wave-state URL, and required
-guardian check. Failed checks block broad participation.
+and repo seed, admin key, durable storage, live 6529 mode, daemon chat posting credentials, GitHub PR adapter, guardian
+wave-state URL, and required guardian check. Failed checks block broad participation.
 
 The launch audit includes a human-readable status draft with the next action, operator checklist, verification links, and
 guardrails. Use it as the short update for reviewers or builders.
