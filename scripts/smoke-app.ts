@@ -88,7 +88,7 @@ async function main() {
     "daemon managed",
     "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.",
     "Draft the non-upgradeable hook scaffold",
-    "Next: Choose project.",
+    "Next: Connect repo.",
     "daemon, a 6529 account, keeps this summary",
     "Review agent is a placeholder until the production reviewer service is wired.",
     "GitHub repo is a placeholder until the first hook repo is configured.",

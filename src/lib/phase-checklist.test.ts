@@ -28,7 +28,10 @@ describe("phase checklist", () => {
       ["review", "waiting"],
       ["log", "waiting"],
     ]);
-    expect(checklist.find((item) => item.id === "project")?.detail).toBe("Set a valid project chat and real GitHub repo.");
+    expect(checklist.find((item) => item.id === "project")).toMatchObject({
+      label: "Connect repo",
+      detail: "Set a real GitHub repo before PR work can run.",
+    });
     expect(checklist.find((item) => item.id === "build")?.detail).toBe("Build waits for a configured GitHub repo.");
   });
 
@@ -52,6 +55,10 @@ describe("phase checklist", () => {
       ["review", "waiting"],
       ["log", "waiting"],
     ]);
+    expect(checklist.find((item) => item.id === "project")).toMatchObject({
+      label: "Choose project",
+      detail: "Set a project chat and real GitHub repo.",
+    });
   });
 
   it("shows approved work as ready to build", () => {

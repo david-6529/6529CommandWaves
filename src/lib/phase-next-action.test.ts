@@ -42,6 +42,17 @@ describe("phase next action", () => {
     });
   });
 
+  it("points a selected project with placeholder repo to repo setup", () => {
+    const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
+
+    expect(nextAction).toMatchObject({
+      status: "action",
+      stepLabel: "Connect repo",
+      title: "Connect the repo",
+      detail: "Set a real GitHub repo before PR work can run.",
+    });
+  });
+
   it("points approved work to the PR build step", () => {
     const nextAction = createPhaseNextAction(
       createPhaseChecklist({

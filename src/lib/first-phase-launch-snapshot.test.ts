@@ -38,8 +38,8 @@ describe("first phase launch snapshot", () => {
         label: "Add real repo before PR build.",
       },
       nextStep: {
-        label: "Choose project",
-        detail: "Set a valid project chat and real GitHub repo.",
+        label: "Connect repo",
+        detail: "Set a real GitHub repo before PR work can run.",
       },
     });
     expect(snapshot.hookSafety).toMatchObject({

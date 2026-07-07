@@ -67,7 +67,10 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
   const active = checklist.find((item) => item.status === "active");
 
   if (active) {
-    const copy = actionCopyByStep[active.id];
+    const copy =
+      active.id === "project" && active.label === "Connect repo"
+        ? { title: "Connect the repo", detail: active.detail }
+        : actionCopyByStep[active.id];
 
     return {
       status: "action",

@@ -8,7 +8,7 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log. Current work: Draft the non-upgradeable hook scaffold. Next: Choose project. Add real repo before PR build.",
+        "This project coordinates one hook build through chat, decisions, PRs, review, and a clear log. Current work: Draft the non-upgradeable hook scaffold. Next: Connect repo. Add real repo before PR build.",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
         status: "complete",
@@ -23,9 +23,9 @@ describe("public project snapshot", () => {
         url: null,
       },
       nextStep: {
-        label: "Choose project",
+        label: "Connect repo",
         status: "active",
-        detail: "Set a valid project chat and real GitHub repo.",
+        detail: "Set a real GitHub repo before PR work can run.",
       },
     });
     expect(snapshot.latestChanges[0]).toMatchObject({

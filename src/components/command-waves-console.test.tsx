@@ -27,7 +27,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("daemon managed");
     expect(text).toContain("This project coordinates one hook build through chat, decisions, PRs, review, and a clear log.");
     expect(text).toContain("Current work: Draft the non-upgradeable hook scaffold.");
-    expect(text).toContain("Next: Choose project.");
+    expect(text).toContain("Next: Connect repo.");
     expect(text).toContain("daemon, a 6529 account, keeps this summary");
     expect(text).toContain("Review agent is a placeholder until the production reviewer service is wired.");
     expect(text).toContain("GitHub repo is a placeholder until the first hook repo is configured.");
