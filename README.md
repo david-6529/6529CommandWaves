@@ -77,8 +77,8 @@ What remains manual or MVP-only:
 - The GitHub adapter can prepare branches, commit bounded text files, open draft PRs, post bounded PR comments, and
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
-- Contribution reporting uses visible app activity and project chat posts pulled into the app. Full scoring across GitHub commits,
-  reviews, merges, and off-app activity is still future work.
+- Contribution reporting uses visible app activity, project chat posts pulled into the app, recorded PR links, and
+  repo-bound review proof. Full scoring across unattached GitHub commits, merges, and off-app activity is still future work.
 - The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until the repo is selected.
 
 What we are working on next:
@@ -152,7 +152,7 @@ Hardening tasks after the first public loop:
 
 1. Move the guardian into an external GitHub App, keeping the verifier as the shared core.
 2. Replace approved-file PR setup with a controlled Codex harness that writes bounded code patches in an isolated worker.
-3. Expand contribution reports from app activity into wave posts, PRs, reviews, commits, and ledger events.
+3. Expand contribution reports from app activity into full wave history, GitHub commits, merges, and off-app review notes.
 
 ## Lessons Reused From `6529arena`
 

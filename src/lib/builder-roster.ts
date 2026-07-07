@@ -24,6 +24,10 @@ function roleFor(contributor: ContributionContributor) {
     return "Coordinator";
   }
 
+  if (contributor.pullRequests > 0 || contributor.reviewProofs > 0) {
+    return "Builder";
+  }
+
   if (contributor.proposals > 0) {
     return "Proposer";
   }
@@ -50,6 +54,8 @@ function roleFor(contributor: ContributionContributor) {
 function activityFor(contributor: ContributionContributor) {
   const activity = [
     ...(contributor.proposals ? [countLabel(contributor.proposals, "proposal")] : []),
+    ...(contributor.pullRequests ? [countLabel(contributor.pullRequests, "PR")] : []),
+    ...(contributor.reviewProofs ? [countLabel(contributor.reviewProofs, "review proof")] : []),
     ...(contributor.votes ? [countLabel(contributor.votes, "vote")] : []),
     ...(contributor.decisions ? [countLabel(contributor.decisions, "decision")] : []),
     ...(contributor.chatPosts ? [countLabel(contributor.chatPosts, "chat post")] : []),
@@ -73,6 +79,8 @@ function scoreLabelFor(contributor: ContributionContributor) {
   const onlyChatActivity =
     contributor.chatPosts > 0 &&
     contributor.proposals === 0 &&
+    contributor.pullRequests === 0 &&
+    contributor.reviewProofs === 0 &&
     contributor.votes === 0 &&
     contributor.decisions === 0 &&
     contributor.ledgerEvents === 0;
@@ -83,6 +91,8 @@ function scoreLabelFor(contributor: ContributionContributor) {
 function statsFor(contributor: ContributionContributor): BuilderRosterStat[] {
   const stats = [
     ["Proposals", contributor.proposals],
+    ["PRs", contributor.pullRequests],
+    ["Reviews", contributor.reviewProofs],
     ["Votes", contributor.votes],
     ["Decisions", contributor.decisions],
     ["Chat posts", contributor.chatPosts],

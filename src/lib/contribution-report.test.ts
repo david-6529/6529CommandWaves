@@ -62,6 +62,8 @@ describe("contribution report", () => {
       "Complete proposal: 6 report points.",
       "Reviewing proposal: 4 report points.",
       "Other proposal: 3 report points.",
+      "Recorded PR linked to a proposal: 2 report points.",
+      "Repo-bound Guardian review proof linked to a proposal: 2 report points.",
       "Project decision receipt: 2 report points.",
       "Vote or attributed activity log event: 1 report point.",
       "Chat post pulled into app: 1 report point.",
@@ -70,16 +72,22 @@ describe("contribution report", () => {
     expect(report.evidence).toContain("1 Guardian review proof");
     expect(report.contributors[0]).toMatchObject({
       identity: "david",
-      score: 10,
+      score: 14,
       scoreBasis: [
         "Proposal work: 6 report points",
+        "PR evidence: 2 report points",
+        "Review proof: 2 report points",
         "Decision receipts: 2 report points",
         "Votes: 1 report point",
         "Activity log: 1 report point",
       ],
       proposals: 1,
+      pullRequests: 1,
+      reviewProofs: 1,
       decisions: 1,
     });
+    expect(report.contributors[0].rationale).toContain("Linked approved work to a GitHub PR");
+    expect(report.contributors[0].rationale).toContain("Received repo-bound Guardian review proof");
     expect(report.contributors[0].rationale).toContain("Recorded project decision receipt");
     expect(report.contributors.some((contributor) => contributor.votes > 0)).toBe(true);
     expect(report.contributors.some((contributor) => contributor.identity === "Decision")).toBe(false);
@@ -92,6 +100,10 @@ describe("contribution report", () => {
 
     expect(report.evidence).not.toContain("1 GitHub PR link");
     expect(report.evidence).not.toContain("1 Guardian review proof");
+    expect(report.contributors[0]).toMatchObject({
+      pullRequests: 0,
+      reviewProofs: 0,
+    });
     expect(report.notes.join(" ")).toContain("not a permission system");
   });
 
@@ -114,6 +126,10 @@ describe("contribution report", () => {
 
     expect(report.evidence).toContain("1 GitHub PR link");
     expect(report.evidence).not.toContain("1 Guardian review proof");
+    expect(report.contributors[0]).toMatchObject({
+      pullRequests: 1,
+      reviewProofs: 0,
+    });
   });
 
   it("defaults generatedAt to the newest ledger event", () => {
@@ -202,6 +218,10 @@ describe("contribution report", () => {
     expect(draft).toContain("Contributors:");
     expect(draft).toContain("- david: report score");
     expect(draft).toContain("Proposal work: 6 report points");
+    expect(draft).toContain("PR evidence: 2 report points");
+    expect(draft).toContain("Review proof: 2 report points");
+    expect(draft).toContain("1 PR");
+    expect(draft).toContain("1 review proof");
     expect(draft).toContain("Decision receipts: 2 report points");
     expect(draft).toContain("Report scores are an AI-readable activity report, not a permission system.");
     expect(draft).toContain("Reputation, token weight, payouts, and merge rights must use separate human-approved rules.");

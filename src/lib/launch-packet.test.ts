@@ -147,6 +147,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain(
       `Review proof: ${configuredDemoWave.reviews[0].proof?.verifierVersion} / ${configuredDemoWave.reviews[0].proof?.attestationHash}`,
     );
+    expect(packet.text).toContain("david: report score 14");
+    expect(packet.text).toContain("PR evidence: 2 report points");
+    expect(packet.text).toContain("Review proof: 2 report points");
+    expect(packet.text).toContain("1 PR, 1 review proof");
     expect(packet.text).not.toContain("Review proof: not bound to the selected GitHub repo.");
   });
 

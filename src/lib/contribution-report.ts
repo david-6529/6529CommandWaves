@@ -11,6 +11,8 @@ export type ContributionContributor = {
   proposals: number;
   votes: number;
   decisions: number;
+  pullRequests: number;
+  reviewProofs: number;
   chatPosts: number;
   ledgerEvents: number;
   rationale: string[];
@@ -56,6 +58,8 @@ function addContributor(map: Map<string, ContributionContributor>, identity: str
     proposals: 0,
     votes: 0,
     decisions: 0,
+    pullRequests: 0,
+    reviewProofs: 0,
     chatPosts: 0,
     ledgerEvents: 0,
     rationale: [],
@@ -162,6 +166,8 @@ const scoringRubric = [
   "Complete proposal: 6 report points.",
   "Reviewing proposal: 4 report points.",
   "Other proposal: 3 report points.",
+  "Recorded PR linked to a proposal: 2 report points.",
+  "Repo-bound Guardian review proof linked to a proposal: 2 report points.",
   "Project decision receipt: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
   "Chat post pulled into app: 1 report point.",
@@ -213,6 +219,27 @@ export function createContributionReport(
 
     if (proposal.status === "complete") {
       addRationale(contributor, "Carried work through review");
+    }
+
+    const execution = wave.executions.find((item) => item.proposalId === proposal.id);
+    const prCount = execution ? gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl).length : 0;
+
+    if (prCount) {
+      const points = prCount * 2;
+
+      contributor.pullRequests += prCount;
+      contributor.score += points;
+      addScoreBasis(contributor, "PR evidence", points);
+      addRationale(contributor, "Linked approved work to a GitHub PR");
+    }
+
+    const review = wave.reviews.find((item) => item.proposalId === proposal.id);
+
+    if (review && guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl)) {
+      contributor.reviewProofs += 1;
+      contributor.score += 2;
+      addScoreBasis(contributor, "Review proof", 2);
+      addRationale(contributor, "Received repo-bound Guardian review proof");
     }
   }
 
@@ -307,6 +334,8 @@ export function createContributionReportDraft(
     ? report.contributors.map((contributor) => {
         const counts = [
           countLabel(contributor.proposals, "proposal"),
+          countLabel(contributor.pullRequests, "PR"),
+          countLabel(contributor.reviewProofs, "review proof"),
           countLabel(contributor.votes, "vote"),
           countLabel(contributor.decisions, "decision"),
           countLabel(contributor.chatPosts, "chat post"),

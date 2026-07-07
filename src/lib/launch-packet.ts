@@ -239,7 +239,9 @@ function contributionLines(report: ContributionReport) {
     (contributor) =>
       `${contributor.identity}: report score ${contributor.score}, ${contributor.scoreBasis.join(", ")}, ${
         contributor.proposals
-      } proposal${contributor.proposals === 1 ? "" : "s"}, ${contributor.votes} vote${
+      } proposal${contributor.proposals === 1 ? "" : "s"}, ${contributor.pullRequests} PR${
+        contributor.pullRequests === 1 ? "" : "s"
+      }, ${contributor.reviewProofs} review proof${contributor.reviewProofs === 1 ? "" : "s"}, ${contributor.votes} vote${
         contributor.votes === 1 ? "" : "s"
       }`,
   );
@@ -247,7 +249,7 @@ function contributionLines(report: ContributionReport) {
   return [
     `- Summary: ${report.summary}`,
     "- Scoring rubric:",
-    ...limitedList(report.scoringRubric, 6, "No scoring rubric recorded."),
+    ...limitedList(report.scoringRubric, 8, "No scoring rubric recorded."),
     "- Records used:",
     ...limitedList(report.evidence, 6, "No app records yet."),
     "- Visible contributors:",
