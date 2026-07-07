@@ -370,8 +370,10 @@ export function validateCommandPrManifest({
   });
   const hookParameterChecks = evaluateHookParameterPolicy({
     changedPaths,
+    changedFiles,
     proposalText,
     hookSignals,
+    hookPatchSignals,
   });
   const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
 

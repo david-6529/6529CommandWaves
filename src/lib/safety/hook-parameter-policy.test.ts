@@ -20,6 +20,58 @@ describe("hook parameter policy", () => {
     expect(checks.find((item) => item.id === "hook_parameter_explicit_bound")?.status).toBe("fail");
   });
 
+  it("requires PR-side test evidence when patches write parameters", () => {
+    const checks = evaluateHookParameterPolicy({
+      proposalText:
+        "Add hook fee parameters capped at 100 bps. Include tests for the 100 bps fee cap and parameter bounds.",
+      changedPaths: ["contracts/HookParameters.sol"],
+      hookPatchSignals: [
+        {
+          label: "parameter_write",
+          risk: "high",
+          path: "contracts/HookParameters.sol",
+          line: "feeBps = nextFeeBps;",
+          reason: "Added Solidity code writes hook fee, cap, limit, parameter, or config state.",
+          defaultBlocked: false,
+        },
+      ],
+    });
+
+    expect(checks.find((item) => item.id === "hook_parameter_pr_bound_tests")).toMatchObject({
+      status: "fail",
+      message: "PR changes that write hook parameters must include a changed bound-focused test file.",
+    });
+  });
+
+  it("passes parameter-write patches with changed bound test evidence", () => {
+    const checks = evaluateHookParameterPolicy({
+      proposalText:
+        "Add hook fee parameters capped at 100 bps. Include tests for the 100 bps fee cap and parameter bounds.",
+      changedPaths: ["contracts/HookParameters.sol", "test/HookParameters.t.sol"],
+      changedFiles: [
+        {
+          path: "test/HookParameters.t.sol",
+          patch: "@@\n+function testFeeCap100Bps() public { assertEq(maxFeeBps, 100); }",
+        },
+      ],
+      hookPatchSignals: [
+        {
+          label: "parameter_write",
+          risk: "high",
+          path: "contracts/HookParameters.sol",
+          line: "feeBps = nextFeeBps;",
+          reason: "Added Solidity code writes hook fee, cap, limit, parameter, or config state.",
+          defaultBlocked: false,
+        },
+      ],
+    });
+
+    expect(checks.find((item) => item.id === "hook_parameter_pr_bound_tests")).toMatchObject({
+      status: "pass",
+      message: "PR changes include test evidence for the bounded parameter write.",
+    });
+  });
+
   it("does not treat negated parameter text as requested work", () => {
     const checks = evaluateHookParameterPolicy({
       proposalText: "Draft docs only. No parameter changes.",

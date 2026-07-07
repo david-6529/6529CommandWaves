@@ -1,4 +1,5 @@
 import type { HookContractSignal } from "./hook-contract-policy";
+import type { HookChangedFile, HookPatchSignal } from "./hook-diff-policy";
 
 export type HookParameterPolicyCheck = {
   id: string;
@@ -15,11 +16,14 @@ export const hookParameterPolicySummary = [
 
 const parameterPathPattern = /(^|\/)(.*parameter.*|.*config.*|.*constant.*|.*fee.*|.*limit.*)\.sol$/i;
 const parameterTextPattern = /\b(fee|fees|bps|basis points?|parameter|parameters|bounds?|bounded|limit|limits|config|constant|tweakable)\b/i;
-const parameterTestPattern = /\b(test|tests|tested|testing|invariant|property|fuzz|forge test|unit test)\b/i;
-const parameterBoundTestPattern = /\b(bound|bounds|bounded|cap|capped|max|maximum|limit|fee|fees|parameter|parameters|bps|basis points?)\b/i;
+const parameterTestPattern =
+  /\b(test|tests|tested|testing|invariant|property|fuzz|forge test|unit test)\b|function\s+test[A-Za-z0-9_]*/i;
+const parameterBoundTestPattern =
+  /\b(bound|bounds|bounded|cap|capped|max|maximum|limit|fee|fees|parameter|parameters|bps|basis points?)\b|(?:fee|cap|max|bps)[A-Za-z0-9_]*(?:fee|cap|max|bps)/i;
 const liveHolderAuthorityPattern = /\b(rep|tdh|holder|holders|weighted vote|weighted voting)\b/i;
 const nonEnforcedAuthorityPattern =
   /\b(planned|not enforced|not live|manual|future|advisory|note only|notes only|informational)\b/i;
+const testPathPattern = /(^|\/)(test|tests|spec)(\/|\.|$)|\.t\.sol$|[\w.-]+(?:test|spec)\.(?:sol|ts|tsx|js|jsx)$/i;
 
 const numericBoundPatterns = [
   /\b(?:max(?:imum)?|cap(?:ped)?(?: at| to)?|upper bound|not exceed|no more than|at most|limit(?:ed)? to|bounded (?:at|by|to|under))\s+\d+(?:\.\d+)?\s*(?:%|bps|basis points?|wei|gwei|eth|usd|tokens?|days?|hours?|blocks?)?\b/i,
@@ -45,6 +49,35 @@ function hasParameterTestEvidence(value: string) {
   return parameterTestPattern.test(value) && parameterBoundTestPattern.test(value);
 }
 
+function addedPatchText(patch: string) {
+  return patch
+    .split(/\r?\n/)
+    .filter((line) => line.startsWith("+") && !line.startsWith("+++"))
+    .map((line) => line.slice(1).trim())
+    .join("\n");
+}
+
+function hasPrBoundTestEvidence({
+  changedPaths,
+  changedFiles,
+}: {
+  changedPaths: string[];
+  changedFiles: HookChangedFile[];
+}) {
+  const changedTestPath = changedPaths.some((path) => testPathPattern.test(path));
+  const changedTestFiles = changedFiles.filter((file) => testPathPattern.test(file.path));
+
+  if (!changedTestPath && !changedTestFiles.length) {
+    return false;
+  }
+
+  if (!changedTestFiles.length || changedTestFiles.some((file) => !file.patch)) {
+    return true;
+  }
+
+  return changedTestFiles.some((file) => hasParameterTestEvidence(addedPatchText(file.patch ?? "")));
+}
+
 function claimsLiveHolderAuthority(value: string) {
   return liveHolderAuthorityPattern.test(value) && !nonEnforcedAuthorityPattern.test(value);
 }
@@ -53,15 +86,26 @@ export function evaluateHookParameterPolicy({
   proposalText = "",
   changedPaths = [],
   hookSignals = [],
+  hookPatchSignals = [],
+  changedFiles = [],
 }: {
   proposalText?: string;
   changedPaths?: string[];
   hookSignals?: HookContractSignal[];
+  hookPatchSignals?: HookPatchSignal[];
+  changedFiles?: HookChangedFile[];
 }): HookParameterPolicyCheck[] {
+  const normalizedChangedPaths = changedPaths.map((path) => path.trim()).filter(Boolean);
+  const normalizedChangedFiles = changedFiles.map((file) => ({
+    path: file.path.trim(),
+    patch: typeof file.patch === "string" ? file.patch : null,
+  })).filter((file) => file.path);
   const checkedProposalText = removeNegatedParameterClauses(proposalText);
+  const hasParameterWritePatch = hookPatchSignals.some((signal) => signal.label === "parameter_write");
   const touchesParameterChange =
     hookSignals.some((signal) => signal.label === "parameter_change") ||
-    changedPaths.some((path) => parameterPathPattern.test(path)) ||
+    normalizedChangedPaths.some((path) => parameterPathPattern.test(path)) ||
+    hasParameterWritePatch ||
     parameterTextPattern.test(checkedProposalText);
   const checks: HookParameterPolicyCheck[] = [
     {
@@ -86,6 +130,21 @@ export function evaluateHookParameterPolicy({
         ? "Hook parameter work includes bound-focused test or review evidence language."
         : "Hook parameter work must include tests or equivalent reviewer evidence for the named bounds.",
     });
+
+    if (hasParameterWritePatch) {
+      const hasPrTests = hasPrBoundTestEvidence({
+        changedPaths: normalizedChangedPaths,
+        changedFiles: normalizedChangedFiles,
+      });
+
+      checks.push({
+        id: "hook_parameter_pr_bound_tests",
+        status: hasPrTests ? "pass" : "fail",
+        message: hasPrTests
+          ? "PR changes include test evidence for the bounded parameter write."
+          : "PR changes that write hook parameters must include a changed bound-focused test file.",
+      });
+    }
   } else {
     checks.push({
       id: "hook_parameter_not_requested",

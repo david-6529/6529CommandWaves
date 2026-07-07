@@ -279,6 +279,46 @@ describe("PR reviewer gate", () => {
       proposal,
       poll,
       manifest,
+      changedPaths: ["contracts/HookParameters.sol", "test/HookParameters.t.sol"],
+      changedFiles: [
+        {
+          path: "contracts/HookParameters.sol",
+          patch: [
+            "@@",
+            "+uint16 public feeBps;",
+            "+function setFeeBps(uint16 nextFeeBps) external {",
+            "+  feeBps = nextFeeBps;",
+            "+}",
+          ].join("\n"),
+        },
+        {
+          path: "test/HookParameters.t.sol",
+          patch: [
+            "@@",
+            "+function testFeeCap100Bps() public {",
+            "+  assertEq(hook.maxFeeBps(), 100);",
+            "+}",
+          ].join("\n"),
+        },
+      ],
+    });
+
+    expect(result.status).toBe("pass");
+    expect(result.hookSignals).toContainEqual(expect.objectContaining({ label: "parameter_change", risk: "high" }));
+    expect(result.hookPatchSignals).toContainEqual(expect.objectContaining({ label: "parameter_write", risk: "high" }));
+    expect(result.hookParameterChecks.every((item) => item.status === "pass")).toBe(true);
+  });
+
+  it("fails hook parameter writes without changed bound-test evidence", () => {
+    const wave = approvedDemoWave();
+    const proposal = wave.proposals[0];
+    const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+    const manifest = createCommandPrManifest({ wave, proposal, poll });
+    const result = validateCommandPrManifest({
+      wave,
+      proposal,
+      poll,
+      manifest,
       changedPaths: ["contracts/HookParameters.sol"],
       changedFiles: [
         {
@@ -294,10 +334,11 @@ describe("PR reviewer gate", () => {
       ],
     });
 
-    expect(result.status).toBe("pass");
-    expect(result.hookSignals).toContainEqual(expect.objectContaining({ label: "parameter_change", risk: "high" }));
-    expect(result.hookPatchSignals).toContainEqual(expect.objectContaining({ label: "parameter_write", risk: "high" }));
-    expect(result.hookParameterChecks.every((item) => item.status === "pass")).toBe(true);
+    expect(result.status).toBe("fail");
+    expect(result.hookParameterChecks.find((item) => item.id === "hook_parameter_pr_bound_tests")).toMatchObject({
+      status: "fail",
+      message: "PR changes that write hook parameters must include a changed bound-focused test file.",
+    });
   });
 
   it("fails hook parameter changes that do not name a cap", () => {
