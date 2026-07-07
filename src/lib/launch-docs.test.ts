@@ -42,4 +42,12 @@ describe("launch docs", () => {
     expect(readme).toContain("must be required in GitHub branch protection or rulesets");
     expect(playbook).toContain("Make `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` required in GitHub branch protection or rulesets.");
   });
+
+  it("keeps reviewer placeholder docs aligned with this phase", () => {
+    const docs = [readRepoFile("README.md"), readRepoFile("docs/mvp-plan.md")].join("\n");
+
+    expect(docs).toContain("Review agent and GitHub repo are explicit placeholders for this phase");
+    expect(docs).toContain("Reviewer checks are placeholders for this phase");
+    expect(docs).not.toContain("production reviewer service is wired");
+  });
 });

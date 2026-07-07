@@ -36,7 +36,7 @@ What exists now:
 - One active hook project with project chat and a placeholder GitHub repo until the first repo is selected.
 - A top-right wallet connection control that can add a connected address to the access request draft.
 - Orchestrator identity set to the 6529 account `daemon`.
-- Review agent and GitHub repo are explicit placeholders until the production reviewer service and first repo are selected.
+- Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
 - A simplified chat-first UI with a project overview, current hook change, chat composer, latest posts, builder profiles,
   project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.

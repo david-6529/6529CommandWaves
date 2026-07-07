@@ -4,7 +4,7 @@
 
 A Command Wave is a project workspace where public chat governs scoped work in a GitHub repo.
 
-For the first public phase, the product helps the community build a 6529 hook together. Access notes explain who can join. People and agents propose work in plain English. The daemon account summarizes chat, classifies risk, keeps scope small, and routes important work to a visible decision. Approved work can move into a controlled PR flow. Reviewer checks stay as a placeholder until the production reviewer service is wired, and humans stay in charge of merge, deploy, payment, and governance decisions.
+For the first public phase, the product helps the community build a 6529 hook together. Access notes explain who can join. People and agents propose work in plain English. The daemon account summarizes chat, classifies risk, keeps scope small, and routes important work to a visible decision. Approved work can move into a controlled PR flow. Reviewer checks are placeholders for this phase, and humans stay in charge of merge, deploy, payment, and governance decisions.
 
 The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused project workspace so anyone can see the access notes, chat activity, repo setup status, current code review state, and next action.
 
