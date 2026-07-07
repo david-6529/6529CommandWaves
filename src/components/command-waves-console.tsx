@@ -2304,7 +2304,7 @@ export function CommandWavesConsole() {
                   disabled={!canSaveChatWorkItem}
                   onClick={() => void saveChatWorkItem()}
                 >
-                  {apiBusy === "proposal" ? "Adding" : "Add to discussion"}
+                  {apiBusy === "proposal" ? "Saving" : "Save as work"}
                 </Button>
                 <Button
                   type="button"

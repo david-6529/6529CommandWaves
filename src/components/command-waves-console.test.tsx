@@ -55,7 +55,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Chat with builders");
     expect(text).toContain("The same box starts the work.");
     expect(text).toContain("Discuss repo setup");
-    expect(text).toContain("Add to discussion");
+    expect(text).toContain("Save as work");
     expect(text).toContain("Post to chat");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show visible chat, PR, and review activity.");
