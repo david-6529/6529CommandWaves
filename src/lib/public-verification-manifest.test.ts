@@ -34,6 +34,22 @@ describe("public verification manifest", () => {
         reviewCount: demoWave.reviews.length,
         ledgerEventCount: demoWave.ledger.length,
       },
+      launchTracks: {
+        chat: {
+          status: "needs_setup",
+          statusLabel: "checks needed",
+          nextAction: {
+            title: "Run project chat check",
+          },
+        },
+        prLoop: {
+          status: "needs_setup",
+          statusLabel: "checks needed",
+          nextAction: {
+            title: "Select the repo",
+          },
+        },
+      },
       agents: {
         orchestrator: {
           handle: "daemon",

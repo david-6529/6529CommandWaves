@@ -49,7 +49,7 @@ What exists now:
 - Scoped API routes for setup, proposals, local votes, decision receipts, PR records, reviews, launch audit, setup proof,
   and public project state.
 - Public active project index for agents or future UI surfaces that need the hook list and project chat links.
-- Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, and required hash fields.
+- Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, launch track status, and required hash fields.
 - Public project state includes a full snapshot hash, so setup checks can detect stale or edited state payloads.
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook

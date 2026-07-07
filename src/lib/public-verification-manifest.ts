@@ -49,6 +49,26 @@ export type PublicVerificationManifest = {
     ledgerEventCount: number;
   };
   endpoints: VerificationEndpoint[];
+  launchTracks: {
+    chat: {
+      status: string;
+      statusLabel: string;
+      summary: string;
+      nextAction: {
+        title: string;
+        detail: string;
+      };
+    };
+    prLoop: {
+      status: string;
+      statusLabel: string;
+      summary: string;
+      nextAction: {
+        title: string;
+        detail: string;
+      };
+    };
+  };
   agents: {
     orchestrator: {
       handle: string;
@@ -201,6 +221,26 @@ export async function createPublicVerificationManifest(
         note: "chatLaunchHash verifies the generated chat-launch payload.",
       },
     ],
+    launchTracks: {
+      chat: {
+        status: launchSnapshot.launchAudit.chatLaunch.status,
+        statusLabel: launchSnapshot.launchAudit.chatLaunch.statusLabel,
+        summary: launchSnapshot.launchAudit.chatLaunch.summary,
+        nextAction: {
+          title: launchSnapshot.launchAudit.chatLaunch.nextAction.title,
+          detail: launchSnapshot.launchAudit.chatLaunch.nextAction.detail,
+        },
+      },
+      prLoop: {
+        status: launchSnapshot.launchAudit.status,
+        statusLabel: launchSnapshot.launchAudit.statusLabel,
+        summary: launchSnapshot.launchAudit.summary,
+        nextAction: {
+          title: launchSnapshot.launchAudit.nextAction.title,
+          detail: launchSnapshot.launchAudit.nextAction.detail,
+        },
+      },
+    },
     agents: {
       orchestrator: {
         handle: stateSnapshot.agents.orchestrator.handle,
