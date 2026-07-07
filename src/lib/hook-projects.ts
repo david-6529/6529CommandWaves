@@ -1,5 +1,7 @@
 import type { CommandWave } from "./command-waves";
 import { isPlaceholderValue } from "./env-placeholders";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { ledgerEventsByRecency } from "./ledger";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "./phase-next-action";
@@ -71,11 +73,10 @@ function findPullRequestUrl(wave: CommandWave) {
     return null;
   }
 
-  return (
-    wave.executions
-      .flatMap((execution) => execution.artifacts)
-      .find((artifact) => /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+/.test(artifact)) ?? null
-  );
+  return gitHubPullRequestUrlsForRepo(
+    wave.executions.flatMap((execution) => execution.artifacts),
+    wave.repoUrl,
+  )[0] ?? null;
 }
 
 function hasConfiguredRepo(wave: CommandWave) {
@@ -168,13 +169,19 @@ function codeStatus(wave: CommandWave) {
   }
 
   const phaseWork = selectPhaseWork(wave);
+  const prUrl = findPullRequestUrl(wave);
+  const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(phaseWork.prReview, wave.repoUrl);
 
-  if (phaseWork.prReview?.status === "pass") {
+  if (phaseWork.prReview?.status === "pass" && reviewProofBound) {
     return "PR reviewed and logged.";
   }
 
+  if (phaseWork.prReview?.status === "pass") {
+    return "Reviewer proof must be bound to the selected GitHub repo.";
+  }
+
   if (phaseWork.prExecution?.status === "complete") {
-    return "PR record is ready for review.";
+    return prUrl ? "PR record is ready for review." : "PR record must link to the selected GitHub repo.";
   }
 
   if (phaseWork.prProposal?.status === "approved") {
@@ -194,13 +201,19 @@ function codeSnapshotLabel(wave: CommandWave) {
   }
 
   const phaseWork = selectPhaseWork(wave);
+  const prUrl = findPullRequestUrl(wave);
+  const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(phaseWork.prReview, wave.repoUrl);
 
-  if (phaseWork.prReview?.status === "pass") {
+  if (phaseWork.prReview?.status === "pass" && reviewProofBound) {
     return "PR reviewed";
   }
 
+  if (phaseWork.prReview?.status === "pass") {
+    return "review proof needed";
+  }
+
   if (phaseWork.prExecution?.status === "complete") {
-    return "PR ready";
+    return prUrl ? "PR ready" : "PR link needed";
   }
 
   if (phaseWork.prProposal?.status === "approved") {
@@ -220,9 +233,14 @@ function reviewStatus(wave: CommandWave) {
   }
 
   const phaseWork = selectPhaseWork(wave);
+  const prUrl = findPullRequestUrl(wave);
+
+  if (phaseWork.prReview?.status === "pass" && guardianReviewProofBoundToConfiguredRepo(phaseWork.prReview, wave.repoUrl)) {
+    return "review passed";
+  }
 
   if (phaseWork.prReview?.status === "pass") {
-    return "review passed";
+    return "proof needs repo";
   }
 
   if (phaseWork.prReview?.status === "changes_requested") {
@@ -234,7 +252,7 @@ function reviewStatus(wave: CommandWave) {
   }
 
   if (phaseWork.prExecution?.status === "complete") {
-    return "ready for review";
+    return prUrl ? "ready for review" : "PR link needed";
   }
 
   return "not reviewed";
@@ -249,12 +267,15 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
     const hasProject = Boolean(wave.waveUrl.trim() && hasConfiguredRepo(wave));
     const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
+    const boundReviewCount = wave.reviews.filter((review) =>
+      guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl),
+    ).length;
     const evidenceLabel = hasPlaceholderRepo(wave)
       ? `${countLabel(wave.proposals.length, "proposal")}, repo not set`
       : [
           countLabel(wave.proposals.length, "proposal"),
           countLabel(wave.executions.length, "run"),
-          countLabel(wave.reviews.length, "review"),
+          countLabel(boundReviewCount, "review"),
         ].join(", ");
 
     return {

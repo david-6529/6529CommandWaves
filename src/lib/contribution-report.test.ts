@@ -1,15 +1,32 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createContributionReport, createContributionReportDraft } from "./contribution-report";
+import { hashValue } from "./run-manifest";
+
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
 
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
   executions: demoWave.executions.map((execution) => ({
     ...execution,
-    artifacts: execution.artifacts.map((artifact) =>
-      artifact.replace(demoWave.repoUrl, "https://github.com/6529-Collections/6529-hook"),
-    ),
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
   })),
 };
 
@@ -33,7 +50,7 @@ describe("contribution report", () => {
     expect(report.notes.join(" ")).toContain("chat post, PR, review, and ledger records");
     expect(report.coverage.included).toContain("Work proposals stored by this app.");
     expect(report.coverage.included).toContain("Chat posts pulled into this app.");
-    expect(report.coverage.included).toContain("Recorded GitHub PR links and Guardian review proof.");
+    expect(report.coverage.included).toContain("Recorded GitHub PR links and repo-bound Guardian review proof.");
     expect(report.coverage.notIncluded).toContain("Live chat posts that have not been pulled into app state.");
     expect(report.coverage.notIncluded).toContain("Manual payments, reputation, token weight, off-app agreements, or private coordination.");
     expect(report.scoringRubric).toEqual([
@@ -71,6 +88,27 @@ describe("contribution report", () => {
     expect(report.evidence).not.toContain("1 GitHub PR link");
     expect(report.evidence).not.toContain("1 Guardian review proof");
     expect(report.notes.join(" ")).toContain("not a permission system");
+  });
+
+  it("does not count review proof that is not bound to the configured repo", () => {
+    const report = createContributionReport({
+      ...configuredDemoWave,
+      reviews: configuredDemoWave.reviews.map((review) => ({
+        ...review,
+        proof: review.proof
+          ? {
+              ...review.proof,
+              inputs: {
+                ...review.proof.inputs,
+                repositoryHash: undefined,
+              },
+            }
+          : review.proof,
+      })),
+    });
+
+    expect(report.evidence).toContain("1 GitHub PR link");
+    expect(report.evidence).not.toContain("1 Guardian review proof");
   });
 
   it("defaults generatedAt to the newest ledger event", () => {

@@ -5,6 +5,8 @@ import {
   type PollState,
 } from "./command-waves";
 import { isPlaceholderValue } from "./env-placeholders";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { selectPhaseWork, type PhaseWork } from "./phase-work";
 
 export type PhaseChecklistStatus = "done" | "active" | "waiting" | "blocked";
@@ -35,13 +37,16 @@ function buildStatus(
   execution: PhaseWork["prExecution"],
   decisionDone: boolean,
   canRunCode: boolean,
+  hasConfiguredPrLink: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (!canRunCode) {
     return { status: "waiting", detail: "Build waits for a selected GitHub repo." };
   }
 
   if (execution?.status === "complete") {
-    return { status: "done", detail: "PR record is ready." };
+    return hasConfiguredPrLink
+      ? { status: "done", detail: "PR record is ready." }
+      : { status: "blocked", detail: "PR record must link to the selected GitHub repo." };
   }
 
   if (execution?.status === "blocked") {
@@ -59,13 +64,17 @@ function reviewStatus(
   execution: PhaseWork["prExecution"],
   review: PhaseWork["prReview"],
   canRunCode: boolean,
+  hasConfiguredPrLink: boolean,
+  reviewProofBound: boolean,
 ): Pick<PhaseChecklistItem, "status" | "detail"> {
   if (!canRunCode) {
     return { status: "waiting", detail: "Review waits for a PR from the selected GitHub repo." };
   }
 
   if (review?.status === "pass") {
-    return { status: "done", detail: "Reviewer proof and checks are recorded." };
+    return reviewProofBound
+      ? { status: "done", detail: "Reviewer proof and checks are recorded." }
+      : { status: "blocked", detail: "Reviewer proof must be bound to the selected GitHub repo." };
   }
 
   if (review && review.status !== "waiting") {
@@ -73,7 +82,9 @@ function reviewStatus(
   }
 
   if (execution?.status === "complete") {
-    return { status: "active", detail: "PR record is ready for review." };
+    return hasConfiguredPrLink
+      ? { status: "active", detail: "PR record is ready for review." }
+      : { status: "blocked", detail: "Review waits for a PR link that matches the selected GitHub repo." };
   }
 
   return { status: "waiting", detail: "Review waits for a PR record." };
@@ -111,6 +122,8 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
   const poll = phaseWork.prPoll;
   const execution = phaseWork.prExecution;
   const review = phaseWork.prReview;
+  const hasConfiguredPrLink = Boolean(execution && gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl).length);
+  const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
   const decisionDone = proposal ? isDecisionDone(proposal.status, poll, wave.waveUrl) : false;
   const decisionReferenceCheck = poll?.decision
     ? validateWaveDecisionReference({
@@ -119,11 +132,13 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
         requireUrl: true,
       })
     : null;
-  const build = buildStatus(execution, decisionDone, canRunCode);
-  const reviewItem = reviewStatus(execution, review, canRunCode);
+  const build = buildStatus(execution, decisionDone, canRunCode, hasConfiguredPrLink);
+  const reviewItem = reviewStatus(execution, review, canRunCode, hasConfiguredPrLink, reviewProofBound);
   const projectItem = projectSetupItem(wave, canRunCode);
   const loggedReview = Boolean(
     canRunCode &&
+      hasConfiguredPrLink &&
+      reviewProofBound &&
       proposal &&
       review?.status === "pass" &&
       wave.ledger.some(
@@ -186,9 +201,11 @@ export function createPhaseChecklist(wave: CommandWave): PhaseChecklistItem[] {
     {
       id: "log",
       label: "Log",
-      status: loggedReview ? "done" : canRunCode && review?.status === "pass" ? "active" : "waiting",
+      status: loggedReview ? "done" : reviewItem.status === "blocked" ? "blocked" : reviewItem.status === "done" ? "active" : "waiting",
       detail: loggedReview
         ? "Audit log, discussion update draft, and launch packet are ready."
+        : reviewItem.status === "blocked"
+          ? "Resolve review evidence before logging the result."
         : "Log the result before sharing it back.",
     },
   ];

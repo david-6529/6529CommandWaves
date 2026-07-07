@@ -1,10 +1,33 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createActiveHookProjects } from "./hook-projects";
+import { hashValue } from "./run-manifest";
+
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
 
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
+  })),
 };
 
 describe("active hook projects", () => {
@@ -124,6 +147,38 @@ describe("active hook projects", () => {
       codeStatus: "PR record is ready for review.",
       codeSnapshotLabel: "PR ready",
       reviewStatusLabel: "ready for review",
+    });
+  });
+
+  it("does not surface stale PR links or review proof as ready", () => {
+    const projects = createActiveHookProjects({
+      ...configuredDemoWave,
+      executions: configuredDemoWave.executions.map((execution) => ({
+        ...execution,
+        artifacts: execution.artifacts.map((artifact) =>
+          artifact.startsWith("https://github.com/") ? "https://github.com/other-org/other-hook/pull/12" : artifact,
+        ),
+      })),
+      reviews: configuredDemoWave.reviews.map((review) => ({
+        ...review,
+        proof: review.proof
+          ? {
+              ...review.proof,
+              inputs: {
+                ...review.proof.inputs,
+                repositoryHash: undefined,
+              },
+            }
+          : review.proof,
+      })),
+    });
+
+    expect(projects[0]).toMatchObject({
+      codeStatus: "Reviewer proof must be bound to the selected GitHub repo.",
+      codeSnapshotLabel: "review proof needed",
+      latestPrUrl: null,
+      reviewStatusLabel: "proof needs repo",
+      evidenceLabel: "1 proposal, 1 run, 0 reviews",
     });
   });
 

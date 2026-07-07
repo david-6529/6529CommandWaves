@@ -2,10 +2,33 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
+import { hashValue } from "./run-manifest";
+
+const configuredRepo = {
+  owner: "6529-Collections",
+  repo: "6529-hook",
+  htmlUrl: "https://github.com/6529-Collections/6529-hook",
+};
 
 const configuredDemoWave = {
   ...demoWave,
-  repoUrl: "https://github.com/6529-Collections/6529-hook",
+  repoUrl: configuredRepo.htmlUrl,
+  executions: demoWave.executions.map((execution) => ({
+    ...execution,
+    artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+  })),
+  reviews: demoWave.reviews.map((review) => ({
+    ...review,
+    proof: review.proof
+      ? {
+          ...review.proof,
+          inputs: {
+            ...review.proof.inputs,
+            repositoryHash: hashValue(configuredRepo),
+          },
+        }
+      : review.proof,
+  })),
 };
 
 describe("phase next action", () => {

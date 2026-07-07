@@ -1,4 +1,5 @@
 import type { CommandWave } from "./command-waves";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { latestLedgerTimestamp } from "./ledger";
 
@@ -135,7 +136,9 @@ function evidenceSummary(wave: CommandWave, roomPostCount: number) {
   const voteCount = wave.polls.reduce((count, poll) => count + (poll.votes?.length ?? 0), 0);
   const decisionCount = wave.polls.filter((poll) => poll.decision).length;
   const prLinkCount = githubPrLinkCount(wave);
-  const reviewProofCount = prLinkCount ? wave.reviews.filter((review) => review.proof).length : 0;
+  const reviewProofCount = prLinkCount
+    ? wave.reviews.filter((review) => guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl)).length
+    : 0;
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
@@ -163,7 +166,7 @@ const coverage = {
     "Work proposals stored by this app.",
     "Votes and recorded project decision receipts stored by this app.",
     "Chat posts pulled into this app.",
-    "Recorded GitHub PR links and Guardian review proof.",
+    "Recorded GitHub PR links and repo-bound Guardian review proof.",
     "Attributed activity log events stored by this app.",
   ],
   notIncluded: [
