@@ -20,7 +20,7 @@ describe("public project snapshot", () => {
       },
       decision: {
         status: "recorded",
-        detail: "5 yes, 1 no. Decision link recorded.",
+        detail: "Builders approved with 5 yes and 1 no.",
       },
       repo: {
         status: "placeholder",

@@ -1121,10 +1121,11 @@ export function CommandWavesConsole() {
   const activePollDecisionRecorded = Boolean(activePoll?.decision && activeDecisionReferenceCheck?.ok !== false);
   const activePollCanVote = activePoll?.status === "open";
   const showDecisionRecorder = Boolean(activePoll && activePollNeedsWaveDecision);
+  const activePollApprovalText = `Builders approved with ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`;
   const activePollTitle = activePollNeedsWaveDecision
     ? "Project decision needed"
     : activePollDecisionRecorded
-      ? "Project decision recorded"
+      ? "Builders approved"
       : activePoll?.status === "failed"
         ? "Vote failed"
         : activePoll?.status === "passed"
@@ -1133,7 +1134,7 @@ export function CommandWavesConsole() {
   const activePollDetail = activePollNeedsWaveDecision
     ? "Local vote passed. Record the project decision before work runs."
     : activePollDecisionRecorded
-      ? `Project decision recorded after ${activePoll?.yesVotes ?? 0} yes and ${activePoll?.noVotes ?? 0} no.`
+      ? activePollApprovalText
       : `Local tally: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Needs ${
           activePoll?.quorumRequired ?? 0
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
@@ -1184,7 +1185,7 @@ export function CommandWavesConsole() {
   const currentDecisionDetail = activePollNeedsWaveDecision
     ? "Record the project decision before PR work starts."
     : activePollDecisionRecorded
-      ? `${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no. Decision link recorded.`
+      ? activePollApprovalText
       : activePoll?.status === "open"
         ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Decision still open.`
         : activeProposal

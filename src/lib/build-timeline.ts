@@ -75,8 +75,8 @@ function decisionItem(wave: CommandWave, proposal: CommandProposal | null, poll:
     return {
       id: "decision",
       label: "Decision",
-      title: "Project decision recorded",
-      detail: `${poll.yesVotes} yes, ${poll.noVotes} no.`,
+      title: "Builders approved",
+      detail: `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       status: "done",
       href: poll.decision.url,
       hrefLabel: "Open decision",

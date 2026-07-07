@@ -64,7 +64,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Repo placeholder");
     expect(text).toContain("View setup");
     expect(text).toContain("Decision");
-    expect(text).toContain("5 yes, 1 no. Decision link recorded.");
+    expect(text).toContain("Builders approved with 5 yes and 1 no.");
     expect(text).toContain("GitHub repo");
     expect(text).toContain("The GitHub repo is a placeholder until the pilot repo is selected.");
     expect(text).toContain("This default is only a placeholder. Select the pilot repo before creating PR work.");

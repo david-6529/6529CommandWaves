@@ -119,7 +119,7 @@ async function main() {
     "Draft hook scaffold",
     "Repo placeholder",
     "View setup",
-    "5 yes, 1 no. Decision link recorded.",
+    "Builders approved with 5 yes and 1 no.",
     "GitHub repo",
     "id=\"project-repo-url\"",
     "id=\"project-access-key\"",

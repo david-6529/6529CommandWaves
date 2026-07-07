@@ -40,8 +40,8 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
     return {
       id: "decision",
       label: "Decision",
-      title: "Project decision recorded",
-      body: `The project decision recorded ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+      title: "Builders approved",
+      body: `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       status: `${poll.yesVotes} yes, ${poll.noVotes} no`,
       href: poll.decision.url,
       hrefLabel: "Open decision",

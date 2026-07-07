@@ -102,7 +102,7 @@ function waveStatus(wave: CommandWave) {
   }
 
   if (poll?.decision?.url) {
-    return `Project decision recorded with ${poll.yesVotes} yes and ${poll.noVotes} no.`;
+    return `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`;
   }
 
   if (poll?.status === "passed") {

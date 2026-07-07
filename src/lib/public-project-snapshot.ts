@@ -77,7 +77,7 @@ function decisionSnapshot(wave: CommandWave) {
   if (poll?.decision && pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
     return {
       status: "recorded",
-      detail: `${poll.yesVotes} yes, ${poll.noVotes} no. Decision link recorded.`,
+      detail: `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       url: poll.decision.url,
     };
   }

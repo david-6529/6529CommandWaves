@@ -59,7 +59,7 @@ describe("active hook projects", () => {
         nextActionLabel: "next",
         nextActionTitle: "Repo placeholder",
         nextActionDetail: "PR work waits until maintainers select the GitHub repo.",
-        waveStatus: "Project decision recorded with 5 yes and 1 no.",
+        waveStatus: "Builders approved with 5 yes and 1 no.",
         codeStatus: "GitHub repo is not selected yet.",
         latestPrUrl: null,
         reviewStatusLabel: "not ready",
@@ -125,7 +125,7 @@ describe("active hook projects", () => {
     });
 
     expect(projects[0]).toMatchObject({
-      waveStatus: "Project decision recorded with 5 yes and 1 no.",
+      waveStatus: "Builders approved with 5 yes and 1 no.",
       accessSnapshotLabel: "manual review",
       orchestrationSnapshotLabel: "high approved",
       codeStatus: "Approved PR change is ready to build.",
