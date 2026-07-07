@@ -6,6 +6,11 @@ import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
 import { findRunManifestArtifact } from "./run-manifest";
 
 describe("local command adapters", () => {
+  const configuredWave = {
+    ...demoWave,
+    repoUrl: "https://github.com/6529-Collections/6529-hook",
+  };
+
   it("includes run manifest evidence in local agent executions", async () => {
     const proposal = demoWave.proposals[0];
     const execution = await localOrchestratorAdapter.execute({
@@ -110,6 +115,20 @@ describe("local command adapters", () => {
       },
     });
     expect(review.proof?.attestationHash).toHaveLength(64);
+  });
+
+  it("binds local reviewer proof to the selected GitHub repo", async () => {
+    const proposal = configuredWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: configuredWave,
+      proposal,
+      poll: configuredWave.polls[0],
+    });
+    const review = await localGuardianAdapter.review({ wave: configuredWave, proposal, execution });
+
+    expect(review.status).toBe("pass");
+    expect(review.proof?.inputs.repositoryHash).toHaveLength(64);
+    expect(review.checks).toContain("Guardian PR gate passed.");
   });
 
   it("asks for changes when the guardian PR gate fails", async () => {

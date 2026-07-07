@@ -507,6 +507,7 @@ describe("Command wave store", () => {
       proposalId: "cmd-001",
       status: "pass",
     });
+    expect(reviewed.reviews[0]?.proof?.inputs.repositoryHash).toHaveLength(64);
   });
 
   it("rejects review when the repo is no longer configured", async () => {

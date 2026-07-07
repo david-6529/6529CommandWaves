@@ -90,6 +90,7 @@ export type GuardianReviewProof = {
     manifestHash: string | null;
     changedPathsHash: string;
     changedFilesHash?: string;
+    repositoryHash?: string;
     rulesHash: string;
   };
   resultHash: string;

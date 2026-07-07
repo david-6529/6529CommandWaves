@@ -14,6 +14,7 @@ import {
   createGuardianAttestation,
   formatCommandPrManifestForPullRequest,
 } from "./github/pr-reviewer-gate";
+import { configuredGitHubRepo } from "./github/pr-evidence";
 import { pullRequestUrl } from "./github/repo";
 import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact, hashValue } from "./run-manifest";
 import {
@@ -142,6 +143,7 @@ export const localGuardianAdapter: GuardianAdapter = {
     const actualManifest = findRunManifestArtifact(input.execution.artifacts);
     const manifestMatches = actualManifest?.manifestHash === expectedManifest.manifestHash;
     const poll = input.wave.polls.find((item) => item.proposalId === input.proposal.id) ?? null;
+    const repository = configuredGitHubRepo(input.wave.repoUrl);
     const actualHandoff = findAgentHandoffArtifact(input.execution.artifacts);
     const expectedHandoff =
       input.proposal.kind === "open_pr"
@@ -190,6 +192,7 @@ export const localGuardianAdapter: GuardianAdapter = {
             poll,
             manifest: createCommandPrManifest({ wave: input.wave, proposal: input.proposal, poll }),
             changedPaths: [],
+            ...(repository ? { repository } : {}),
           })
         : null;
     const failedGateChecks = attestation?.result.checks.filter((item) => item.status === "fail") ?? [];
