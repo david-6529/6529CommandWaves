@@ -132,9 +132,13 @@ function projectSummary({
     repo.status === "placeholder"
       ? "Repo is a placeholder until PR work starts."
       : "Repo is connected. Approved changes can move into PR review.";
+  const nextStepDetail =
+    repo.status === "placeholder" && nextStep.detail === "Select the hook repo before PR work starts."
+      ? "Keep discussing in chat. Select the hook repo before PR work starts."
+      : nextStep.detail;
   const statusParagraph = [
     `Current focus: ${currentWork.title}.`,
-    `Next: ${nextStep.detail}`,
+    `Next: ${nextStepDetail}`,
     repoLine,
     latestChange ? `Latest change: ${latestChange}` : "No project changes recorded yet.",
   ].join(" ");

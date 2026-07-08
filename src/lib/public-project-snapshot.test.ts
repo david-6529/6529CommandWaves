@@ -8,10 +8,10 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Select the hook repo before PR work starts. Repo is a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
+        "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo is a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
       summaryParagraphs: [
         "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: Select the hook repo before PR work starts. Repo is a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo is a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
       ],
       updatedAt: "2026-06-20T12:40:00.000Z",
       currentWork: {

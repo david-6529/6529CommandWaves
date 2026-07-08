@@ -104,7 +104,7 @@ async function main() {
     "This is a shared workspace for one hook project.",
     "Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
     "Draft the non-upgradeable hook scaffold",
-    "Next: Select the hook repo before PR work starts.",
+    "Next: Keep discussing in chat. Select the hook repo before PR work starts.",
     "Repo is a placeholder until PR work starts.",
     "Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
     "The GitHub repo is intentionally a placeholder until PR work starts.",
