@@ -121,6 +121,8 @@ describe("CommandWavesConsole", () => {
     const html = renderedConsoleHtml();
 
     expect(html).toContain(">View setup</button>");
+    expect(html).toContain("grid-cols-2");
+    expect(html).not.toContain("overflow-x-auto");
     expect(html).toContain('id="project-repo-url"');
     expect(html).toContain('placeholder="Select later, owner/repo or GitHub URL"');
     expect(html).toContain('placeholder="Type a chat name"');

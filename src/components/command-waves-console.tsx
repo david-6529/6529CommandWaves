@@ -2304,9 +2304,9 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</p>
               <p className="text-sm leading-6 text-zinc-500">{commandWaveProductCopy.simpleFlow}</p>
             </div>
-            <ol className="mt-3 flex gap-3 overflow-x-auto pb-1 lg:grid lg:grid-cols-6 lg:gap-2 lg:overflow-visible lg:pb-0">
+            <ol className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2">
               {phaseChecklist.map((item) => (
-                <li key={item.id} className="min-w-32 border-t border-zinc-800 pt-2 lg:min-w-0">
+                <li key={item.id} className="min-w-0 border-t border-zinc-800 pt-2">
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-sm font-semibold text-zinc-100">{flowStepLabel(item)}</p>
                     <Badge className={phaseStatusClass(item.status)}>{item.status}</Badge>
