@@ -5,12 +5,16 @@ import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
 import { POST as recordDecision } from "./command-wave/decision/route";
 import { POST as executeCommand } from "./command-wave/execute/route";
+import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
 import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
+import { GET as getProjectIndex } from "./command-wave/projects/route";
 import { POST as submitProposalRoute } from "./command-wave/proposals/route";
 import { GET as getContributionReport } from "./command-wave/reports/contribution/route";
 import { POST as reviewCommand } from "./command-wave/review/route";
 import { DELETE as resetWave, GET as getWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
+import { GET as getSetupProof } from "./command-wave/setup/proof/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
+import { GET as getCommandWaveState } from "./command-wave/state/route";
 import { GET as getVerificationManifest } from "./command-wave/verification/manifest/route";
 import { POST as recordVoteRoute } from "./command-wave/votes/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
@@ -37,6 +41,13 @@ async function responsePayload(response: Response) {
 }
 
 type RouteHandler = (request: Request) => Response | Promise<Response>;
+
+const publicPlaceholderLeakChecks = [
+  "https://github.com/your-org/your-hook-repo",
+  "https://github.com/6529-Collections/6529-hook",
+  "Built cmd-001 through Codex",
+  "Review passed the hook scaffold",
+];
 
 describe("API route validation", () => {
   const previousMockMode = process.env["6529_MOCK_MODE"];
@@ -252,6 +263,28 @@ describe("API route validation", () => {
     });
     expect(JSON.stringify(payload)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
+
+  it.each([
+    ["command wave state", getCommandWaveState, "/api/command-wave/state"],
+    ["setup proof", getSetupProof, "/api/command-wave/setup/proof"],
+    ["project index", getProjectIndex, "/api/command-wave/projects"],
+    ["launch audit", getLaunchAudit, "/api/command-wave/launch/audit"],
+    ["chat launch", getChatLaunch, "/api/command-wave/launch/chat"],
+    ["verification manifest", getVerificationManifest, "/api/command-wave/verification/manifest"],
+    ["contribution report", getContributionReport, "/api/command-wave/reports/contribution"],
+  ] satisfies [string, RouteHandler, string][])(
+    "keeps the public %s endpoint placeholder-safe",
+    async (_label, handler, path) => {
+      const response = await handler(request(`https://command-waves.example.com${path}`));
+      const payload = await responsePayload(response);
+      const serialized = JSON.stringify(payload);
+
+      expect(response.status).toBe(200);
+      for (const leak of publicPlaceholderLeakChecks) {
+        expect(serialized).not.toContain(leak);
+      }
+    },
+  );
 
   it("keeps protected wave mutation responses placeholder-safe", async () => {
     const response = await submitProposalRoute(
