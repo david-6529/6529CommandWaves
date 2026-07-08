@@ -63,6 +63,43 @@ describe("public project snapshot", () => {
     );
   });
 
+  it("moves new proposal activity into the current summary and changelog", () => {
+    const snapshot = createPublicProjectSnapshot({
+      ...demoWave,
+      proposals: [
+        {
+          ...demoWave.proposals[0],
+          id: "cmd-002",
+          title: "Add swap fee cap tests",
+          status: "ready_for_vote",
+        },
+        ...demoWave.proposals,
+      ],
+      ledger: [
+        ...demoWave.ledger,
+        {
+          id: "evt-new-work",
+          at: "2026-06-20T13:05:00.000Z",
+          actor: "daemon",
+          type: "proposal_submitted",
+          message: "Submitted cmd-002: Add swap fee cap tests.",
+        },
+      ],
+    });
+
+    expect(snapshot.currentWork).toMatchObject({
+      title: "Add swap fee cap tests",
+      status: "ready for vote",
+    });
+    expect(snapshot.summary).toContain("Current focus: Add swap fee cap tests.");
+    expect(snapshot.summary).toContain("Latest change: Submitted cmd-002: Add swap fee cap tests.");
+    expect(snapshot.latestChanges[0]).toMatchObject({
+      label: "work proposed",
+      message: "Submitted cmd-002: Add swap fee cap tests.",
+    });
+    expect(snapshot.updatedAt).toBe("2026-06-20T13:05:00.000Z");
+  });
+
   it("labels local approval as waiting for a decision link", () => {
     const snapshot = createPublicProjectSnapshot({
       ...demoWave,
