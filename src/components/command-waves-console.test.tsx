@@ -58,10 +58,12 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("daemon labels risk and keeps scope small.");
     expect(text).toContain("A reviewer check must pass before humans merge.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
-    expect(text).toContain("Current work");
-    expect(text).toContain("repo placeholder");
+    expect(text).toContain("Work being discussed");
+    expect(text).toContain("repo needed");
     expect(text).toContain("Draft hook scaffold");
     expect(text).toContain("Next");
+    expect(text).toContain("Keep discussing. Select repo later.");
+    expect(text).toContain("Chat can continue now. PR work waits for the selected hook repo.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("View setup");
     expect(text).toContain("Decision");

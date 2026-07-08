@@ -1143,7 +1143,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "repo placeholder"
+    ? "repo needed"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
@@ -1178,7 +1178,7 @@ export function CommandWavesConsole() {
       ? title.trim() || "Pick the next change"
       : activeProposal?.title ?? "Pick the next change";
   const currentFocusDisplayTitle = currentWorkDisplayTitle(currentFocusTitle);
-  const currentFocusLabel = readyForNextHookChange ? "Next work" : "Current work";
+  const currentFocusLabel = readyForNextHookChange ? "Next work" : "Work being discussed";
   const currentFocusDescription =
     readyForNextHookChange
       ? "Use chat to decide if this is the next change."
@@ -1194,6 +1194,10 @@ export function CommandWavesConsole() {
         : activeProposal
           ? "No decision required by current rules."
           : "Discuss scope in chat before saving a proposal.";
+  const currentNextTitle = currentWorkNeedsRepo ? "Keep discussing. Select repo later." : phaseNextAction.title;
+  const currentNextDetail = currentWorkNeedsRepo
+    ? "Chat can continue now. PR work waits for the selected hook repo."
+    : phaseNextAction.detail;
   const canBuildApprovedPr = Boolean(
     activeProposal &&
       activeProposal.kind === "open_pr" &&
@@ -2365,38 +2369,36 @@ export function CommandWavesConsole() {
             </div>
             <h2 className="mt-3 text-3xl font-semibold leading-9 text-zinc-50">{currentFocusDisplayTitle}</h2>
             <p className="mt-2 text-base leading-7 text-zinc-400">{humanizeLegacyCommandCopy(currentFocusDescription)}</p>
-            <div className="mt-5 grid gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
-                <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{phaseNextAction.title}</p>
-                <p className="mt-1 text-sm leading-6 text-zinc-500">{phaseNextAction.detail}</p>
+            <div className="mt-5 divide-y divide-zinc-800 border-y border-zinc-800">
+              <div className="flex flex-wrap items-start justify-between gap-3 py-4">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</p>
+                  <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{currentNextTitle}</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">{currentNextDetail}</p>
+                </div>
                 {projectRepoIsPlaceholder ? (
-                  <Button type="button" variant="secondary" className="mt-3" onClick={() => openSetupControls({ focusRepo: true })}>
+                  <Button type="button" variant="secondary" onClick={() => openSetupControls({ focusRepo: true })}>
                     View setup
                   </Button>
                 ) : null}
               </div>
-              <div>
+              <div className="py-4">
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
                 <p className="mt-1 text-base leading-7 text-zinc-400">{currentDecisionDetail}</p>
               </div>
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{projectRepoLabel}</p>
-                {projectRepoHref && !projectRepoIsPlaceholder ? (
+              {projectRepoHref && !projectRepoIsPlaceholder ? (
+                <div className="flex flex-wrap items-center justify-between gap-3 py-4">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{projectRepoLabel}</p>
                   <a
-                    className="mt-1 inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
+                    className="inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
                     href={projectRepoHref}
                     target="_blank"
                     rel="noreferrer"
                   >
                     Open repo
                   </a>
-                ) : projectRepoIsPlaceholder ? (
-                  <p className="mt-1 text-base leading-7 text-zinc-400">{githubRepoPlaceholder.description}</p>
-                ) : (
-                  <p className="mt-1 text-base leading-7 text-zinc-400">Repo not set yet.</p>
-                )}
-              </div>
+                </div>
+              ) : null}
             </div>
             {discussionQueueItems.length ? (
               <div className="mt-5 border-t border-zinc-800 pt-4">
