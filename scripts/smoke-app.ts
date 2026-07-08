@@ -103,7 +103,7 @@ async function main() {
     "Project, Discuss, Decide, PR, Review, Log",
     "Active projects",
     "Start with the pilot hook. More hook projects can appear here after this loop works.",
-    "Hook Build",
+    "6529 AMM hook",
     "6529-hook-builder",
     "Message builders",
     "Who can join?",
@@ -381,7 +381,7 @@ async function main() {
 
   assert(objectValue(projectsPayload, "version") === "command-wave-projects-v0.1", "Projects endpoint returned the wrong version.");
   assertSha256("Projects response hash", objectValue(projectsPayload, "projectsHash"));
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "Hook Build");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529 AMM hook");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
   assert(

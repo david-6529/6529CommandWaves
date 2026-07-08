@@ -3,13 +3,13 @@ import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./
 import { demoWave } from "./demo-wave";
 
 const seedEnv = {
-  COMMAND_WAVE_INITIAL_NAME: "6529 Hook",
+  COMMAND_WAVE_INITIAL_NAME: "6529 AMM hook",
   COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/real-hook-chat",
   COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/6529-Collections/real-hook",
 };
 
 const placeholderRepoSeedEnv = {
-  COMMAND_WAVE_INITIAL_NAME: "6529 Hook",
+  COMMAND_WAVE_INITIAL_NAME: "6529 AMM hook",
   COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/real-hook-chat",
   COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
 };
@@ -17,7 +17,7 @@ const placeholderRepoSeedEnv = {
 describe("command wave seed", () => {
   it("detects explicit first project seed settings", () => {
     expect(hasInitialCommandWaveProject(seedEnv)).toBe(true);
-    expect(hasInitialCommandWaveProject({ COMMAND_WAVE_INITIAL_NAME: "6529 Hook" })).toBe(false);
+    expect(hasInitialCommandWaveProject({ COMMAND_WAVE_INITIAL_NAME: "6529 AMM hook" })).toBe(false);
   });
 
   it("creates a clean first project from environment setup", () => {
@@ -27,7 +27,7 @@ describe("command wave seed", () => {
 
     expect(wave).toMatchObject({
       id: demoWave.id,
-      name: "6529 Hook",
+      name: "6529 AMM hook",
       waveUrl: "https://6529.io/waves/real-hook-chat",
       repoUrl: "https://github.com/6529-Collections/real-hook",
       proposals: [],
@@ -53,7 +53,7 @@ describe("command wave seed", () => {
 
     expect(wave).toMatchObject({
       id: demoWave.id,
-      name: "6529 Hook",
+      name: "6529 AMM hook",
       waveUrl: "https://6529.io/waves/real-hook-chat",
       repoUrl: "https://github.com/your-org/your-hook-repo",
       proposals: [],

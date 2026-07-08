@@ -39,7 +39,7 @@ export type ActiveHookProject = {
 
 function hookName(wave: CommandWave) {
   if (/6529[-\s]?hook/i.test(`${wave.name} ${wave.repoUrl}`)) {
-    return "Hook Build";
+    return "6529 AMM hook";
   }
 
   return wave.name.replace(/\b(builder|wave|command)\b/gi, "").replace(/\s+/g, " ").trim() || "Hook project";

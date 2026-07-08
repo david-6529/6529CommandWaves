@@ -41,7 +41,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Project, Discuss, Decide, PR, Review, Log");
     expect(text).toContain("Active projects");
     expect(text).toContain("Start with the pilot hook. More hook projects can appear here after this loop works.");
-    expect(text).toContain("Hook Build");
+    expect(text).toContain("6529 AMM hook");
     expect(text).toContain("6529-hook-builder");
     expect(text).toContain("Message builders");
     expect(text).toContain("Discuss");
@@ -247,7 +247,7 @@ describe("CommandWavesConsole", () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(activeProjectsHtml).toContain("Active projects");
-    expect(activeProjectsHtml).toContain("Hook Build");
+    expect(activeProjectsHtml).toContain("6529 AMM hook");
     expect(activeProjectsHtml).toContain("GitHub repo placeholder");
     expect(activeProjectsHtml).toContain(">Open chat</a>");
     expect(activeProjectsHtml).toContain("GitHub repo placeholder");

@@ -184,7 +184,7 @@ describe("command wave persistence", () => {
 
     const wave = await getCommandWave();
 
-    expect(wave.name).toBe("6529 Hook");
+    expect(wave.name).toBe("6529 AMM hook");
     expect(wave.gates).toContain("Manual builder review for phase 1");
     expect(wave.gates).toContain("AI contribution report scores are not permissions");
     expect(wave.polls[0]?.decision?.summary).toBe("Builders approved the hook scaffold with 5 yes and 1 no.");

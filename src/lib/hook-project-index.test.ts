@@ -18,7 +18,7 @@ describe("hook project index", () => {
       projects: [
         {
           id: demoWave.id,
-          name: "Hook Build",
+          name: "6529 AMM hook",
           waveLabel: "6529-hook-builder",
           repoUrl: null,
           repoLabel: "GitHub repo placeholder",

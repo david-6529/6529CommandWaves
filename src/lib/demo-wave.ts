@@ -52,7 +52,7 @@ const poll: PollState = {
 
 const preExecutionWave: CommandWave = {
   id: "cw-6529-hook-builder",
-  name: "6529 Hook",
+  name: "6529 AMM hook",
   waveUrl: "https://6529.io/waves/6529-hook-builder",
   repoUrl: githubRepoPlaceholder.url,
   gates: [...defaultParticipationGates],

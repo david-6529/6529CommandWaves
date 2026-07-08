@@ -14,7 +14,7 @@ describe("legacy command copy", () => {
 
   it("maps old hook builder product language to the current project framing", () => {
     expect(humanizeLegacyCommandCopy("Created 6529 Hook Builder and attached the builder wave plus GitHub repo.")).toBe(
-      "Created Hook Build and attached the project chat and GitHub repo.",
+      "Created 6529 AMM hook and attached the project chat and GitHub repo.",
     );
     expect(humanizeLegacyCommandCopy("Builder wave approved cmd-001.")).toBe("Project chat approved cmd-001.");
     expect(humanizeLegacyCommandCopy("Wave Poll recorded a builder 6529 decision receipt.")).toBe(

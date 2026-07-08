@@ -37,7 +37,7 @@ describe("active hook projects", () => {
     expect(projects).toEqual([
       expect.objectContaining({
         id: demoWave.id,
-        name: "Hook Build",
+        name: "6529 AMM hook",
         status: "setup",
         waveUrl: demoWave.waveUrl,
         repoUrl: null,

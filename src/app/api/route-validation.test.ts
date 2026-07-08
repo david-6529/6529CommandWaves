@@ -246,6 +246,7 @@ describe("API route validation", () => {
     expect(response.status).toBe(200);
     expect(payload).toMatchObject({
       wave: {
+        name: "6529 AMM hook",
         repoUrl: null,
       },
     });

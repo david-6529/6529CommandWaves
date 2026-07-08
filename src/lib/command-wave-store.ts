@@ -245,9 +245,10 @@ function withCurrentHookChatCopy(wave: CommandWave) {
     return wave;
   }
 
+  const legacyBuiltInNames = new Set(["6529 Hook", "6529 Hook Builder", "6529 Hook Project"]);
   const nextWave: CommandWave = {
     ...wave,
-    name: wave.name === "6529 Hook Builder" || wave.name === "6529 Hook Project" ? demoWave.name : wave.name,
+    name: legacyBuiltInNames.has(wave.name) ? demoWave.name : wave.name,
     gates: wave.gates.map(normalizeBuiltInHookGate),
     polls: wave.polls.map((poll) => ({
       ...poll,

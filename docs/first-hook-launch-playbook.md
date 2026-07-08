@@ -74,7 +74,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.example
 COMMAND_WAVE_STORE=postgres
 DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
-COMMAND_WAVE_INITIAL_NAME="6529 Hook"
+COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
 # Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
