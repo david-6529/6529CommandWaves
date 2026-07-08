@@ -362,6 +362,83 @@ describe("API route validation", () => {
     expect(JSON.stringify(payload)).not.toContain("Review passed the hook scaffold");
   });
 
+  it("updates public project state from a route-submitted PR proposal", async () => {
+    const response = await submitProposalRoute(
+      request("https://command-waves.example.com/api/command-wave/proposals", {
+        method: "POST",
+        body: JSON.stringify({
+          title: "Add 30 bps fee cap tests",
+          proposer: "project chat",
+          kind: "open_pr",
+          prompt: "Add tests for a maximum 30 bps swap fee cap in the AMM hook.",
+          spec: "Add bound-focused tests for the maximum 30 bps fee cap. Keep the change limited to test coverage.",
+          budgetUsd: 0,
+        }),
+      }),
+    );
+    const submitPayload = await responsePayload(response);
+
+    expect(response.status).toBe(200);
+    expect(submitPayload).toMatchObject({
+      wave: {
+        repoUrl: null,
+        proposals: expect.arrayContaining([
+          expect.objectContaining({
+            id: "cmd-002",
+            title: "Add 30 bps fee cap tests",
+            proposer: "project chat",
+            kind: "open_pr",
+            status: "ready_for_vote",
+          }),
+        ]),
+      },
+    });
+
+    const stateResponse = await getCommandWaveState(
+      request("https://command-waves.example.com/api/command-wave/state"),
+    );
+    const statePayload = await responsePayload(stateResponse);
+
+    expect(stateResponse.status).toBe(200);
+    expect(statePayload).toMatchObject({
+      wave: {
+        repoUrl: null,
+      },
+      projectSnapshot: {
+        currentWork: {
+          title: "Add 30 bps fee cap tests",
+          status: "ready for vote",
+        },
+        repo: {
+          status: "placeholder",
+          url: null,
+        },
+      },
+    });
+    expect(JSON.stringify(statePayload)).toContain("Current focus: Add 30 bps fee cap tests.");
+    expect(JSON.stringify(statePayload)).toContain("Repo is a placeholder until PR work starts.");
+    expect(JSON.stringify(statePayload)).toContain("Submitted cmd-002: Add 30 bps fee cap tests.");
+    expect(JSON.stringify(statePayload)).not.toContain("https://github.com/your-org/your-hook-repo");
+
+    const projectsResponse = await getProjectIndex(
+      request("https://command-waves.example.com/api/command-wave/projects"),
+    );
+    const projectsPayload = await responsePayload(projectsResponse);
+
+    expect(projectsResponse.status).toBe(200);
+    expect(projectsPayload).toMatchObject({
+      activeProjectId: "cw-6529-hook-builder",
+      projects: [
+        {
+          repoUrl: null,
+          currentFocus: "Add 30 bps fee cap tests",
+          evidenceLabel: "2 proposals, GitHub repo not set",
+        },
+      ],
+    });
+    expect(JSON.stringify(projectsPayload)).not.toContain("https://github.com/your-org/your-hook-repo");
+  });
+
   it("publishes the public verification manifest", async () => {
     const response = await getVerificationManifest(
       request("https://command-waves.example.com/api/command-wave/verification/manifest"),
