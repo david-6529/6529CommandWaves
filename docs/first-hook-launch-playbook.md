@@ -17,7 +17,7 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 
 ## Use Now
 
-- Project chat and GitHub repo setup.
+- Project chat setup, with the GitHub repo left as a placeholder until PR work starts.
 - Participation notes for who can join.
 - 6529 hook project snapshot with chat context, repo state, PR state, and review evidence.
 - One PR-sized command at a time.
@@ -76,7 +76,7 @@ DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
-# Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
+# Intentional placeholder until PR work starts. Keep this until maintainers select the hook repo.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 6529_BOT_BEARER_TOKEN=<6529 bot token>
@@ -87,7 +87,7 @@ COMMAND_WAVE_REPO_ADAPTER=github
 COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
-1. Pick the builder chat. Keep the GitHub repo placeholder until the pilot repo is selected.
+1. Pick the builder chat. Keep the GitHub repo placeholder for chat launch.
 2. Open Maintainer tools, run Launch readiness, and use the launch check to expose setup blockers.
 3. Select the hook repo before PR work, then confirm it has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, the guardian workflow, and the required guardian check.
 4. Copy the chat launch brief from setup.
@@ -111,7 +111,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 
 The launch check focuses on the first public loop. The chat-first launch requires the deployed app URL, first hook chat,
 admin key, durable storage, live 6529 mode, and daemon chat posting credentials. The GitHub repo can stay as a placeholder
-until PR work starts. A ready PR loop also requires the selected reviewer process, GitHub PR adapter, guardian workflow,
+until PR work starts. A ready PR loop also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian workflow,
 guardian wave-state URL, and required guardian check. Failed checks block broad participation.
 
 Use `npm run chat:launch` against the remote chat launch audit before inviting builders into discussion. Use

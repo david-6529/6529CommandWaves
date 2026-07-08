@@ -33,7 +33,7 @@ protocol.
 What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
-- One active hook project with project chat and a placeholder GitHub repo. The pilot repo is selected later.
+- One active hook project with project chat and an intentional placeholder GitHub repo until PR work starts.
 - A top-right wallet connection control that can add a connected address to the access request draft.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
@@ -73,18 +73,18 @@ What remains manual or MVP-only:
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution prepares a branch, commits a bounded work packet plus optional approved text files, and opens a draft PR
   record. It does not yet run an isolated code-writing worker.
-- The GitHub repo is a placeholder in the default project state. No PR work can run until the pilot repo is selected.
+- The GitHub repo is a placeholder in the default project state. Chat can launch first, but PR work waits until maintainers select the repo.
 - The GitHub adapter can prepare branches, commit bounded text files, open draft PRs, post bounded PR comments, and
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting uses visible app activity, project chat posts pulled into the app, recorded PR links, and
   repo-bound review proof. Full scoring across unattached GitHub commits, merges, and off-app activity is still future work.
-- The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until the repo is selected.
+- The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until maintainers select the repo.
 
 What we are working on next:
 
 1. Pick the first real public project chat.
-2. Keep the GitHub repo as a placeholder until the pilot repo is selected for PR work.
+2. Keep the GitHub repo as a placeholder until PR work starts.
 3. Configure launch env, durable storage, and daemon chat posting.
 4. Add the selected hook repo, reviewer process, guardian workflow, and required guardian check before the first PR.
 5. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
@@ -111,7 +111,7 @@ The app makes the important answers visible:
 The first public phase:
 
 1. Choose one public project chat.
-2. Connect one GitHub smart contract repo for the hook.
+2. Keep the GitHub repo placeholder through chat launch, then connect one repo before PR work starts.
 3. Record who-can-join requirements such as reputation, token, allowlists, or QnA as advisory until live enforcement exists.
 4. Propose hook work in plain English with clear limits.
 5. Let orchestration rules classify risk and require votes for important changes.
@@ -145,7 +145,7 @@ artifacts. Until then, the MVP is useful and auditable, but not the strongest po
 
 First launch tasks:
 
-1. Pick the first real project chat and hook repo, then publish the launch playbook.
+1. Pick the first real project chat, keep the repo placeholder for chat launch, then publish the launch playbook.
 2. Set `COMMAND_WAVE_STATE_URL` to the deployed `/api/command-wave/state` endpoint before making the guardian a required PR check.
 
 Hardening tasks after the first public loop:
@@ -223,7 +223,7 @@ Audit and launch:
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The copyable launch packet includes the same workflow proof chain for chat share-back.
 - The local demo separates current work status from launch readiness. Chat launch readiness still needs production env,
-  durable storage, live 6529 mode, and daemon posting. PR-loop readiness also needs a selected repo, GitHub PR adapter,
+  durable storage, live 6529 mode, and daemon posting. PR-loop readiness also needs the selected hook repo, GitHub PR adapter,
   guardian state, guardian workflow, and required checks.
 
 Maintainer setup:
@@ -268,7 +268,7 @@ DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
-# Placeholder until the pilot repo is selected. PR work stays blocked while this is unchanged.
+# Intentional placeholder until PR work starts. Keep this until maintainers select the hook repo.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 6529_BOT_BEARER_TOKEN=<6529 bot token>
@@ -282,9 +282,9 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
 `COMMAND_WAVE_INITIAL_WAVE_URL` seeds the first project chat. `COMMAND_WAVE_INITIAL_REPO_URL` stays as a placeholder
-until the pilot repo is selected, and PR work stays blocked while it is unchanged. Launch readiness fails a placeholder
-project chat, warns on a placeholder repo, and blocks PR work until a real repo is selected. `ADMIN_API_KEY` protects setup,
-proposal, vote, run, review, and reset actions. `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
+until PR work starts. Chat launch readiness allows the placeholder repo, while full PR-loop readiness blocks PR work until
+a real repo is selected. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions.
+`COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
 The chat-first launch requires daemon chat posting credentials and durable storage. A ready PR loop also requires the
 selected reviewer process, GitHub PR adapter, guardian workflow in the selected hook repo, and the required guardian check
@@ -292,7 +292,7 @@ so the public workflow can record draft PRs predictably.
 
 The local demo still reports launch gaps until the first hook chat is reachable, `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`,
 durable storage, live 6529 mode, daemon chat posting credentials, and setup validation are configured. PR-loop readiness
-also requires the selected repo, selected reviewer process, GitHub PR adapter, guardian state, guardian workflow, and
+also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian state, guardian workflow, and
 required guardian check.
 
 ## Durable Storage
@@ -461,7 +461,7 @@ npm run launch:audit
 If Next is running on another port, set `LOCAL_APP_URL` to that app URL before `setup:verify`, `chat:launch`, or
 `launch:audit`. The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero
 until production env, live 6529 mode, durable storage, and daemon posting are configured. PR-loop readiness also needs a
-selected repo, GitHub PR adapter, guardian state, guardian workflow, and the required guardian check.
+selected hook repo, GitHub PR adapter, guardian state, guardian workflow, and the required guardian check.
 
 Expose the current project state to the guardian with:
 
@@ -508,7 +508,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 ## Next Production Steps
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
-2. Set the initial hook wave, keep the GitHub repo placeholder until selection, then run the remote launch audit until setup is reachable.
+2. Set the initial hook chat, keep the GitHub repo placeholder for chat launch, then run the remote chat launch audit until setup is reachable.
 3. Add an isolated Codex worker that produces bounded patch files before the existing branch, commit, and draft PR sequence.
 4. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 5. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.

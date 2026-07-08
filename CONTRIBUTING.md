@@ -1,14 +1,14 @@
 # Contributing To The First Hook Phase
 
-This repo uses one 6529 project chat to coordinate one smart contract repo. The pilot GitHub repo is still a placeholder
-until maintainers select it, so PR work starts only after that setup is done.
+This repo uses one 6529 project chat to coordinate one smart contract repo. The GitHub repo is intentionally a placeholder
+until PR work starts, so discussion and decisions can begin before maintainers select the repo.
 
 ## Simple Flow
 
 1. Discuss ideas in the community space.
 2. Turn one idea into a PR-sized proposal.
 3. Get the project decision.
-4. Select the pilot GitHub repo before PR work.
+4. Select the GitHub repo before PR work.
 5. Build on a prepared branch.
 6. Open a draft PR with the Command Waves manifest.
 7. Wait for review before humans merge, deploy, pay, or change governance.
@@ -16,7 +16,7 @@ until maintainers select it, so PR work starts only after that setup is done.
 ## Before Opening A PR
 
 - Link the work to an approved project proposal.
-- Make sure the pilot GitHub repo has been selected.
+- Make sure the GitHub repo has been selected.
 - Keep the PR scoped to that proposal.
 - Include the Command Waves manifest in the PR body.
 - Include tests or reviewer records for the approved scope.
