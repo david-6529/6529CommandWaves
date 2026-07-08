@@ -64,6 +64,7 @@ describe("active hook projects", () => {
         latestPrUrl: null,
         reviewStatusLabel: "not ready",
         evidenceLabel: "1 proposal, GitHub repo not set",
+        latestActivity: "Builders approved the hook scaffold with 5 yes and 1 no.",
       }),
     ]);
   });
@@ -228,7 +229,7 @@ describe("active hook projects", () => {
 
   it("uses the newest ledger timestamp for latest activity", () => {
     const projects = createActiveHookProjects({
-      ...demoWave,
+      ...configuredDemoWave,
       ledger: [
         {
           id: "evt-newest",

@@ -22,7 +22,7 @@ describe("command wave state snapshot", () => {
         currentWork: {
           title: "Draft the non-upgradeable hook scaffold",
         },
-        updatedAt: "2026-06-20T12:50:00.000Z",
+        updatedAt: "2026-06-20T12:40:00.000Z",
         repo: {
           status: "placeholder",
         },
@@ -101,7 +101,7 @@ describe("command wave state snapshot", () => {
     expect(stateHash).toBe(createCommandWaveStateHash(snapshotWithoutStateHash));
     expect(snapshot.wave.repoUrl).toBeNull();
     expect(snapshot.waveStateHash).toBe(publicCommandWaveHash(demoWave));
-    expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("review recorded");
+    expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("builders approved");
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
     expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("delegatecall");
     expect(snapshot.workflowProof.steps.map((step) => [step.id, step.status])).toEqual([

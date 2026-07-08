@@ -27,6 +27,7 @@ describe("chat launch snapshot", () => {
       verification: {
         chatLaunchStatus: launchSnapshot.launchAudit.chatLaunch.status,
         launchStatus: launchSnapshot.launchAudit.status,
+        operatorChecklist: expect.any(Array),
       },
     });
     const { chatLaunchHash, ...hashInput } = snapshot;

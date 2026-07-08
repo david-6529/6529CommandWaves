@@ -60,6 +60,7 @@ describe("chat launch verifier", () => {
     expect(result.launchStatus).not.toBe("ready");
     expect(result.chatLaunchHash).toBeNull();
     expect(result.nextAction?.title).toBe("Open project chat");
+    expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "launch_status")).toBeUndefined();
     expect(result.checks.find((item) => item.id === "chat_launch_ready")).toMatchObject({
       status: "pass",
@@ -89,6 +90,7 @@ describe("chat launch verifier", () => {
     expect(result.statusDraft).toBeNull();
     expect(result.auditHash).toBe(launchSnapshot.auditHash);
     expect(result.chatLaunchHash).toBe(chatSnapshot.chatLaunchHash);
+    expect(result.operatorChecklist).toEqual([]);
     expect(result.checks.find((item) => item.id === "chat_launch_hash")).toMatchObject({
       status: "pass",
     });
@@ -158,10 +160,26 @@ describe("chat launch verifier", () => {
 
     expect(result.status).toBe("fail");
     expect(result.chatLaunchStatus).toBe("blocked");
+    expect(result.operatorChecklist).toContain("- Set a strong ADMIN_API_KEY before public launch.");
+    expect(result.operatorChecklist).toContain("- Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL.");
+    expect(result.operatorChecklist).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.");
+    expect(result.operatorChecklist).toContain("- Set 6529_BOT_BEARER_TOKEN and 6529_BOT_WALLET_ADDRESS for daemon chat posting.");
     expect(result.checks.find((item) => item.id === "chat_launch_ready")).toMatchObject({
       status: "fail",
       message: "Project chat launch is blocked.",
     });
+  });
+
+  it("prints a specific operator checklist item before setup is checked", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+    });
+    const result = verifyChatLaunchAuditPayload(snapshot);
+
+    expect(result.status).toBe("fail");
+    expect(result.operatorChecklist).toContain("- Run the remote project chat setup check before inviting builders.");
+    expect(result.operatorChecklist.join("\n")).not.toContain("Resolve Project chat check");
   });
 
   it("fails until remote setup checks are run", async () => {

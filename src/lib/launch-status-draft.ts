@@ -63,6 +63,10 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_guardian_wave_state: [
     "Set COMMAND_WAVE_STATE_URL to the deployed /api/command-wave/state URL for guardian PR checks.",
   ],
+  chat_setup_not_checked: ["Run the remote project chat setup check before inviting builders."],
+  chat_setup_remote_check: ["Run the remote project chat setup check before inviting builders."],
+  chat_wave_format: ["Set COMMAND_WAVE_INITIAL_WAVE_URL to a valid project chat."],
+  chat_wave_reachable: ["Pick a reachable 6529 project chat before inviting builders."],
   flow_project: ["Select the first project chat, and keep the GitHub repo placeholder until PR work starts."],
   flow_proposal: ["Create one PR-sized hook proposal before starting the first public loop."],
   flow_decision: ["Record the project decision before PR work starts."],

@@ -66,6 +66,13 @@ async function main() {
     }
   }
 
+  if (result.operatorChecklist.length) {
+    console.log("Chat launch operator checklist:");
+    for (const item of result.operatorChecklist) {
+      console.log(item);
+    }
+  }
+
   if (result.status !== "pass") {
     process.exitCode = 1;
   }

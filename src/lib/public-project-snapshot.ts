@@ -2,7 +2,7 @@ import { pollApprovalPassedForWave, type CommandWave } from "./command-waves";
 import { githubRepoPlaceholder } from "./agent-identities";
 import { isPlaceholderValue } from "./env-placeholders";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
-import { ledgerEventsByRecency } from "./ledger";
+import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { createPhaseChecklist } from "./phase-checklist";
 import { selectPhaseWork } from "./phase-work";
 
@@ -149,7 +149,7 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
   const currentWork = currentWorkSnapshot(wave);
   const repo = repoSnapshot(wave);
   const nextStep = nextStepSnapshot(wave);
-  const latestChanges = ledgerEventsByRecency(wave.ledger)
+  const latestChanges = ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl)
     .slice(0, 3)
     .map((event) => ({
       at: event.at,

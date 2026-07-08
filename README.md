@@ -442,8 +442,8 @@ runs a shape-only chat launch check.
 
 `npm run chat:launch` exits nonzero until the chat launch track is ready and generated with remote setup checks. The full
 `npm run launch:audit` command exits nonzero until the reviewed PR loop is also ready. For offline verification, set
-`CHAT_LAUNCH_PATH` or `LAUNCH_AUDIT_PATH`. The full launch verifier prints the status draft, state hashes, blockers,
-open items, and an operator checklist.
+`CHAT_LAUNCH_PATH` or `LAUNCH_AUDIT_PATH`. The chat verifier prints chat blockers, open items, and a chat operator
+checklist. The full launch verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
 When it can resolve the command-wave state target, it also checks that the public state snapshot hash matches the launch
 audit evidence. When it can resolve the project index target, it checks that the active project list includes the launch
 project and has a valid hash. Set `LAUNCH_AUDIT_STATE_URL` or `LAUNCH_AUDIT_PROJECT_INDEX_URL` to override those targets

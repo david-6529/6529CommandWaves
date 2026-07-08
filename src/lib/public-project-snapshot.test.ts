@@ -8,12 +8,12 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
       summaryParagraphs: [
         "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
       ],
-      updatedAt: "2026-06-20T12:50:00.000Z",
+      updatedAt: "2026-06-20T12:40:00.000Z",
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
         status: "complete",
@@ -34,19 +34,10 @@ describe("public project snapshot", () => {
       },
     });
     expect(snapshot.latestChanges[0]).toMatchObject({
-      label: "review recorded",
-      message: "Review passed the hook scaffold. It matched the builder decision and rules.",
-    });
-    const approvalSnapshot = createPublicProjectSnapshot({
-      ...demoWave,
-      executions: [],
-      reviews: [],
-      ledger: demoWave.ledger.filter((event) => event.type !== "guardian_reviewed" && event.type !== "execution_logged"),
-    });
-    expect(approvalSnapshot.latestChanges[0]).toMatchObject({
       label: "builders approved",
       message: "Builders approved the hook scaffold with 5 yes and 1 no.",
     });
+    expect(snapshot.latestChanges.map((event) => event.label)).not.toContain("review recorded");
     expect(JSON.stringify(snapshot)).not.toContain("\u2014");
   });
 

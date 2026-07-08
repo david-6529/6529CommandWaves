@@ -37,7 +37,7 @@ import {
 } from "@/lib/first-phase-launch-audit";
 import { createHookProposalPreflight, type HookProposalPreflightCheck } from "@/lib/hook-proposal-preflight";
 import { createActiveHookProjects } from "@/lib/hook-projects";
-import { ledgerEventsByRecency } from "@/lib/ledger";
+import { ledgerEventsForVisibleProjectHistory } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
@@ -1379,7 +1379,10 @@ export function CommandWavesConsole() {
   const visibleReviewChecks = activeReview?.checks.slice(0, 4) ?? [];
   const hiddenReviewChecks = activeReview?.checks.slice(visibleReviewChecks.length) ?? [];
   const buildTimeline = useMemo(() => createBuildTimeline(wave, title), [title, wave]);
-  const orderedLedgerEvents = useMemo(() => ledgerEventsByRecency(wave.ledger), [wave.ledger]);
+  const orderedLedgerEvents = useMemo(
+    () => ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl),
+    [wave.ledger, wave.repoUrl],
+  );
   const topChangelogItems = orderedLedgerEvents.slice(0, 3);
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");

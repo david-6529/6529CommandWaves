@@ -36,6 +36,7 @@ export function createChatLaunchSnapshot(snapshot: FirstPhaseLaunchSnapshot): Ch
     auditHash: verificationResult.auditHash,
     blockers: verificationResult.blockers,
     openItems: verificationResult.openItems,
+    operatorChecklist: verificationResult.operatorChecklist,
     checks: verificationResult.checks,
   };
 

@@ -3,7 +3,7 @@ import { reviewAgentIdentity } from "./agent-identities";
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
-import { ledgerEventsByRecency } from "./ledger";
+import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
@@ -275,7 +275,8 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const hasProject = Boolean(wave.waveUrl.trim() && hasConfiguredRepo(wave));
     const repoIsPlaceholder = hasPlaceholderRepo(wave);
     const publicRepoUrl = repoIsPlaceholder ? null : wave.repoUrl;
-    const latestActivity = ledgerEventsByRecency(wave.ledger)[0]?.message ?? "No activity logged yet.";
+    const latestActivity =
+      ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl)[0]?.message ?? "No activity logged yet.";
     const boundReviewCount = wave.reviews.filter((review) =>
       guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl),
     ).length;

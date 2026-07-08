@@ -1,6 +1,7 @@
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { hookProjectIndexHashInput } from "./hook-project-index";
 import { verifyLaunchAuditPayload, type LaunchAuditVerificationCheck } from "./launch-audit-verifier";
+import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { hashValue } from "./run-manifest";
 
 export type ChatLaunchVerificationResult = {
@@ -18,6 +19,7 @@ export type ChatLaunchVerificationResult = {
   chatLaunchHash: string | null;
   blockers: string[];
   openItems: string[];
+  operatorChecklist: string[];
   checks: LaunchAuditVerificationCheck[];
 };
 
@@ -74,6 +76,24 @@ function itemSummary(value: unknown) {
 
 function collectItemSummaries(value: unknown) {
   return Array.isArray(value) ? value.map(itemSummary) : [];
+}
+
+function collectOpenItemRecords(value: unknown): LaunchStatusOpenItem[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter(isRecord).flatMap((item) => {
+    const id = asString(item.id);
+    const label = asString(item.label);
+    const detail = asString(item.detail);
+
+    return id && label && detail ? [{ id, label, detail }] : [];
+  });
+}
+
+function operatorChecklistFor(openItems: LaunchStatusOpenItem[]) {
+  return openItems.length ? launchOperatorChecklistLines(openItems) : [];
 }
 
 function check(id: string, status: LaunchAuditVerificationCheck["status"], message: string): LaunchAuditVerificationCheck {
@@ -211,6 +231,7 @@ function verifyChatLaunchSnapshotPayload(
   const launchStatus = asString(prLoop?.status) ?? "unknown";
   const blockers = collectItemSummaries(chatLaunch?.blockers);
   const openItems = collectItemSummaries(chatLaunch?.openItems);
+  const openItemRecords = collectOpenItemRecords(chatLaunch?.openItems);
   const setupCheckMode = asString(snapshot?.setupCheckMode);
   const sourceAuditHash = asString(snapshot?.sourceAuditHash);
   const chatLaunchHash = asString(snapshot?.chatLaunchHash);
@@ -324,6 +345,7 @@ function verifyChatLaunchSnapshotPayload(
     chatLaunchHash,
     blockers,
     openItems,
+    operatorChecklist: operatorChecklistFor(openItemRecords),
     checks,
   };
 }
@@ -340,6 +362,7 @@ export function verifyChatLaunchAuditPayload(
   const chatLaunchStatus = asString(chatLaunch?.status) ?? "unknown";
   const blockers = collectItemSummaries(chatLaunch?.blockers);
   const openItems = collectItemSummaries(chatLaunch?.openItems);
+  const openItemRecords = collectOpenItemRecords(chatLaunch?.openItems);
   const checks = [
     ...fullAudit.checks.filter((item) => requiredFullAuditCheckIds.has(item.id)),
     check(
@@ -375,6 +398,7 @@ export function verifyChatLaunchAuditPayload(
     chatLaunchHash: null,
     blockers,
     openItems,
+    operatorChecklist: operatorChecklistFor(openItemRecords),
     checks,
   };
 }
