@@ -196,8 +196,8 @@ describe("launch audit verifier", () => {
       status: "pass",
     });
     expect(result.nextAction?.title).toBe("Repo not selected yet");
-    expect(result.statusDraft).toContain("Project launch status");
-    expect(result.statusDraft).toContain("Status: checks needed");
+    expect(result.statusDraft).toContain("Staged project status");
+    expect(result.statusDraft).toContain("PR loop: checks needed");
     expect(result.stateEvidence).toEqual({
       waveStateHash: publicCommandWaveHash(configuredDemoWave),
       rulesHash: hashValue(configuredDemoWave.rules),
@@ -691,7 +691,7 @@ describe("launch audit verifier", () => {
     });
     const result = verifyLaunchAuditPayload({
       ...snapshot,
-      statusDraft: "Project launch status\nStatus: ready\nOperator checklist:\nVerification:",
+      statusDraft: "Staged project status\nPR loop: ready\nOperator checklist:\nVerification:",
     });
 
     expect(result.status).toBe("fail");

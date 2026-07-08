@@ -52,13 +52,13 @@ describe("launch status draft", () => {
     });
     const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
 
-    expect(draft).toContain("Project launch status");
+    expect(draft).toContain("Staged project status");
     expect(draft).toContain(`Project chat: ${configuredDemoWave.waveUrl}`);
     expect(draft).toContain(`GitHub repo: ${configuredDemoWave.repoUrl}`);
     expect(draft).toContain("Chat launch: checks needed");
     expect(draft).toContain("Chat next action: Run project chat check");
-    expect(draft).toContain("Status: checks needed");
-    expect(draft).toContain("Next action: Run launch setup check");
+    expect(draft).toContain("PR loop: checks needed");
+    expect(draft).toContain("PR loop next action: Run launch setup check");
     expect(draft).toContain(
       "- Setup check: Verify the project chat, repo, contributor rules, PR template, guardian workflow, and required guardian check before inviting contributors.",
     );
@@ -162,8 +162,8 @@ describe("launch status draft", () => {
     expect(audit.status).toBe("needs_setup");
     expect(draft).toContain("Chat launch: ready");
     expect(draft).toContain("Chat next action: Open project chat");
-    expect(draft).toContain("Status: checks needed");
-    expect(draft).toContain("Next action: Select reviewer process");
+    expect(draft).toContain("PR loop: checks needed");
+    expect(draft).toContain("PR loop next action: Select reviewer process");
     expect(draft).toContain(
       "- Review agent: Review agent is a placeholder. Select the reviewer process before claiming the reviewed PR loop is ready.",
     );

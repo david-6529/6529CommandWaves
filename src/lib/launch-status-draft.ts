@@ -108,19 +108,19 @@ export function createLaunchStatusDraft({
   verificationTargets: LaunchStatusVerificationTargets;
 }) {
   return [
-    "Project launch status",
+    "Staged project status",
     "",
     `Project chat: ${wave.waveUrl}`,
     projectRepoLine("GitHub repo", wave.repoUrl),
     `Chat launch: ${audit.chatLaunch.statusLabel}`,
     audit.chatLaunch.summary,
-    `Status: ${audit.statusLabel}`,
+    `PR loop: ${audit.statusLabel}`,
     audit.summary,
     "",
     `Chat next action: ${audit.chatLaunch.nextAction.title}`,
     audit.chatLaunch.nextAction.detail,
     "",
-    `Next action: ${audit.nextAction.title}`,
+    `PR loop next action: ${audit.nextAction.title}`,
     audit.nextAction.detail,
     "",
     "Open items:",

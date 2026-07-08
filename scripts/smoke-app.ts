@@ -269,7 +269,7 @@ async function main() {
   assertSha256("Launch audit wave state hash", objectValue(stateEvidence, "waveStateHash"));
   assertSha256("Launch audit rules hash", objectValue(stateEvidence, "rulesHash"));
   assertString("Launch audit status draft", statusDraft);
-  for (const label of ["Project launch status", "Operator checklist:", "Verification:", "Guardrails:"]) {
+  for (const label of ["Staged project status", "Chat launch:", "PR loop:", "Operator checklist:", "Verification:", "Guardrails:"]) {
     assertIncludes("Launch audit status draft", statusDraft, label);
   }
   assertIncludes("Launch audit status draft", statusDraft, "Verification manifest:");

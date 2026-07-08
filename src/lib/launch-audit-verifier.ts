@@ -428,10 +428,11 @@ function statusDraftReady(value: unknown) {
 
   return Boolean(
     draft &&
-      draft.includes("Project launch status") &&
+      draft.includes("Staged project status") &&
       draft.includes("Chat launch:") &&
       draft.includes("Chat next action:") &&
-      draft.includes("Status:") &&
+      draft.includes("PR loop:") &&
+      draft.includes("PR loop next action:") &&
       draft.includes("Operator checklist:") &&
       draft.includes("Verification:") &&
       draft.includes("Guardrails:") &&

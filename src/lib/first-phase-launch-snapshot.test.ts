@@ -131,9 +131,9 @@ describe("first phase launch snapshot", () => {
       chatLaunchUrl: "https://command-waves.example.com/api/command-wave/launch/chat",
       launchAuditUrl: "https://command-waves.example.com/api/command-wave/launch/audit",
     });
-    expect(snapshot.statusDraft).toContain("Project launch status");
-    expect(snapshot.statusDraft).toContain("Status: checks needed");
-    expect(snapshot.statusDraft).toContain("Next action: Repo not selected yet");
+    expect(snapshot.statusDraft).toContain("Staged project status");
+    expect(snapshot.statusDraft).toContain("PR loop: checks needed");
+    expect(snapshot.statusDraft).toContain("PR loop next action: Repo not selected yet");
     expect(snapshot.statusDraft).toContain("GitHub repo is a placeholder. PR work stays blocked until maintainers choose the repo.");
     expect(snapshot.statusDraft).toContain(
       "- Verification manifest: https://command-waves.example.com/api/command-wave/verification/manifest",
