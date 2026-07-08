@@ -2691,15 +2691,6 @@ export function CommandWavesConsole() {
                       <p className="mt-1 text-base font-semibold text-zinc-50">{member.activity}</p>
                       <p className="mt-1 text-sm leading-6 text-zinc-400">Report: {member.scoreLabel}</p>
                     </div>
-                    {member.basis.length ? (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {member.basis.slice(0, 2).map((basis) => (
-                          <Badge key={`${member.identity}-${basis}`} className="border-zinc-800 bg-zinc-900 text-zinc-400">
-                            {basis}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : null}
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
                         Message

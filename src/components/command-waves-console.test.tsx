@@ -304,6 +304,20 @@ describe("CommandWavesConsole", () => {
     expect(activeProjectsHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);
   });
 
+  it("keeps visible member cards focused on activity instead of report scoring details", () => {
+    const html = renderedConsoleHtml();
+    const start = html.indexOf('id="members-and-rules"');
+    const end = html.indexOf('id="start-building"');
+    const membersHtml = html.slice(start, end);
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(membersHtml).toContain("Activity");
+    expect(membersHtml).toContain("Report: 1 report point");
+    expect(membersHtml).not.toContain("Proposal work: 3 report points");
+    expect(membersHtml).not.toContain("Decision links: 2 report points");
+  });
+
   it("asks for proposal substance before optional proposal details", () => {
     const html = renderedConsoleHtml();
     const start = html.indexOf('id="start-building"');
