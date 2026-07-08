@@ -102,8 +102,8 @@ describe("first phase launch snapshot", () => {
       waveStateHash: publicCommandWaveHash(demoWave),
       rulesHash: hashValue(demoWave.rules),
       proposalCount: demoWave.proposals.length,
-      reviewCount: demoWave.reviews.length,
-      ledgerEventCount: demoWave.ledger.length,
+      reviewCount: 0,
+      ledgerEventCount: 4,
     });
     expect(snapshot.reports.contribution).toMatchObject({
       mode: "informational",

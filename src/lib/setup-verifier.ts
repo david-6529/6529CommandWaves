@@ -26,6 +26,10 @@ export type SetupVerificationOptions = {
   commandWaveState?: unknown;
 };
 
+type PublicStateWave = Omit<CommandWave, "repoUrl"> & {
+  repoUrl: string | null;
+};
+
 function check(id: string, status: SetupVerificationCheck["status"], message: string): SetupVerificationCheck {
   return { id, status, message };
 }
@@ -38,14 +42,14 @@ function asString(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
-function isCommandWave(value: unknown): value is CommandWave {
+function isCommandWave(value: unknown): value is PublicStateWave {
   const record = isRecord(value) ? value : null;
 
   return Boolean(
     record &&
       typeof record.id === "string" &&
       typeof record.waveUrl === "string" &&
-      typeof record.repoUrl === "string" &&
+      (typeof record.repoUrl === "string" || record.repoUrl === null) &&
       isRecord(record.rules) &&
       Array.isArray(record.proposals) &&
       Array.isArray(record.polls) &&

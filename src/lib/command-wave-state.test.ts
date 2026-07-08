@@ -100,6 +100,11 @@ describe("command wave state snapshot", () => {
     expect(stateHash).toMatch(/^[a-f0-9]{64}$/);
     expect(stateHash).toBe(createCommandWaveStateHash(snapshotWithoutStateHash));
     expect(snapshot.wave.repoUrl).toBeNull();
+    expect(snapshot.wave.executions).toEqual([]);
+    expect(snapshot.wave.reviews).toEqual([]);
+    expect(snapshot.wave.ledger.map((event) => event.type)).not.toContain("execution_logged");
+    expect(snapshot.wave.ledger.map((event) => event.type)).not.toContain("guardian_reviewed");
+    expect(snapshot.wave.proposals[0]?.status).toBe("approved");
     expect(snapshot.waveStateHash).toBe(publicCommandWaveHash(demoWave));
     expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("builders approved");
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");

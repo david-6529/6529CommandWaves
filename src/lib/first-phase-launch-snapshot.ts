@@ -1,5 +1,7 @@
 import {
   commandWaveStateUrlFromEnv,
+  createPublicCommandWave,
+  createPublicCommandWaveSource,
   phaseOneAuthorityBoundary,
   phaseOneProductContract,
   publicCommandWaveHash,
@@ -21,7 +23,7 @@ import { publicHookSafety } from "./public-hook-safety";
 import { createPublicProjectSnapshot } from "./public-project-snapshot";
 import { createPublicWorkflowProof } from "./public-workflow-proof";
 import { hashValue } from "./run-manifest";
-import { validateCommandWaveSetup, type SetupValidation } from "./setup-validation";
+import { validateCommandWaveSetup, validateSetupShape, type SetupValidation } from "./setup-validation";
 import { getReadinessChecks, getReadinessSummary, type ReadinessCheck } from "./system/readiness";
 
 export type FirstPhaseLaunchSnapshot = {
@@ -89,7 +91,29 @@ function appRouteUrl(path: string, env: Record<string, string | undefined>) {
   return appUrl ? `${appUrl}${path}` : path;
 }
 
-function createPublicSetupValidation(setupValidation: SetupValidation): SetupValidation {
+function createPublicSetupValidation(setupValidation: SetupValidation, publicSourceWave: CommandWave): SetupValidation {
+  if (isPlaceholderValue(publicSourceWave.repoUrl)) {
+    const placeholderValidation = validateSetupShape({
+      waveUrl: publicSourceWave.waveUrl,
+      repoUrl: publicSourceWave.repoUrl,
+    });
+
+    return {
+      ...placeholderValidation,
+      repo: null,
+      repoMetadata: null,
+      repoRequiredFiles: [],
+      checks: placeholderValidation.checks.map((check) =>
+        check.id === "repo_format"
+          ? {
+              ...check,
+              message: "GitHub repo is not selected yet.",
+            }
+          : check,
+      ),
+    };
+  }
+
   const repoUrl = setupValidation.repo?.htmlUrl ?? "";
 
   if (!repoUrl || !isPlaceholderValue(repoUrl)) {
@@ -110,12 +134,14 @@ export async function createFirstPhaseLaunchSnapshot(
 ): Promise<FirstPhaseLaunchSnapshot> {
   const env = options.env ?? process.env;
   const generatedAt = options.generatedAt ?? new Date().toISOString();
+  const publicSourceWave = createPublicCommandWaveSource(wave);
+  const publicWave = createPublicCommandWave(publicSourceWave);
   const setupValidation =
     options.setupValidation ??
     (await validateCommandWaveSetup(
       {
-        waveUrl: wave.waveUrl,
-        repoUrl: wave.repoUrl,
+        waveUrl: publicSourceWave.waveUrl,
+        repoUrl: publicSourceWave.repoUrl,
       },
       {
         checkWaveRemote: Boolean(options.checkSetupRemote),
@@ -123,8 +149,8 @@ export async function createFirstPhaseLaunchSnapshot(
       },
     ));
   const readinessChecks = options.readinessChecks ?? getReadinessChecks(env);
-  const phaseChecklist = createPhaseChecklist(wave);
-  const phaseWork = selectPhaseWork(wave);
+  const phaseChecklist = createPhaseChecklist(publicSourceWave);
+  const phaseWork = selectPhaseWork(publicSourceWave);
   const launchPacketProposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
   const launchPacketUsesPrWork = Boolean(
     launchPacketProposal && phaseWork.prProposal && launchPacketProposal.id === phaseWork.prProposal.id,
@@ -132,23 +158,23 @@ export async function createFirstPhaseLaunchSnapshot(
   const launchPacketPoll = launchPacketUsesPrWork
     ? phaseWork.prPoll
     : launchPacketProposal
-      ? wave.polls.find((poll) => poll.proposalId === launchPacketProposal.id) ?? null
+      ? publicSourceWave.polls.find((poll) => poll.proposalId === launchPacketProposal.id) ?? null
       : null;
   const launchPacketExecution = launchPacketUsesPrWork
     ? phaseWork.prExecution
     : launchPacketProposal
-      ? wave.executions.find((execution) => execution.proposalId === launchPacketProposal.id) ?? null
+      ? publicSourceWave.executions.find((execution) => execution.proposalId === launchPacketProposal.id) ?? null
       : null;
   const launchPacketReview = launchPacketUsesPrWork
     ? phaseWork.prReview
     : launchPacketProposal
-      ? wave.reviews.find((review) => review.proposalId === launchPacketProposal.id) ?? null
+      ? publicSourceWave.reviews.find((review) => review.proposalId === launchPacketProposal.id) ?? null
       : null;
   const launchAudit = createFirstPhaseLaunchAudit({
     phaseChecklist,
     readinessChecks,
     setupValidation,
-    wave,
+    wave: publicSourceWave,
   });
   const commandWaveStateUrl = commandWaveStateUrlFromEnv(env) ?? appRouteUrl("/api/command-wave/state", env);
   const launchAuditPath = options.checkSetupRemote ? "/api/command-wave/launch/audit?remote=1" : "/api/command-wave/launch/audit";
@@ -162,23 +188,22 @@ export async function createFirstPhaseLaunchSnapshot(
     chatLaunchUrl: appRouteUrl(chatLaunchPath, env),
     launchAuditUrl: appRouteUrl(launchAuditPath, env),
   };
-  const contributionReport = createContributionReport(wave, { generatedAt });
-  const publicRepoUrl = isPlaceholderValue(wave.repoUrl) ? null : wave.repoUrl;
-  const publicSetupValidation = createPublicSetupValidation(setupValidation);
+  const contributionReport = createContributionReport(publicSourceWave, { generatedAt });
+  const publicSetupValidation = createPublicSetupValidation(setupValidation, publicSourceWave);
   const snapshotWithoutHash = {
     version: "command-wave-launch-audit-v0.1",
     generatedAt,
     project: {
-      id: wave.id,
-      name: wave.name,
-      waveUrl: wave.waveUrl,
-      repoUrl: publicRepoUrl,
+      id: publicSourceWave.id,
+      name: publicSourceWave.name,
+      waveUrl: publicSourceWave.waveUrl,
+      repoUrl: publicWave.repoUrl,
     },
     setupCheckMode: options.checkSetupRemote ? "remote" : "shape",
-    projectSnapshot: createPublicProjectSnapshot(wave),
+    projectSnapshot: createPublicProjectSnapshot(publicSourceWave),
     hookSafety: publicHookSafety,
-    workflowProof: createPublicWorkflowProof(wave),
-    access: createParticipationAccessSnapshot(wave.gates),
+    workflowProof: createPublicWorkflowProof(publicSourceWave),
+    access: createParticipationAccessSnapshot(publicSourceWave.gates),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
     agents: {
@@ -187,21 +212,21 @@ export async function createFirstPhaseLaunchSnapshot(
       githubRepo: publicGithubRepoPlaceholder,
     },
     stateEvidence: {
-      waveStateHash: publicCommandWaveHash(wave),
-      rulesHash: hashValue(wave.rules),
-      proposalCount: wave.proposals.length,
-      reviewCount: wave.reviews.length,
-      ledgerEventCount: wave.ledger.length,
+      waveStateHash: publicCommandWaveHash(publicSourceWave),
+      rulesHash: hashValue(publicSourceWave.rules),
+      proposalCount: publicWave.proposals.length,
+      reviewCount: publicWave.reviews.length,
+      ledgerEventCount: publicWave.ledger.length,
     },
     verificationTargets,
     setupValidation: publicSetupValidation,
     statusDraft: createLaunchStatusDraft({
-      wave,
+      wave: publicSourceWave,
       audit: launchAudit,
       verificationTargets,
     }),
     launchPacket: createLaunchPacket({
-      wave,
+      wave: publicSourceWave,
       proposal: launchPacketProposal,
       poll: launchPacketPoll,
       execution: launchPacketExecution,
@@ -211,7 +236,7 @@ export async function createFirstPhaseLaunchSnapshot(
     }),
     reports: {
       contribution: contributionReport,
-      developerFee: createDeveloperFeePlan(wave, contributionReport),
+      developerFee: createDeveloperFeePlan(publicSourceWave, contributionReport),
     },
     readiness: {
       summary: getReadinessSummary(readinessChecks),

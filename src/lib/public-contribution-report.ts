@@ -1,4 +1,5 @@
 import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
+import { createPublicCommandWaveSource } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { isPlaceholderValue } from "./env-placeholders";
@@ -68,7 +69,8 @@ export function createPublicContributionReport(
   wave: CommandWave,
   options: PublicContributionReportOptions = {},
 ): PublicContributionReport {
-  const report = createContributionReport(wave, {
+  const publicSourceWave = createPublicCommandWaveSource(wave);
+  const report = createContributionReport(publicSourceWave, {
     generatedAt: options.generatedAt,
     limit: options.limit,
   });
@@ -77,10 +79,10 @@ export function createPublicContributionReport(
     version: "command-wave-contribution-report-v0.1",
     generatedAt,
     project: {
-      id: wave.id,
-      name: wave.name,
-      waveUrl: wave.waveUrl,
-      repo: publicRepo(wave),
+      id: publicSourceWave.id,
+      name: publicSourceWave.name,
+      waveUrl: publicSourceWave.waveUrl,
+      repo: publicRepo(publicSourceWave),
     },
     agents: {
       orchestrator: {

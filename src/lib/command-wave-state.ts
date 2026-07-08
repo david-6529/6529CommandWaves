@@ -1,6 +1,7 @@
 import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
-import type { CommandWave } from "./command-waves";
+import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
+import type { CommandWave, LedgerEvent } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { hasProductionValue, isPlaceholderValue } from "./env-placeholders";
 import { createParticipationAccessSnapshot } from "./participation-gates";
@@ -87,21 +88,43 @@ export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBound
   accessStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
 };
 
+const repoBoundPublicEventTypes = new Set<LedgerEvent["type"]>([
+  "execution_started",
+  "execution_logged",
+  "guardian_reviewed",
+]);
+
+export function createPublicCommandWaveSource(wave: CommandWave): CommandWave {
+  const setupSafeWave = withPlaceholderRepoSetupState(wave);
+
+  if (!isPlaceholderValue(setupSafeWave.repoUrl)) {
+    return setupSafeWave;
+  }
+
+  return {
+    ...setupSafeWave,
+    executions: [],
+    reviews: [],
+    ledger: setupSafeWave.ledger.filter((event) => !repoBoundPublicEventTypes.has(event.type)),
+  };
+}
+
 export function createCommandWaveStateSnapshot(
   wave: CommandWave,
   options: { generatedAt?: string } = {},
 ): CommandWaveStateSnapshot {
   const generatedAt = options.generatedAt ?? new Date().toISOString();
-  const publicWave = createPublicCommandWave(wave);
+  const publicSourceWave = createPublicCommandWaveSource(wave);
+  const publicWave = createPublicCommandWave(publicSourceWave);
   const snapshotWithoutHash = {
     version: "command-wave-state-v0.1",
     generatedAt,
     wave: publicWave,
-    waveStateHash: publicCommandWaveHash(wave),
-    projectSnapshot: createPublicProjectSnapshot(wave),
+    waveStateHash: publicCommandWaveHash(publicSourceWave),
+    projectSnapshot: createPublicProjectSnapshot(publicSourceWave),
     hookSafety: publicHookSafety,
-    workflowProof: createPublicWorkflowProof(wave),
-    access: createParticipationAccessSnapshot(wave.gates),
+    workflowProof: createPublicWorkflowProof(publicSourceWave),
+    access: createParticipationAccessSnapshot(publicSourceWave.gates),
     productContract: phaseOneProductContract,
     authorityBoundary: phaseOneAuthorityBoundary,
     agents: {
@@ -110,7 +133,7 @@ export function createCommandWaveStateSnapshot(
       githubRepo: publicGithubRepoPlaceholder,
     },
     reports: {
-      contribution: createContributionReport(wave, { generatedAt }),
+      contribution: createContributionReport(publicSourceWave, { generatedAt }),
     },
     guardian: {
       envVar: "COMMAND_WAVE_STATE_URL",
@@ -125,9 +148,11 @@ export function createCommandWaveStateSnapshot(
 }
 
 export function createPublicCommandWave(wave: CommandWave): PublicCommandWave {
+  const publicSourceWave = createPublicCommandWaveSource(wave);
+
   return {
-    ...wave,
-    repoUrl: isPlaceholderValue(wave.repoUrl) ? null : wave.repoUrl,
+    ...publicSourceWave,
+    repoUrl: isPlaceholderValue(publicSourceWave.repoUrl) ? null : publicSourceWave.repoUrl,
   };
 }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCommandWaveStateSnapshot } from "./command-wave-state";
+import { createCommandWaveStateSnapshot, publicCommandWaveHash } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { createHookProjectIndex } from "./hook-project-index";
@@ -195,19 +195,19 @@ describe("launch audit verifier", () => {
     expect(result.checks.find((item) => item.id === "developer_fee_plan")).toMatchObject({
       status: "pass",
     });
-    expect(result.nextAction?.title).toBe("Select reviewer process");
+    expect(result.nextAction?.title).toBe("Repo not selected yet");
     expect(result.statusDraft).toContain("Project launch status");
     expect(result.statusDraft).toContain("Status: checks needed");
     expect(result.stateEvidence).toEqual({
-      waveStateHash: hashValue(configuredDemoWave),
+      waveStateHash: publicCommandWaveHash(configuredDemoWave),
       rulesHash: hashValue(configuredDemoWave.rules),
       proposalCount: configuredDemoWave.proposals.length,
-      reviewCount: configuredDemoWave.reviews.length,
-      ledgerEventCount: configuredDemoWave.ledger.length,
+      reviewCount: 0,
+      ledgerEventCount: 4,
     });
     expect(result.publicState).toMatchObject({
       stateHash: commandWaveState.stateHash,
-      waveStateHash: hashValue(configuredDemoWave),
+      waveStateHash: publicCommandWaveHash(configuredDemoWave),
     });
     expect(result.publicProjectIndex).toMatchObject({
       projectsHash: projectIndex.projectsHash,

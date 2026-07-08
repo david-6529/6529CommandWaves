@@ -32,8 +32,8 @@ describe("public verification manifest", () => {
         waveStateHash: publicCommandWaveHash(demoWave),
         rulesHash: hashValue(demoWave.rules),
         proposalCount: demoWave.proposals.length,
-        reviewCount: demoWave.reviews.length,
-        ledgerEventCount: demoWave.ledger.length,
+        reviewCount: 0,
+        ledgerEventCount: 4,
       },
       launchTracks: {
         chat: {

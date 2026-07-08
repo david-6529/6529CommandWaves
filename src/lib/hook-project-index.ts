@@ -1,3 +1,4 @@
+import { createPublicCommandWaveSource } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createActiveHookProjects, type ActiveHookProject } from "./hook-projects";
 import { hashValue } from "./run-manifest";
@@ -24,7 +25,8 @@ export function createHookProjectIndex(
   input: CommandWave | CommandWave[],
   options: { generatedAt?: string } = {},
 ): HookProjectIndex {
-  const projects = createActiveHookProjects(input);
+  const publicSourceWaves = (Array.isArray(input) ? input : [input]).map(createPublicCommandWaveSource);
+  const projects = createActiveHookProjects(publicSourceWaves);
   const indexWithoutHash = {
     version: "command-wave-projects-v0.1",
     generatedAt: options.generatedAt ?? new Date().toISOString(),
