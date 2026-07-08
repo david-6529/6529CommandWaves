@@ -128,6 +128,11 @@ async function main() {
     "No GitHub repo is selected yet. Select the pilot repo before creating PR work.",
     "PR build waits until maintainers select the GitHub repo.",
     "Project chat",
+    "Open chat",
+    "Find chat",
+    "Type a chat name",
+    "Refresh chat to read the latest posts here.",
+    "First public project chat.",
     "id=\"project-chat-tab-general\"",
     "aria-controls=\"project-chat-panel-general\"",
     "id=\"project-chat-panel-general\"",
@@ -185,6 +190,9 @@ async function main() {
     !renderedHtml.includes("https://github.com/your-org/your-hook-repo"),
     "Home page must not render the placeholder GitHub URL.",
   );
+  for (const oldLabel of ["Open source", "Project source", "Find a source", "Type a source name"]) {
+    assert(!renderedHtml.includes(oldLabel), `Home page should not render old source wording: ${oldLabel}.`);
+  }
   assertNoEmDash("Home page", renderedHtml);
 
   const readiness = await fetchJson("/api/readiness");

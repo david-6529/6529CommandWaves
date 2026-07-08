@@ -191,7 +191,7 @@ const projectWorkRules = [
 ];
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
-  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public project source."],
+  ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public project chat."],
   ["COMMAND_WAVE_INITIAL_REPO_URL", "Placeholder now. Select the pilot repo before PR work."],
   ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
   ["DATABASE_URL", "Production Postgres connection."],
@@ -1579,9 +1579,9 @@ export function CommandWavesConsole() {
       const results = await requestWaveSearch(query);
 
       setWaveSearchResults(results);
-      setApiNotice(results.length ? `Found ${results.length} source option${results.length === 1 ? "" : "s"}.` : "No sources found.");
+      setApiNotice(results.length ? `Found ${results.length} chat option${results.length === 1 ? "" : "s"}.` : "No chats found.");
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : "Source search failed.");
+      setApiError(error instanceof Error ? error.message : "Chat search failed.");
     } finally {
       setApiBusy(null);
     }
@@ -1793,7 +1793,7 @@ export function CommandWavesConsole() {
         setProjectChatNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
             ? "Message copied for posting."
-            : "Message copied. Open the source manually.",
+            : "Message copied. Open the chat manually.",
         );
         return;
       }
@@ -2013,7 +2013,7 @@ export function CommandWavesConsole() {
         setProposalDraftNotice(
           openDiscussionInTab(discussionTab, wave.waveUrl)
             ? "Proposal copied for discussion."
-            : "Proposal copied. Open the source manually.",
+            : "Proposal copied. Open the chat manually.",
         );
         return;
       }
@@ -2909,7 +2909,7 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={() => void copyParticipationGuideDraft()}>
                   Copy guide
                 </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open chat</LinkButton> : null}
               </div>
               {participationGuideNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{participationGuideNotice}</p> : null}
             </div>
@@ -2924,7 +2924,7 @@ export function CommandWavesConsole() {
             </Badge>
           </summary>
           <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
-            Hook project source, GitHub repo, access notes, and the next code step.
+            Hook project chat, GitHub repo, access notes, and the next code step.
           </p>
           <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
@@ -2937,7 +2937,7 @@ export function CommandWavesConsole() {
                       <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
                       <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge className="border-zinc-700 bg-black text-zinc-300">source {project.waveLabel}</Badge>
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">chat {project.waveLabel}</Badge>
                         <Badge className="border-zinc-700 bg-black text-zinc-300">code {project.repoLabel}</Badge>
                       </div>
                     </div>
@@ -2974,7 +2974,7 @@ export function CommandWavesConsole() {
                         </ul>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open source</LinkButton> : null}
+                        {project.waveUrl ? <LinkButton href={project.waveUrl}>Open chat</LinkButton> : null}
                         <Button
                           type="button"
                           variant="secondary"
@@ -3018,7 +3018,7 @@ export function CommandWavesConsole() {
                         </div>
                       ) : (
                         <p className="mt-3 text-xs leading-5 text-zinc-500">
-                          Preview the source to read the latest posts here.
+                          Refresh chat to read the latest posts here.
                         </p>
                       )}
                     </div>
@@ -3183,7 +3183,7 @@ export function CommandWavesConsole() {
                 </Button>
                 {launchEnvNotice ? <p className="mt-2 text-xs leading-5 text-amber-100/75">{launchEnvNotice}</p> : null}
               </div>
-              <Field label="Project source">
+              <Field label="Project chat">
                 <Input
                   value={waveUrl}
                   onChange={(event) => {
@@ -3193,11 +3193,11 @@ export function CommandWavesConsole() {
                 />
               </Field>
               <div className="rounded-md border border-zinc-800 bg-black p-3">
-                <Field label="Find a source">
+                <Field label="Find chat">
                   <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
                     <Input
                       value={waveSearchQuery}
-                      placeholder="Type a source name"
+                      placeholder="Type a chat name"
                       onChange={(event) => setWaveSearchQuery(event.target.value)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter") {
@@ -3295,7 +3295,7 @@ export function CommandWavesConsole() {
                   >
                     Copy participation guide
                   </Button>
-                  <LinkButton href={waveUrl}>Open source</LinkButton>
+                  <LinkButton href={waveUrl}>Open chat</LinkButton>
                 </div>
                 {participationGuideNotice ? (
                   <p className="mt-2 text-xs leading-5 text-zinc-500">{participationGuideNotice}</p>
@@ -3749,7 +3749,7 @@ export function CommandWavesConsole() {
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
                     Copy proposal
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open chat</LinkButton> : null}
                 </div>
                 {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
               </div>
@@ -3833,7 +3833,7 @@ export function CommandWavesConsole() {
                         <p className="mt-1 text-xs text-zinc-500">{activePollDetail}</p>
                         {activePoll.status === "open" ? (
                           <p className="mt-1 text-xs text-zinc-500">
-                            Optional local tally only. The project decision is the approval source.
+                            Optional local tally only. The project decision is the approval record.
                           </p>
                         ) : null}
                       </div>
@@ -3871,7 +3871,7 @@ export function CommandWavesConsole() {
                           <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveDecisionDraft()}>
                             Copy request
                           </Button>
-                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
+                          {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open chat</LinkButton> : null}
                         </div>
                         {decisionDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{decisionDraftNotice}</p> : null}
                       </div>
@@ -4154,7 +4154,7 @@ export function CommandWavesConsole() {
                 <Button type="button" variant="secondary" onClick={() => void copyDeveloperFeePlanDraft()}>
                   Copy planning draft
                 </Button>
-                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
+                {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open chat</LinkButton> : null}
               </div>
               {developerFeePlanNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{developerFeePlanNotice}</p> : null}
               <Badge className="mt-3 border-amber-700 bg-amber-950/45 text-amber-100">
@@ -4181,7 +4181,7 @@ export function CommandWavesConsole() {
                   <Button type="button" variant="secondary" onClick={() => void copyWaveUpdateDraft()}>
                     Copy update
                   </Button>
-                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open source</LinkButton> : null}
+                  {wave.waveUrl ? <LinkButton href={wave.waveUrl}>Open chat</LinkButton> : null}
                   <Button type="button" variant="secondary" onClick={resetWaveUpdateDraft}>
                     Reset draft
                   </Button>

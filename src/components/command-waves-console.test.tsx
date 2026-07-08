@@ -70,8 +70,16 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("No GitHub repo is selected yet. Select the pilot repo before creating PR work.");
     expect(text).toContain("PR build waits until maintainers select the GitHub repo.");
     expect(text).toContain("Project chat");
+    expect(text).toContain("Open chat");
+    expect(text).toContain("Find chat");
+    expect(text).toContain("Refresh chat to read the latest posts here.");
+    expect(text).toContain("First public project chat.");
     expect(text).toContain("Summarize or inspect project state.");
     expect(text).not.toContain("wave/repo state");
+    expect(text).not.toContain("Open source");
+    expect(text).not.toContain("Project source");
+    expect(text).not.toContain("Find a source");
+    expect(text).not.toContain("Type a source name");
     expect(text).toContain("General");
     expect(text).toContain("Build");
     expect(text).toContain("Review");
@@ -114,6 +122,7 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain(">View setup</button>");
     expect(html).toContain('id="project-repo-url"');
     expect(html).toContain('placeholder="Select later, owner/repo or GitHub URL"');
+    expect(html).toContain('placeholder="Type a chat name"');
     expect(html).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(html).toContain('id="project-access-key"');
     expect(html).toContain('id="who-can-join"');
