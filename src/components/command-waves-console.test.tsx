@@ -25,14 +25,14 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon updates");
-    expect(text).toContain("This is a shared workspace for one hook project.");
+    expect(text).toContain("This workspace is for one hook project.");
     expect(text).toContain(
-      "Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
+      "Builders use chat to discuss ideas, record decisions, and turn approved work into reviewed GitHub PRs.",
     );
     expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next: Keep discussing in chat. Select the hook repo before PR work starts.");
-    expect(text).toContain("GitHub repo is a placeholder. PR work waits until maintainers choose the repo.");
-    expect(text).toContain("Latest change: Builders approved the hook scaffold with 5 yes and 1 no.");
+    expect(text).toContain("Repo: not selected yet. PR work waits until maintainers choose it.");
+    expect(text).toContain("Latest: Builders approved the hook scaffold with 5 yes and 1 no.");
     expect(text).toContain("No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");

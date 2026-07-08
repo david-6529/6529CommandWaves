@@ -8,10 +8,10 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. GitHub repo is a placeholder. PR work waits until maintainers choose the repo. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
+        "This workspace is for one hook project. Builders use chat to discuss ideas, record decisions, and turn approved work into reviewed GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo: not selected yet. PR work waits until maintainers choose it. Latest: Builders approved the hook scaffold with 5 yes and 1 no.",
       summaryParagraphs: [
-        "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. GitHub repo is a placeholder. PR work waits until maintainers choose the repo. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
+        "This workspace is for one hook project. Builders use chat to discuss ideas, record decisions, and turn approved work into reviewed GitHub PRs.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo: not selected yet. PR work waits until maintainers choose it. Latest: Builders approved the hook scaffold with 5 yes and 1 no.",
       ],
       updatedAt: "2026-06-20T12:40:00.000Z",
       currentWork: {
@@ -57,9 +57,9 @@ describe("public project snapshot", () => {
 
     expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Current focus: Choose one hook change.");
     expect(createPublicProjectSnapshot(emptyWave).updatedAt).toBeNull();
-    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("No project changes recorded yet.");
+    expect(createPublicProjectSnapshot(emptyWave).summary).toContain("Latest: no project changes recorded yet.");
     expect(createPublicProjectSnapshot(configuredWave).summary).toContain(
-      "Repo is connected. Approved changes can move into PR review.",
+      "Repo: connected. Approved changes can move into PR review.",
     );
   });
 
@@ -92,7 +92,7 @@ describe("public project snapshot", () => {
       status: "ready for vote",
     });
     expect(snapshot.summary).toContain("Current focus: Add swap fee cap tests.");
-    expect(snapshot.summary).toContain("Latest change: Submitted cmd-002: Add swap fee cap tests.");
+    expect(snapshot.summary).toContain("Latest: Submitted cmd-002: Add swap fee cap tests.");
     expect(snapshot.latestChanges[0]).toMatchObject({
       label: "work proposed",
       message: "Submitted cmd-002: Add swap fee cap tests.",

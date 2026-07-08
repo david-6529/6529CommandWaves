@@ -130,8 +130,8 @@ function projectSummary({
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "GitHub repo is a placeholder. PR work waits until maintainers choose the repo."
-      : "Repo is connected. Approved changes can move into PR review.";
+      ? "Repo: not selected yet. PR work waits until maintainers choose it."
+      : "Repo: connected. Approved changes can move into PR review.";
   const nextStepDetail =
     repo.status === "placeholder" && nextStep.detail === "Select the hook repo before PR work starts."
       ? "Keep discussing in chat. Select the hook repo before PR work starts."
@@ -140,11 +140,11 @@ function projectSummary({
     `Current focus: ${currentWork.title}.`,
     `Next: ${nextStepDetail}`,
     repoLine,
-    latestChange ? `Latest change: ${latestChange}` : "No project changes recorded yet.",
+    latestChange ? `Latest: ${latestChange}` : "Latest: no project changes recorded yet.",
   ].join(" ");
 
   return [
-    "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
+    "This workspace is for one hook project. Builders use chat to discuss ideas, record decisions, and turn approved work into reviewed GitHub PRs.",
     statusParagraph,
   ];
 }
