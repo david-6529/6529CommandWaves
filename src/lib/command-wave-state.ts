@@ -1,15 +1,17 @@
 import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
 import { createCommandWaveStateHash } from "./command-wave-state-hash";
-import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
-import type { CommandWave, LedgerEvent } from "./command-waves";
+import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
-import { hasProductionValue, isPlaceholderValue } from "./env-placeholders";
+import { hasProductionValue } from "./env-placeholders";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { commandWaveProductCopy } from "./product-copy";
+import { createPublicCommandWave, createPublicCommandWaveSource, type PublicCommandWave } from "./public-command-wave";
 import { publicHookSafety, type PublicHookSafety } from "./public-hook-safety";
 import { createPublicProjectSnapshot, type PublicProjectSnapshot } from "./public-project-snapshot";
 import { createPublicWorkflowProof, type PublicWorkflowProof } from "./public-workflow-proof";
 import { hashValue } from "./run-manifest";
+
+export { createPublicCommandWave, createPublicCommandWaveSource, type PublicCommandWave } from "./public-command-wave";
 
 export type CommandWaveStateSnapshot = {
   version: "command-wave-state-v0.1";
@@ -43,10 +45,6 @@ export type CommandWaveStateSnapshot = {
     envVar: "COMMAND_WAVE_STATE_URL";
     expectedPayload: "command-wave-state-v0.1 snapshot";
   };
-};
-
-export type PublicCommandWave = Omit<CommandWave, "repoUrl"> & {
-  repoUrl: string | null;
 };
 
 export type PhaseOneProductContract = {
@@ -88,27 +86,6 @@ export const phaseOneAuthorityBoundary: CommandWaveStateSnapshot["authorityBound
   accessStatus: "Reputation, token, holder, allowlist, and QnA access notes are advisory until wired and verified.",
 };
 
-const repoBoundPublicEventTypes = new Set<LedgerEvent["type"]>([
-  "execution_started",
-  "execution_logged",
-  "guardian_reviewed",
-]);
-
-export function createPublicCommandWaveSource(wave: CommandWave): CommandWave {
-  const setupSafeWave = withPlaceholderRepoSetupState(wave);
-
-  if (!isPlaceholderValue(setupSafeWave.repoUrl)) {
-    return setupSafeWave;
-  }
-
-  return {
-    ...setupSafeWave,
-    executions: [],
-    reviews: [],
-    ledger: setupSafeWave.ledger.filter((event) => !repoBoundPublicEventTypes.has(event.type)),
-  };
-}
-
 export function createCommandWaveStateSnapshot(
   wave: CommandWave,
   options: { generatedAt?: string } = {},
@@ -144,15 +121,6 @@ export function createCommandWaveStateSnapshot(
   return {
     ...snapshotWithoutHash,
     stateHash: createCommandWaveStateHash(snapshotWithoutHash),
-  };
-}
-
-export function createPublicCommandWave(wave: CommandWave): PublicCommandWave {
-  const publicSourceWave = createPublicCommandWaveSource(wave);
-
-  return {
-    ...publicSourceWave,
-    repoUrl: isPlaceholderValue(publicSourceWave.repoUrl) ? null : publicSourceWave.repoUrl,
   };
 }
 

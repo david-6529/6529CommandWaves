@@ -25,7 +25,6 @@ import { createContributionReport, createContributionReportDraft, reportPointLab
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
 import { githubRepoPlaceholder, orchestratorAgentIdentity } from "@/lib/agent-identities";
-import { withPlaceholderRepoSetupState } from "@/lib/command-wave-sanitize";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { isPlaceholderValue } from "@/lib/env-placeholders";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
@@ -46,6 +45,7 @@ import { createPhaseChecklist, type PhaseChecklistItem, type PhaseChecklistStatu
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
+import { createPublicCommandWaveSource } from "@/lib/public-command-wave";
 import { createPublicProjectSnapshot } from "@/lib/public-project-snapshot";
 import { projectChatAuthorLabel } from "@/lib/project-chat-display";
 import { createProjectChatFeed } from "@/lib/project-chat-feed";
@@ -242,29 +242,8 @@ function shortTime(value: string) {
   }).format(new Date(value));
 }
 
-const repoBoundConsoleEventTypes = new Set<CommandWave["ledger"][number]["type"]>([
-  "execution_started",
-  "execution_logged",
-  "guardian_reviewed",
-]);
-
-function createPublicConsoleWave(wave: CommandWave): CommandWave {
-  const setupSafeWave = withPlaceholderRepoSetupState(wave);
-
-  if (!isPlaceholderValue(setupSafeWave.repoUrl)) {
-    return setupSafeWave;
-  }
-
-  return {
-    ...setupSafeWave,
-    executions: [],
-    reviews: [],
-    ledger: setupSafeWave.ledger.filter((event) => !repoBoundConsoleEventTypes.has(event.type)),
-  };
-}
-
 function cloneDemoWave(): CommandWave {
-  return createPublicConsoleWave(JSON.parse(JSON.stringify(demoWave)) as CommandWave);
+  return createPublicCommandWaveSource(JSON.parse(JSON.stringify(demoWave)) as CommandWave);
 }
 
 type WaveApiResponse = ApiErrorPayload & {
@@ -430,7 +409,7 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
     throw new Error(formatApiError(payload, "Project request failed."));
   }
 
-  return createPublicConsoleWave({
+  return createPublicCommandWaveSource({
     ...payload.wave,
     repoUrl: payload.wave.repoUrl ?? githubRepoPlaceholder.url,
   });

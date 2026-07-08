@@ -1,7 +1,5 @@
 import {
   commandWaveStateUrlFromEnv,
-  createPublicCommandWave,
-  createPublicCommandWaveSource,
   phaseOneAuthorityBoundary,
   phaseOneProductContract,
   publicCommandWaveHash,
@@ -19,6 +17,7 @@ import { createLaunchStatusDraft } from "./launch-status-draft";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
 import { selectPhaseWork } from "./phase-work";
+import { createPublicCommandWave, createPublicCommandWaveSource } from "./public-command-wave";
 import { publicHookSafety } from "./public-hook-safety";
 import { createPublicProjectSnapshot } from "./public-project-snapshot";
 import { createPublicWorkflowProof } from "./public-workflow-proof";

@@ -1,6 +1,6 @@
-import { createPublicCommandWaveSource } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createActiveHookProjects, type ActiveHookProject } from "./hook-projects";
+import { createPublicCommandWaveSource } from "./public-command-wave";
 import { hashValue } from "./run-manifest";
 
 export type HookProjectIndex = {

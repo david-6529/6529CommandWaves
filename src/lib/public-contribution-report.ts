@@ -1,8 +1,8 @@
 import { orchestratorAgentIdentity, publicGithubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
-import { createPublicCommandWaveSource } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createContributionReport, type ContributionReport } from "./contribution-report";
 import { isPlaceholderValue } from "./env-placeholders";
+import { createPublicCommandWaveSource } from "./public-command-wave";
 import { hashValue } from "./run-manifest";
 
 export type PublicContributionReport = {
