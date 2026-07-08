@@ -47,7 +47,7 @@ const checklistByItemId: Record<string, string[]> = {
   readiness_app_url: ["Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL."],
   readiness_initial_hook_project: [
     "Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.",
-    "Keep COMMAND_WAVE_INITIAL_REPO_URL as the placeholder until the selected hook repo is ready.",
+    "Keep COMMAND_WAVE_INITIAL_REPO_URL as the placeholder until maintainers choose the hook repo.",
   ],
   readiness_database: ["Set DATABASE_URL to production Postgres before durable public audit storage."],
   readiness_command_wave_store: ["Set COMMAND_WAVE_STORE=postgres for production state."],

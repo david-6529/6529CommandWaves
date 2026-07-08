@@ -199,7 +199,7 @@ describe("launch status draft", () => {
     expect(draft).toContain("- Set a strong ADMIN_API_KEY before public launch.");
     expect(draft).toContain("- Set NEXT_PUBLIC_APP_URL to the deployed HTTPS app URL.");
     expect(draft).toContain("- Set COMMAND_WAVE_INITIAL_WAVE_URL to the first project chat.");
-    expect(draft).toContain("- Keep COMMAND_WAVE_INITIAL_REPO_URL as the placeholder until the selected hook repo is ready.");
+    expect(draft).toContain("- Keep COMMAND_WAVE_INITIAL_REPO_URL as the placeholder until maintainers choose the hook repo.");
     expect(draft).toContain("- Set 6529_BOT_BEARER_TOKEN and 6529_BOT_WALLET_ADDRESS for daemon chat posting.");
     expect(draft).toContain("- Set COMMAND_WAVE_REPO_ADAPTER=github before automated PR creation.");
     expect(draft).toContain("- Set COMMAND_WAVE_GITHUB_TOKEN or GITHUB_TOKEN with repo access.");

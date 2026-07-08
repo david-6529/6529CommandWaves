@@ -17,7 +17,7 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 
 ## Use Now
 
-- Project chat setup, with the GitHub repo left as a placeholder until PR work starts.
+- Project chat setup, with no GitHub repo selected until maintainers choose it.
 - Participation notes for who can join.
 - 6529 hook project snapshot with chat context, repo state, PR state, and review evidence.
 - One PR-sized command at a time.
@@ -76,7 +76,7 @@ DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
-# Intentional placeholder until PR work starts. Keep this until maintainers select the hook repo.
+# Intentional placeholder. Keep this until maintainers choose the hook repo.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 6529_BOT_BEARER_TOKEN=<6529 bot token>
@@ -111,7 +111,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 
 The launch check focuses on the first public loop. The chat-first launch requires the deployed app URL, first hook chat,
 admin key, durable storage, live 6529 mode, and daemon chat posting credentials. The GitHub repo can stay as a placeholder
-until PR work starts. A ready PR loop also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian workflow,
+until maintainers choose it. A ready PR loop also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian workflow,
 guardian wave-state URL, and required guardian check. Failed checks block broad participation.
 
 Use `npm run chat:launch` against the remote chat launch audit before inviting builders into discussion. Use

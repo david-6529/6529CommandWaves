@@ -33,7 +33,7 @@ protocol.
 What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
-- One active hook project with project chat and an intentional placeholder GitHub repo until PR work starts.
+- One active hook project with project chat and an intentional placeholder GitHub repo until maintainers choose it.
 - A top-right wallet connection control that can add a connected address to the access request draft.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
@@ -79,7 +79,7 @@ What remains manual or MVP-only:
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting uses visible app activity, project chat posts pulled into the app, recorded PR links, and
   repo-bound review proof. Full scoring across unattached GitHub commits, merges, and off-app activity is still future work.
-- The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until maintainers select the repo.
+- The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until maintainers choose the repo.
 
 What we are working on next:
 
@@ -282,7 +282,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
 `COMMAND_WAVE_INITIAL_WAVE_URL` seeds the first project chat. `COMMAND_WAVE_INITIAL_REPO_URL` stays as a placeholder
-until PR work starts. Chat launch readiness allows the placeholder repo, while full PR-loop readiness blocks PR work until
+until maintainers choose the hook repo. Chat launch readiness allows the placeholder repo, while full PR-loop readiness blocks PR work until
 a real repo is selected. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions.
 `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
