@@ -118,7 +118,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Start in chat so builders can shape the idea.");
     expect(text).toContain("Save the proposal once builders can see it.");
     expect(text).toContain("Use GitHub PRs once the repo is connected.");
-    expect(text).toContain("Propose work");
+    expect(text).toContain("Save proposal from chat");
+    expect(text).toContain("after discussion");
     expect(text).toContain("Boundaries and success criteria");
     expect(text).toContain("Details");
     expect(text).toContain("Chat launch");

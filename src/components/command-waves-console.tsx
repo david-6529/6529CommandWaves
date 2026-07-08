@@ -2431,7 +2431,7 @@ export function CommandWavesConsole() {
             {discussionQueueItems.length ? (
               <div className="mt-5 border-t border-zinc-800 pt-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Discussion queue</p>
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Saved discussion</p>
                   <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">
                     {countLabel(phaseWork.supportProposals.length, "item")}
                   </Badge>
@@ -2753,7 +2753,10 @@ export function CommandWavesConsole() {
           open={suggestOpen}
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
-          <summary className="flex cursor-pointer items-center gap-3 text-base font-semibold text-zinc-50">Propose work</summary>
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
+            <span>Save proposal from chat</span>
+            <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">after discussion</Badge>
+          </summary>
           <div className="mt-4 max-w-4xl">
             <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:grid-cols-5">
               {proposalFlowSteps.map(([label, detail], index) => (
