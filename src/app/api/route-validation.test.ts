@@ -49,12 +49,25 @@ const publicPlaceholderLeakChecks = [
   "Review passed the hook scaffold",
 ];
 
+function setNodeEnv(value: string | undefined) {
+  const env = process.env as Record<string, string | undefined>;
+
+  if (value === undefined) {
+    delete env.NODE_ENV;
+    return;
+  }
+
+  env.NODE_ENV = value;
+}
+
 describe("API route validation", () => {
+  const previousNodeEnv = process.env.NODE_ENV;
   const previousMockMode = process.env["6529_MOCK_MODE"];
   const previousAdminKey = process.env.ADMIN_API_KEY;
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
 
   beforeEach(async () => {
+    setNodeEnv("test");
     delete process.env.ADMIN_API_KEY;
     process.env["6529_MOCK_MODE"] = "true";
     process.env.COMMAND_WAVE_STORE = "memory";
@@ -68,6 +81,8 @@ describe("API route validation", () => {
     clearCommandWaveStoreForTests();
     resetMockDropsForTests();
     resetRateLimitsForTest();
+
+    setNodeEnv(previousNodeEnv);
 
     if (previousMockMode === undefined) {
       delete process.env["6529_MOCK_MODE"];
@@ -210,6 +225,38 @@ describe("API route validation", () => {
       expect(response.status).toBe(401);
       await expect(responsePayload(response)).resolves.toMatchObject({
         error: "Admin API key required.",
+      });
+    },
+  );
+
+  it.each([
+    ["setup update", updateSetup, "/api/command-wave", "PATCH"],
+    ["state replace", replaceWave, "/api/command-wave", "PUT"],
+    ["reset", resetWave, "/api/command-wave", "DELETE"],
+    ["proposal submit", submitProposalRoute, "/api/command-wave/proposals", "POST"],
+    ["vote record", recordVoteRoute, "/api/command-wave/votes", "POST"],
+    ["decision record", recordDecision, "/api/command-wave/decision", "POST"],
+    ["PR build", executeCommand, "/api/command-wave/execute", "POST"],
+    ["review record", reviewCommand, "/api/command-wave/review", "POST"],
+    ["Codex packet", createCodexPacket, "/api/command-wave/codex-packet", "POST"],
+    ["chat post", postChatMessage, "/api/6529/chat-post", "POST"],
+  ] satisfies [string, RouteHandler, string, string][])(
+    "fails closed for %s routes in production without ADMIN_API_KEY",
+    async (_label, handler, path, method) => {
+      setNodeEnv("production");
+      delete process.env.ADMIN_API_KEY;
+
+      const response = await handler(
+        request(`https://command-waves.example.com${path}`, {
+          method,
+          body: method === "DELETE" ? null : JSON.stringify({}),
+        }),
+      );
+
+      expect(response.status).toBe(503);
+      await expect(responsePayload(response)).resolves.toMatchObject({
+        error: "Unexpected error",
+        errorId: expect.any(String),
       });
     },
   );
