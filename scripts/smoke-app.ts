@@ -22,8 +22,9 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
-function assertNoEmDash(label: string, value: string) {
+function assertNoForbiddenDash(label: string, value: string) {
   assert(!value.includes("\u2014"), `${label} contains an em dash.`);
+  assert(!value.includes("\u2013"), `${label} contains an en dash.`);
 }
 
 function assertIncludes(label: string, value: string, expected: string) {
@@ -195,14 +196,14 @@ async function main() {
   for (const oldLabel of ["Open source", "Project source", "Find a source", "Type a source name"]) {
     assert(!renderedHtml.includes(oldLabel), `Home page should not render old source wording: ${oldLabel}.`);
   }
-  assertNoEmDash("Home page", renderedHtml);
+  assertNoForbiddenDash("Home page", renderedHtml);
 
   const readiness = await fetchJson("/api/readiness");
   const readinessChecks = objectValue(readiness, "checks");
 
   assert(Array.isArray(readinessChecks), "Readiness response is missing checks.");
   assert(readinessChecks.length > 0, "Readiness response has no checks.");
-  assertNoEmDash("Readiness response", JSON.stringify(readiness));
+  assertNoForbiddenDash("Readiness response", JSON.stringify(readiness));
 
   const wavePayload = await fetchJson("/api/command-wave");
   const publicWave = objectValue(wavePayload, "wave");
@@ -216,7 +217,7 @@ async function main() {
     !JSON.stringify(wavePayload).includes("https://github.com/your-org/your-hook-repo"),
     "Public project read response should not expose the placeholder repo URL.",
   );
-  assertNoEmDash("Public project read response", JSON.stringify(wavePayload));
+  assertNoForbiddenDash("Public project read response", JSON.stringify(wavePayload));
 
   const launchPayload = await fetchJson("/api/command-wave/launch/audit");
   const audit = objectValue(launchPayload, "audit");
@@ -314,7 +315,7 @@ async function main() {
     "Launch audit response still exposes stale decision-link copy.",
   );
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "No automatic payouts.");
-  assertNoEmDash("Launch audit response", JSON.stringify(launchPayload));
+  assertNoForbiddenDash("Launch audit response", JSON.stringify(launchPayload));
 
   const chatLaunchPayload = await fetchJson("/api/command-wave/launch/chat");
   const chatLaunchAudit = objectValue(chatLaunchPayload, "audit");
@@ -333,7 +334,7 @@ async function main() {
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "chatLaunch");
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "prLoop");
-  assertNoEmDash("Chat launch response", JSON.stringify(chatLaunchPayload));
+  assertNoForbiddenDash("Chat launch response", JSON.stringify(chatLaunchPayload));
 
   const statePayload = await fetchJson("/api/command-wave/state");
 
@@ -385,7 +386,7 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "stateHash");
   assertIncludes("State response", JSON.stringify(statePayload), "humansControl");
   assertIncludes("State response", JSON.stringify(statePayload), "Auto-merge PRs");
-  assertNoEmDash("State response", JSON.stringify(statePayload));
+  assertNoForbiddenDash("State response", JSON.stringify(statePayload));
 
   const projectsPayload = await fetchJson("/api/command-wave/projects");
 
@@ -406,7 +407,7 @@ async function main() {
     !JSON.stringify(projectsPayload).includes(staleBuilderDecision),
     "Projects response still exposes stale decision requirement copy.",
   );
-  assertNoEmDash("Projects response", JSON.stringify(projectsPayload));
+  assertNoForbiddenDash("Projects response", JSON.stringify(projectsPayload));
 
   const contributionReportPayload = await fetchJson("/api/command-wave/reports/contribution");
 
@@ -442,7 +443,7 @@ async function main() {
     !JSON.stringify(contributionReportPayload).includes(staleBuilderDecision),
     "Contribution report still exposes stale decision requirement copy.",
   );
-  assertNoEmDash("Contribution report", JSON.stringify(contributionReportPayload));
+  assertNoForbiddenDash("Contribution report", JSON.stringify(contributionReportPayload));
 
   const verificationManifestPayload = await fetchJson("/api/command-wave/verification/manifest");
   const verificationManifest = objectValue(verificationManifestPayload, "manifest");
@@ -491,7 +492,7 @@ async function main() {
     objectValue(contributionEndpointHashes, "generated") === objectValue(contributionReportPayload, "reportHash"),
     "Verification manifest contribution report hash does not match report endpoint.",
   );
-  assertNoEmDash("Verification manifest", JSON.stringify(verificationManifestPayload));
+  assertNoForbiddenDash("Verification manifest", JSON.stringify(verificationManifestPayload));
 
   const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");
   const proof = objectValue(setupProofPayload, "proof");
@@ -503,7 +504,7 @@ async function main() {
       objectValue(proof as JsonObject, "version") === "command-wave-setup-v0.1",
     "Setup proof endpoint returned the wrong version.",
   );
-  assertNoEmDash("Setup proof response", JSON.stringify(setupProofPayload));
+  assertNoForbiddenDash("Setup proof response", JSON.stringify(setupProofPayload));
 
   console.log(`App smoke check passed for ${baseUrl}.`);
 }
