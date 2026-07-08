@@ -315,7 +315,7 @@ function nextStep(
   }
 
   if (!configuredGitHubRepo(wave.repoUrl)) {
-    return "PR work waits until maintainers select the GitHub repo.";
+    return "PR work waits while the GitHub repo is a placeholder.";
   }
 
   if (!execution) {

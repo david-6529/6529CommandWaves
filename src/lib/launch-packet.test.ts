@@ -78,7 +78,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("# Project launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain(
-      "Repo: GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)",
+      "Repo: GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)",
     );
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("Manual builder review for phase 1");
@@ -129,7 +129,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("run-manifest:{");
     expect(packet.text).toContain("No automatic payouts.");
     expect(packet.text).toContain("This packet does not grant reputation, token weight, payouts, permissions, or merge rights.");
-    expect(packet.text).toContain("PR work waits until maintainers select the GitHub repo.");
+    expect(packet.text).toContain("PR work waits while the GitHub repo is a placeholder.");
     expect(packet.text).not.toContain("automatically posted");
     expect(packet.text).not.toContain("\u2014");
   });

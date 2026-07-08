@@ -126,7 +126,7 @@ function summaryFor(status: FirstPhaseLaunchAuditStatus) {
     return "The first public loop is blocked until failed checks are fixed.";
   }
 
-  return "The local flow is usable. Invite contributors after setup checks pass.";
+  return "The project chat can run while PR work waits for repo and reviewer setup.";
 }
 
 const launchActionCopyByItemId: Record<string, string> = {
@@ -168,8 +168,8 @@ const launchActionCopyByItemId: Record<string, string> = {
 };
 
 function launchActionTitle(item: FirstPhaseLaunchAuditItem) {
-  if (item.id === "flow_project" && item.label === "Choose GitHub repo") {
-    return "Choose GitHub repo";
+  if (item.id === "flow_build" && item.detail.toLowerCase().includes("github repo is a placeholder")) {
+    return "GitHub repo placeholder";
   }
 
   const explicitTitle = launchActionCopyByItemId[item.id];

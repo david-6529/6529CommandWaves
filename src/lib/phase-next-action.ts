@@ -19,7 +19,7 @@ const actionCopyByStep: Record<
 > = {
   project: {
     title: "Set the project",
-    detail: "Confirm one project chat and one GitHub repo before proposals start.",
+    detail: "Confirm the project chat. The GitHub repo can stay as a placeholder until PR work starts.",
   },
   proposal: {
     title: "Propose scoped hook work",
@@ -68,10 +68,8 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
 
   if (active) {
     const copy =
-      active.id === "project" && active.label === "Choose GitHub repo"
-        ? { title: "Choose GitHub repo", detail: active.detail }
-        : active.id === "review" && active.detail.toLowerCase().includes("reviewer process")
-          ? { title: "Select reviewer process", detail: active.detail }
+      active.id === "review" && active.detail.toLowerCase().includes("reviewer process")
+        ? { title: "Select reviewer process", detail: active.detail }
         : actionCopyByStep[active.id];
 
     return {
@@ -86,12 +84,20 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
   const waiting = checklist.find((item) => item.status === "waiting");
 
   if (waiting) {
+    const repoPlaceholderCopy =
+      waiting.id === "build" && waiting.detail.toLowerCase().includes("github repo is a placeholder")
+        ? {
+            title: "GitHub repo placeholder",
+            detail: waiting.detail,
+          }
+        : null;
+
     return {
       status: "waiting",
       statusLabel: statusLabel("waiting"),
       stepLabel: waiting.label,
-      title: `Waiting for ${waiting.label.toLowerCase()}`,
-      detail: waiting.detail,
+      title: repoPlaceholderCopy?.title ?? `Waiting for ${waiting.label.toLowerCase()}`,
+      detail: repoPlaceholderCopy?.detail ?? waiting.detail,
     };
   }
 

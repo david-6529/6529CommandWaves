@@ -40,11 +40,11 @@ describe("first phase launch snapshot", () => {
       updatedAt: "2026-06-20T12:50:00.000Z",
       repo: {
         status: "placeholder",
-        label: "GitHub repo placeholder. The GitHub repo is a placeholder until the pilot repo is selected.",
+        label: "GitHub repo placeholder. The GitHub repo is intentionally a placeholder until PR work starts.",
       },
       nextStep: {
-        label: "Choose GitHub repo",
-        detail: "PR work waits until maintainers select the GitHub repo.",
+        label: "Build PR",
+        detail: "PR work waits while the GitHub repo is a placeholder.",
       },
     });
     expect(snapshot.hookSafety).toMatchObject({
@@ -94,7 +94,7 @@ describe("first phase launch snapshot", () => {
       githubRepo: {
         status: "placeholder",
         configuredUrl: null,
-        nextStep: "Select the pilot repo before PR work can run.",
+        nextStep: "Select the pilot repo before building or reviewing PRs.",
       },
     });
     expect(snapshot.authorityBoundary.appDoesNot).toContain("Auto-merge PRs");
@@ -133,7 +133,7 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.statusDraft).toContain("Project launch status");
     expect(snapshot.statusDraft).toContain("Status: checks needed");
-    expect(snapshot.statusDraft).toContain("Next action: Choose GitHub repo");
+    expect(snapshot.statusDraft).toContain("Next action: GitHub repo placeholder");
     expect(snapshot.statusDraft).toContain("GitHub repo is a placeholder. PR work stays blocked until the repo is selected.");
     expect(snapshot.statusDraft).toContain(
       "- Verification manifest: https://command-waves.example.com/api/command-wave/verification/manifest",
@@ -155,7 +155,7 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.launchPacket.packetHash).toMatch(/^[a-f0-9]{64}$/);
     expect(snapshot.launchPacket.text).toContain("# Project launch packet");
     expect(snapshot.launchPacket.text).toContain(
-      "Repo: GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)",
+      "Repo: GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)",
     );
     expect(snapshot.launchPacket.text).toContain("## Workflow Proof");
     expect(snapshot.launchPacket.text).toContain("## Verification");
@@ -182,7 +182,7 @@ describe("first phase launch snapshot", () => {
       "This packet does not grant reputation, token weight, payouts, permissions, or merge rights.",
     );
     expect(snapshot.phaseChecklist.map((item) => [item.id, item.status])).toEqual([
-      ["project", "active"],
+      ["project", "done"],
       ["proposal", "done"],
       ["decision", "done"],
       ["build", "waiting"],
@@ -190,8 +190,8 @@ describe("first phase launch snapshot", () => {
       ["log", "waiting"],
     ]);
     expect(snapshot.launchAudit.nextAction).toMatchObject({
-      itemId: "flow_project",
-      title: "Choose GitHub repo",
+      itemId: "flow_build",
+      title: "GitHub repo placeholder",
     });
   });
 

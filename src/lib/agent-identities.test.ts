@@ -22,15 +22,15 @@ describe("agent identities", () => {
       status: "placeholder",
       label: "GitHub repo placeholder",
       url: "https://github.com/your-org/your-hook-repo",
-      description: "The GitHub repo is a placeholder until the pilot repo is selected.",
-      nextStep: "Select the pilot repo before PR work can run.",
+      description: "The GitHub repo is intentionally a placeholder until PR work starts.",
+      nextStep: "Select the pilot repo before building or reviewing PRs.",
     });
     expect(publicGithubRepoPlaceholder).toMatchObject({
       status: "placeholder",
       label: "GitHub repo placeholder",
       configuredUrl: null,
-      description: "The GitHub repo is a placeholder until the pilot repo is selected.",
-      nextStep: "Select the pilot repo before PR work can run.",
+      description: "The GitHub repo is intentionally a placeholder until PR work starts.",
+      nextStep: "Select the pilot repo before building or reviewing PRs.",
     });
     expect(publicGithubRepoPlaceholder).not.toHaveProperty("url");
     expect(JSON.stringify({ reviewAgentIdentity, githubRepoPlaceholder, publicGithubRepoPlaceholder })).not.toContain(

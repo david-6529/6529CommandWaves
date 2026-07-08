@@ -1143,7 +1143,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "repo needed"
+    ? "repo placeholder"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
@@ -1913,7 +1913,7 @@ export function CommandWavesConsole() {
   function preparePrDiscussion() {
     if (!repoCanRunCode) {
       setDiscussionTabId("build");
-      setProjectChatMessage("Which GitHub repo should hold this hook before PR work starts?");
+      setProjectChatMessage("The GitHub repo is still a placeholder. Which repo should be selected before PR work starts?");
       setProjectChatNotice("Repo discussion draft ready.");
       return;
     }
@@ -3937,7 +3937,7 @@ export function CommandWavesConsole() {
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
                           ? !repoCanRunCode
-                            ? "PR build waits until maintainers select the GitHub repo."
+                            ? "PR work waits while the GitHub repo is a placeholder."
                             : activePrHasWaveDecision
                               ? "Ready to build the approved PR."
                             : "Record the decision link before the PR build step."

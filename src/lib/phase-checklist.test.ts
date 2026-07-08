@@ -47,7 +47,7 @@ describe("phase checklist", () => {
     const checklist = createPhaseChecklist(demoWave);
 
     expect(checklist.map((item) => [item.id, item.status])).toEqual([
-      ["project", "active"],
+      ["project", "done"],
       ["proposal", "done"],
       ["decision", "done"],
       ["build", "waiting"],
@@ -55,10 +55,12 @@ describe("phase checklist", () => {
       ["log", "waiting"],
     ]);
     expect(checklist.find((item) => item.id === "project")).toMatchObject({
-      label: "Choose GitHub repo",
-      detail: "PR work waits until maintainers select the GitHub repo.",
+      label: "Choose project",
+      detail: "Project chat is set. GitHub repo is a placeholder until PR work starts.",
     });
-    expect(checklist.find((item) => item.id === "build")?.detail).toBe("Build waits for a selected GitHub repo.");
+    expect(checklist.find((item) => item.id === "build")?.detail).toBe(
+      "PR work waits while the GitHub repo is a placeholder.",
+    );
   });
 
   it("shows setup as active before a valid repo is configured", () => {

@@ -65,14 +65,14 @@ describe("phase next action", () => {
     });
   });
 
-  it("points a selected project with placeholder repo to repo setup", () => {
+  it("shows placeholder repo as the PR blocker after chat is selected", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
 
     expect(nextAction).toMatchObject({
-      status: "action",
-      stepLabel: "Choose GitHub repo",
-      title: "Choose GitHub repo",
-      detail: "PR work waits until maintainers select the GitHub repo.",
+      status: "waiting",
+      stepLabel: "Build PR",
+      title: "GitHub repo placeholder",
+      detail: "PR work waits while the GitHub repo is a placeholder.",
     });
   });
 

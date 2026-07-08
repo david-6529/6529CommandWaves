@@ -27,7 +27,7 @@ describe("command wave state snapshot", () => {
           status: "placeholder",
         },
         nextStep: {
-          label: "Choose GitHub repo",
+          label: "Build PR",
         },
       },
       hookSafety: {
@@ -76,7 +76,7 @@ describe("command wave state snapshot", () => {
           status: "placeholder",
           label: "GitHub repo placeholder",
           configuredUrl: null,
-          nextStep: "Select the pilot repo before PR work can run.",
+          nextStep: "Select the pilot repo before building or reviewing PRs.",
         },
       },
       reports: {

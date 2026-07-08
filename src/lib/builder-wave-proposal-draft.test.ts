@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createBuilderWaveProposalDraft } from "./builder-wave-proposal-draft";
 
-const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
+const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)";
 
 describe("project chat proposal draft", () => {
   it("creates a concise hook proposal post", () => {

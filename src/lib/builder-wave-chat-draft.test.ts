@@ -4,7 +4,7 @@ import { demoWave } from "./demo-wave";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 
-const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is a placeholder until the pilot repo is selected.)";
+const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)";
 
 describe("project chat draft", () => {
   it("creates a concise message for the project chat", () => {

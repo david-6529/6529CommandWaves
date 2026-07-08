@@ -8,10 +8,10 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
       summaryParagraphs: [
-        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and move approved changes into GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits until maintainers select the GitHub repo. GitHub repo is still a placeholder, so PR work waits. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Review passed the hook scaffold. It matched the builder decision and rules.",
       ],
       updatedAt: "2026-06-20T12:50:00.000Z",
       currentWork: {
@@ -24,13 +24,13 @@ describe("public project snapshot", () => {
       },
       repo: {
         status: "placeholder",
-        label: "GitHub repo placeholder. The GitHub repo is a placeholder until the pilot repo is selected.",
+        label: "GitHub repo placeholder. The GitHub repo is intentionally a placeholder until PR work starts.",
         url: null,
       },
       nextStep: {
-        label: "Choose GitHub repo",
-        status: "active",
-        detail: "PR work waits until maintainers select the GitHub repo.",
+        label: "Build PR",
+        status: "waiting",
+        detail: "PR work waits while the GitHub repo is a placeholder.",
       },
     });
     expect(snapshot.latestChanges[0]).toMatchObject({
