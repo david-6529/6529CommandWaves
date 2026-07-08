@@ -31,9 +31,9 @@ describe("CommandWavesConsole", () => {
     );
     expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("Next: Keep discussing in chat. Select the hook repo before PR work starts.");
-    expect(text).toContain("Repo is a placeholder until PR work starts.");
+    expect(text).toContain("GitHub repo is a placeholder. PR work waits until maintainers choose the repo.");
     expect(text).toContain("Latest change: Builders approved the hook scaffold with 5 yes and 1 no.");
-    expect(text).toContain("The GitHub repo is intentionally a placeholder until PR work starts.");
+    expect(text).toContain("No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("How this works");
@@ -67,7 +67,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Decision");
     expect(text).toContain("Builders approved with 5 yes and 1 no.");
     expect(text).toContain("GitHub repo");
-    expect(text).toContain("The GitHub repo is intentionally a placeholder until PR work starts.");
+    expect(text).toContain("No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.");
     expect(text).toContain("No GitHub repo is selected yet. Select the pilot repo before creating PR work.");
     expect(text).toContain("Select the hook repo before PR work starts.");
     expect(text).toContain("Project chat");

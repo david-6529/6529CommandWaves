@@ -103,7 +103,7 @@ describe("active hook projects", () => {
       nextActionStatus: "action",
       nextActionLabel: "next",
       nextActionTitle: "Set the project",
-      nextActionDetail: "Confirm the project chat. The GitHub repo can stay as a placeholder until PR work starts.",
+      nextActionDetail: "Confirm the project chat. The GitHub repo can stay as a placeholder until maintainers choose it.",
       waveStatus: "No PR-sized hook change selected yet.",
       accessSnapshotLabel: "manual review",
       accessDetails: [

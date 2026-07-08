@@ -19,7 +19,7 @@ const actionCopyByStep: Record<
 > = {
   project: {
     title: "Set the project",
-    detail: "Confirm the project chat. The GitHub repo can stay as a placeholder until PR work starts.",
+    detail: "Confirm the project chat. The GitHub repo can stay as a placeholder until maintainers choose it.",
   },
   proposal: {
     title: "Propose scoped hook work",

@@ -164,7 +164,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
       label: "Pull request",
       status: prStatus,
       detail: !repoConfigured
-        ? "GitHub repo is a placeholder. Select it before PR work can run."
+        ? "GitHub repo is a placeholder. Choose it before PR work can run."
         : missingConfiguredPrLink
           ? "PR record is complete but no PR link matches the configured repo."
         : execution?.status === "complete"

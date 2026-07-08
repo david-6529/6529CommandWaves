@@ -18,8 +18,8 @@ export const githubRepoPlaceholder = {
   status: "placeholder",
   label: "GitHub repo placeholder",
   url: "https://github.com/your-org/your-hook-repo",
-  description: "The GitHub repo is intentionally a placeholder until PR work starts.",
-  nextStep: "Select the pilot repo before building or reviewing PRs.",
+  description: "No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.",
+  nextStep: "Choose the pilot repo before creating or reviewing PRs.",
 } as const;
 
 export const publicGithubRepoPlaceholder = {

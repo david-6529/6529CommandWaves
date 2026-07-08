@@ -36,7 +36,7 @@ const chatReadySetupValidation: SetupValidation = {
       id: "repo_placeholder",
       label: "GitHub repo placeholder",
       status: "warn",
-      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+      message: "GitHub repo is a placeholder. PR work stays blocked until maintainers choose the repo.",
     },
   ],
   canSave: true,

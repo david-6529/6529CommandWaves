@@ -76,7 +76,7 @@ describe("command wave state snapshot", () => {
           status: "placeholder",
           label: "GitHub repo placeholder",
           configuredUrl: null,
-          nextStep: "Select the pilot repo before building or reviewing PRs.",
+          nextStep: "Choose the pilot repo before creating or reviewing PRs.",
         },
       },
       reports: {

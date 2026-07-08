@@ -439,7 +439,7 @@ describe("API route validation", () => {
       },
     });
     expect(JSON.stringify(statePayload)).toContain("Current focus: Add 30 bps fee cap tests.");
-    expect(JSON.stringify(statePayload)).toContain("Repo is a placeholder until PR work starts.");
+    expect(JSON.stringify(statePayload)).toContain("GitHub repo is a placeholder. PR work waits until maintainers choose the repo.");
     expect(JSON.stringify(statePayload)).toContain("Submitted cmd-002: Add 30 bps fee cap tests.");
     expect(JSON.stringify(statePayload)).not.toContain("https://github.com/your-org/your-hook-repo");
 

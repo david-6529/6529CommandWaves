@@ -6,10 +6,10 @@ describe("project repo copy", () => {
     const placeholder = "https://github.com/your-org/your-hook-repo";
 
     expect(projectRepoText(placeholder)).toBe(
-      "GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)",
+      "GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)",
     );
     expect(projectRepoLine("GitHub repo", placeholder)).toBe(
-      "GitHub repo: GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)",
+      "GitHub repo: GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)",
     );
     expect(contributorRulesReferenceLine(placeholder)).toBeNull();
   });

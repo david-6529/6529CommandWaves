@@ -67,7 +67,7 @@ const checklistByItemId: Record<string, string[]> = {
   chat_setup_remote_check: ["Run the remote project chat setup check before inviting builders."],
   chat_wave_format: ["Set COMMAND_WAVE_INITIAL_WAVE_URL to a valid project chat."],
   chat_wave_reachable: ["Pick a reachable 6529 project chat before inviting builders."],
-  flow_project: ["Select the first project chat, and keep the GitHub repo placeholder until PR work starts."],
+  flow_project: ["Select the first project chat. The GitHub repo can stay as a placeholder until maintainers choose it."],
   flow_proposal: ["Create one PR-sized hook proposal before starting the first public loop."],
   flow_decision: ["Record the project decision before PR work starts."],
   flow_build: ["After the repo is configured, attach the PR record or Codex work packet for the approved change."],

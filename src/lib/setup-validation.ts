@@ -115,7 +115,7 @@ export function validateSetupShape(input: SetupValidationInput): SetupValidation
         "repo_placeholder",
         "GitHub repo placeholder",
         "warn",
-        "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+        "GitHub repo is a placeholder. PR work stays blocked until maintainers choose the repo.",
       ),
     );
   }

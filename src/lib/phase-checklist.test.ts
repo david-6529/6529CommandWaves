@@ -56,7 +56,7 @@ describe("phase checklist", () => {
     ]);
     expect(checklist.find((item) => item.id === "project")).toMatchObject({
       label: "Choose project",
-      detail: "Project chat is set. GitHub repo is a placeholder until PR work starts.",
+      detail: "Project chat is set. GitHub repo is a placeholder until maintainers choose it.",
     });
     expect(checklist.find((item) => item.id === "build")?.detail).toBe(
       "Select the hook repo before PR work starts.",

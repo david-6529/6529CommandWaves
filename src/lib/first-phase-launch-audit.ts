@@ -409,7 +409,7 @@ function chatReadinessItem(check: ReadinessCheck): FirstPhaseLaunchAuditItem {
       id: "readiness_initial_hook_project",
       label: check.label,
       status: "ready",
-      detail: "First project chat is configured. The GitHub repo can stay as a placeholder until PR work starts.",
+      detail: "First project chat is configured. The GitHub repo can stay as a placeholder until maintainers choose it.",
       source: "readiness",
     };
   }

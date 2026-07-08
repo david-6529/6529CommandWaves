@@ -186,7 +186,7 @@ function initialHookProjectCheck(env: Record<string, string | undefined>): Readi
       id: "initial_hook_project",
       label: "First hook project",
       status: "warn",
-      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+      message: "GitHub repo is a placeholder. PR work stays blocked until maintainers choose the repo.",
     };
   }
 

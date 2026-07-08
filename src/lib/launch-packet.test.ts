@@ -78,7 +78,7 @@ describe("launch packet", () => {
     expect(packet.text).toContain("# Project launch packet");
     expect(packet.text).toContain("Status: human-reviewed draft");
     expect(packet.text).toContain(
-      "Repo: GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)",
+      "Repo: GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)",
     );
     expect(packet.text).toContain("Participation notes (advisory):");
     expect(packet.text).toContain("Manual builder review for phase 1");
@@ -92,7 +92,7 @@ describe("launch packet", () => {
     expect(packet.text).not.toContain("Room approved");
     expect(packet.text).toContain("Review proof: not bound to the selected GitHub repo.");
     expect(packet.text).toContain("- Build: blocked");
-    expect(packet.text).toContain("GitHub repo is a placeholder. Select it before PR work can run.");
+    expect(packet.text).toContain("GitHub repo is a placeholder. Choose it before PR work can run.");
     expect(packet.text).toContain("## Workflow Proof");
     expect(packet.text).toContain("Summary: Public proof of the chat, decision, PR, review, and log path for the first hook build.");
     expect(packet.text).toContain("Source of truth: project chat");

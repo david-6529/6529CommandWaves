@@ -120,7 +120,7 @@ function projectSetupItem(wave: CommandWave, canRunCode: boolean): Pick<PhaseChe
       return {
         label: "Choose project",
         status: "done",
-        detail: "Project chat is set. GitHub repo is a placeholder until PR work starts.",
+        detail: "Project chat is set. GitHub repo is a placeholder until maintainers choose it.",
       };
     }
 

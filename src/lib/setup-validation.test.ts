@@ -66,7 +66,7 @@ describe("setup validation", () => {
       id: "repo_placeholder",
       label: "GitHub repo placeholder",
       status: "warn",
-      message: "GitHub repo is a placeholder. PR work stays blocked until the repo is selected.",
+      message: "GitHub repo is a placeholder. PR work stays blocked until maintainers choose the repo.",
     });
     expect(setupValidationNotice(validation)).toBe("Setup check found 1 launch warning.");
   });

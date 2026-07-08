@@ -105,9 +105,9 @@ async function main() {
     "Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
     "Draft the non-upgradeable hook scaffold",
     "Next: Keep discussing in chat. Select the hook repo before PR work starts.",
-    "Repo is a placeholder until PR work starts.",
+    "GitHub repo is a placeholder. PR work waits until maintainers choose the repo.",
     "Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
-    "The GitHub repo is intentionally a placeholder until PR work starts.",
+    "No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.",
     "GitHub repo placeholder",
     "Changelog",
     "How this works",
@@ -139,7 +139,7 @@ async function main() {
     "id=\"project-repo-url\"",
     "placeholder=\"Select later, owner/repo or GitHub URL\"",
     "id=\"project-access-key\"",
-    "The GitHub repo is intentionally a placeholder until PR work starts.",
+    "No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.",
     "No GitHub repo is selected yet. Select the pilot repo before creating PR work.",
     "Select the hook repo before PR work starts.",
     "Project chat",
@@ -301,7 +301,7 @@ async function main() {
   assertIncludes(
     "Launch audit response",
     JSON.stringify(launchPayload),
-    "Repo: GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)",
+    "Repo: GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)",
   );
   assert(
     !JSON.stringify(launchPayload).includes("https://github.com/6529-Collections/6529-hook"),

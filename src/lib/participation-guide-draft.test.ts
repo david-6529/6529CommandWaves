@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createParticipationGuideDraft } from "./participation-guide-draft";
 
-const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)";
+const placeholderRepoText = "GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)";
 
 describe("participation guide draft", () => {
   it("creates a copyable participation guide for the project chat", () => {

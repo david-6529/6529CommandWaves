@@ -3,7 +3,7 @@ import { createContributionReport } from "./contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "./developer-fee-plan";
 import { demoWave } from "./demo-wave";
 
-const placeholderRepoText = "GitHub repo placeholder (The GitHub repo is intentionally a placeholder until PR work starts.)";
+const placeholderRepoText = "GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)";
 
 describe("developer fee plan", () => {
   it("waits for reviewer process before treating reviewed work as fee evidence", () => {

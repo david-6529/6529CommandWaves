@@ -73,7 +73,7 @@ What remains manual or MVP-only:
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution prepares a branch, commits a bounded work packet plus optional approved text files, and opens a draft PR
   record. It does not yet run an isolated code-writing worker.
-- The GitHub repo is a placeholder in the default project state. Chat can launch first, but PR work waits until maintainers select the repo.
+- The GitHub repo is a placeholder in the default project state. Chat can launch first, but PR work waits until maintainers choose the repo.
 - The GitHub adapter can prepare branches, commit bounded text files, open draft PRs, post bounded PR comments, and
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
@@ -84,7 +84,7 @@ What remains manual or MVP-only:
 What we are working on next:
 
 1. Pick the first real public project chat.
-2. Keep the GitHub repo as a placeholder until PR work starts.
+2. Keep the GitHub repo as a placeholder until maintainers choose it.
 3. Configure launch env, durable storage, and daemon chat posting.
 4. Add the selected hook repo, reviewer process, guardian workflow, and required guardian check before the first PR.
 5. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
@@ -111,7 +111,7 @@ The app makes the important answers visible:
 The first public phase:
 
 1. Choose one public project chat.
-2. Keep the GitHub repo placeholder through chat launch, then connect one repo before PR work starts.
+2. Keep the GitHub repo placeholder through chat launch, then connect one repo when maintainers choose it.
 3. Record who-can-join requirements such as reputation, token, allowlists, or QnA as advisory until live enforcement exists.
 4. Propose hook work in plain English with clear limits.
 5. Let orchestration rules classify risk and require votes for important changes.
@@ -268,7 +268,7 @@ DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
 COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
-# Intentional placeholder until PR work starts. Keep this until maintainers select the hook repo.
+# Intentional placeholder. Keep this until maintainers choose the hook repo.
 COMMAND_WAVE_INITIAL_REPO_URL=https://github.com/your-org/your-hook-repo
 6529_MOCK_MODE=false
 6529_BOT_BEARER_TOKEN=<6529 bot token>
