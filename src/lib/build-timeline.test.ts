@@ -54,8 +54,8 @@ describe("build timeline", () => {
     expect(timeline[2]).toMatchObject({
       label: "PR",
       status: "waiting",
-      title: "GitHub repo placeholder",
-      detail: "PR work waits while the GitHub repo is a placeholder.",
+      title: "Repo not selected yet",
+      detail: "Select the hook repo before PR work starts.",
       href: null,
       hrefLabel: null,
     });

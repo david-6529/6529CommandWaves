@@ -30,7 +30,7 @@ describe("CommandWavesConsole", () => {
       "Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
     );
     expect(text).toContain("Current focus: Draft the non-upgradeable hook scaffold.");
-    expect(text).toContain("Next: PR work waits while the GitHub repo is a placeholder.");
+    expect(text).toContain("Next: Select the hook repo before PR work starts.");
     expect(text).toContain("GitHub repo is intentionally a placeholder until PR work starts.");
     expect(text).toContain("Latest change: Builders approved the hook scaffold with 5 yes and 1 no.");
     expect(text).toContain("daemon keeps the log current.");
@@ -70,7 +70,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("GitHub repo");
     expect(text).toContain("The GitHub repo is intentionally a placeholder until PR work starts.");
     expect(text).toContain("No GitHub repo is selected yet. Select the pilot repo before creating PR work.");
-    expect(text).toContain("PR work waits while the GitHub repo is a placeholder.");
+    expect(text).toContain("Select the hook repo before PR work starts.");
     expect(text).toContain("Project chat");
     expect(text).toContain("Open chat");
     expect(text).toContain("Find chat");
@@ -86,7 +86,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Build");
     expect(text).toContain("Review");
     expect(text).toContain("Questions, ideas, risks, and work all start here.");
-    expect(text).toContain("Discuss repo");
+    expect(text).not.toContain("Discuss repo");
+    expect(text).not.toContain("Add PR note");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
     expect(text).toContain("Save proposal");

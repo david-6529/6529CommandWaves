@@ -315,7 +315,7 @@ function nextStep(
   }
 
   if (!configuredGitHubRepo(wave.repoUrl)) {
-    return "PR work waits while the GitHub repo is a placeholder.";
+    return "Select the hook repo before PR work starts.";
   }
 
   if (!execution) {

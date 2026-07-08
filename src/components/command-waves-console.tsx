@@ -1913,21 +1913,6 @@ export function CommandWavesConsole() {
     });
   }
 
-  function preparePrDiscussion() {
-    if (!repoCanRunCode) {
-      setDiscussionTabId("build");
-      setProjectChatMessage("The GitHub repo is still a placeholder. Which repo should be selected before PR work starts?");
-      setProjectChatNotice("Repo discussion draft ready.");
-      return;
-    }
-
-    const prReference = activeExecutionPrUrl ?? "PR link";
-
-    setDiscussionTabId("review");
-    setProjectChatMessage(`PR to discuss: ${prReference}\n\nWhat should builders review?`);
-    setProjectChatNotice("PR discussion draft ready.");
-  }
-
   function proposalTemplateValues() {
     return new Set(proposalTypeOptions.flatMap((item) => [item.title, item.request, item.limits]));
   }
@@ -2450,9 +2435,6 @@ export function CommandWavesConsole() {
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
                   Request access
-                </Button>
-                <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
-                  {repoCanRunCode ? "Add PR note" : "Discuss repo"}
                 </Button>
               </div>
             </div>
@@ -3940,7 +3922,7 @@ export function CommandWavesConsole() {
                         ? humanizeLegacyCommandCopy(activeExecution.summary)
                         : activeProposalIsPr
                           ? !repoCanRunCode
-                            ? "PR work waits while the GitHub repo is a placeholder."
+                            ? "Select the hook repo before PR work starts."
                             : activePrHasWaveDecision
                               ? "Ready to build the approved PR."
                             : "Record the decision link before the PR build step."
@@ -3963,7 +3945,7 @@ export function CommandWavesConsole() {
                         {apiBusy === "execute"
                           ? "Building"
                           : !repoCanRunCode
-                            ? "GitHub repo placeholder"
+                            ? "Repo not selected"
                             : activePrHasWaveDecision
                               ? "Build approved PR"
                               : "Decision link needed"}

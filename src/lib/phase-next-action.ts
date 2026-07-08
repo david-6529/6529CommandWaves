@@ -85,9 +85,9 @@ export function createPhaseNextAction(checklist: PhaseChecklistItem[]): PhaseNex
 
   if (waiting) {
     const repoPlaceholderCopy =
-      waiting.id === "build" && waiting.detail.toLowerCase().includes("github repo is a placeholder")
+      waiting.id === "build" && waiting.detail.toLowerCase().includes("hook repo")
         ? {
-            title: "GitHub repo placeholder",
+            title: "Repo not selected yet",
             detail: waiting.detail,
           }
         : null;

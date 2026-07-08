@@ -233,7 +233,7 @@ describe("first phase launch audit", () => {
       expect.objectContaining({
         id: "flow_build",
         label: "Build PR",
-        detail: "PR work waits while the GitHub repo is a placeholder.",
+        detail: "Select the hook repo before PR work starts.",
       }),
     );
   });
@@ -356,8 +356,8 @@ describe("first phase launch audit", () => {
     expect(audit.nextAction).toMatchObject({
       status: "needs_setup",
       itemId: "flow_build",
-      title: "GitHub repo placeholder",
-      detail: "PR work waits while the GitHub repo is a placeholder.",
+      title: "Repo not selected yet",
+      detail: "Select the hook repo before PR work starts.",
     });
     expect(audit.blockers).toEqual([]);
     expect(audit.openItems).toContainEqual(

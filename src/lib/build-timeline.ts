@@ -129,8 +129,8 @@ function prItem(
     return {
       id: "pr",
       label: "PR",
-      title: "GitHub repo placeholder",
-      detail: "PR work waits while the GitHub repo is a placeholder.",
+      title: "Repo not selected yet",
+      detail: "Select the hook repo before PR work starts.",
       status: "waiting",
       href: null,
       hrefLabel: null,

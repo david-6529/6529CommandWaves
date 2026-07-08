@@ -59,7 +59,7 @@ describe("phase checklist", () => {
       detail: "Project chat is set. GitHub repo is a placeholder until PR work starts.",
     });
     expect(checklist.find((item) => item.id === "build")?.detail).toBe(
-      "PR work waits while the GitHub repo is a placeholder.",
+      "Select the hook repo before PR work starts.",
     );
   });
 

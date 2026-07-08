@@ -8,10 +8,10 @@ describe("public project snapshot", () => {
 
     expect(snapshot).toMatchObject({
       summary:
-        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
+        "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs. Current focus: Draft the non-upgradeable hook scaffold. Next: Select the hook repo before PR work starts. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
       summaryParagraphs: [
         "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
-        "Current focus: Draft the non-upgradeable hook scaffold. Next: PR work waits while the GitHub repo is a placeholder. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
+        "Current focus: Draft the non-upgradeable hook scaffold. Next: Select the hook repo before PR work starts. GitHub repo is intentionally a placeholder until PR work starts. Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
       ],
       updatedAt: "2026-06-20T12:40:00.000Z",
       currentWork: {
@@ -30,7 +30,7 @@ describe("public project snapshot", () => {
       nextStep: {
         label: "Build PR",
         status: "waiting",
-        detail: "PR work waits while the GitHub repo is a placeholder.",
+        detail: "Select the hook repo before PR work starts.",
       },
     });
     expect(snapshot.latestChanges[0]).toMatchObject({

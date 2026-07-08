@@ -49,7 +49,7 @@ function buildStatus(
     return {
       status: "waiting",
       detail: repoIsPlaceholder
-        ? "PR work waits while the GitHub repo is a placeholder."
+        ? "Select the hook repo before PR work starts."
         : "PR work waits for a selected GitHub repo.",
     };
   }

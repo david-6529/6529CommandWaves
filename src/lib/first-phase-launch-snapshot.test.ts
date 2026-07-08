@@ -44,7 +44,7 @@ describe("first phase launch snapshot", () => {
       },
       nextStep: {
         label: "Build PR",
-        detail: "PR work waits while the GitHub repo is a placeholder.",
+        detail: "Select the hook repo before PR work starts.",
       },
     });
     expect(snapshot.hookSafety).toMatchObject({
@@ -133,7 +133,7 @@ describe("first phase launch snapshot", () => {
     });
     expect(snapshot.statusDraft).toContain("Project launch status");
     expect(snapshot.statusDraft).toContain("Status: checks needed");
-    expect(snapshot.statusDraft).toContain("Next action: GitHub repo placeholder");
+    expect(snapshot.statusDraft).toContain("Next action: Repo not selected yet");
     expect(snapshot.statusDraft).toContain("GitHub repo is a placeholder. PR work stays blocked until the repo is selected.");
     expect(snapshot.statusDraft).toContain(
       "- Verification manifest: https://command-waves.example.com/api/command-wave/verification/manifest",
@@ -191,7 +191,7 @@ describe("first phase launch snapshot", () => {
     ]);
     expect(snapshot.launchAudit.nextAction).toMatchObject({
       itemId: "flow_build",
-      title: "GitHub repo placeholder",
+      title: "Repo not selected yet",
     });
   });
 

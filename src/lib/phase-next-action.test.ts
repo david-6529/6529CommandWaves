@@ -71,8 +71,8 @@ describe("phase next action", () => {
     expect(nextAction).toMatchObject({
       status: "waiting",
       stepLabel: "Build PR",
-      title: "GitHub repo placeholder",
-      detail: "PR work waits while the GitHub repo is a placeholder.",
+      title: "Repo not selected yet",
+      detail: "Select the hook repo before PR work starts.",
     });
   });
 
