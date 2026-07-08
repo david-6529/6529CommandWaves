@@ -311,6 +311,28 @@ describe("API route validation", () => {
     expect(JSON.stringify(payload)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
 
+  it("publishes default public state with chat-first placeholder summary", async () => {
+    const response = await getCommandWaveState(
+      request("https://command-waves.example.com/api/command-wave/state"),
+    );
+    const payload = await responsePayload(response);
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      wave: {
+        repoUrl: null,
+      },
+      projectSnapshot: {
+        summary: expect.stringContaining("Next: Keep discussing in chat. Select the hook repo before PR work starts."),
+        repo: {
+          status: "placeholder",
+          url: null,
+        },
+      },
+    });
+    expect(JSON.stringify(payload)).not.toContain("https://github.com/your-org/your-hook-repo");
+  });
+
   it.each([
     ["command wave state", getCommandWaveState, "/api/command-wave/state"],
     ["setup proof", getSetupProof, "/api/command-wave/setup/proof"],
@@ -405,6 +427,7 @@ describe("API route validation", () => {
         repoUrl: null,
       },
       projectSnapshot: {
+        summary: expect.stringContaining("Next: Vote is open: 0 yes, 0 no."),
         currentWork: {
           title: "Add 30 bps fee cap tests",
           status: "ready for vote",

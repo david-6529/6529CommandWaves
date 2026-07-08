@@ -107,6 +107,9 @@ describe("command wave state snapshot", () => {
     expect(snapshot.wave.proposals[0]?.status).toBe("approved");
     expect(snapshot.waveStateHash).toBe(publicCommandWaveHash(demoWave));
     expect(snapshot.projectSnapshot.latestChanges[0]?.label).toBe("builders approved");
+    expect(snapshot.projectSnapshot.summary).toContain(
+      "Next: Keep discussing in chat. Select the hook repo before PR work starts.",
+    );
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
     expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("delegatecall");
     expect(snapshot.workflowProof.steps.map((step) => [step.id, step.status])).toEqual([
