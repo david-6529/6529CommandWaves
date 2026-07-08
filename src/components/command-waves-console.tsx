@@ -2377,9 +2377,7 @@ export function CommandWavesConsole() {
                   <p className="mt-1 text-sm leading-6 text-zinc-500">{currentNextDetail}</p>
                 </div>
                 {projectRepoIsPlaceholder ? (
-                  <Button type="button" variant="secondary" onClick={() => openSetupControls({ focusRepo: true })}>
-                    View setup
-                  </Button>
+                  <JumpLink href="#project-chat">Message builders</JumpLink>
                 ) : null}
               </div>
               <div className="py-4">

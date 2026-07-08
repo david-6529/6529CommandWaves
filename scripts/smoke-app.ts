@@ -135,7 +135,7 @@ async function main() {
     "Keep discussing. Select repo later.",
     "Chat can continue now. PR work waits for the selected hook repo.",
     "GitHub repo placeholder",
-    "View setup",
+    "Message builders",
     "Builders approved with 5 yes and 1 no.",
     "GitHub repo",
     "id=\"project-repo-url\"",

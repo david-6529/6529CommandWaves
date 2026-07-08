@@ -65,7 +65,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Keep discussing. Select repo later.");
     expect(text).toContain("Chat can continue now. PR work waits for the selected hook repo.");
     expect(text).toContain("GitHub repo placeholder");
-    expect(text).toContain("View setup");
+    expect(text).toContain("Message builders");
     expect(text).toContain("Decision");
     expect(text).toContain("Builders approved with 5 yes and 1 no.");
     expect(text).toContain("GitHub repo");
@@ -121,10 +121,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("/api/command-wave/verification/manifest");
   });
 
-  it("links the current blocker to the repo setup field", () => {
+  it("keeps the current blocker chat-first while setup stays available", () => {
     const html = renderedConsoleHtml();
 
-    expect(html).toContain(">View setup</button>");
+    expect(html).toContain('href="#project-chat"');
     expect(html).toContain("grid-cols-2");
     expect(html).not.toContain("overflow-x-auto");
     expect(html).toContain('id="project-repo-url"');
