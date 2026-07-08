@@ -91,19 +91,22 @@ function appRouteUrl(path: string, env: Record<string, string | undefined>) {
   return appUrl ? `${appUrl}${path}` : path;
 }
 
+function hasFailedPublicSetupCheck(setupValidation: SetupValidation) {
+  return setupValidation.checks.some((check) => check.status === "fail");
+}
+
 function createPublicSetupValidation(setupValidation: SetupValidation, publicSourceWave: CommandWave): SetupValidation {
   if (isPlaceholderValue(publicSourceWave.repoUrl)) {
     const placeholderValidation = validateSetupShape({
       waveUrl: publicSourceWave.waveUrl,
       repoUrl: publicSourceWave.repoUrl,
     });
-
-    return {
-      ...placeholderValidation,
-      repo: null,
-      repoMetadata: null,
-      repoRequiredFiles: [],
-      checks: placeholderValidation.checks.map((check) =>
+    const baseCheckIds = new Set(placeholderValidation.checks.map((check) => check.id));
+    const waveOnlyRemoteChecks = setupValidation.checks.filter(
+      (check) => check.id.startsWith("wave_") && !baseCheckIds.has(check.id),
+    );
+    const checks = [
+      ...placeholderValidation.checks.map((check) =>
         check.id === "repo_format"
           ? {
               ...check,
@@ -111,6 +114,21 @@ function createPublicSetupValidation(setupValidation: SetupValidation, publicSou
             }
           : check,
       ),
+      ...waveOnlyRemoteChecks,
+    ];
+
+    const publicValidation = {
+      ...placeholderValidation,
+      repo: null,
+      repoMetadata: null,
+      repoRequiredFiles: [],
+      checks,
+      canRunCode: false,
+    };
+
+    return {
+      ...publicValidation,
+      canSave: !hasFailedPublicSetupCheck(publicValidation),
     };
   }
 

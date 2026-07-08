@@ -219,10 +219,17 @@ describe("first phase launch snapshot", () => {
       checkSetupRemote: true,
       setupValidation: {
         waveId: "6529-hook-builder",
-        repo: null,
+        repo: {
+          owner: "your-org",
+          repo: "your-hook-repo",
+          htmlUrl: "https://github.com/your-org/your-hook-repo",
+        },
         repoMetadata: null,
         repoRequiredFiles: [],
-        checks: [],
+        checks: [
+          { id: "wave_reachable", label: "Wave reachable", status: "pass", message: "Live 6529 wave is reachable." },
+          { id: "repo_reachable", label: "Repo reachable", status: "pass", message: "GitHub repo exists." },
+        ],
         canSave: true,
         canRunCode: true,
       },
@@ -238,6 +245,17 @@ describe("first phase launch snapshot", () => {
     expect(snapshot.verificationTargets.verificationManifestUrl).toBe(
       "https://command-waves.example.com/api/command-wave/verification/manifest",
     );
+    expect(snapshot.setupValidation.repo).toBeNull();
+    expect(snapshot.setupValidation.canRunCode).toBe(false);
+    expect(snapshot.setupValidation.checks).toContainEqual({
+      id: "wave_reachable",
+      label: "Wave reachable",
+      status: "pass",
+      message: "Live 6529 wave is reachable.",
+    });
+    expect(snapshot.setupValidation.checks.map((check) => check.id)).toContain("repo_placeholder");
+    expect(snapshot.setupValidation.checks.map((check) => check.id)).not.toContain("repo_reachable");
+    expect(JSON.stringify(snapshot.setupValidation)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
 
   it("does not publish placeholder app URLs as production verification targets", async () => {
