@@ -2332,7 +2332,7 @@ export function CommandWavesConsole() {
                   <dl className="mt-3 grid gap-3 sm:grid-cols-3">
                     <div>
                       <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Chat</dt>
-                      <dd className="mt-1 text-sm leading-6 text-zinc-300">{project.waveLabel}</dd>
+                      <dd className="mt-1 text-sm leading-6 text-zinc-300">Project chat</dd>
                     </div>
                     <div>
                       <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Repo</dt>
@@ -2922,7 +2922,7 @@ export function CommandWavesConsole() {
                       <p className="text-sm font-semibold text-zinc-100">{project.name}</p>
                       <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500">{project.participation}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge className="border-zinc-700 bg-black text-zinc-300">chat {project.waveLabel}</Badge>
+                        <Badge className="border-zinc-700 bg-black text-zinc-300">chat Project chat</Badge>
                         <Badge className="border-zinc-700 bg-black text-zinc-300">code {project.repoLabel}</Badge>
                       </div>
                     </div>

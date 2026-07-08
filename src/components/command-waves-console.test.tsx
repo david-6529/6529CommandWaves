@@ -44,7 +44,6 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Active projects");
     expect(text).toContain("Start with the pilot hook. More hook projects can appear here after this loop works.");
     expect(text).toContain("6529 AMM hook");
-    expect(text).toContain("6529-hook-builder");
     expect(text).toContain("Message builders");
     expect(text).toContain("Discuss");
     expect(text).toContain("PR");
@@ -262,14 +261,17 @@ describe("CommandWavesConsole", () => {
     const start = html.indexOf('id="active-projects"');
     const end = html.indexOf('id="workspace"');
     const activeProjectsHtml = html.slice(start, end);
+    const activeProjectsText = activeProjectsHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(activeProjectsHtml).toContain("Active projects");
     expect(activeProjectsHtml).toContain("6529 AMM hook");
+    expect(activeProjectsHtml).toContain(">Project chat</dd>");
     expect(activeProjectsHtml).toContain("GitHub repo placeholder");
     expect(activeProjectsHtml).toContain(">Open chat</a>");
     expect(activeProjectsHtml).toContain("GitHub repo placeholder");
+    expect(activeProjectsText).not.toContain("6529-hook-builder");
     expect(activeProjectsHtml).not.toContain(">Select repo</button>");
     expect(activeProjectsHtml).not.toContain("https://github.com/your-org/your-hook-repo");
     expect(activeProjectsHtml.match(/<details\b[^>]*\sopen(?:=""|="open")?/g) ?? []).toHaveLength(0);
