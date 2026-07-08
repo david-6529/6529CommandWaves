@@ -130,7 +130,7 @@ function projectSummary({
 }) {
   const repoLine =
     repo.status === "placeholder"
-      ? "GitHub repo is intentionally a placeholder until PR work starts."
+      ? "Repo is a placeholder until PR work starts."
       : "Repo is connected. Approved changes can move into PR review.";
   const statusParagraph = [
     `Current focus: ${currentWork.title}.`,
@@ -140,7 +140,7 @@ function projectSummary({
   ].join(" ");
 
   return [
-    "This pilot is the shared workspace for the 6529 AMM hook. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
+    "This is a shared workspace for one hook project. Builders use chat to ask questions, suggest work, record decisions, and prepare approved changes for GitHub PRs.",
     statusParagraph,
   ];
 }
