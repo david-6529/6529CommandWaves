@@ -2655,7 +2655,7 @@ export function CommandWavesConsole() {
                 <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Members</p>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">Builders</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">
-                  Profiles show visible chat, PR, and review activity. They are context for humans, not permissions.
+                  Profiles show what each builder has done. They are context for humans, not permissions.
                 </p>
               </div>
             </div>
@@ -2676,9 +2676,9 @@ export function CommandWavesConsole() {
                       </div>
                     </div>
                     <div className="mt-4 border-y border-zinc-800 py-3">
-                      <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Visible contribution</p>
-                      <p className="mt-1 text-base font-semibold text-zinc-50">{member.scoreLabel}</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-400">{member.activity}</p>
+                      <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Activity</p>
+                      <p className="mt-1 text-base font-semibold text-zinc-50">{member.activity}</p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-400">Report: {member.scoreLabel}</p>
                     </div>
                     {member.basis.length ? (
                       <div className="mt-3 flex flex-wrap gap-2">
