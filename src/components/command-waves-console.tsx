@@ -2509,7 +2509,7 @@ export function CommandWavesConsole() {
                   disabled={!canSaveChatWorkItem}
                   onClick={() => void saveChatWorkItem()}
                 >
-                  {apiBusy === "proposal" ? "Saving" : "Save proposal"}
+                  {apiBusy === "proposal" ? "Saving" : "Save as proposal"}
                 </Button>
                 <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
                   Clear

@@ -89,6 +89,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Add PR note");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
+    expect(text).toContain("Save as proposal");
     expect(text).toContain("Save proposal");
     expect(text).toContain("Recent chat");
     expect(text).toContain("Builders");

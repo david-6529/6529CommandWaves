@@ -158,6 +158,7 @@ async function main() {
     "Questions, ideas, risks, and work all start here.",
     "GitHub repo placeholder",
     "Post to chat",
+    "Save as proposal",
     "Save proposal",
     "Recent chat",
     "Builders",
