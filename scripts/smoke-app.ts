@@ -107,8 +107,6 @@ async function main() {
     "Next: Select the hook repo before PR work starts.",
     "Repo is a placeholder until PR work starts.",
     "Latest change: Builders approved the hook scaffold with 5 yes and 1 no.",
-    "daemon keeps the log current.",
-    "Reviewer process is a placeholder for this phase.",
     "The GitHub repo is intentionally a placeholder until PR work starts.",
     "GitHub repo placeholder",
     "Changelog",

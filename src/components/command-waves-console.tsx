@@ -2237,14 +2237,16 @@ export function CommandWavesConsole() {
                   {paragraph}
                 </p>
               ))}
-              <p className="mt-2 text-base leading-7 text-zinc-400">
-                {orchestratorAgentIdentity.handle} keeps the log current. Reviewer process is a placeholder for this phase.{" "}
-                {projectRepoHref && !projectRepoIsPlaceholder ? (
-                  <a className="font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300" href={projectRepoHref} target="_blank" rel="noreferrer">
-                    Open the GitHub repo
-                  </a>
-                ) : null}
-              </p>
+              {projectRepoHref && !projectRepoIsPlaceholder ? (
+                <a
+                  className="mt-3 inline-flex text-base font-semibold text-zinc-100 underline decoration-zinc-600 underline-offset-4 hover:text-blue-300"
+                  href={projectRepoHref}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open the GitHub repo
+                </a>
+              ) : null}
             </details>
 
             <details className="rounded-lg border border-zinc-800 p-4">
