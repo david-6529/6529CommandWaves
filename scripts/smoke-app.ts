@@ -219,6 +219,19 @@ async function main() {
   assert(readinessChecks.length > 0, "Readiness response has no checks.");
   assertNoForbiddenDash("Readiness response", JSON.stringify(readiness));
 
+  const chatPostingCapabilityPayload = await fetchJson("/api/6529/chat-post");
+  const chatPostingCapability = objectValue(chatPostingCapabilityPayload, "capability");
+
+  assertJsonObject("Chat posting capability", chatPostingCapability);
+  assert(
+    typeof objectValue(chatPostingCapability, "canPost") === "boolean",
+    "Chat posting capability is missing canPost.",
+  );
+  assertString("Chat posting capability mode", objectValue(chatPostingCapability, "mode"));
+  assertString("Chat posting capability message", objectValue(chatPostingCapability, "message"));
+  assert(!JSON.stringify(chatPostingCapabilityPayload).includes("6529_BOT"), "Chat posting capability exposes env names.");
+  assertNoForbiddenDash("Chat posting capability", JSON.stringify(chatPostingCapabilityPayload));
+
   const wavePayload = await fetchJson("/api/command-wave");
   const publicWave = objectValue(wavePayload, "wave");
 

@@ -19,19 +19,49 @@ export type ChatPostResult = {
   mode: "mock" | "live";
 };
 
+export type ChatPostingCapability = {
+  canPost: boolean;
+  mode: "mock" | "live" | "manual";
+  message: string;
+};
+
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function isMockMode() {
-  return process.env["6529_MOCK_MODE"] !== "false";
+function isMockMode(env: Record<string, string | undefined> = process.env) {
+  return env["6529_MOCK_MODE"] !== "false";
 }
 
-function postingConfigured() {
+function postingConfigured(env: Record<string, string | undefined> = process.env) {
   return (
-    isMockMode() ||
-    (Boolean(process.env["6529_BOT_BEARER_TOKEN"]?.trim()) && Boolean(process.env["6529_BOT_WALLET_ADDRESS"]?.trim()))
+    isMockMode(env) ||
+    (Boolean(env["6529_BOT_BEARER_TOKEN"]?.trim()) && Boolean(env["6529_BOT_WALLET_ADDRESS"]?.trim()))
   );
+}
+
+export function getChatPostingCapability(env: Record<string, string | undefined> = process.env): ChatPostingCapability {
+  if (isMockMode(env)) {
+    return {
+      canPost: true,
+      mode: "mock",
+      message: "Local chat posting is active.",
+    };
+  }
+
+  if (postingConfigured(env)) {
+    return {
+      canPost: true,
+      mode: "live",
+      message: "Project chat posting is configured.",
+    };
+  }
+
+  return {
+    canPost: false,
+    mode: "manual",
+    message: "Direct chat posting is not configured. Copy the draft instead.",
+  };
 }
 
 function dropIdFromResult(value: unknown) {

@@ -302,6 +302,16 @@ type ChatPostResponse = ApiErrorPayload & {
   };
 };
 
+type ChatPostingCapability = {
+  canPost: boolean;
+  mode: "mock" | "live" | "manual";
+  message: string;
+};
+
+type ChatPostCapabilityResponse = ApiErrorPayload & {
+  capability?: ChatPostingCapability;
+};
+
 type SetupValidationResponse = ApiErrorPayload & {
   validation?: SetupValidation;
 };
@@ -457,6 +467,20 @@ async function requestChatPost(waveUrl: string, content: string, accessKey?: str
   }
 
   return payload.post;
+}
+
+async function requestChatPostingCapability(signal?: AbortSignal) {
+  const response = await fetchWithClientTimeout("/api/6529/chat-post", {
+    headers: { accept: "application/json" },
+    signal,
+  });
+  const payload = await readApiJson<ChatPostCapabilityResponse>(response, "Chat posting check failed.");
+
+  if (!response.ok || !payload.capability) {
+    throw new Error(formatApiError(payload, "Chat posting check failed."));
+  }
+
+  return payload.capability;
 }
 
 function contextModeLabel(preview: WaveContextPreview) {
@@ -1013,6 +1037,7 @@ export function CommandWavesConsole() {
   const [developerFeePlanNotice, setDeveloperFeePlanNotice] = useState("");
   const [projectChatNotice, setProjectChatNotice] = useState("");
   const [chatPostUrl, setChatPostUrl] = useState("");
+  const [chatPostingCapability, setChatPostingCapability] = useState<ChatPostingCapability | null>(null);
   const [projectChatMessage, setProjectChatMessage] = useState("");
   const [discussionTabId, setDiscussionTabId] = useState<DiscussionTabId>("general");
   const [walletNotice, setWalletNotice] = useState("");
@@ -1326,7 +1351,9 @@ export function CommandWavesConsole() {
   );
   const chatPostTargetUrl = primaryHookProject?.waveUrl ?? wave.waveUrl;
   const hasProjectChatMessage = Boolean(projectChatMessage.trim());
-  const canPostChatMessage = Boolean(hasProjectChatMessage && chatPostTargetUrl);
+  const canPostChatMessage = Boolean(hasProjectChatMessage && chatPostTargetUrl && chatPostingCapability?.canPost);
+  const chatPostingUnavailableMessage =
+    chatPostingCapability && !chatPostingCapability.canPost ? chatPostingCapability.message : "";
   const chatWorkSpec =
     `Captured from ${selectedDiscussionTab.label.toLowerCase()} chat. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.`;
   const canSaveChatWorkItem = Boolean(hasProjectChatMessage && apiBusy === null);
@@ -1457,6 +1484,30 @@ export function CommandWavesConsole() {
     return () => {
       controller.abort();
       window.clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    requestChatPostingCapability(controller.signal)
+      .then((capability) => {
+        if (!controller.signal.aborted) {
+          setChatPostingCapability(capability);
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setChatPostingCapability({
+            canPost: false,
+            mode: "manual",
+            message: "Direct chat posting is not configured. Copy the draft instead.",
+          });
+        }
+      });
+
+    return () => {
+      controller.abort();
     };
   }, []);
 
@@ -1820,6 +1871,11 @@ export function CommandWavesConsole() {
 
     if (!chatPostTargetUrl) {
       setProjectChatNotice("Project chat is not connected yet.");
+      return;
+    }
+
+    if (!chatPostingCapability?.canPost) {
+      setProjectChatNotice(chatPostingCapability?.message ?? "Direct chat posting is not ready. Copy the draft instead.");
       return;
     }
 
@@ -2467,6 +2523,9 @@ export function CommandWavesConsole() {
                   Clear
                 </Button>
               </div>
+              {hasProjectChatMessage && chatPostingUnavailableMessage ? (
+                <p className="mt-2 text-sm leading-6 text-zinc-500">{chatPostingUnavailableMessage}</p>
+              ) : null}
               {projectChatNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{projectChatNotice}</p> : null}
               {chatPostUrl ? (
                 <a

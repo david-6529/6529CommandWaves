@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { POST as previewContext } from "./6529/context/preview/route";
-import { POST as postChatMessage } from "./6529/chat-post/route";
+import { GET as getChatPostCapability, POST as postChatMessage } from "./6529/chat-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
 import { POST as recordDecision } from "./command-wave/decision/route";
@@ -65,11 +65,15 @@ describe("API route validation", () => {
   const previousMockMode = process.env["6529_MOCK_MODE"];
   const previousAdminKey = process.env.ADMIN_API_KEY;
   const previousStoreMode = process.env.COMMAND_WAVE_STORE;
+  const previousBotToken = process.env["6529_BOT_BEARER_TOKEN"];
+  const previousBotWallet = process.env["6529_BOT_WALLET_ADDRESS"];
 
   beforeEach(async () => {
     setNodeEnv("test");
     delete process.env.ADMIN_API_KEY;
     process.env["6529_MOCK_MODE"] = "true";
+    delete process.env["6529_BOT_BEARER_TOKEN"];
+    delete process.env["6529_BOT_WALLET_ADDRESS"];
     process.env.COMMAND_WAVE_STORE = "memory";
     clearCommandWaveStoreForTests();
     await resetCommandWave();
@@ -100,6 +104,18 @@ describe("API route validation", () => {
       delete process.env.COMMAND_WAVE_STORE;
     } else {
       process.env.COMMAND_WAVE_STORE = previousStoreMode;
+    }
+
+    if (previousBotToken === undefined) {
+      delete process.env["6529_BOT_BEARER_TOKEN"];
+    } else {
+      process.env["6529_BOT_BEARER_TOKEN"] = previousBotToken;
+    }
+
+    if (previousBotWallet === undefined) {
+      delete process.env["6529_BOT_WALLET_ADDRESS"];
+    } else {
+      process.env["6529_BOT_WALLET_ADDRESS"] = previousBotWallet;
     }
   });
 
@@ -180,6 +196,26 @@ describe("API route validation", () => {
     await expect(responsePayload(response)).resolves.toMatchObject({
       error: "Keep chat messages under 4000 characters.",
     });
+  });
+
+  it("publishes chat posting capability without credentials", async () => {
+    process.env["6529_MOCK_MODE"] = "false";
+    process.env["6529_BOT_BEARER_TOKEN"] = "secret-token";
+    process.env["6529_BOT_WALLET_ADDRESS"] = "0x1234567890abcdef1234567890abcdef12345678";
+
+    const response = await getChatPostCapability(request("https://command-waves.example.com/api/6529/chat-post"));
+    const payload = await responsePayload(response);
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      capability: {
+        canPost: true,
+        mode: "live",
+        message: "Project chat posting is configured.",
+      },
+    });
+    expect(JSON.stringify(payload)).not.toContain("secret-token");
+    expect(JSON.stringify(payload)).not.toContain("0x1234567890abcdef1234567890abcdef12345678");
   });
 
   it("rejects non-JSON mutation bodies at the route", async () => {

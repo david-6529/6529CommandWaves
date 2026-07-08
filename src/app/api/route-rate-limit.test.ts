@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { POST as postChatMessage } from "./6529/chat-post/route";
+import { GET as getChatPostCapability, POST as postChatMessage } from "./6529/chat-post/route";
 import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
 import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
 import { GET as getHookProjects } from "./command-wave/projects/route";
@@ -70,6 +70,7 @@ describe("API route rate limits", () => {
     ["command-wave state", getCommandWaveState, "/api/command-wave/state", 60],
     ["verification manifest", getVerificationManifest, "/api/command-wave/verification/manifest", 30],
     ["readiness", getReadiness, "/api/readiness", 30],
+    ["chat posting capability", getChatPostCapability, "/api/6529/chat-post", 30],
   ] satisfies [string, (request: Request) => Response | Promise<Response>, string, number][])(
     "rate limits %s reads",
     async (_label, handler, path, max) => {

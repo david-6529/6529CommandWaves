@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { postChatMessage } from "./chat-post";
+import { getChatPostingCapability, postChatMessage } from "./chat-post";
 import { resetMockDropsForTests } from "./mock";
 import { previewWaveContext } from "./wave-context";
 
@@ -84,6 +84,30 @@ describe("6529 chat posting", () => {
     ).rejects.toMatchObject({
       message: "Chat posting is not configured. Copy the draft instead.",
       status: 409,
+    });
+  });
+
+  it("reports direct posting capability without exposing credentials", () => {
+    expect(getChatPostingCapability({ "6529_MOCK_MODE": "true" })).toEqual({
+      canPost: true,
+      mode: "mock",
+      message: "Local chat posting is active.",
+    });
+    expect(
+      getChatPostingCapability({
+        "6529_MOCK_MODE": "false",
+        "6529_BOT_BEARER_TOKEN": "secret-token",
+        "6529_BOT_WALLET_ADDRESS": "0x1234567890abcdef1234567890abcdef12345678",
+      }),
+    ).toEqual({
+      canPost: true,
+      mode: "live",
+      message: "Project chat posting is configured.",
+    });
+    expect(getChatPostingCapability({ "6529_MOCK_MODE": "false" })).toEqual({
+      canPost: false,
+      mode: "manual",
+      message: "Direct chat posting is not configured. Copy the draft instead.",
     });
   });
 

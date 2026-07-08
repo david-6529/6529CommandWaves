@@ -1,7 +1,19 @@
-import { postChatMessage } from "@/lib/6529/chat-post";
+import { getChatPostingCapability, postChatMessage } from "@/lib/6529/chat-post";
 import { handleRouteError, json, readJsonObject } from "@/lib/api";
 import { requireAdminRequest } from "@/lib/admin-auth";
 import { assertRateLimit } from "@/lib/rate-limit";
+
+export async function GET(request: Request) {
+  try {
+    assertRateLimit(request, { namespace: "6529_chat_post_capability", max: 30, windowMs: 60_000 });
+
+    return json({
+      capability: getChatPostingCapability(),
+    });
+  } catch (error) {
+    return handleRouteError(error);
+  }
+}
 
 export async function POST(request: Request) {
   try {
