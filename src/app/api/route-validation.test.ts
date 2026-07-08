@@ -253,6 +253,35 @@ describe("API route validation", () => {
     expect(JSON.stringify(payload)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
 
+  it("keeps protected wave mutation responses placeholder-safe", async () => {
+    const response = await submitProposalRoute(
+      request("https://command-waves.example.com/api/command-wave/proposals", {
+        method: "POST",
+        body: JSON.stringify({
+          title: "Ask about fee cap",
+          proposer: "tester",
+          kind: "draft_response",
+          prompt: "Ask builders which fee cap tests should come first.",
+          spec: "Question only. No code work.",
+          budgetUsd: 0,
+        }),
+      }),
+    );
+    const payload = await responsePayload(response);
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      wave: {
+        repoUrl: null,
+        executions: [],
+        reviews: [],
+      },
+    });
+    expect(JSON.stringify(payload)).not.toContain("https://github.com/your-org/your-hook-repo");
+    expect(JSON.stringify(payload)).not.toContain("Built cmd-001 through Codex");
+    expect(JSON.stringify(payload)).not.toContain("Review passed the hook scaffold");
+  });
+
   it("publishes the public verification manifest", async () => {
     const response = await getVerificationManifest(
       request("https://command-waves.example.com/api/command-wave/verification/manifest"),
