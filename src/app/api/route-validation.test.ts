@@ -474,8 +474,8 @@ describe("API route validation", () => {
         },
       },
     });
-    expect(JSON.stringify(statePayload)).toContain("Current focus: Add 30 bps fee cap tests.");
-    expect(JSON.stringify(statePayload)).toContain("Repo: not selected yet. PR work waits until maintainers choose it.");
+    expect(JSON.stringify(statePayload)).toContain("Now: Add 30 bps fee cap tests.");
+    expect(JSON.stringify(statePayload)).toContain("Repo: not selected.");
     expect(JSON.stringify(statePayload)).toContain("Submitted cmd-002: Add 30 bps fee cap tests.");
     expect(JSON.stringify(statePayload)).not.toContain("https://github.com/your-org/your-hook-repo");
 
