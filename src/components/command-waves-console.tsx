@@ -24,7 +24,7 @@ import {
 import { createContributionReport, createContributionReportDraft, reportPointLabel } from "@/lib/contribution-report";
 import { createDeveloperFeePlan, createDeveloperFeePlanDraft } from "@/lib/developer-fee-plan";
 import { demoWave } from "@/lib/demo-wave";
-import { githubRepoPlaceholder, orchestratorAgentIdentity } from "@/lib/agent-identities";
+import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "@/lib/agent-identities";
 import { commandWaveProductCopy } from "@/lib/product-copy";
 import { isPlaceholderValue } from "@/lib/env-placeholders";
 import { humanizeLegacyCommandCopy } from "@/lib/legacy-copy";
@@ -1450,9 +1450,18 @@ export function CommandWavesConsole() {
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
     ["How does work start?", "Post in chat. Good ideas become small proposals the group can discuss."],
     [
+      "Who coordinates?",
+      `${orchestratorAgentIdentity.handle} is the 6529 account that updates the summary, labels risk, and routes work.`,
+    ],
+    [
       "How are PRs approved?",
       "The group records a project decision before PR work starts. Review approval is manual in this phase.",
     ],
+    [
+      "What about GitHub?",
+      "The GitHub repo is a placeholder for now. Chat can continue. PR work waits until maintainers choose the repo.",
+    ],
+    ["Who reviews PRs?", `${reviewAgentIdentity.role} is a placeholder for this phase. Humans still merge.`],
     ["Who merges?", "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work."],
   ];
 

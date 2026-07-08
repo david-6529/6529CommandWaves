@@ -50,10 +50,16 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who can join");
     expect(text).toContain("How do I join?");
     expect(text).toContain("How does work start?");
+    expect(text).toContain("Who coordinates?");
     expect(text).toContain("How are PRs approved?");
+    expect(text).toContain("What about GitHub?");
+    expect(text).toContain("Who reviews PRs?");
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
     expect(text).toContain("daemon labels risk and keeps scope small.");
+    expect(text).toContain("daemon is the 6529 account that updates the summary, labels risk, and routes work.");
+    expect(text).toContain("The GitHub repo is a placeholder for now. Chat can continue. PR work waits until maintainers choose the repo.");
+    expect(text).toContain("Review agent is a placeholder for this phase. Humans still merge.");
     expect(text).toContain("A reviewer check must pass before humans merge.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Work being discussed");
