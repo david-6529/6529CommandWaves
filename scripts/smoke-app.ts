@@ -194,6 +194,20 @@ async function main() {
   assert(readinessChecks.length > 0, "Readiness response has no checks.");
   assertNoEmDash("Readiness response", JSON.stringify(readiness));
 
+  const wavePayload = await fetchJson("/api/command-wave");
+  const publicWave = objectValue(wavePayload, "wave");
+
+  assertJsonObject("Public project read wave", publicWave);
+  assert(
+    objectValue(publicWave, "repoUrl") === null,
+    "Public project read response should publish null while the GitHub repo is a placeholder.",
+  );
+  assert(
+    !JSON.stringify(wavePayload).includes("https://github.com/your-org/your-hook-repo"),
+    "Public project read response should not expose the placeholder repo URL.",
+  );
+  assertNoEmDash("Public project read response", JSON.stringify(wavePayload));
+
   const launchPayload = await fetchJson("/api/command-wave/launch/audit");
   const audit = objectValue(launchPayload, "audit");
 

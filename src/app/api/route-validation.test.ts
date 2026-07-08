@@ -9,7 +9,7 @@ import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
 import { POST as submitProposalRoute } from "./command-wave/proposals/route";
 import { GET as getContributionReport } from "./command-wave/reports/contribution/route";
 import { POST as reviewCommand } from "./command-wave/review/route";
-import { DELETE as resetWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
+import { DELETE as resetWave, GET as getWave, PATCH as updateSetup, PUT as replaceWave } from "./command-wave/route";
 import { POST as validateSetup } from "./command-wave/setup/validate/route";
 import { GET as getVerificationManifest } from "./command-wave/verification/manifest/route";
 import { POST as recordVoteRoute } from "./command-wave/votes/route";
@@ -237,6 +237,19 @@ describe("API route validation", () => {
         },
       },
     });
+  });
+
+  it("keeps the public project read response placeholder-safe", async () => {
+    const response = await getWave(request("https://command-waves.example.com/api/command-wave"));
+    const payload = await responsePayload(response);
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      wave: {
+        repoUrl: null,
+      },
+    });
+    expect(JSON.stringify(payload)).not.toContain("https://github.com/your-org/your-hook-repo");
   });
 
   it("publishes the public verification manifest", async () => {

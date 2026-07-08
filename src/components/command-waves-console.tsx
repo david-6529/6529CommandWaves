@@ -247,7 +247,7 @@ function cloneDemoWave(): CommandWave {
 }
 
 type WaveApiResponse = ApiErrorPayload & {
-  wave?: CommandWave;
+  wave?: Omit<CommandWave, "repoUrl"> & { repoUrl: string | null };
 };
 
 type WaveContextPreview = {
@@ -409,7 +409,10 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
     throw new Error(formatApiError(payload, "Project request failed."));
   }
 
-  return payload.wave;
+  return {
+    ...payload.wave,
+    repoUrl: payload.wave.repoUrl ?? githubRepoPlaceholder.url,
+  };
 }
 
 async function requestContextPreview(waveId: string) {
