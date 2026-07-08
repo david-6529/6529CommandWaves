@@ -37,8 +37,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Changelog");
     expect(text).toContain("How this works");
-    expect(text).toContain("Flow");
-    expect(text).toContain("Project, Discuss, Decide, PR, Review, Log");
+    expect(text).toContain("Current loop");
+    expect(text).toContain("Build PR: Select the hook repo before PR work starts.");
     expect(text).toContain("Active projects");
     expect(text).toContain("Start with the pilot hook. More hook projects can appear here after this loop works.");
     expect(text).toContain("6529 AMM hook");
@@ -268,7 +268,7 @@ describe("CommandWavesConsole", () => {
   it("keeps the top context accordions stacked with only the summary open", () => {
     const html = renderedConsoleHtml();
     const start = html.indexOf('aria-label="Project context"');
-    const end = html.indexOf('aria-label="Build flow"');
+    const end = html.indexOf('aria-label="Project loop"');
     const contextHtml = html.slice(start, end);
 
     expect(start).toBeGreaterThan(-1);

@@ -1415,6 +1415,14 @@ export function CommandWavesConsole() {
     [wave.ledger, wave.repoUrl],
   );
   const topChangelogItems = orderedLedgerEvents.slice(0, 3);
+  const currentLoopItem =
+    phaseChecklist.find((item) => item.status === "blocked" || item.status === "active") ??
+    phaseChecklist.find((item) => item.status === "waiting") ??
+    phaseChecklist[phaseChecklist.length - 1];
+  const currentLoopDetail =
+    phaseNextAction.status === "ready"
+      ? phaseNextAction.detail
+      : `${phaseNextAction.stepLabel}: ${phaseNextAction.detail}`;
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
   const launchNextActionItemId = launchAudit.nextAction.itemId ?? "";
@@ -2358,21 +2366,24 @@ export function CommandWavesConsole() {
             </details>
           </section>
 
-          <section className="mt-5 border-t border-zinc-800 pt-4" aria-label="Build flow">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Flow</p>
-              <p className="text-sm leading-6 text-zinc-500">{commandWaveProductCopy.simpleFlow}</p>
+          <section className="mt-5 border-t border-zinc-800 pt-4" aria-label="Project loop">
+            <div className="grid gap-2 lg:grid-cols-[10rem_minmax(0,1fr)]">
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current loop</p>
+              <p className="text-sm leading-6 text-zinc-400">{currentLoopDetail}</p>
             </div>
-            <ol className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2">
+            <ol className="mt-3 flex flex-wrap gap-2">
               {phaseChecklist.map((item) => (
-                <li key={item.id} className="min-w-0 border-t border-zinc-800 pt-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-semibold text-zinc-100">{flowStepLabel(item)}</p>
-                    <Badge className={phaseStatusClass(item.status)}>{item.status}</Badge>
-                  </div>
-                  {item.status === "active" ? (
-                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">{item.detail}</p>
-                  ) : null}
+                <li
+                  key={item.id}
+                  className={`rounded-md border px-3 py-2 text-sm font-semibold ${
+                    item.id === currentLoopItem?.id
+                      ? "border-zinc-500 bg-zinc-900 text-zinc-50"
+                      : item.status === "done"
+                        ? "border-emerald-900 bg-emerald-950/20 text-emerald-100"
+                        : "border-zinc-800 bg-zinc-950 text-zinc-500"
+                  }`}
+                >
+                  {flowStepLabel(item)}
                 </li>
               ))}
             </ol>
