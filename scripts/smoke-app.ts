@@ -129,7 +129,7 @@ async function main() {
     "Connect wallet if you want, then use Request access in chat.",
     "Work being discussed",
     "Draft hook scaffold",
-    "PR waits",
+    "repo not selected",
     "Keep discussing",
     "PR work starts after maintainers select the hook repo.",
     "GitHub repo placeholder",

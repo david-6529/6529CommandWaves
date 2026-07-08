@@ -63,7 +63,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("A reviewer check must pass before humans merge.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Work being discussed");
-    expect(text).toContain("PR waits");
+    expect(text).toContain("repo not selected");
     expect(text).toContain("Draft hook scaffold");
     expect(text).toContain("Next");
     expect(text).toContain("Keep discussing");

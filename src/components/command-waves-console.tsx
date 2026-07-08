@@ -1168,7 +1168,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "PR waits"
+    ? "repo not selected"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
