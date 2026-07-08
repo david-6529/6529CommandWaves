@@ -58,10 +58,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("A reviewer check must pass before humans merge.");
     expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
     expect(text).toContain("Current work");
-    expect(text).toContain("repo placeholder");
+    expect(text).toContain("repo needed");
     expect(text).toContain("Draft hook scaffold");
     expect(text).toContain("Next");
-    expect(text).toContain("GitHub repo placeholder");
+    expect(text).toContain("Choose GitHub repo");
     expect(text).toContain("View setup");
     expect(text).toContain("Decision");
     expect(text).toContain("Builders approved with 5 yes and 1 no.");
@@ -84,6 +84,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Build");
     expect(text).toContain("Review");
     expect(text).toContain("Questions, ideas, risks, and work all start here.");
+    expect(text).toContain("Discuss repo");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
     expect(text).toContain("Save proposal");

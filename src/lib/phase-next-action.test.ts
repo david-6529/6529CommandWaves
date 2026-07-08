@@ -70,8 +70,8 @@ describe("phase next action", () => {
 
     expect(nextAction).toMatchObject({
       status: "action",
-      stepLabel: "GitHub repo placeholder",
-      title: "GitHub repo placeholder",
+      stepLabel: "Choose GitHub repo",
+      title: "Choose GitHub repo",
       detail: "PR work waits until maintainers select the GitHub repo.",
     });
   });

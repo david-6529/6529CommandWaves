@@ -168,8 +168,8 @@ const launchActionCopyByItemId: Record<string, string> = {
 };
 
 function launchActionTitle(item: FirstPhaseLaunchAuditItem) {
-  if (item.id === "flow_project" && item.label === "GitHub repo placeholder") {
-    return "GitHub repo placeholder";
+  if (item.id === "flow_project" && item.label === "Choose GitHub repo") {
+    return "Choose GitHub repo";
   }
 
   const explicitTitle = launchActionCopyByItemId[item.id];

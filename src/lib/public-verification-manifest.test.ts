@@ -47,7 +47,7 @@ describe("public verification manifest", () => {
           status: "needs_setup",
           statusLabel: "checks needed",
           nextAction: {
-            title: "GitHub repo placeholder",
+            title: "Choose GitHub repo",
           },
         },
       },

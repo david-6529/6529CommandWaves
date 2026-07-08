@@ -57,7 +57,7 @@ describe("active hook projects", () => {
         codeSnapshotLabel: "GitHub repo placeholder",
         nextActionStatus: "action",
         nextActionLabel: "next",
-        nextActionTitle: "GitHub repo placeholder",
+        nextActionTitle: "Choose GitHub repo",
         nextActionDetail: "PR work waits until maintainers select the GitHub repo.",
         waveStatus: "Builders approved with 5 yes and 1 no.",
         codeStatus: "GitHub repo is not selected yet.",

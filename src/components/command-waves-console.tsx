@@ -1143,7 +1143,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "GitHub repo placeholder"
+    ? "repo needed"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
@@ -2449,7 +2449,7 @@ export function CommandWavesConsole() {
                   Request access
                 </Button>
                 <Button type="button" variant="secondary" onClick={preparePrDiscussion}>
-                  {repoCanRunCode ? "Add PR note" : "GitHub repo placeholder"}
+                  {repoCanRunCode ? "Add PR note" : "Discuss repo"}
                 </Button>
               </div>
             </div>

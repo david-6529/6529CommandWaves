@@ -55,7 +55,7 @@ describe("phase checklist", () => {
       ["log", "waiting"],
     ]);
     expect(checklist.find((item) => item.id === "project")).toMatchObject({
-      label: "GitHub repo placeholder",
+      label: "Choose GitHub repo",
       detail: "PR work waits until maintainers select the GitHub repo.",
     });
     expect(checklist.find((item) => item.id === "build")?.detail).toBe("Build waits for a selected GitHub repo.");
