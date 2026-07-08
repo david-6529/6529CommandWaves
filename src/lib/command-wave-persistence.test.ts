@@ -6,6 +6,7 @@ import {
   replaceCommandWave,
   resetCommandWave,
   submitCommandProposal,
+  updateCommandWaveSetup,
 } from "./command-wave-store";
 import { demoWave } from "./demo-wave";
 import { deletePersistedCommandWave, getCommandWaveStoreMode, savePersistedCommandWave } from "./command-wave-persistence";
@@ -128,6 +129,19 @@ describe("command wave persistence", () => {
     expect(wave.reviews).toEqual([]);
     expect(wave.proposals[0]?.status).toBe("approved");
     expect(wave.ledger[0]?.message).toBe("Created the hook build with project chat. GitHub repo setup is still needed.");
+  });
+
+  it("records placeholder repo setup without naming a fake GitHub repo", async () => {
+    const wave = await updateCommandWaveSetup({
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      repoUrl: "https://github.com/your-org/your-hook-repo",
+    });
+
+    expect(wave.repoUrl).toBe("https://github.com/your-org/your-hook-repo");
+    expect(wave.ledger[0]?.message).toBe(
+      "Updated setup to wave 6529-hook-builder and kept the GitHub repo as a placeholder.",
+    );
+    expect(wave.ledger[0]?.message).not.toContain("your-org/your-hook-repo");
   });
 
   it("normalizes old hook chat copy without replacing custom activity", async () => {

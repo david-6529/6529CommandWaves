@@ -4,6 +4,7 @@ import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { createHookProjectIndex } from "./hook-project-index";
+import { createPublicCommandWaveSource } from "./public-command-wave";
 import { createPublicContributionReport } from "./public-contribution-report";
 import { hashValue } from "./run-manifest";
 import { createSetupProof, setupProofOptionsFromEnv } from "./setup-proof";
@@ -102,15 +103,16 @@ export async function createPublicVerificationManifest(
 ): Promise<PublicVerificationManifest> {
   const env = options.env ?? process.env;
   const generatedAt = options.generatedAt ?? new Date().toISOString();
-  const launchSnapshot = await createFirstPhaseLaunchSnapshot(wave, {
+  const publicSourceWave = createPublicCommandWaveSource(wave);
+  const launchSnapshot = await createFirstPhaseLaunchSnapshot(publicSourceWave, {
     generatedAt,
     env,
   });
   const chatLaunchSnapshot = createChatLaunchSnapshot(launchSnapshot);
-  const stateSnapshot = createCommandWaveStateSnapshot(wave, { generatedAt });
-  const projectIndex = createHookProjectIndex(wave, { generatedAt });
-  const contributionReport = createPublicContributionReport(wave);
-  const setupProof = createSetupProof(wave, {
+  const stateSnapshot = createCommandWaveStateSnapshot(publicSourceWave, { generatedAt });
+  const projectIndex = createHookProjectIndex(publicSourceWave, { generatedAt });
+  const contributionReport = createPublicContributionReport(publicSourceWave);
+  const setupProof = createSetupProof(publicSourceWave, {
     ...setupProofOptionsFromEnv(env),
     generatedAt,
     commandWaveStateUrl: launchSnapshot.verificationTargets.commandWaveStateUrl,
@@ -120,9 +122,9 @@ export async function createPublicVerificationManifest(
     version: "command-wave-verification-manifest-v0.1",
     generatedAt,
     project: {
-      id: wave.id,
-      name: wave.name,
-      waveUrl: wave.waveUrl,
+      id: publicSourceWave.id,
+      name: publicSourceWave.name,
+      waveUrl: publicSourceWave.waveUrl,
       repoStatus,
     },
     stableAnchors: {

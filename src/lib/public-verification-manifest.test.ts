@@ -139,4 +139,25 @@ describe("public verification manifest", () => {
     expect(first.manifestHash).not.toBe(second.manifestHash);
     expect(first.stableAnchors).toEqual(second.stableAnchors);
   });
+
+  it("keeps old concrete pilot repo evidence published as a placeholder", async () => {
+    const generatedAt = "2026-06-20T13:00:00.000Z";
+    const staleConcretePilot = {
+      ...demoWave,
+      repoUrl: "https://github.com/6529-Collections/6529-hook",
+    };
+    const manifest = await createPublicVerificationManifest(staleConcretePilot, {
+      generatedAt,
+      env: manifestEnv,
+    });
+    const placeholderManifest = await createPublicVerificationManifest(demoWave, {
+      generatedAt,
+      env: manifestEnv,
+    });
+
+    expect(manifest.project.repoStatus).toBe("placeholder");
+    expect(manifest.stableAnchors.setupHash).toBe(placeholderManifest.stableAnchors.setupHash);
+    expect(manifest.stableAnchors.reviewCount).toBe(0);
+    expect(JSON.stringify(manifest)).not.toContain("https://github.com/6529-Collections/6529-hook");
+  });
 });

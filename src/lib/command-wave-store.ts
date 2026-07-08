@@ -9,6 +9,7 @@ import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { defaultParticipationGates, normalizeParticipationGates } from "./participation-gates";
 import { validateSetupShape } from "./setup-validation";
+import { isPlaceholderValue } from "./env-placeholders";
 import {
   classifyRisk,
   createWaveDecisionReceipt,
@@ -447,6 +448,12 @@ export async function updateCommandWaveSetup(input: unknown) {
   const gates = Object.hasOwn(body, "gates")
     ? normalizeParticipationGates(body.gates, [])
     : normalizeParticipationGates(wave.gates);
+  const repoStatusMessage =
+    validation.repo && isPlaceholderValue(validation.repo.htmlUrl)
+      ? "kept the GitHub repo as a placeholder"
+      : validation.repo
+        ? `selected repo ${validation.repo.owner}/${validation.repo.repo}`
+        : "kept the GitHub repo unset";
   const nextWave = appendLedger(
     {
       ...wave,
@@ -457,7 +464,7 @@ export async function updateCommandWaveSetup(input: unknown) {
     {
       actor: "Setup",
       type: "rules_defined",
-      message: `Updated setup to wave ${validation.waveId} and repo ${validation.repo?.owner}/${validation.repo?.repo}.`,
+      message: `Updated setup to wave ${validation.waveId} and ${repoStatusMessage}.`,
     },
   );
 
