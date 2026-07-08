@@ -170,6 +170,10 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("Build reference");
     expect(text).not.toContain("Use Codex to draft");
+    expect(text).not.toContain("Built cmd-001 through Codex");
+    expect(text).not.toContain("Review passed the hook scaffold");
+    expect(text).not.toContain("PR #12");
+    expect(text).not.toContain("forge test passed");
     expect(text).not.toContain("6529 decision " + "receipt");
     expect(text).not.toContain("decision " + "receipt needed");
     expect(text).not.toContain("Decision " + "receipt needed");

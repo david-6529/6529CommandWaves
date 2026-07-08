@@ -242,8 +242,29 @@ function shortTime(value: string) {
   }).format(new Date(value));
 }
 
+const repoBoundConsoleEventTypes = new Set<CommandWave["ledger"][number]["type"]>([
+  "execution_started",
+  "execution_logged",
+  "guardian_reviewed",
+]);
+
+function createPublicConsoleWave(wave: CommandWave): CommandWave {
+  const setupSafeWave = withPlaceholderRepoSetupState(wave);
+
+  if (!isPlaceholderValue(setupSafeWave.repoUrl)) {
+    return setupSafeWave;
+  }
+
+  return {
+    ...setupSafeWave,
+    executions: [],
+    reviews: [],
+    ledger: setupSafeWave.ledger.filter((event) => !repoBoundConsoleEventTypes.has(event.type)),
+  };
+}
+
 function cloneDemoWave(): CommandWave {
-  return withPlaceholderRepoSetupState(JSON.parse(JSON.stringify(demoWave)) as CommandWave);
+  return createPublicConsoleWave(JSON.parse(JSON.stringify(demoWave)) as CommandWave);
 }
 
 type WaveApiResponse = ApiErrorPayload & {
@@ -409,10 +430,10 @@ async function requestWave(path: string, init?: RequestInit, accessKey?: string)
     throw new Error(formatApiError(payload, "Project request failed."));
   }
 
-  return {
+  return createPublicConsoleWave({
     ...payload.wave,
     repoUrl: payload.wave.repoUrl ?? githubRepoPlaceholder.url,
-  };
+  });
 }
 
 async function requestContextPreview(waveId: string) {
