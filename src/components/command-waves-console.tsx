@@ -192,7 +192,7 @@ const projectWorkRules = [
 const publicLaunchSetupItems = [
   ["NEXT_PUBLIC_APP_URL", "Deployed app URL for public proof links."],
   ["COMMAND_WAVE_INITIAL_WAVE_URL", "First public project chat."],
-  ["COMMAND_WAVE_INITIAL_REPO_URL", "Placeholder now. Select the pilot repo before PR work."],
+  ["COMMAND_WAVE_INITIAL_REPO_URL", "Placeholder now. Keep it until maintainers choose the hook repo."],
   ["COMMAND_WAVE_STORE=postgres", "Use durable command-wave state."],
   ["DATABASE_URL", "Production Postgres connection."],
   ["ADMIN_API_KEY", "Protects setup and mutation routes."],

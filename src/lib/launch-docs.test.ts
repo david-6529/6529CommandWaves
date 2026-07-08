@@ -37,6 +37,21 @@ describe("launch docs", () => {
     }
   });
 
+  it("keeps repo placeholder wording human-owned across launch docs", () => {
+    const docs = [
+      readRepoFile("README.md"),
+      readRepoFile("docs/first-hook-launch-playbook.md"),
+      readRepoFile(".env.example"),
+      readRepoFile(".env.production.example"),
+    ].join("\n");
+    const stalePrWork = "until PR work " + "starts";
+    const staleMaintainerSelect = "maintainers " + "select";
+
+    expect(docs).toContain("until maintainers choose the hook repo");
+    expect(docs).not.toContain(stalePrWork);
+    expect(docs).not.toContain(staleMaintainerSelect);
+  });
+
   it("documents the required GitHub guardian check outside env files", () => {
     const readme = readRepoFile("README.md");
     const playbook = readRepoFile("docs/first-hook-launch-playbook.md");

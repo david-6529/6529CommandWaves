@@ -328,6 +328,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Public launch setup");
     expect(text).toContain("COMMAND_WAVE_INITIAL_WAVE_URL");
     expect(text).toContain("COMMAND_WAVE_INITIAL_REPO_URL");
+    expect(text).toContain("Placeholder now. Keep it until maintainers choose the hook repo.");
     expect(text).toContain("COMMAND_WAVE_STORE=postgres");
     expect(text).toContain("DATABASE_URL");
     expect(text).toContain("ADMIN_API_KEY");
