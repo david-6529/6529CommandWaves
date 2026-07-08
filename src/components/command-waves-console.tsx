@@ -2441,19 +2441,19 @@ export function CommandWavesConsole() {
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button
                   type="button"
+                  variant={!canPostChatMessage && hasProjectChatMessage ? "primary" : "secondary"}
+                  disabled={!hasProjectChatMessage}
+                  onClick={() => void copyBuilderWaveChatDraft()}
+                >
+                  Copy draft
+                </Button>
+                <Button
+                  type="button"
                   variant={canPostChatMessage ? "primary" : "secondary"}
                   disabled={isBusy || !canPostChatMessage}
                   onClick={() => void postBuilderWaveChatDraft()}
                 >
                   {apiBusy === "chatPost" ? "Posting" : "Post to chat"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={!hasProjectChatMessage}
-                  onClick={() => void copyBuilderWaveChatDraft()}
-                >
-                  Copy draft
                 </Button>
                 <Button
                   type="button"

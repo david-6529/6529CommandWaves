@@ -221,6 +221,22 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain(">Review</button>");
   });
 
+  it("orders chat actions from discussion draft to saved proposal", () => {
+    const html = renderedConsoleHtml();
+    const start = html.indexOf('id="project-chat"');
+    const end = html.indexOf('id="active-projects"');
+    const chatHtml = html.slice(start, end);
+    const copyIndex = chatHtml.indexOf("Copy draft");
+    const postIndex = chatHtml.indexOf("Post to chat");
+    const saveIndex = chatHtml.indexOf("Save as proposal");
+
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(copyIndex).toBeGreaterThan(-1);
+    expect(postIndex).toBeGreaterThan(copyIndex);
+    expect(saveIndex).toBeGreaterThan(postIndex);
+  });
+
   it("does not render light-mode surface classes", () => {
     const html = renderedConsoleHtml();
 
