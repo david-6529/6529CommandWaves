@@ -1913,8 +1913,8 @@ export function CommandWavesConsole() {
   function preparePrDiscussion() {
     if (!repoCanRunCode) {
       setDiscussionTabId("build");
-      setProjectChatMessage("GitHub repo placeholder: which GitHub repo should hold the hook before PR work starts?");
-      setProjectChatNotice("GitHub repo placeholder discussion draft ready.");
+      setProjectChatMessage("Which GitHub repo should hold this hook before PR work starts?");
+      setProjectChatNotice("Repo discussion draft ready.");
       return;
     }
 

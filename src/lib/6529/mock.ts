@@ -12,7 +12,7 @@ const mockDropsFixture = {
       id: "drop-003",
       serial_no: 3,
       created_at: "2026-06-20T12:10:00.000Z",
-      content: "GitHub repo placeholder for now. Which GitHub repo should hold the hook before PR work starts?",
+      content: "Which GitHub repo should hold this hook before PR work starts?",
       author: { handle: "daemon" },
       drop_type: "CHAT",
     },
