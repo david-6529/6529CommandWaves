@@ -2,7 +2,7 @@ import type { CommandWave } from "./command-waves";
 import { orchestratorAgentIdentity } from "./agent-identities";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
-import { latestLedgerTimestamp } from "./ledger";
+import { ledgerEventsForVisibleProjectHistory, latestLedgerTimestamp } from "./ledger";
 
 export type ContributionContributor = {
   identity: string;
@@ -126,8 +126,12 @@ function isSystemChatAuthor(identity: string) {
   );
 }
 
+function visibleLedgerEvents(wave: CommandWave) {
+  return ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl);
+}
+
 function latestReportTimestamp(wave: CommandWave, chatPosts: ContributionChatPost[]) {
-  const ledgerLatest = latestLedgerTimestamp(wave.ledger);
+  const ledgerLatest = latestLedgerTimestamp(visibleLedgerEvents(wave));
   const chatLatest = chatPosts
     .map((post) => (post.createdAt ? Date.parse(post.createdAt) : 0))
     .filter((time) => Number.isFinite(time) && time > 0)
@@ -149,6 +153,7 @@ function evidenceSummary(wave: CommandWave, chatPostCount: number) {
   const reviewProofCount = prLinkCount
     ? wave.reviews.filter((review) => guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl)).length
     : 0;
+  const ledgerEventCount = visibleLedgerEvents(wave).length;
   const evidence = [
     ...(wave.proposals.length ? [countLabel(wave.proposals.length, "proposal")] : []),
     ...(voteCount ? [countLabel(voteCount, "vote")] : []),
@@ -156,7 +161,7 @@ function evidenceSummary(wave: CommandWave, chatPostCount: number) {
     ...(chatPostCount ? [countLabel(chatPostCount, "chat post")] : []),
     ...(prLinkCount ? [countLabel(prLinkCount, "GitHub PR link")] : []),
     ...(reviewProofCount ? [countLabel(reviewProofCount, "Guardian review proof")] : []),
-    ...(wave.ledger.length ? [countLabel(wave.ledger.length, "ledger event")] : []),
+    ...(ledgerEventCount ? [countLabel(ledgerEventCount, "ledger event")] : []),
   ];
 
   return evidence.length ? evidence : ["No app records yet."];
@@ -217,10 +222,6 @@ export function createContributionReport(
     addScoreBasis(contributor, "Proposal work", points);
     addRationale(contributor, "Proposed work");
 
-    if (proposal.status === "complete") {
-      addRationale(contributor, "Carried work through review");
-    }
-
     const execution = wave.executions.find((item) => item.proposalId === proposal.id);
     const prCount = execution ? gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl).length : 0;
 
@@ -240,6 +241,7 @@ export function createContributionReport(
       contributor.score += 2;
       addScoreBasis(contributor, "Review proof", 2);
       addRationale(contributor, "Received repo-bound Guardian review proof");
+      addRationale(contributor, "Carried work through review");
     }
   }
 
@@ -263,7 +265,7 @@ export function createContributionReport(
     }
   }
 
-  for (const event of wave.ledger) {
+  for (const event of visibleLedgerEvents(wave)) {
     if (["Setup", "Rule Engine", "AI Worker", "Agent", "Reviewer", "Wave Poll", "Decision"].includes(event.actor)) {
       continue;
     }

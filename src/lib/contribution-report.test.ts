@@ -100,10 +100,12 @@ describe("contribution report", () => {
 
     expect(report.evidence).not.toContain("1 GitHub PR link");
     expect(report.evidence).not.toContain("1 Guardian review proof");
+    expect(report.evidence).toContain("4 ledger events");
     expect(report.contributors[0]).toMatchObject({
       pullRequests: 0,
       reviewProofs: 0,
     });
+    expect(report.contributors[0].rationale).not.toContain("Carried work through review");
     expect(report.notes.join(" ")).toContain("not a permission system");
   });
 
@@ -132,10 +134,10 @@ describe("contribution report", () => {
     });
   });
 
-  it("defaults generatedAt to the newest ledger event", () => {
+  it("defaults generatedAt to the newest visible ledger event", () => {
     const report = createContributionReport(demoWave);
 
-    expect(report.generatedAt).toBe("2026-06-20T12:50:00.000Z");
+    expect(report.generatedAt).toBe("2026-06-20T12:40:00.000Z");
   });
 
   it("reports no records before app activity exists", () => {
