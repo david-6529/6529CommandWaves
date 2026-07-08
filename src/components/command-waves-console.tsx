@@ -1168,7 +1168,7 @@ export function CommandWavesConsole() {
         } total votes and ${activePoll?.yesPercentRequired ?? 0}% yes.`;
   const currentWorkNeedsRepo = !repoCanRunCode && activeProposalIsPr;
   const currentBuildStatusLabel = currentWorkNeedsRepo
-    ? "repo needed"
+    ? "PR waits"
     : readyForNextHookChange
       ? "needs discussion"
       : activeExecution
@@ -1219,9 +1219,9 @@ export function CommandWavesConsole() {
         : activeProposal
           ? "No decision required by current rules."
           : "Discuss scope in chat before saving a proposal.";
-  const currentNextTitle = currentWorkNeedsRepo ? "Keep discussing. Select repo later." : phaseNextAction.title;
+  const currentNextTitle = currentWorkNeedsRepo ? "Keep discussing" : phaseNextAction.title;
   const currentNextDetail = currentWorkNeedsRepo
-    ? "Chat can continue now. PR work waits for the selected hook repo."
+    ? "PR work starts after maintainers select the hook repo."
     : phaseNextAction.detail;
   const canBuildApprovedPr = Boolean(
     activeProposal &&
