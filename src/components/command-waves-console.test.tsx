@@ -259,12 +259,15 @@ describe("CommandWavesConsole", () => {
 
   it("keeps the public active projects list collapsed and placeholder-safe", () => {
     const html = renderedConsoleHtml();
+    const workspaceStart = html.indexOf('id="workspace"');
     const start = html.indexOf('id="active-projects"');
-    const end = html.indexOf('id="workspace"');
+    const end = html.indexOf('id="members-and-rules"');
     const activeProjectsHtml = html.slice(start, end);
     const activeProjectsText = activeProjectsHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
+    expect(workspaceStart).toBeGreaterThan(-1);
     expect(start).toBeGreaterThan(-1);
+    expect(start).toBeGreaterThan(workspaceStart);
     expect(end).toBeGreaterThan(start);
     expect(activeProjectsHtml).toContain("Active projects");
     expect(activeProjectsHtml).toContain("6529 AMM hook");

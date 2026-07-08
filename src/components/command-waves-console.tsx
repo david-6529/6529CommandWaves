@@ -2313,54 +2313,6 @@ export function CommandWavesConsole() {
             </ol>
           </section>
 
-          <details id="active-projects" className="mt-5 border-t border-zinc-800 pt-4">
-            <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-              <span>Active projects</span>
-              <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
-                {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
-              </Badge>
-            </summary>
-            <p className="mt-3 text-base leading-7 text-zinc-400">
-              Start with the pilot hook. More hook projects can appear here after this loop works.
-            </p>
-            <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-              {activeHookProjects.map((project) => (
-                <div key={project.id} className="py-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-lg font-semibold text-zinc-50">{project.name}</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-400">{project.currentFocus}</p>
-                    </div>
-                    <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
-                      {project.statusLabel}
-                    </Badge>
-                  </div>
-                  <dl className="mt-3 grid gap-3 sm:grid-cols-3">
-                    <div>
-                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Chat</dt>
-                      <dd className="mt-1 text-sm leading-6 text-zinc-300">Project chat</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Repo</dt>
-                      <dd className="mt-1 text-sm leading-6 text-zinc-300">{project.repoLabel}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</dt>
-                      <dd className="mt-1 text-sm leading-6 text-zinc-300">{project.nextActionTitle}</dd>
-                    </div>
-                  </dl>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {project.waveUrl ? <LinkButton href={project.waveUrl}>Open chat</LinkButton> : null}
-                    {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
-                    <JumpLink href="#project-chat">Message builders</JumpLink>
-                    {!project.repoUrl ? (
-                      <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">GitHub repo placeholder</Badge>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </details>
         </header>
 
         <section id="workspace" className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
@@ -2578,6 +2530,55 @@ export function CommandWavesConsole() {
             </section>
           </details>
         </section>
+
+        <details id="active-projects" className="border-t border-zinc-800 pt-4">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
+            <span>Active projects</span>
+            <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">
+              {activeHookProjects.length} {activeHookProjects.length === 1 ? "hook" : "hooks"}
+            </Badge>
+          </summary>
+          <p className="mt-3 text-base leading-7 text-zinc-400">
+            Start with the pilot hook. More hook projects can appear here after this loop works.
+          </p>
+          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+            {activeHookProjects.map((project) => (
+              <div key={project.id} className="py-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-lg font-semibold text-zinc-50">{project.name}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{project.currentFocus}</p>
+                  </div>
+                  <Badge className={project.status === "active" ? statusClass("complete") : riskClass("medium")}>
+                    {project.statusLabel}
+                  </Badge>
+                </div>
+                <dl className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Chat</dt>
+                    <dd className="mt-1 text-sm leading-6 text-zinc-300">Project chat</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Repo</dt>
+                    <dd className="mt-1 text-sm leading-6 text-zinc-300">{project.repoLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Next</dt>
+                    <dd className="mt-1 text-sm leading-6 text-zinc-300">{project.nextActionTitle}</dd>
+                  </div>
+                </dl>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {project.waveUrl ? <LinkButton href={project.waveUrl}>Open chat</LinkButton> : null}
+                  {project.repoUrl ? <LinkButton href={project.repoUrl}>Open repo</LinkButton> : null}
+                  <JumpLink href="#project-chat">Message builders</JumpLink>
+                  {!project.repoUrl ? (
+                    <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">GitHub repo placeholder</Badge>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
 
         <section id="members-and-rules" className="border-t border-zinc-800 pt-6">
           <section className="min-w-0">
