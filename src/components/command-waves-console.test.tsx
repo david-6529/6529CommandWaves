@@ -100,14 +100,12 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Group chat");
     expect(text).toContain("Live builder thread");
     expect(text).toContain("daemon observes");
-    expect(text).toContain(
-      "One shared thread for questions, ideas, votes, and PR links. daemon parses messages in the background and keeps the project state current.",
-    );
+    expect(text).toContain("One shared thread. Ask questions, suggest work, vote, and paste PR links. daemon keeps the project state current.");
     expect(text).toContain("Thread");
-    expect(text).toContain("Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.");
+    expect(text).toContain("Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.");
     expect(text).toContain("Message the group");
-    expect(text).toContain("3 messages / 5 min");
-    expect(text).toContain("Current daemon pace: 3 messages every 5 minutes per builder identity.");
+    expect(text).toContain("limit: 3 messages every 5 min");
+    expect(text).toContain("Current chat limit: 3 messages every 5 minutes for each builder. daemon enforces it.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Send");
     expect(text).not.toContain("No categories or post types.");

@@ -132,7 +132,7 @@ describe("API route rate limits", () => {
     });
   });
 
-  it("rate limits chat posting per builder identity", async () => {
+  it("rate limits chat posting for each builder", async () => {
     const adminKey = "strong-admin-key-for-route-tests";
 
     process.env.ADMIN_API_KEY = adminKey;

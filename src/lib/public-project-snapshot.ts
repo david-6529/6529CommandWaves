@@ -1,6 +1,6 @@
 import { classifyRisk, pollApprovalPassedForWave, type CommandWave, type RiskLevel } from "./command-waves";
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
-import { directChatPostPace } from "./chat-posting-policy";
+import { chatPostPaceDetail, chatPostPaceShortLabel, directChatPostPace } from "./chat-posting-policy";
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
@@ -24,13 +24,12 @@ export const publicProjectChatSettings = {
   mode: "group_chat",
   label: "Group chat",
   title: "Live builder thread",
-  detail:
-    "One shared thread for questions, ideas, votes, and PR links. daemon parses messages in the background and keeps the project state current.",
+  detail: "One shared thread. Ask questions, suggest work, vote, and paste PR links. daemon keeps the project state current.",
   composerLabel: "Message",
   placeholder: "Ask a question, suggest work, paste a PR, or call for a vote.",
   posting: {
-    label: `${directChatPostPace.maxPosts} messages / ${directChatPostPace.windowSeconds / 60} min`,
-    detail: `Current daemon pace: ${directChatPostPace.maxPosts} messages every ${directChatPostPace.windowSeconds / 60} minutes per builder identity.`,
+    label: chatPostPaceShortLabel(directChatPostPace),
+    detail: chatPostPaceDetail(directChatPostPace),
     pace: {
       maxPosts: directChatPostPace.maxPosts,
       windowSeconds: directChatPostPace.windowSeconds,
@@ -40,7 +39,7 @@ export const publicProjectChatSettings = {
   },
   parser: {
     agent: orchestratorAgentIdentity.handle,
-    detail: "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
+    detail: "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
   },
 } as const;
 

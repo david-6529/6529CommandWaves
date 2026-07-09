@@ -11,6 +11,7 @@ import { createBuilderWaveJoinDraft } from "@/lib/builder-wave-join-draft";
 import { createBuilderWaveLaunchDraft } from "@/lib/builder-wave-launch-draft";
 import { createBuilderWaveProposalDraft } from "@/lib/builder-wave-proposal-draft";
 import { createBuilderWaveReviewRequestDraft } from "@/lib/builder-wave-review-request-draft";
+import { chatPostPaceShortLabel } from "@/lib/chat-posting-policy";
 import { commandKindLabel } from "@/lib/command-kind-copy";
 import { createCommandOrchestrationSummary } from "@/lib/command-orchestration-summary";
 import {
@@ -1343,7 +1344,7 @@ export function CommandWavesConsole() {
   const chatPostingUnavailableMessage =
     chatPostingCapability && !chatPostingCapability.canPost ? chatPostingCapability.message : "";
   const chatPostingPace = chatPostingCapability?.pace ?? projectChat.posting.pace;
-  const chatPostingPaceLabel = `${chatPostingPace.maxPosts} messages / ${chatPostingPace.windowSeconds / 60} min`;
+  const chatPostingPaceLabel = chatPostPaceShortLabel(chatPostingPace);
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -2417,7 +2418,7 @@ export function CommandWavesConsole() {
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">daemon pace: {chatPostingPaceLabel}</Badge>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">limit: {chatPostingPaceLabel}</Badge>
                   <Button
                     type="button"
                     variant="secondary"

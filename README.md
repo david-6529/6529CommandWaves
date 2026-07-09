@@ -44,7 +44,7 @@ What exists now:
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
-- Direct chat posting is admin-protected, IP-limited, and paced by the current daemon setting per supplied builder identity.
+- Direct chat posting is admin-protected, IP-limited, and paced by the current daemon setting for each builder.
 - Successful chat posts record a daemon-observed project event with parsed signals for PR links, decisions, reviews, repo setup, suggested work, or questions.
 - Public daemon summaries redact obvious credentials before they enter project state.
 - Pulled chat previews use the same redaction before display or contribution reporting.
@@ -487,7 +487,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
 - `GET /api/6529/chat-post`: public hashable capability check for direct chat posting. It does not expose bot credentials.
-- `POST /api/6529/chat-post`: protected human-triggered chat posting when the bot wallet is configured. Posts are paced per supplied builder identity.
+- `POST /api/6529/chat-post`: protected human-triggered chat posting when the bot wallet is configured. Posts are paced for each builder.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.

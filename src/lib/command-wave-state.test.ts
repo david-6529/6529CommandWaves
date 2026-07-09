@@ -67,7 +67,7 @@ describe("command wave state snapshot", () => {
           },
           parser: {
             agent: "daemon",
-            detail: "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
+            detail: "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
           },
         },
         pullRequests: [],

@@ -163,11 +163,11 @@ async function main() {
     "Group chat",
     "Live builder thread",
     "daemon observes",
-    "One shared thread for questions, ideas, votes, and PR links. daemon parses messages in the background and keeps the project state current.",
+    "One shared thread. Ask questions, suggest work, vote, and paste PR links. daemon keeps the project state current.",
     "Thread",
-    "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
-    "3 messages / 5 min",
-    "Current daemon pace: 3 messages every 5 minutes per builder identity.",
+    "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
+    "limit: 3 messages every 5 min",
+    "Current chat limit: 3 messages every 5 minutes for each builder. daemon enforces it.",
     "Message the group",
     "GitHub repo placeholder",
     "Send",
@@ -272,7 +272,7 @@ async function main() {
   assertJsonObject("Chat posting pace", chatPostingPace);
   assert(objectValue(chatPostingPace, "maxPosts") === 3, "Chat posting pace maxPosts is wrong.");
   assert(objectValue(chatPostingPace, "windowSeconds") === 300, "Chat posting pace windowSeconds is wrong.");
-  assert(objectValue(chatPostingPace, "identity") === "builder identity", "Chat posting pace identity is wrong.");
+  assert(objectValue(chatPostingPace, "identity") === "each builder", "Chat posting pace identity is wrong.");
   assert(objectValue(chatPostingPace, "enforcedBy") === "daemon", "Chat posting pace enforcer is wrong.");
   assert(!JSON.stringify(chatPostingCapabilityPayload).includes("6529_BOT"), "Chat posting capability exposes env names.");
   assert(!JSON.stringify(chatPostingCapabilityPayload).includes("windowMs"), "Chat posting capability exposes internal windowMs.");
@@ -437,9 +437,9 @@ async function main() {
   assertIncludes(
     "State response",
     JSON.stringify(statePayload),
-    "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
+    "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
   );
-  assertIncludes("State response", JSON.stringify(statePayload), "3 messages / 5 min");
+  assertIncludes("State response", JSON.stringify(statePayload), "3 messages every 5 min");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
   assertIncludes("State response", JSON.stringify(statePayload), "rules");
   assertIncludes("State response", JSON.stringify(statePayload), "How are PRs approved?");

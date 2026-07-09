@@ -152,7 +152,7 @@ describe("6529 chat posting", () => {
         pace: {
           maxPosts: 3,
           windowSeconds: 300,
-          identity: "builder identity",
+          identity: "each builder",
           enforcedBy: "daemon",
         },
       },
