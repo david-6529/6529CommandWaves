@@ -50,20 +50,17 @@ describe("hook project index", () => {
               title: "Select the pilot GitHub repo",
             }),
           ]),
-          chatSections: expect.arrayContaining([
-            expect.objectContaining({
-              id: "general",
-              label: "General",
+          workflow: expect.objectContaining({
+            current: expect.objectContaining({
+              stepId: "build",
+              detail: "Build PR: Select the hook repo before PR work starts.",
             }),
-            expect.objectContaining({
-              id: "build",
-              label: "Build",
-            }),
-            expect.objectContaining({
-              id: "review",
-              label: "Review",
-            }),
-          ]),
+          }),
+          chat: expect.objectContaining({
+            id: "project-chat",
+            mode: "group_chat",
+            label: "Group chat",
+          }),
           pullRequests: [],
           rules: expect.arrayContaining([
             expect.objectContaining({
@@ -88,7 +85,9 @@ describe("hook project index", () => {
     expect(JSON.stringify(index.projects)).toContain("latestChanges");
     expect(JSON.stringify(index.projects)).toContain("currentVote");
     expect(JSON.stringify(index.projects)).toContain("discussionTopics");
-    expect(JSON.stringify(index.projects)).toContain("chatSections");
+    expect(JSON.stringify(index.projects)).toContain("workflow");
+    expect(JSON.stringify(index.projects)).toContain("chat");
+    expect(JSON.stringify(index.projects)).toContain("group_chat");
     expect(JSON.stringify(index.projects)).toContain("pullRequests");
     expect(JSON.stringify(index.projects)).toContain("managedBy");
     expect(JSON.stringify(index.projects)).toContain("rules");

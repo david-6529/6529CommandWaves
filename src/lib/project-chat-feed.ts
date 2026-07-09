@@ -1,4 +1,5 @@
 import type { CommandWave, ExecutionRecord, GuardianReview, LedgerEvent, PollState } from "./command-waves";
+import { orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { commandKindLabel } from "./command-kind-copy";
 import { ledgerEventsByRecency } from "./ledger";
 import { selectPhaseWork } from "./phase-work";
@@ -12,6 +13,7 @@ export type ProjectChatFeedDraft = {
 export type ProjectChatFeedItem = {
   id: string;
   label: string;
+  author?: string;
   title: string;
   body: string;
   status: string;
@@ -40,6 +42,7 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
     return {
       id: "decision",
       label: "Decision",
+      author: "builders",
       title: "Builders approved",
       body: `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       status: `${poll.yesVotes} yes, ${poll.noVotes} no`,
@@ -51,6 +54,7 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
   return {
     id: "decision",
     label: "Decision",
+    author: "builders",
     title: poll.status === "open" ? "Decision is open" : `Decision is ${poll.status}`,
     body: `Current tally is ${poll.yesVotes} yes and ${poll.noVotes} no.`,
     status: poll.status.replaceAll("_", " "),
@@ -61,6 +65,7 @@ function draftDecisionItem(): ProjectChatFeedItem {
   return {
     id: "draft-decision",
     label: "Draft status",
+    author: orchestratorAgentIdentity.handle,
     title: "Not decided yet",
     body: "Discuss this draft in chat before PR work starts.",
     status: "needs decision",
@@ -87,6 +92,7 @@ function supportProposalFeedItem(proposal: CommandWave["proposals"][number]): Pr
   return {
     id: `support-${proposal.id}`,
     label: supportProposalLabel(proposal),
+    author: proposal.proposer,
     title: proposal.title,
     body: proposal.prompt,
     status: proposal.status.replaceAll("_", " "),
@@ -101,6 +107,7 @@ function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): Pro
   return {
     id: "pr",
     label,
+    author: orchestratorAgentIdentity.handle,
     title: "PR recorded",
     body: "The approved hook change has a PR record ready for builders to inspect.",
     status: execution.status,
@@ -117,6 +124,7 @@ function reviewFeedItem(review: GuardianReview | null, label = "Review"): Projec
   return {
     id: "review",
     label,
+    author: reviewAgentIdentity.handle,
     title: review.status === "pass" ? "Review passed" : `Review is ${review.status.replaceAll("_", " ")}`,
     body: "The review checked the PR against the approved hook proposal and rules.",
     status: review.status.replaceAll("_", " "),
@@ -127,6 +135,7 @@ function activityFeedItem(event: LedgerEvent): ProjectChatFeedItem {
   return {
     id: `activity-${event.id}`,
     label: "Activity",
+    author: event.actor,
     title: event.type.replaceAll("_", " "),
     body: event.message,
     status: event.actor,
@@ -143,6 +152,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
     items.push({
       id: "next-proposal",
       label: "Next proposal",
+      author: clean(draft?.proposer ?? "", "A builder"),
       title: draftTitle,
       body: `${clean(draft?.proposer ?? "", "A builder")} is preparing this as the next PR-sized hook change for chat.`,
       status: "draft",
@@ -152,6 +162,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
     items.push({
       id: "current-proposal",
       label: "Current proposal",
+      author: phaseWork.prProposal.proposer,
       title: phaseWork.prProposal.title,
       body: phaseWork.prProposal.prompt,
       status: phaseWork.prProposal.status.replaceAll("_", " "),
@@ -184,6 +195,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
         {
           id: "start",
           label: "Start",
+          author: orchestratorAgentIdentity.handle,
           title: "No hook activity yet",
           body: "Pick one small hook change and bring it to chat.",
           status: "waiting",

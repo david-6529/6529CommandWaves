@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timeline";
@@ -41,12 +41,12 @@ import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
 import { normalizeParticipationGates } from "@/lib/participation-gates";
-import { createPhaseChecklist, type PhaseChecklistItem, type PhaseChecklistStatus } from "@/lib/phase-checklist";
+import { createPhaseChecklist, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { createPublicCommandWaveSource } from "@/lib/public-command-wave";
-import { createPublicProjectSnapshot, type PublicProjectChatSection } from "@/lib/public-project-snapshot";
+import { createPublicProjectSnapshot } from "@/lib/public-project-snapshot";
 import { projectChatAuthorLabel } from "@/lib/project-chat-display";
 import { createProjectChatFeed } from "@/lib/project-chat-feed";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
@@ -140,16 +140,6 @@ const proposalFlowSteps = [
   ["Build", "Use GitHub PRs once the repo is connected."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
-type DiscussionTabId = PublicProjectChatSection["id"];
-
-function projectChatTabId(id: DiscussionTabId) {
-  return `project-chat-tab-${id}`;
-}
-
-function projectChatPanelId(id: DiscussionTabId) {
-  return `project-chat-panel-${id}`;
-}
-
 const projectRepoInputId = "project-repo-url";
 const projectAccessKeyInputId = "project-access-key";
 
@@ -623,19 +613,6 @@ function phaseStatusClass(status: PhaseChecklistStatus) {
   return "border-zinc-700 bg-zinc-900 text-zinc-400";
 }
 
-function flowStepLabel(item: PhaseChecklistItem) {
-  const labels: Record<PhaseChecklistItem["id"], string> = {
-    project: "Project",
-    proposal: "Discuss",
-    decision: "Decide",
-    build: "PR",
-    review: "Review",
-    log: "Log",
-  };
-
-  return labels[item.id];
-}
-
 function progressStatusClass(status: BuildTimelineStatus) {
   if (status === "done") {
     return statusClass("complete");
@@ -968,16 +945,6 @@ function countLabel(count: number, singular: string) {
   return `${count} ${count === 1 ? singular : `${singular}s`}`;
 }
 
-function createChatWorkTitle(message: string) {
-  const normalized = (message.trim().split("\n")[0] ?? "").replace(/\s+/g, " ").trim();
-
-  if (!normalized) {
-    return "New proposal";
-  }
-
-  return normalized.length > 72 ? `${normalized.slice(0, 69).trimEnd()}...` : normalized;
-}
-
 function shortWalletAddress(address: string) {
   const trimmed = address.trim();
 
@@ -1023,7 +990,6 @@ export function CommandWavesConsole() {
   const [chatPostUrl, setChatPostUrl] = useState("");
   const [chatPostingCapability, setChatPostingCapability] = useState<ChatPostingCapability | null>(null);
   const [projectChatMessage, setProjectChatMessage] = useState("");
-  const [discussionTabId, setDiscussionTabId] = useState<DiscussionTabId>("general");
   const [walletNotice, setWalletNotice] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   const [launchBriefNotice, setLaunchBriefNotice] = useState("");
@@ -1053,8 +1019,7 @@ export function CommandWavesConsole() {
   const selectedRule = wave.rules.rulesByKind[kind];
   const phaseWork = useMemo(() => selectPhaseWork(wave), [wave]);
   const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
-  const projectChatSections = publicProjectSnapshot.chatSections;
-  const selectedDiscussionTab = projectChatSections.find((item) => item.id === discussionTabId) ?? projectChatSections[0];
+  const projectChat = publicProjectSnapshot.chat;
   const selectedProposalType = proposalTypeOptions.find((item) => item.kind === kind) ?? proposalTypeOptions[0];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const hookProposalPreflight = useMemo(
@@ -1068,7 +1033,6 @@ export function CommandWavesConsole() {
     hookProposalPreflightBlocked,
   );
   const firstHookProposalFailure = hookProposalPreflight.checks.find((check) => check.status === "fail") ?? null;
-  const selectedDiscussionPanelId = projectChatPanelId(selectedDiscussionTab.id);
   const simpleDecisionRoute =
     selectedRule.mode === "poll" ? "Needs a decision" : selectedRule.mode === "auto" ? "Can be logged" : "Parked";
   const simplePreflightMessage =
@@ -1266,7 +1230,7 @@ export function CommandWavesConsole() {
   const visibleProjectChatSnapshotDrops = primaryProjectContextPreview
     ? [...primaryProjectContextPreview.sampleDrops].slice(-3).reverse()
     : [];
-  const visibleProjectChatSnapshotFallback = projectChatFeed.slice(0, 2);
+  const visibleProjectChatSnapshotFallback = projectChatFeed.slice(0, 4);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -1333,9 +1297,6 @@ export function CommandWavesConsole() {
   const canPostChatMessage = Boolean(hasProjectChatMessage && chatPostTargetUrl && chatPostingCapability?.canPost);
   const chatPostingUnavailableMessage =
     chatPostingCapability && !chatPostingCapability.canPost ? chatPostingCapability.message : "";
-  const chatWorkSpec =
-    `Captured from ${selectedDiscussionTab.label.toLowerCase()} chat. Needs builder discussion before code work. Keep the hook immutable. No deploys, payments, owner changes, proxies, delegatecall, or rule changes.`;
-  const canSaveChatWorkItem = Boolean(hasProjectChatMessage && apiBusy === null);
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -1394,14 +1355,7 @@ export function CommandWavesConsole() {
     [wave.ledger, wave.repoUrl],
   );
   const topChangelogItems = publicProjectSnapshot.latestChanges;
-  const currentLoopItem =
-    phaseChecklist.find((item) => item.status === "blocked" || item.status === "active") ??
-    phaseChecklist.find((item) => item.status === "waiting") ??
-    phaseChecklist[phaseChecklist.length - 1];
-  const currentLoopDetail =
-    phaseNextAction.status === "ready"
-      ? phaseNextAction.detail
-      : `${phaseNextAction.stepLabel}: ${phaseNextAction.detail}`;
+  const currentLoop = publicProjectSnapshot.workflow;
   const isBusy = apiBusy !== null;
   const showApiNotice = Boolean(apiError || isBusy || apiNotice !== "Project state loaded.");
   const launchNextActionItemId = launchAudit.nextAction.itemId ?? "";
@@ -1907,48 +1861,6 @@ export function CommandWavesConsole() {
     }
   }
 
-  async function saveChatWorkItem() {
-    const chatPrompt = projectChatMessage.trim();
-
-    if (!chatPrompt) {
-      setProjectChatNotice("Write a message first.");
-      return;
-    }
-
-    const nextTitle = createChatWorkTitle(chatPrompt);
-
-    setApiBusy("proposal");
-    setApiError("");
-    setProjectChatNotice("");
-
-    try {
-      const nextWave = await requestWave("/api/command-wave/proposals", {
-        method: "POST",
-        body: JSON.stringify({
-          title: nextTitle,
-          proposer,
-          kind: "draft_response",
-          prompt: chatPrompt,
-          spec: chatWorkSpec,
-          budgetUsd: "0",
-        }),
-      }, accessKey);
-
-      applyWave(nextWave);
-      setKind("draft_response");
-      setTitle(nextTitle);
-      setPrompt(chatPrompt);
-      setSpec(chatWorkSpec);
-      setProjectChatMessage("");
-      setApiNotice("Work item saved from chat.");
-      setProjectChatNotice("Work item saved.");
-    } catch (error) {
-      setProjectChatNotice(error instanceof Error ? error.message : "Work item save failed.");
-    } finally {
-      setApiBusy(null);
-    }
-  }
-
   function resetBuilderWaveChatDraft() {
     setProjectChatMessage("");
     setProjectChatNotice("Message cleared.");
@@ -1956,7 +1868,6 @@ export function CommandWavesConsole() {
   }
 
   function messageMember(identity: string) {
-    setDiscussionTabId("general");
     setProjectChatMessage(`@${identity} `);
     setProjectChatNotice("Message draft ready.");
     window.requestAnimationFrame(() => {
@@ -1980,45 +1891,11 @@ export function CommandWavesConsole() {
   }
 
   function prepareJoinRequest() {
-    setDiscussionTabId("general");
     setProjectChatMessage(createBuilderWaveJoinDraft(proposer, wave.gates, { walletAddress }));
     setProjectChatNotice("Access request ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }
-
-  function focusDiscussionTab(tabId: DiscussionTabId) {
-    setDiscussionTabId(tabId);
-    window.requestAnimationFrame(() => {
-      document.getElementById(projectChatTabId(tabId))?.focus();
-    });
-  }
-
-  function handleDiscussionTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
-    const lastIndex = projectChatSections.length - 1;
-    let nextIndex: number | null = null;
-
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-      nextIndex = currentIndex === lastIndex ? 0 : currentIndex + 1;
-    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-      nextIndex = currentIndex === 0 ? lastIndex : currentIndex - 1;
-    } else if (event.key === "Home") {
-      nextIndex = 0;
-    } else if (event.key === "End") {
-      nextIndex = lastIndex;
-    }
-
-    if (nextIndex === null) {
-      return;
-    }
-
-    event.preventDefault();
-    const nextTab = projectChatSections[nextIndex];
-
-    if (nextTab) {
-      focusDiscussionTab(nextTab.id);
-    }
   }
 
   async function connectWallet() {
@@ -2244,7 +2121,7 @@ export function CommandWavesConsole() {
   }
 
   return (
-    <main className="dark-app min-h-screen bg-zinc-950 text-base text-zinc-100">
+    <main className="dark-app min-h-screen bg-zinc-950 bg-[linear-gradient(180deg,#101012_0%,#09090b_34%,#050505_100%)] text-base text-zinc-100">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8">
         <header className="border-b border-zinc-800 pb-5">
           <div className="flex flex-wrap items-start justify-between gap-5">
@@ -2266,7 +2143,7 @@ export function CommandWavesConsole() {
           </div>
 
           <section className="mt-5 space-y-3 border-t border-zinc-800 pt-4" aria-label="Project context">
-            <details className="rounded-lg border border-zinc-800 p-4" open>
+            <details className="rounded-lg border border-zinc-700/80 bg-[linear-gradient(180deg,rgba(39,39,42,0.46),rgba(9,9,11,0.74))] p-4 shadow-[0_1px_0_rgba(255,255,255,0.05)_inset]" open>
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
                 <span>Project summary</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{orchestratorAgentIdentity.handle} updates</Badge>
@@ -2288,7 +2165,7 @@ export function CommandWavesConsole() {
               ) : null}
             </details>
 
-            <details className="rounded-lg border border-zinc-800 p-4">
+            <details className="rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
                 <span>How this works</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">simple</Badge>
@@ -2306,7 +2183,7 @@ export function CommandWavesConsole() {
               </div>
             </details>
 
-            <details className="rounded-lg border border-zinc-800 p-4">
+            <details className="rounded-lg border border-zinc-800 bg-zinc-950/70 p-4 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]">
               <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
                 <span>Changelog</span>
                 <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{topChangelogItems.length} updates</Badge>
@@ -2335,21 +2212,21 @@ export function CommandWavesConsole() {
           <section className="mt-5 border-t border-zinc-800 pt-4" aria-label="Project loop">
             <div className="grid gap-2 lg:grid-cols-[10rem_minmax(0,1fr)]">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current loop</p>
-              <p className="text-sm leading-6 text-zinc-400">{currentLoopDetail}</p>
+              <p className="text-sm leading-6 text-zinc-400">{currentLoop.current.detail}</p>
             </div>
             <ol className="mt-3 flex flex-wrap gap-2">
-              {phaseChecklist.map((item) => (
+              {currentLoop.steps.map((item) => (
                 <li
                   key={item.id}
                   className={`rounded-md border px-3 py-2 text-sm font-semibold ${
-                    item.id === currentLoopItem?.id
+                    item.id === currentLoop.current.stepId
                       ? "border-zinc-500 bg-zinc-900 text-zinc-50"
                       : item.status === "done"
                         ? "border-emerald-900 bg-emerald-950/20 text-emerald-100"
                         : "border-zinc-800 bg-zinc-950 text-zinc-500"
                   }`}
                 >
-                  {flowStepLabel(item)}
+                  {item.label}
                 </li>
               ))}
             </ol>
@@ -2358,7 +2235,7 @@ export function CommandWavesConsole() {
         </header>
 
         <section id="workspace" className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
-          <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 p-5">
+          <section id="current-build" className="scroll-mt-4 rounded-lg border border-zinc-800 bg-[linear-gradient(180deg,rgba(24,24,27,0.72),rgba(9,9,11,0.86))] p-5 shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_18px_60px_rgba(0,0,0,0.22)]">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{currentFocusLabel}</p>
               <Badge className={currentBuildStatusClass}>{currentBuildStatusLabel}</Badge>
@@ -2423,16 +2300,20 @@ export function CommandWavesConsole() {
             </div>
           </section>
 
-          <details id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-800 p-5" open>
+          <details
+            id="project-chat"
+            className="scroll-mt-4 rounded-lg border border-zinc-800 bg-[linear-gradient(180deg,rgba(24,24,27,0.78),rgba(9,9,11,0.9))] p-5 shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_18px_60px_rgba(0,0,0,0.22)]"
+            open
+          >
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
               <span>Project chat</span>
-              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{selectedDiscussionTab.label}</Badge>
+              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} watches</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{selectedDiscussionTab.title}</h2>
-                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-400">{selectedDiscussionTab.detail}</p>
+                <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{projectChat.title}</h2>
+                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-400">{projectChat.detail}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -2441,44 +2322,97 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Project chat sections">
-              {projectChatSections.map((tab, index) => {
-                const selected = tab.id === selectedDiscussionTab.id;
+            <section className="mt-5 rounded-lg border border-zinc-800 bg-black/20 p-4" aria-label="Group chat stream">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-zinc-50">Latest messages</h3>
+                  <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={isBusy || !primaryHookProject?.waveUrl}
+                  onClick={() => void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)}
+                >
+                  {apiBusy === "context" ? "Loading" : "Refresh"}
+                </Button>
+              </div>
+              <div className="mt-4 grid gap-3">
+                {hasRecentDiscussionPosts
+                  ? visibleProjectChatSnapshotDrops.slice(0, 4).map((drop) => {
+                      const author = projectChatAuthorLabel(drop.author);
 
-                return (
-                  <button
-                    key={tab.id}
-                    id={projectChatTabId(tab.id)}
-                    type="button"
-                    role="tab"
-                    aria-selected={selected}
-                    aria-controls={projectChatPanelId(tab.id)}
-                    tabIndex={selected ? 0 : -1}
-                    className={`inline-flex h-10 cursor-pointer items-center justify-center rounded-md border px-4 text-sm font-semibold transition ${
-                      selected
-                        ? "border-zinc-50 bg-zinc-900 text-zinc-50"
-                        : "border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-                    }`}
-                    onKeyDown={(event) => handleDiscussionTabKeyDown(event, index)}
-                    onClick={() => setDiscussionTabId(tab.id)}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
+                      return (
+                        <div key={drop.id} className="flex gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-zinc-100">
+                            {author.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-semibold text-zinc-50">{author}</p>
+                              {drop.url ? (
+                                <a
+                                  className="text-sm font-semibold text-blue-300 hover:text-blue-200"
+                                  href={drop.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Open post
+                                </a>
+                              ) : null}
+                            </div>
+                            <p className="mt-1 line-clamp-3 text-sm leading-6 text-zinc-400">{drop.preview}</p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  : visibleProjectChatSnapshotFallback.slice(0, 4).map((item) => {
+                      const author = item.author ?? (item.label === "Activity" ? item.status : orchestratorAgentIdentity.handle);
 
-            <div
-              id={selectedDiscussionPanelId}
-              className="mt-5"
-              role="tabpanel"
-              aria-labelledby={projectChatTabId(selectedDiscussionTab.id)}
-            >
-              <Field label="Message">
+                      return (
+                        <div key={item.id} className="flex gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-zinc-100">
+                            {author.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-semibold text-zinc-50">{author}</p>
+                              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{item.label}</Badge>
+                              {item.href ? (
+                                <a
+                                  className="text-sm font-semibold text-blue-300 hover:text-blue-200"
+                                  href={item.href}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {item.hrefLabel ?? "Open"}
+                                </a>
+                              ) : null}
+                            </div>
+                            <p className="mt-1 text-sm font-semibold leading-6 text-zinc-50">
+                              {humanizeLegacyCommandCopy(item.title)}
+                            </p>
+                            <p className="mt-1 line-clamp-3 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+              </div>
+            </section>
+
+            <section className="mt-5 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4" aria-label="Send a chat message">
+              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-base font-semibold text-zinc-50">Write to the group</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
+                </div>
+                <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.posting.label}</Badge>
+              </div>
+              <Field label={projectChat.composerLabel}>
                 <Textarea
                   rows={4}
                   value={projectChatMessage}
-                  placeholder={selectedDiscussionTab.placeholder}
+                  placeholder={projectChat.placeholder}
                   onChange={(event) => {
                     setProjectChatMessage(event.target.value);
                     setProjectChatNotice("");
@@ -2503,14 +2437,6 @@ export function CommandWavesConsole() {
                 >
                   {apiBusy === "chatPost" ? "Posting" : "Post to chat"}
                 </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={!canSaveChatWorkItem}
-                  onClick={() => void saveChatWorkItem()}
-                >
-                  {apiBusy === "proposal" ? "Saving" : "Save as proposal"}
-                </Button>
                 <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
                   Clear
                 </Button>
@@ -2529,55 +2455,6 @@ export function CommandWavesConsole() {
                   Open posted message
                 </a>
               ) : null}
-            </div>
-
-            <section className="mt-5 border-t border-zinc-800 pt-4" aria-label="Project chat snapshot">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Recent chat</h3>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isBusy || !primaryHookProject?.waveUrl}
-                  onClick={() => void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)}
-                >
-                  {apiBusy === "context" ? "Loading" : "Refresh"}
-                </Button>
-              </div>
-              <div className="mt-3 divide-y divide-zinc-800">
-                {hasRecentDiscussionPosts
-                  ? visibleProjectChatSnapshotDrops.slice(0, 2).map((drop) => (
-                      <div key={drop.id} className="py-3 first:pt-0 last:pb-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-50">{projectChatAuthorLabel(drop.author)}</p>
-                          {drop.url ? (
-                            <a
-                              className="text-sm font-semibold text-blue-300 hover:text-blue-200"
-                              href={drop.url}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Open post
-                            </a>
-                          ) : null}
-                        </div>
-                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{drop.preview}</p>
-                      </div>
-                    ))
-                  : visibleProjectChatSnapshotFallback.slice(0, 2).map((item) => (
-                      <div key={item.id} className="py-3 first:pt-0 last:pb-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="text-sm font-semibold text-zinc-500">{item.label}</p>
-                          <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{item.status}</Badge>
-                        </div>
-                        <p className="mt-1 text-sm font-semibold leading-6 text-zinc-50">
-                          {humanizeLegacyCommandCopy(item.title)}
-                        </p>
-                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
-                      </div>
-                    ))}
-              </div>
             </section>
           </details>
         </section>

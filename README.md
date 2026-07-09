@@ -210,7 +210,7 @@ Audit and launch:
 - Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
   rights, reputation, or token weight.
 - Public project summary publishes two state-derived paragraphs: the builder loop, then current focus, next step, repo state, and latest change.
-- Public command-wave state exposes `currentVote`, `discussionTopics`, `chatSections`, `pullRequests`, `rules`, `managedBy`, and contribution report voting summaries.
+- Public command-wave state exposes `currentVote`, `discussionTopics`, group chat settings, `pullRequests`, `rules`, `managedBy`, and contribution report voting summaries.
 - Public active project index exposes the same compact project state for each active hook, including latest changes and member summaries.
 - Public command-wave state keeps placeholder repo URLs empty while keeping hashes verifiable.
 - Public project index keeps repo URLs empty while projects still use placeholder repos.

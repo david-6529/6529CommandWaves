@@ -44,20 +44,25 @@ describe("command wave state snapshot", () => {
             title: "Select the pilot GitHub repo",
           },
         ],
-        chatSections: [
-          {
-            id: "general",
-            label: "General",
+        workflow: {
+          current: expect.objectContaining({
+            stepId: "build",
+            detail: "Build PR: Select the hook repo before PR work starts.",
+          }),
+          steps: expect.arrayContaining([
+            expect.objectContaining({ id: "project", label: "Project", status: "done" }),
+            expect.objectContaining({ id: "build", label: "PR", status: "waiting" }),
+          ]),
+        },
+        chat: {
+          id: "project-chat",
+          mode: "group_chat",
+          label: "Group chat",
+          parser: {
+            agent: "daemon",
+            detail: "No need to choose a post type. daemon reads the stream and classifies what matters.",
           },
-          {
-            id: "build",
-            label: "Build",
-          },
-          {
-            id: "review",
-            label: "Review",
-          },
-        ],
+        },
         pullRequests: [],
         rules: expect.arrayContaining([
           {

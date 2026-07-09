@@ -13,21 +13,25 @@ describe("project chat feed", () => {
 
     expect(feed.map((item) => item.label)).toEqual(["Next proposal", "Draft status", "Last PR", "Last review"]);
     expect(feed[0]).toMatchObject({
+      author: "david",
       title: "Add fee cap tests",
       status: "draft",
     });
     expect(feed[1]).toMatchObject({
+      author: "daemon",
       title: "Not decided yet",
       body: "Discuss this draft in chat before PR work starts.",
       status: "needs decision",
     });
     expect(feed[2]).toMatchObject({
+      author: "daemon",
       title: "PR recorded",
       body: "The approved hook change has a PR record ready for builders to inspect.",
       hrefLabel: "Open PR",
       status: "complete",
     });
     expect(feed[3]).toMatchObject({
+      author: "review-agent",
       body: "The review checked the PR against the approved hook proposal and rules.",
       title: "Review passed",
       status: "pass",
@@ -53,6 +57,7 @@ describe("project chat feed", () => {
       {
         id: "start",
         label: "Start",
+        author: "daemon",
         title: "No hook activity yet",
         body: "Pick one small hook change and bring it to chat.",
         status: "waiting",
@@ -90,6 +95,7 @@ describe("project chat feed", () => {
     expect(createProjectChatFeed(wave)[0]).toMatchObject({
       id: "support-cmd-002",
       label: "Question",
+      author: "david",
       title: "Clarify fee cap options",
       body: "Compare the simplest fee cap options.",
       status: "approved",

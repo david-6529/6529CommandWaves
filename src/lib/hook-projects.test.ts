@@ -106,23 +106,24 @@ describe("active hook projects", () => {
             status: "needed",
           }),
         ],
-        chatSections: [
-          expect.objectContaining({
-            id: "general",
-            label: "General",
-            title: "Chat",
+        workflow: expect.objectContaining({
+          current: expect.objectContaining({
+            stepId: "build",
+            detail: "Build PR: Select the hook repo before PR work starts.",
           }),
-          expect.objectContaining({
-            id: "build",
-            label: "Build",
-            title: "Work",
+          steps: expect.arrayContaining([
+            expect.objectContaining({ id: "project", label: "Project", status: "done" }),
+            expect.objectContaining({ id: "build", label: "PR", status: "waiting" }),
+          ]),
+        }),
+        chat: expect.objectContaining({
+          id: "project-chat",
+          mode: "group_chat",
+          title: "Group chat",
+          parser: expect.objectContaining({
+            agent: "daemon",
           }),
-          expect.objectContaining({
-            id: "review",
-            label: "Review",
-            title: "Review",
-          }),
-        ],
+        }),
         pullRequests: [],
         rules: expect.arrayContaining([
           expect.objectContaining({

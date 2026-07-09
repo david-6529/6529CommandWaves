@@ -125,6 +125,7 @@ async function main() {
     "Who reviews PRs?",
     "Who merges?",
     "Everything starts in chat.",
+    "Post in chat. daemon parses the discussion and turns clear agreement into small proposals.",
     "daemon labels risk and keeps scope small.",
     "daemon updates the summary, labels risk, and routes work.",
     "Builders record a project decision before PR work starts.",
@@ -159,19 +160,19 @@ async function main() {
     "Type a chat name",
     "Refresh chat to read the latest posts here.",
     "First public project chat.",
-    "id=\"project-chat-tab-general\"",
-    "aria-controls=\"project-chat-panel-general\"",
-    "id=\"project-chat-panel-general\"",
-    "role=\"tabpanel\"",
-    "General",
-    "Build",
-    "Review",
-    "Questions, ideas, risks, and work all start here.",
+    "Group chat",
+    "daemon watches",
+    "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
+    "Latest messages",
+    "No need to choose a post type. daemon reads the stream and classifies what matters.",
+    "Write to the group",
+    "Posting pace",
+    "daemon can slow posting if chat gets noisy. Keep each message useful.",
+    "Message the group",
+    "Ask a question, suggest work, paste a PR, or share context.",
     "GitHub repo placeholder",
     "Post to chat",
-    "Save as proposal",
     "Save proposal",
-    "Recent chat",
     "Pull requests",
     "Code contributions",
     "PRs show why code changed, where to inspect it, and daemon and reviewer status.",
@@ -230,6 +231,9 @@ async function main() {
   );
   for (const oldLabel of ["Open source", "Project source", "Find a source", "Type a source name"]) {
     assert(!renderedHtml.includes(oldLabel), `Home page should not render old source wording: ${oldLabel}.`);
+  }
+  for (const oldChatControl of ["project-chat-tab", "project-chat-panel", "role=\"tablist\"", "Save as proposal"]) {
+    assert(!renderedHtml.includes(oldChatControl), `Home page should not render old chat control: ${oldChatControl}.`);
   }
   assertNoPublicRepoLeaks("Home page", renderedHtml);
   assertNoForbiddenDash("Home page", renderedHtml);
@@ -404,8 +408,9 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
   assertIncludes("State response", JSON.stringify(statePayload), "currentVote");
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
-  assertIncludes("State response", JSON.stringify(statePayload), "chatSections");
-  assertIncludes("State response", JSON.stringify(statePayload), "Shape one change small enough for a decision and a PR.");
+  assertIncludes("State response", JSON.stringify(statePayload), "\"chat\"");
+  assertIncludes("State response", JSON.stringify(statePayload), "group_chat");
+  assertIncludes("State response", JSON.stringify(statePayload), "No need to choose a post type.");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
   assertIncludes("State response", JSON.stringify(statePayload), "rules");
   assertIncludes("State response", JSON.stringify(statePayload), "How are PRs approved?");
@@ -464,7 +469,8 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "builders approved");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "currentVote");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "discussionTopics");
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "chatSections");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "\"chat\"");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "group_chat");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "pullRequests");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "rules");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "How are PRs approved?");

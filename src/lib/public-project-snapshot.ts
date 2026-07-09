@@ -7,35 +7,31 @@ import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
+import { createPhaseNextAction } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
 
 export type PublicProjectSnapshot = ReturnType<typeof createPublicProjectSnapshot>;
 
-export const publicProjectChatSections = [
-  {
-    id: "general",
-    label: "General",
-    title: "Chat",
-    detail: "Questions, ideas, risks, and work all start here.",
-    placeholder: "Ask a question, suggest work, or share context.",
+export const publicProjectChatSettings = {
+  id: "project-chat",
+  mode: "group_chat",
+  label: "Group chat",
+  title: "Group chat",
+  detail:
+    "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
+  composerLabel: "Message the group",
+  placeholder: "Ask a question, suggest work, paste a PR, or share context.",
+  posting: {
+    label: "Posting pace",
+    detail: "daemon can slow posting if chat gets noisy. Keep each message useful.",
   },
-  {
-    id: "build",
-    label: "Build",
-    title: "Work",
-    detail: "Shape one change small enough for a decision and a PR.",
-    placeholder: "Describe the change builders should discuss or decide on.",
+  parser: {
+    agent: orchestratorAgentIdentity.handle,
+    detail: "No need to choose a post type. daemon reads the stream and classifies what matters.",
   },
-  {
-    id: "review",
-    label: "Review",
-    title: "Review",
-    detail: "Share PR links, test results, and concerns before merge.",
-    placeholder: "Paste a PR link, test result, or review note.",
-  },
-] as const;
+} as const;
 
-export type PublicProjectChatSection = (typeof publicProjectChatSections)[number];
+export type PublicProjectChatSettings = typeof publicProjectChatSettings;
 
 function eventTypeLabel(type: string) {
   const labels: Record<string, string> = {
@@ -87,6 +83,46 @@ function currentWorkSnapshot(wave: CommandWave) {
     title: humanizeLegacyCommandCopy(proposal.title),
     status: proposal.status.replaceAll("_", " "),
     detail: humanizeLegacyCommandCopy(proposal.prompt),
+  };
+}
+
+function workflowStepLabel(id: ReturnType<typeof createPhaseChecklist>[number]["id"]) {
+  const labels: Record<ReturnType<typeof createPhaseChecklist>[number]["id"], string> = {
+    project: "Project",
+    proposal: "Discuss",
+    decision: "Decide",
+    build: "PR",
+    review: "Review",
+    log: "Log",
+  };
+
+  return labels[id];
+}
+
+function workflowSnapshot(wave: CommandWave) {
+  const checklist = createPhaseChecklist(wave);
+  const nextAction = createPhaseNextAction(checklist);
+  const currentStep =
+    checklist.find((item) => item.status === "blocked" || item.status === "active") ??
+    checklist.find((item) => item.status === "waiting") ??
+    checklist[checklist.length - 1] ??
+    null;
+
+  return {
+    current: {
+      stepId: currentStep?.id ?? null,
+      stepLabel: nextAction.stepLabel,
+      status: nextAction.status,
+      statusLabel: nextAction.statusLabel,
+      title: nextAction.title,
+      detail: nextAction.status === "ready" ? nextAction.detail : `${nextAction.stepLabel}: ${nextAction.detail}`,
+    },
+    steps: checklist.map((item) => ({
+      id: item.id,
+      label: workflowStepLabel(item.id),
+      status: item.status,
+      detail: item.detail,
+    })),
   };
 }
 
@@ -294,7 +330,7 @@ function projectRulesSnapshot(wave: CommandWave) {
     },
     {
       question: "How does work start?",
-      answer: "Post in chat. Good ideas become small proposals the group can discuss.",
+      answer: "Post in chat. daemon parses the discussion and turns clear agreement into small proposals.",
     },
     {
       question: "Who coordinates?",
@@ -401,10 +437,11 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
       pullRequests: orchestratorAgentIdentity.handle,
       reviewer: reviewAgentIdentity.handle,
     },
+    workflow: workflowSnapshot(wave),
     currentWork,
     currentVote: currentVoteSnapshot(wave),
     discussionTopics: discussionTopicsSnapshot(wave),
-    chatSections: publicProjectChatSections,
+    chat: publicProjectChatSettings,
     pullRequests: pullRequestSnapshots(wave),
     rules: projectRulesSnapshot(wave),
     decision: decisionSnapshot(wave),

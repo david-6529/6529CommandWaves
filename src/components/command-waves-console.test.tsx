@@ -56,6 +56,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who reviews PRs?");
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
+    expect(text).toContain("Post in chat. daemon parses the discussion and turns clear agreement into small proposals.");
     expect(text).toContain("daemon labels risk and keeps scope small.");
     expect(text).toContain("daemon updates the summary, labels risk, and routes work.");
     expect(text).toContain("The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.");
@@ -93,17 +94,23 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Project source");
     expect(text).not.toContain("Find a source");
     expect(text).not.toContain("Type a source name");
-    expect(text).toContain("General");
-    expect(text).toContain("Build");
-    expect(text).toContain("Review");
-    expect(text).toContain("Questions, ideas, risks, and work all start here.");
     expect(text).not.toContain("Discuss repo");
     expect(text).not.toContain("Add PR note");
+    expect(text).toContain("Group chat");
+    expect(text).toContain("daemon watches");
+    expect(text).toContain(
+      "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
+    );
+    expect(text).toContain("Latest messages");
+    expect(text).toContain("No need to choose a post type. daemon reads the stream and classifies what matters.");
+    expect(text).toContain("Write to the group");
+    expect(text).toContain("Posting pace");
+    expect(text).toContain("daemon can slow posting if chat gets noisy. Keep each message useful.");
+    expect(text).toContain("Message the group");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
-    expect(text).toContain("Save as proposal");
+    expect(text).not.toContain("Save as proposal");
     expect(text).toContain("Save proposal");
-    expect(text).toContain("Recent chat");
     expect(text).toContain("Pull requests");
     expect(text).toContain("Code contributions");
     expect(text).toContain("PRs show why code changed, where to inspect it, and daemon and reviewer status.");
@@ -227,38 +234,41 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain("bg-zinc-950");
   });
 
-  it("keeps project chat as an open accordion with chat tabs", () => {
+  it("keeps project chat as one open group chat accordion", () => {
     const html = renderedConsoleHtml();
 
     expect(html).toContain('<details id="project-chat"');
     expect(html).toContain('open="">');
-    expect(html).toContain('role="tablist"');
-    expect(html).toContain('aria-label="Project chat sections"');
-    expect(html).toContain('role="tab"');
-    expect(html).toContain('id="project-chat-tab-general"');
-    expect(html).toContain('aria-controls="project-chat-panel-general"');
-    expect(html).toContain('id="project-chat-panel-general"');
-    expect(html).toContain('role="tabpanel"');
-    expect(html).toContain('aria-labelledby="project-chat-tab-general"');
-    expect(html).toContain(">General</button>");
-    expect(html).toContain(">Build</button>");
-    expect(html).toContain(">Review</button>");
+    expect(html).toContain('aria-label="Group chat stream"');
+    expect(html).toContain('aria-label="Send a chat message"');
+    expect(html).toContain("Latest messages");
+    expect(html).toContain("Write to the group");
+    expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or share context."');
+    expect(html).not.toContain('role="tablist"');
+    expect(html).not.toContain('role="tab"');
+    expect(html).not.toContain('role="tabpanel"');
+    expect(html).not.toContain("project-chat-tab");
+    expect(html).not.toContain("project-chat-panel");
+    expect(html).not.toContain(">General</button>");
+    expect(html).not.toContain(">Build</button>");
+    expect(html).not.toContain(">Review</button>");
   });
 
-  it("orders chat actions from discussion draft to saved proposal", () => {
+  it("orders chat actions like a normal message composer", () => {
     const html = renderedConsoleHtml();
     const start = html.indexOf('id="project-chat"');
     const end = html.indexOf('id="active-projects"');
     const chatHtml = html.slice(start, end);
     const copyIndex = chatHtml.indexOf("Copy draft");
     const postIndex = chatHtml.indexOf("Post to chat");
-    const saveIndex = chatHtml.indexOf("Save as proposal");
+    const clearIndex = chatHtml.indexOf("Clear");
 
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(copyIndex).toBeGreaterThan(-1);
     expect(postIndex).toBeGreaterThan(copyIndex);
-    expect(saveIndex).toBeGreaterThan(postIndex);
+    expect(clearIndex).toBeGreaterThan(postIndex);
+    expect(chatHtml).not.toContain("Save as proposal");
   });
 
   it("does not render light-mode surface classes", () => {

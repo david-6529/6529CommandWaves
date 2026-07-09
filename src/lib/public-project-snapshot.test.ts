@@ -75,29 +75,42 @@ describe("public project snapshot", () => {
           status: "needed",
         },
       ],
-      chatSections: [
-        {
-          id: "general",
-          label: "General",
-          title: "Chat",
-          detail: "Questions, ideas, risks, and work all start here.",
-          placeholder: "Ask a question, suggest work, or share context.",
+      workflow: {
+        current: {
+          stepId: "build",
+          stepLabel: "Build PR",
+          status: "waiting",
+          statusLabel: "waiting",
+          title: "Repo not selected yet",
+          detail: "Build PR: Select the hook repo before PR work starts.",
         },
-        {
-          id: "build",
-          label: "Build",
-          title: "Work",
-          detail: "Shape one change small enough for a decision and a PR.",
-          placeholder: "Describe the change builders should discuss or decide on.",
+        steps: [
+          expect.objectContaining({ id: "project", label: "Project", status: "done" }),
+          expect.objectContaining({ id: "proposal", label: "Discuss", status: "done" }),
+          expect.objectContaining({ id: "decision", label: "Decide", status: "done" }),
+          expect.objectContaining({ id: "build", label: "PR", status: "waiting" }),
+          expect.objectContaining({ id: "review", label: "Review", status: "waiting" }),
+          expect.objectContaining({ id: "log", label: "Log", status: "waiting" }),
+        ],
+      },
+      chat: {
+        id: "project-chat",
+        mode: "group_chat",
+        label: "Group chat",
+        title: "Group chat",
+        detail:
+          "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
+        composerLabel: "Message the group",
+        placeholder: "Ask a question, suggest work, paste a PR, or share context.",
+        posting: {
+          label: "Posting pace",
+          detail: "daemon can slow posting if chat gets noisy. Keep each message useful.",
         },
-        {
-          id: "review",
-          label: "Review",
-          title: "Review",
-          detail: "Share PR links, test results, and concerns before merge.",
-          placeholder: "Paste a PR link, test result, or review note.",
+        parser: {
+          agent: "daemon",
+          detail: "No need to choose a post type. daemon reads the stream and classifies what matters.",
         },
-      ],
+      },
       pullRequests: [],
       rules: [
         {
@@ -110,7 +123,7 @@ describe("public project snapshot", () => {
         },
         {
           question: "How does work start?",
-          answer: "Post in chat. Good ideas become small proposals the group can discuss.",
+          answer: "Post in chat. daemon parses the discussion and turns clear agreement into small proposals.",
         },
         {
           question: "Who coordinates?",

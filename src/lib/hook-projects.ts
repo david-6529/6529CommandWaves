@@ -45,9 +45,10 @@ export type ActiveHookProject = {
   latestChanges: PublicProjectSnapshot["latestChanges"];
   summaryParagraphs: string[];
   managedBy: PublicProjectSnapshot["managedBy"];
+  workflow: PublicProjectSnapshot["workflow"];
   currentVote: PublicProjectSnapshot["currentVote"];
   discussionTopics: PublicProjectSnapshot["discussionTopics"];
-  chatSections: PublicProjectSnapshot["chatSections"];
+  chat: PublicProjectSnapshot["chat"];
   pullRequests: PublicProjectSnapshot["pullRequests"];
   rules: PublicProjectSnapshot["rules"];
   memberCount: number;
@@ -345,9 +346,10 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       latestChanges: publicSnapshot.latestChanges,
       summaryParagraphs: publicSnapshot.summaryParagraphs,
       managedBy: publicSnapshot.managedBy,
+      workflow: publicSnapshot.workflow,
       currentVote: publicSnapshot.currentVote,
       discussionTopics: publicSnapshot.discussionTopics,
-      chatSections: publicSnapshot.chatSections,
+      chat: publicSnapshot.chat,
       pullRequests: publicSnapshot.pullRequests,
       rules: publicSnapshot.rules,
       memberCount: members.length,
