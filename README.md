@@ -44,6 +44,7 @@ What exists now:
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
+- Direct chat posting is admin-protected, IP-limited, and paced per supplied builder identity.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
 - Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,
@@ -182,7 +183,7 @@ Default workspace:
 - Collapsed active-project list with chat, repo state, current focus, and next step.
 - Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
-- Builder message composer with direct chat posting when configured, recent posts, and copyable discussion draft.
+- Builder message composer with direct chat posting when configured, recent posts, and copyable messages.
 - Folded proposal form that asks for title, change, and success criteria before optional work details.
 - Builder profiles with profile links, visible chat and repo activity, voting summaries, and informational contribution signals.
 - Collapsed builder details: who can join, activity-report boundaries, and hook guardrails.
@@ -194,9 +195,9 @@ Safety and review:
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
 - Approved PR execution files are path, size, secret, deployment, governance, upgradeability, delegatecall, destructive
-  opcode, and hook-parameter checked before commit. The execution log records a hash manifest for approved file content.
+  opcode, and hook-parameter checked before commit. The execution log records a hash manifest and patch evidence for approved file content.
 - Reviewer output is written back to the PR as a bounded comment and check run.
-- PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, parameter writes, and bound-test evidence when patch records exist.
+- PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, parameter writes, and bound-test evidence when patch evidence is bound to the approved file manifest.
 
 Audit and launch:
 
@@ -250,7 +251,7 @@ npm run dev
 Open the local URL printed by Next.
 
 6529 mock mode is the safe default. Set `6529_MOCK_MODE=false` only when you are ready to use the live 6529 API.
-Chat posting also requires `6529_BOT_BEARER_TOKEN` and `6529_BOT_WALLET_ADDRESS`; otherwise builders can copy the draft
+Chat posting also requires `6529_BOT_BEARER_TOKEN` and `6529_BOT_WALLET_ADDRESS`; otherwise builders can copy the message
 and post manually.
 
 With the example env, command-wave demo state is stored in `.data/command-wave.json`.
@@ -480,7 +481,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
 - `GET /api/6529/chat-post`: public capability check for direct chat posting. It does not expose bot credentials.
-- `POST /api/6529/chat-post`: protected human-triggered chat posting when the bot wallet is configured.
+- `POST /api/6529/chat-post`: protected human-triggered chat posting when the bot wallet is configured. Posts are paced per supplied builder identity.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.

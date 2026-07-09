@@ -413,8 +413,9 @@ async function requestContextPreview(waveId: string) {
   return payload.preview;
 }
 
-async function requestChatPost(waveUrl: string, content: string, accessKey?: string) {
+async function requestChatPost(waveUrl: string, content: string, accessKey?: string, senderId?: string) {
   const headers = new Headers();
+  const cleanSenderId = senderId?.trim();
 
   headers.set("content-type", "application/json");
   attachAdminApiKey(headers, accessKey);
@@ -425,6 +426,7 @@ async function requestChatPost(waveUrl: string, content: string, accessKey?: str
     body: JSON.stringify({
       waveUrl,
       content,
+      ...(cleanSenderId ? { senderId: cleanSenderId } : {}),
     }),
   });
   const payload = await readApiJson<ChatPostResponse>(response, "Post failed.");
@@ -1830,7 +1832,7 @@ export function CommandWavesConsole() {
     setChatPostUrl("");
 
     try {
-      const post = await requestChatPost(chatPostTargetUrl, builderWaveChatDraft, accessKey);
+      const post = await requestChatPost(chatPostTargetUrl, builderWaveChatDraft, accessKey, walletAddress || proposer);
       let chatPreviewRefreshed = false;
 
       if (primaryHookProject) {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { getChatPostingCapability, postChatMessage } from "./chat-post";
+import { chatPostPaceIdentity, getChatPostingCapability, postChatMessage } from "./chat-post";
 import { resetMockDropsForTests } from "./mock";
 import { previewWaveContext } from "./wave-context";
 
@@ -109,6 +109,13 @@ describe("6529 chat posting", () => {
       mode: "manual",
       message: "Direct chat posting is not configured. Copy the message instead.",
     });
+  });
+
+  it("chooses a chat posting pace identity without treating it as authority", () => {
+    expect(chatPostPaceIdentity({ senderId: " david " })).toBe("david");
+    expect(chatPostPaceIdentity({ walletAddress: " 0x123 " })).toBe("0x123");
+    expect(chatPostPaceIdentity({ author: "builder" })).toBe("builder");
+    expect(chatPostPaceIdentity({ content: "hello" })).toBe("anonymous-builder");
   });
 
   it("requires a project chat and message", async () => {

@@ -35,14 +35,20 @@ function pruneExpiredBuckets(now: number) {
   }
 }
 
-export function assertRateLimit(request: Request, options: RateLimitOptions, now = Date.now()) {
+function normalizedLimitIdentity(value: string) {
+  const normalized = value.trim().replace(/\s+/g, " ").toLowerCase();
+
+  return normalized.length > maxClientIdentityLength ? normalized.slice(0, maxClientIdentityLength) : normalized;
+}
+
+export function assertRateLimitForKey(identity: string, options: RateLimitOptions, now = Date.now()) {
   if (options.max < 1 || options.windowMs < 1) {
     throw new Error("Invalid rate limit configuration.");
   }
 
   pruneExpiredBuckets(now);
 
-  const key = `${options.namespace}:${clientIdentity(request)}`;
+  const key = `${options.namespace}:${normalizedLimitIdentity(identity) || "unknown"}`;
   const bucket = buckets.get(key);
 
   if (!bucket || bucket.resetAt <= now) {
@@ -63,6 +69,10 @@ export function assertRateLimit(request: Request, options: RateLimitOptions, now
   }
 
   bucket.count += 1;
+}
+
+export function assertRateLimit(request: Request, options: RateLimitOptions, now = Date.now()) {
+  assertRateLimitForKey(clientIdentity(request), options, now);
 }
 
 export function resetRateLimitsForTest() {

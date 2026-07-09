@@ -4,6 +4,9 @@ type ChatPostInput = {
   waveUrl?: unknown;
   waveId?: unknown;
   content?: unknown;
+  senderId?: unknown;
+  walletAddress?: unknown;
+  author?: unknown;
 };
 
 type ChatPostDrop = {
@@ -27,6 +30,10 @@ export type ChatPostingCapability = {
 
 function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+export function chatPostPaceIdentity(input: ChatPostInput) {
+  return text(input.senderId) || text(input.walletAddress) || text(input.author) || "anonymous-builder";
 }
 
 function isMockMode(env: Record<string, string | undefined> = process.env) {

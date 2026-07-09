@@ -104,6 +104,7 @@ describe("API route rate limits", () => {
           body: JSON.stringify({
             waveUrl: "https://6529.io/waves/mock-command-wave",
             content: `Chat post ${index}`,
+            senderId: `builder-${index}`,
           }),
         }),
       );
@@ -120,6 +121,50 @@ describe("API route rate limits", () => {
         body: JSON.stringify({
           waveUrl: "https://6529.io/waves/mock-command-wave",
           content: "Chat post over limit",
+          senderId: "builder-over-limit",
+        }),
+      }),
+    );
+
+    expect(limited.status).toBe(429);
+    await expect(limited.json()).resolves.toMatchObject({
+      error: "Too many requests. Try again shortly.",
+    });
+  });
+
+  it("rate limits chat posting per builder identity", async () => {
+    const adminKey = "strong-admin-key-for-route-tests";
+
+    process.env.ADMIN_API_KEY = adminKey;
+
+    for (let index = 0; index < 3; index += 1) {
+      const response = await postChatMessage(
+        request("https://command-waves.example.com/api/6529/chat-post", {
+          method: "POST",
+          headers: {
+            "x-admin-api-key": adminKey,
+          },
+          body: JSON.stringify({
+            waveUrl: "https://6529.io/waves/mock-command-wave",
+            content: `Builder pace post ${index}`,
+            senderId: "david",
+          }),
+        }),
+      );
+
+      expect(response.status).toBe(200);
+    }
+
+    const limited = await postChatMessage(
+      request("https://command-waves.example.com/api/6529/chat-post", {
+        method: "POST",
+        headers: {
+          "x-admin-api-key": adminKey,
+        },
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/mock-command-wave",
+          content: "Builder pace post over limit",
+          senderId: " david ",
         }),
       }),
     );
