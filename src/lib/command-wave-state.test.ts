@@ -58,6 +58,13 @@ describe("command wave state snapshot", () => {
           id: "project-chat",
           mode: "group_chat",
           label: "Group chat",
+          posting: {
+            pace: {
+              maxPosts: 3,
+              windowSeconds: 300,
+              enforcedBy: "daemon",
+            },
+          },
           parser: {
             agent: "daemon",
             detail: "Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.",

@@ -104,7 +104,13 @@ describe("public project snapshot", () => {
         placeholder: "Ask a question, suggest work, paste a PR, or share context.",
         posting: {
           label: "daemon managed pace",
-          detail: "Chat settings can limit how often each builder posts when the thread gets noisy.",
+          detail: "Direct posting is limited to 3 messages per 5 minutes for each builder identity.",
+          pace: {
+            maxPosts: 3,
+            windowSeconds: 300,
+            identity: "builder identity",
+            enforcedBy: "daemon",
+          },
         },
         parser: {
           agent: "daemon",

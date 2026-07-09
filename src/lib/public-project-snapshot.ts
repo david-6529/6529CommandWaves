@@ -1,5 +1,6 @@
 import { pollApprovalPassedForWave, type CommandWave } from "./command-waves";
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { directChatPostPace } from "./chat-posting-policy";
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
@@ -23,7 +24,13 @@ export const publicProjectChatSettings = {
   placeholder: "Ask a question, suggest work, paste a PR, or share context.",
   posting: {
     label: "daemon managed pace",
-    detail: "Chat settings can limit how often each builder posts when the thread gets noisy.",
+    detail: `Direct posting is limited to ${directChatPostPace.maxPosts} messages per ${directChatPostPace.windowSeconds / 60} minutes for each builder identity.`,
+    pace: {
+      maxPosts: directChatPostPace.maxPosts,
+      windowSeconds: directChatPostPace.windowSeconds,
+      identity: directChatPostPace.identity,
+      enforcedBy: directChatPostPace.enforcedBy,
+    },
   },
   parser: {
     agent: orchestratorAgentIdentity.handle,

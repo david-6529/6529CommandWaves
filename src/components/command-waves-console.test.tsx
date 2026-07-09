@@ -105,7 +105,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.");
     expect(text).toContain("Send a message");
     expect(text).toContain("daemon managed pace");
-    expect(text).toContain("Chat settings can limit how often each builder posts when the thread gets noisy.");
+    expect(text).toContain("Direct posting is limited to 3 messages per 5 minutes for each builder identity.");
     expect(text).toContain("daemon will pick up questions, PR links, decisions, and work ideas from the thread.");
     expect(text).toContain("Message the group");
     expect(text).toContain("GitHub repo placeholder");

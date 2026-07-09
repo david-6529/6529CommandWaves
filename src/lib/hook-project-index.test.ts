@@ -60,6 +60,12 @@ describe("hook project index", () => {
             id: "project-chat",
             mode: "group_chat",
             label: "Group chat",
+            posting: expect.objectContaining({
+              pace: expect.objectContaining({
+                maxPosts: 3,
+                windowSeconds: 300,
+              }),
+            }),
           }),
           pullRequests: [],
           rules: expect.arrayContaining([

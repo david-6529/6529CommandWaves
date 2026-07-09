@@ -44,7 +44,7 @@ What exists now:
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
-- Direct chat posting is admin-protected, IP-limited, and paced per supplied builder identity.
+- Direct chat posting is admin-protected, IP-limited, and paced at 3 messages per 5 minutes per supplied builder identity.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
 - Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,
