@@ -212,6 +212,12 @@ describe("API route validation", () => {
         canPost: true,
         mode: "live",
         message: "Project chat posting is configured.",
+        pace: {
+          maxPosts: 3,
+          windowSeconds: 300,
+          identity: "builder identity",
+          enforcedBy: "daemon",
+        },
       },
     });
     expect(JSON.stringify(payload)).not.toContain("secret-token");

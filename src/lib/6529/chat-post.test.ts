@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { chatPostPaceIdentity, getChatPostingCapability, postChatMessage } from "./chat-post";
+import { chatPostPaceIdentity, directChatPostPace, getChatPostingCapability, postChatMessage } from "./chat-post";
 import { resetMockDropsForTests } from "./mock";
 import { previewWaveContext } from "./wave-context";
 
@@ -88,10 +88,18 @@ describe("6529 chat posting", () => {
   });
 
   it("reports direct posting capability without exposing credentials", () => {
+    const publicPace = {
+      maxPosts: directChatPostPace.maxPosts,
+      windowSeconds: directChatPostPace.windowSeconds,
+      identity: directChatPostPace.identity,
+      enforcedBy: directChatPostPace.enforcedBy,
+    };
+
     expect(getChatPostingCapability({ "6529_MOCK_MODE": "true" })).toEqual({
       canPost: true,
       mode: "mock",
       message: "Local chat posting is active.",
+      pace: publicPace,
     });
     expect(
       getChatPostingCapability({
@@ -103,12 +111,15 @@ describe("6529 chat posting", () => {
       canPost: true,
       mode: "live",
       message: "Project chat posting is configured.",
+      pace: publicPace,
     });
     expect(getChatPostingCapability({ "6529_MOCK_MODE": "false" })).toEqual({
       canPost: false,
       mode: "manual",
       message: "Direct chat posting is not configured. Copy the message instead.",
+      pace: publicPace,
     });
+    expect(JSON.stringify(getChatPostingCapability({ "6529_MOCK_MODE": "false" }))).not.toContain("windowMs");
   });
 
   it("chooses a chat posting pace identity without treating it as authority", () => {

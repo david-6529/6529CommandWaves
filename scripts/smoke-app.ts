@@ -257,7 +257,15 @@ async function main() {
   );
   assertString("Chat posting capability mode", objectValue(chatPostingCapability, "mode"));
   assertString("Chat posting capability message", objectValue(chatPostingCapability, "message"));
+  const chatPostingPace = objectValue(chatPostingCapability, "pace");
+
+  assertJsonObject("Chat posting pace", chatPostingPace);
+  assert(objectValue(chatPostingPace, "maxPosts") === 3, "Chat posting pace maxPosts is wrong.");
+  assert(objectValue(chatPostingPace, "windowSeconds") === 300, "Chat posting pace windowSeconds is wrong.");
+  assert(objectValue(chatPostingPace, "identity") === "builder identity", "Chat posting pace identity is wrong.");
+  assert(objectValue(chatPostingPace, "enforcedBy") === "daemon", "Chat posting pace enforcer is wrong.");
   assert(!JSON.stringify(chatPostingCapabilityPayload).includes("6529_BOT"), "Chat posting capability exposes env names.");
+  assert(!JSON.stringify(chatPostingCapabilityPayload).includes("windowMs"), "Chat posting capability exposes internal windowMs.");
   assertNoForbiddenDash("Chat posting capability", JSON.stringify(chatPostingCapabilityPayload));
 
   const wavePayload = await fetchJson("/api/command-wave");

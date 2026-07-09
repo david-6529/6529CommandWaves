@@ -1,4 +1,5 @@
 import { normalizeWaveId, postDrop } from "./client";
+import { directChatPostPace } from "../chat-posting-policy";
 export { chatPostPaceIdentity, directChatPostPace } from "../chat-posting-policy";
 
 type ChatPostInput = {
@@ -27,6 +28,12 @@ export type ChatPostingCapability = {
   canPost: boolean;
   mode: "mock" | "live" | "manual";
   message: string;
+  pace: {
+    maxPosts: number;
+    windowSeconds: number;
+    identity: string;
+    enforcedBy: string;
+  };
 };
 
 function text(value: unknown) {
@@ -44,12 +51,22 @@ function postingConfigured(env: Record<string, string | undefined> = process.env
   );
 }
 
+function publicPostingPace() {
+  return {
+    maxPosts: directChatPostPace.maxPosts,
+    windowSeconds: directChatPostPace.windowSeconds,
+    identity: directChatPostPace.identity,
+    enforcedBy: directChatPostPace.enforcedBy,
+  };
+}
+
 export function getChatPostingCapability(env: Record<string, string | undefined> = process.env): ChatPostingCapability {
   if (isMockMode(env)) {
     return {
       canPost: true,
       mode: "mock",
       message: "Local chat posting is active.",
+      pace: publicPostingPace(),
     };
   }
 
@@ -58,6 +75,7 @@ export function getChatPostingCapability(env: Record<string, string | undefined>
       canPost: true,
       mode: "live",
       message: "Project chat posting is configured.",
+      pace: publicPostingPace(),
     };
   }
 
@@ -65,6 +83,7 @@ export function getChatPostingCapability(env: Record<string, string | undefined>
     canPost: false,
     mode: "manual",
     message: "Direct chat posting is not configured. Copy the message instead.",
+    pace: publicPostingPace(),
   };
 }
 

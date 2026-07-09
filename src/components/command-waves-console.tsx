@@ -273,6 +273,12 @@ type ChatPostingCapability = {
   canPost: boolean;
   mode: "mock" | "live" | "manual";
   message: string;
+  pace: {
+    maxPosts: number;
+    windowSeconds: number;
+    identity: string;
+    enforcedBy: string;
+  };
 };
 
 type ChatPostCapabilityResponse = ApiErrorPayload & {
@@ -1308,6 +1314,8 @@ export function CommandWavesConsole() {
   const canPostChatMessage = Boolean(hasProjectChatMessage && chatPostTargetUrl && chatPostingCapability?.canPost);
   const chatPostingUnavailableMessage =
     chatPostingCapability && !chatPostingCapability.canPost ? chatPostingCapability.message : "";
+  const chatPostingPace = chatPostingCapability?.pace ?? projectChat.posting.pace;
+  const chatPostingPaceLabel = `${chatPostingPace.maxPosts} messages / ${chatPostingPace.windowSeconds / 60} min`;
   const builderWaveProposalDraft = useMemo(
     () =>
       createBuilderWaveProposalDraft({
@@ -1467,6 +1475,7 @@ export function CommandWavesConsole() {
             canPost: false,
             mode: "manual",
             message: "Direct chat posting is not configured. Copy the message instead.",
+            pace: projectChat.posting.pace,
           });
         }
       });
@@ -1474,7 +1483,7 @@ export function CommandWavesConsole() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [projectChat.posting.pace]);
 
   useEffect(() => {
     const project = activeHookProjects[0];
@@ -2425,7 +2434,7 @@ export function CommandWavesConsole() {
                     <p className="text-base font-semibold text-zinc-50">Write to the group</p>
                     <p className="mt-1 text-sm leading-6 text-zinc-500">No categories or post types. daemon parses the thread in the background.</p>
                   </div>
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.posting.label}</Badge>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{chatPostingPaceLabel}</Badge>
                 </div>
                 <Field label={projectChat.composerLabel}>
                   <Textarea
