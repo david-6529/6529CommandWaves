@@ -180,7 +180,7 @@ setup and audit tools stay collapsed until a maintainer needs them.
 Default workspace:
 
 - Project summary accordion, updated by `daemon`, with the current design and repo state in two short paragraphs.
-- Current vote, topics in discussion, and the next action for the active hook change.
+- Current vote, topics in discussion, recent daemon-observed chat, and the next action for the active hook change.
 - Collapsed active-project list with chat, repo state, current focus, and next step.
 - Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.

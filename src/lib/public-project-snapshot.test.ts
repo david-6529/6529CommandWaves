@@ -300,6 +300,22 @@ describe("public project snapshot", () => {
       message:
         "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
     });
+    expect(snapshot.discussionTopics).toEqual([
+      expect.objectContaining({
+        id: "proposal-cmd-001",
+        title: "Draft hook scaffold",
+      }),
+      {
+        id: "chat-evt-chat",
+        title: "Fee cap tests before anyone opens a PR",
+        detail: "Can we discuss fee cap tests before anyone opens a PR?",
+        status: "in chat",
+      },
+      expect.objectContaining({
+        id: "repo-selection",
+        title: "Select the pilot GitHub repo",
+      }),
+    ]);
   });
 
   it("labels local approval as waiting for a decision link", () => {

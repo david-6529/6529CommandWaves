@@ -144,6 +144,37 @@ function compactTopicTitle(title: string) {
   return normalized;
 }
 
+function compactChatTopicTitle(message: string) {
+  const normalized = humanizeLegacyCommandCopy(message)
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^can we discuss\s+/i, "")
+    .replace(/^can we\s+/i, "")
+    .replace(/^should we\s+/i, "")
+    .replace(/[?.!]+$/g, "")
+    .trim();
+
+  if (!normalized) {
+    return "Recent chat";
+  }
+
+  const title = normalized.charAt(0).toUpperCase() + normalized.slice(1);
+
+  return title.length > 58 ? `${title.slice(0, 55)}...` : title;
+}
+
+function chatMessageFromObservation(message: string) {
+  const normalized = humanizeLegacyCommandCopy(message).trim();
+  const separator = "updated the project summary:";
+  const index = normalized.toLowerCase().indexOf(separator);
+
+  if (index === -1) {
+    return normalized;
+  }
+
+  return normalized.slice(index + separator.length).trim();
+}
+
 function currentVoteSnapshot(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
@@ -251,6 +282,19 @@ function decisionSnapshot(wave: CommandWave) {
 function discussionTopicsSnapshot(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
+  const chatTopics = ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl)
+    .filter((event) => event.type === "chat_observed")
+    .slice(0, 1)
+    .map((event) => {
+      const message = chatMessageFromObservation(event.message);
+
+      return {
+        id: `chat-${event.id}`,
+        title: compactChatTopicTitle(message),
+        detail: message || "Builders are discussing this in chat.",
+        status: "in chat",
+      };
+    });
   const topics = [
     proposal
       ? {
@@ -260,6 +304,7 @@ function discussionTopicsSnapshot(wave: CommandWave) {
           status: isPlaceholderValue(wave.repoUrl) && proposal.kind === "open_pr" ? "repo not selected" : proposal.status.replaceAll("_", " "),
         }
       : null,
+    ...chatTopics,
     isPlaceholderValue(wave.repoUrl)
       ? {
           id: "repo-selection",
