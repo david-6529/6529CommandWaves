@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createCommandWaveStateSnapshot, publicCommandWaveHash } from "./command-wave-state";
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { demoWave } from "./demo-wave";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { createHookProjectIndex } from "./hook-project-index";
@@ -596,6 +597,41 @@ describe("launch audit verifier", () => {
     expect(result.publicState).toBeNull();
     expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
       status: "fail",
+    });
+  });
+
+  it("fails when the public state endpoint omits group chat settings", async () => {
+    const snapshot = await createFirstPhaseLaunchSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: readyEnv,
+      checkSetupRemote: true,
+      setupValidation: readySetupValidation,
+    });
+    const commandWaveState = createCommandWaveStateSnapshot(configuredDemoWave, {
+      generatedAt: "2026-06-20T13:01:00.000Z",
+    });
+    const brokenState = {
+      ...commandWaveState,
+      projectSnapshot: {
+        ...commandWaveState.projectSnapshot,
+        chat: {
+          ...commandWaveState.projectSnapshot.chat,
+          mode: "status_feed",
+        },
+      },
+    };
+    const result = verifyLaunchAuditPayload(snapshot, {
+      commandWaveState: {
+        ...brokenState,
+        stateHash: createCommandWaveStateHash(brokenState),
+      },
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.publicState).toBeNull();
+    expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
+      status: "fail",
+      message: "Public command-wave state must return a valid snapshot hash and match the launch audit evidence.",
     });
   });
 

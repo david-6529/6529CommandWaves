@@ -4,6 +4,7 @@ import { hookProjectIndexHashInput } from "./hook-project-index";
 import { createLaunchAuditHash } from "./launch-audit-hash";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
 import { commandWaveProductCopy } from "./product-copy";
+import { publicStateChatSettingsReady } from "./project-chat-settings-proof";
 import { hashValue } from "./run-manifest";
 
 export type LaunchAuditVerificationCheck = {
@@ -359,7 +360,8 @@ function collectPublicState(value: unknown, expected: LaunchAuditStateEvidence |
     !isSha256Hash(stateHash) ||
     !isSha256Hash(waveStateHash) ||
     stateHash !== createCommandWaveStateHash(record) ||
-    waveStateHash !== hashValue(wave)
+    waveStateHash !== hashValue(wave) ||
+    !publicStateChatSettingsReady(record)
   ) {
     return null;
   }

@@ -67,7 +67,7 @@ describe("command wave state snapshot", () => {
           },
           parser: {
             agent: "daemon",
-            detail: "Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.",
+            detail: "No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.",
           },
         },
         pullRequests: [],

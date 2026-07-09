@@ -99,12 +99,12 @@ describe("public project snapshot", () => {
         label: "Group chat",
         title: "Group chat",
         detail:
-          "Use it like a normal group chat. Ask questions, suggest work, paste PRs, and daemon will parse what matters.",
-        composerLabel: "Message the group",
-        placeholder: "Ask a question, suggest work, paste a PR, or share context.",
+          "A shared thread for questions, ideas, decisions, and PR links. Write normally. daemon parses what matters.",
+        composerLabel: "Message",
+        placeholder: "Ask a question, suggest work, paste a PR, or share context",
         posting: {
-          label: "daemon managed pace",
-          detail: "Direct posting is limited to 3 messages per 5 minutes for each builder identity.",
+          label: "3 messages / 5 min",
+          detail: "daemon currently limits each builder identity to 3 messages per 5 minutes.",
           pace: {
             maxPosts: 3,
             windowSeconds: 300,
@@ -114,7 +114,7 @@ describe("public project snapshot", () => {
         },
         parser: {
           agent: "daemon",
-          detail: "Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.",
+          detail: "No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.",
         },
       },
       pullRequests: [],

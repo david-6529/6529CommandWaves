@@ -98,19 +98,18 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Discuss repo");
     expect(text).not.toContain("Add PR note");
     expect(text).toContain("Group chat");
-    expect(text).toContain("daemon parses chat");
+    expect(text).toContain("daemon reads thread");
     expect(text).toContain(
-      "Use it like a normal group chat. Ask questions, suggest work, paste PRs, and daemon will parse what matters.",
+      "A shared thread for questions, ideas, decisions, and PR links. Write normally. daemon parses what matters.",
     );
-    expect(text).toContain("Group thread");
-    expect(text).toContain("Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.");
-    expect(text).toContain("Send a message");
-    expect(text).toContain("daemon managed pace");
-    expect(text).toContain("Direct posting is limited to 3 messages per 5 minutes for each builder identity.");
-    expect(text).toContain("daemon will pick up questions, PR links, decisions, and work ideas from the thread.");
-    expect(text).toContain("Message the group");
+    expect(text).toContain("Shared thread");
+    expect(text).toContain("No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.");
+    expect(text).toContain("Write to the group");
+    expect(text).toContain("3 messages / 5 min");
+    expect(text).toContain("daemon currently limits each builder identity to 3 messages per 5 minutes.");
+    expect(text).toContain("No categories or post types. daemon parses the thread in the background.");
     expect(text).toContain("GitHub repo placeholder");
-    expect(text).toContain("Post to chat");
+    expect(text).toContain("Send");
     expect(text).not.toContain("Save as proposal");
     expect(text).not.toContain("Save proposal");
     expect(text).toContain("Record proposal");
@@ -254,8 +253,8 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain('open="">');
     expect(html).toContain('aria-label="Group chat stream"');
     expect(html).toContain('aria-label="Send a chat message"');
-    expect(html).toContain("Group thread");
-    expect(html).toContain("Send a message");
+    expect(html).toContain("Shared thread");
+    expect(html).toContain("Write to the group");
     expect(text).toContain("david");
     expect(text).toContain("gpebbles");
     expect(text).toContain("simo");
@@ -264,7 +263,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("PR work can start once maintainers select the pilot GitHub repo.");
     expect(text).not.toContain("I am watching for clear agreement before this becomes PR work.");
     expect(text).not.toContain("I recorded the PR for the approved hook change so builders can inspect it.");
-    expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or share context."');
+    expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or share context"');
     expect(html).not.toContain('role="tablist"');
     expect(html).not.toContain('role="tab"');
     expect(html).not.toContain('role="tabpanel"');
@@ -280,15 +279,16 @@ describe("CommandWavesConsole", () => {
     const start = html.indexOf('id="project-chat"');
     const end = html.indexOf('id="active-projects"');
     const chatHtml = html.slice(start, end);
-    const copyIndex = chatHtml.indexOf("Copy message");
-    const postIndex = chatHtml.indexOf("Post to chat");
+    const sendIndex = chatHtml.indexOf("Send");
+    const copyIndex = chatHtml.indexOf("Copy");
     const clearIndex = chatHtml.indexOf("Clear");
 
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
+    expect(sendIndex).toBeGreaterThan(-1);
     expect(copyIndex).toBeGreaterThan(-1);
-    expect(postIndex).toBeGreaterThan(copyIndex);
-    expect(clearIndex).toBeGreaterThan(postIndex);
+    expect(copyIndex).toBeGreaterThan(sendIndex);
+    expect(clearIndex).toBeGreaterThan(copyIndex);
     expect(chatHtml).not.toContain("Save as proposal");
     expect(chatHtml).not.toContain("Project chat message");
     expect(chatHtml).not.toContain("Next proposal");

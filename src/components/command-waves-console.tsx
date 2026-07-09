@@ -2325,14 +2325,14 @@ export function CommandWavesConsole() {
           >
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
               <span>Project chat</span>
-              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} parses chat</Badge>
+              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} reads thread</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{projectChat.title}</h2>
-                <p className="mt-2 max-w-xl text-base leading-7 text-zinc-400">{projectChat.detail}</p>
-                <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
+                <p className="mt-2 max-w-2xl text-base leading-7 text-zinc-400">{projectChat.detail}</p>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -2341,10 +2341,10 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
-            <section className="mt-5 rounded-lg border border-zinc-800 bg-black/20 p-4" aria-label="Group chat stream">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+            <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Group chat stream">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-800 p-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Group thread</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Shared thread</h3>
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
                 <Button
@@ -2356,7 +2356,7 @@ export function CommandWavesConsole() {
                   {apiBusy === "context" ? "Loading" : "Refresh"}
                 </Button>
               </div>
-              <div className="mt-4 grid gap-3">
+              <div className="grid gap-4 p-4">
                 {hasRecentDiscussionPosts
                   ? visibleProjectChatSnapshotDrops.slice(0, 4).map((drop) => {
                       const author = projectChatAuthorLabel(drop.author);
@@ -2366,9 +2366,10 @@ export function CommandWavesConsole() {
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-zinc-100">
                             {author.slice(0, 2).toUpperCase()}
                           </div>
-                          <div className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3">
+                          <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <p className="text-sm font-semibold text-zinc-50">{author}</p>
+                              {drop.createdAt ? <p className="text-xs font-semibold text-zinc-600">{shortTime(drop.createdAt)}</p> : null}
                               {drop.url ? (
                                 <a
                                   className="text-sm font-semibold text-blue-300 hover:text-blue-200"
@@ -2380,7 +2381,9 @@ export function CommandWavesConsole() {
                                 </a>
                               ) : null}
                             </div>
-                            <p className="mt-1 line-clamp-3 text-sm leading-6 text-zinc-400">{drop.preview}</p>
+                            <p className="mt-1 line-clamp-3 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3 text-sm leading-6 text-zinc-300">
+                              {drop.preview}
+                            </p>
                           </div>
                         </div>
                       );
@@ -2393,7 +2396,7 @@ export function CommandWavesConsole() {
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-zinc-100">
                             {author.slice(0, 2).toUpperCase()}
                           </div>
-                          <div className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3">
+                          <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <p className="text-sm font-semibold text-zinc-50">{author}</p>
                               {item.href ? (
@@ -2407,70 +2410,67 @@ export function CommandWavesConsole() {
                                 </a>
                               ) : null}
                             </div>
-                            <p className="mt-1 line-clamp-3 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
+                            <p className="mt-1 line-clamp-3 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3 text-sm leading-6 text-zinc-300">
+                              {humanizeLegacyCommandCopy(item.body)}
+                            </p>
                           </div>
                         </div>
                       );
                     })}
               </div>
-            </section>
 
-            <section className="mt-5 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4" aria-label="Send a chat message">
-              <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-base font-semibold text-zinc-50">Send a message</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-500">daemon will pick up questions, PR links, decisions, and work ideas from the thread.</p>
+              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Send a chat message">
+                <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold text-zinc-50">Write to the group</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">No categories or post types. daemon parses the thread in the background.</p>
+                  </div>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.posting.label}</Badge>
                 </div>
-                <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.posting.label}</Badge>
-              </div>
-              <Field label={projectChat.composerLabel}>
-                <Textarea
-                  inputRef={projectChatTextareaRef}
-                  rows={4}
-                  value={projectChatMessage}
-                  placeholder={projectChat.placeholder}
-                  onChange={(event) => {
-                    setProjectChatMessage(event.target.value);
-                    setProjectChatNotice("");
-                  }}
-                  className="min-h-24 resize-none"
-                />
-              </Field>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  variant={!canPostChatMessage && hasProjectChatMessage ? "primary" : "secondary"}
-                  disabled={!hasProjectChatMessage}
-                  onClick={() => void copyBuilderWaveChatDraft()}
-                >
-                  Copy message
-                </Button>
-                <Button
-                  type="button"
-                  variant={canPostChatMessage ? "primary" : "secondary"}
-                  disabled={isBusy || !canPostChatMessage}
-                  onClick={() => void postBuilderWaveChatDraft()}
-                >
-                  {apiBusy === "chatPost" ? "Posting" : "Post to chat"}
-                </Button>
-                <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
-                  Clear
-                </Button>
-              </div>
-              {hasProjectChatMessage && chatPostingUnavailableMessage ? (
-                <p className="mt-2 text-sm leading-6 text-zinc-500">{chatPostingUnavailableMessage}</p>
-              ) : null}
-              {projectChatNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{projectChatNotice}</p> : null}
-              {chatPostUrl ? (
-                <a
-                  className="mt-1 inline-flex text-sm font-semibold text-blue-300 hover:text-blue-200"
-                  href={chatPostUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open posted message
-                </a>
-              ) : null}
+                <Field label={projectChat.composerLabel}>
+                  <Textarea
+                    inputRef={projectChatTextareaRef}
+                    rows={4}
+                    value={projectChatMessage}
+                    placeholder={projectChat.placeholder}
+                    onChange={(event) => {
+                      setProjectChatMessage(event.target.value);
+                      setProjectChatNotice("");
+                    }}
+                    className="min-h-24 resize-none"
+                  />
+                </Field>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant={canPostChatMessage ? "primary" : "secondary"}
+                    disabled={isBusy || !canPostChatMessage}
+                    onClick={() => void postBuilderWaveChatDraft()}
+                  >
+                    {apiBusy === "chatPost" ? "Sending" : "Send"}
+                  </Button>
+                  <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={() => void copyBuilderWaveChatDraft()}>
+                    Copy
+                  </Button>
+                  <Button type="button" variant="secondary" disabled={!hasProjectChatMessage} onClick={resetBuilderWaveChatDraft}>
+                    Clear
+                  </Button>
+                </div>
+                {hasProjectChatMessage && chatPostingUnavailableMessage ? (
+                  <p className="mt-2 text-sm leading-6 text-zinc-500">{chatPostingUnavailableMessage}</p>
+                ) : null}
+                {projectChatNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{projectChatNotice}</p> : null}
+                {chatPostUrl ? (
+                  <a
+                    className="mt-1 inline-flex text-sm font-semibold text-blue-300 hover:text-blue-200"
+                    href={chatPostUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open sent message
+                  </a>
+                ) : null}
+              </section>
             </section>
           </details>
         </section>

@@ -19,12 +19,12 @@ export const publicProjectChatSettings = {
   label: "Group chat",
   title: "Group chat",
   detail:
-    "Use it like a normal group chat. Ask questions, suggest work, paste PRs, and daemon will parse what matters.",
-  composerLabel: "Message the group",
-  placeholder: "Ask a question, suggest work, paste a PR, or share context.",
+    "A shared thread for questions, ideas, decisions, and PR links. Write normally. daemon parses what matters.",
+  composerLabel: "Message",
+  placeholder: "Ask a question, suggest work, paste a PR, or share context",
   posting: {
-    label: "daemon managed pace",
-    detail: `Direct posting is limited to ${directChatPostPace.maxPosts} messages per ${directChatPostPace.windowSeconds / 60} minutes for each builder identity.`,
+    label: `${directChatPostPace.maxPosts} messages / ${directChatPostPace.windowSeconds / 60} min`,
+    detail: `daemon currently limits each builder identity to ${directChatPostPace.maxPosts} messages per ${directChatPostPace.windowSeconds / 60} minutes.`,
     pace: {
       maxPosts: directChatPostPace.maxPosts,
       windowSeconds: directChatPostPace.windowSeconds,
@@ -34,7 +34,7 @@ export const publicProjectChatSettings = {
   },
   parser: {
     agent: orchestratorAgentIdentity.handle,
-    detail: "Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.",
+    detail: "No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.",
   },
 } as const;
 
