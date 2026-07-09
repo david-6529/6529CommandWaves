@@ -14,7 +14,7 @@ describe("hook progress", () => {
     ]);
     expect(progress.map((step) => step.detail)).toEqual([
       "Shape this draft in chat.",
-      "Save proposal first.",
+      "Record proposal first.",
       "Waits for a decision.",
       "Waits for a PR.",
     ]);

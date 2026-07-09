@@ -136,7 +136,7 @@ const proposalTypeOptions: ProposalTypeOption[] = [
 const proposalFlowSteps = [
   ["Discuss", "Start in chat so builders can shape the idea."],
   ["Decide", "Record a visible decision for important hook work."],
-  ["Record", "Save the proposal once builders can see it."],
+  ["Record", "Record the proposal once builders can see it."],
   ["Build", "Use GitHub PRs once the repo is connected."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
@@ -2667,8 +2667,8 @@ export function CommandWavesConsole() {
           onToggle={(event) => setSuggestOpen(event.currentTarget.open)}
         >
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-            <span>Save proposal from chat</span>
-            <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">after discussion</Badge>
+            <span>Proposal tools</span>
+            <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">after chat</Badge>
           </summary>
           <div className="mt-4 max-w-4xl">
             <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-900 p-3 sm:grid-cols-5">
@@ -2755,12 +2755,12 @@ export function CommandWavesConsole() {
                 Copy draft
               </Button>
               <Button type="button" variant="secondary" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
+                {apiBusy === "proposal" ? "Recording" : "Record proposal"}
               </Button>
               <JumpLink href="#project-chat">Open chat</JumpLink>
             </div>
             <p className="mt-2 text-sm leading-6 text-zinc-500">
-              Discuss it in chat first. Save only when the proposal is visible there.
+              Discuss in chat first. Record only when builders can see the proposal.
             </p>
             {proposalDraftNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{proposalDraftNotice}</p> : null}
             {apiError ? <p className="mt-2 text-sm leading-6 text-red-600">{apiError}</p> : null}
@@ -3717,7 +3717,7 @@ export function CommandWavesConsole() {
               <div className="rounded-md border border-zinc-800 bg-black p-3">
                 <p className="text-sm font-semibold text-zinc-100">Project brief</p>
                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                  Copy this into chat. Save locally only after it matches the project decision path.
+                  Copy this into chat. Record locally only after it matches the project decision path.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <Button type="button" variant="secondary" onClick={() => void copyBuilderWaveProposalDraft()}>
@@ -3728,7 +3728,7 @@ export function CommandWavesConsole() {
                 {proposalDraftNotice ? <p className="mt-2 text-xs leading-5 text-zinc-500">{proposalDraftNotice}</p> : null}
               </div>
               <Button type="button" disabled={isBusy || hookProposalPreflightBlocked} onClick={submitProposal}>
-                {apiBusy === "proposal" ? "Saving" : "Save proposal"}
+                {apiBusy === "proposal" ? "Recording" : "Record proposal"}
               </Button>
             </div>
           </Panel>

@@ -172,7 +172,7 @@ async function main() {
     "Ask a question, suggest work, paste a PR, or share context.",
     "GitHub repo placeholder",
     "Post to chat",
-    "Save proposal",
+    "Record proposal",
     "Pull requests",
     "Code contributions",
     "PRs show why code changed, where to inspect it, and daemon and reviewer status.",
@@ -193,10 +193,11 @@ async function main() {
     "Report points summarize visible work only.",
     "They do not grant access, payouts, or merge rights.",
     "Start in chat so builders can shape the idea.",
-    "Save the proposal once builders can see it.",
+    "Record the proposal once builders can see it.",
     "Use GitHub PRs once the repo is connected.",
-    "Save proposal from chat",
-    "after discussion",
+    "Proposal tools",
+    "after chat",
+    "Discuss in chat first. Record only when builders can see the proposal.",
     "Boundaries and success criteria",
     "Details",
     "Project log",
@@ -232,7 +233,7 @@ async function main() {
   for (const oldLabel of ["Open source", "Project source", "Find a source", "Type a source name"]) {
     assert(!renderedHtml.includes(oldLabel), `Home page should not render old source wording: ${oldLabel}.`);
   }
-  for (const oldChatControl of ["project-chat-tab", "project-chat-panel", "role=\"tablist\"", "Save as proposal"]) {
+  for (const oldChatControl of ["project-chat-tab", "project-chat-panel", "role=\"tablist\"", "Save as proposal", "Save proposal from chat"]) {
     assert(!renderedHtml.includes(oldChatControl), `Home page should not render old chat control: ${oldChatControl}.`);
   }
   assertNoPublicRepoLeaks("Home page", renderedHtml);

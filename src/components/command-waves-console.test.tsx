@@ -110,7 +110,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
     expect(text).not.toContain("Save as proposal");
-    expect(text).toContain("Save proposal");
+    expect(text).not.toContain("Save proposal");
+    expect(text).toContain("Record proposal");
     expect(text).toContain("Pull requests");
     expect(text).toContain("Code contributions");
     expect(text).toContain("PRs show why code changed, where to inspect it, and daemon and reviewer status.");
@@ -138,10 +139,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Start in chat so builders can shape the idea.");
-    expect(text).toContain("Save the proposal once builders can see it.");
+    expect(text).toContain("Record the proposal once builders can see it.");
     expect(text).toContain("Use GitHub PRs once the repo is connected.");
-    expect(text).toContain("Save proposal from chat");
-    expect(text).toContain("after discussion");
+    expect(text).toContain("Proposal tools");
+    expect(text).toContain("after chat");
+    expect(text).toContain("Discuss in chat first. Record only when builders can see the proposal.");
     expect(text).toContain("Boundaries and success criteria");
     expect(text).toContain("Details");
     expect(text).toContain("Chat launch");

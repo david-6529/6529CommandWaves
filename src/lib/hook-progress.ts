@@ -25,7 +25,7 @@ function waitingSteps(hasDraft: boolean): HookProgressStep[] {
       id: "decide",
       label: "Decide",
       status: "waiting",
-      detail: hasDraft ? "Save proposal first." : "Waits for a proposal.",
+      detail: hasDraft ? "Record proposal first." : "Waits for a proposal.",
     },
     { id: "build", label: "PR", status: "waiting", detail: "Waits for a decision." },
     { id: "review", label: "Review", status: "waiting", detail: "Waits for a PR." },
