@@ -65,6 +65,49 @@ describe("active hook projects", () => {
         reviewStatusLabel: "not ready",
         evidenceLabel: "1 proposal, GitHub repo not set",
         latestActivity: "Builders approved the hook scaffold with 5 yes and 1 no.",
+        summaryParagraphs: [
+          "Builders coordinate this hook in chat. Decisions approve scoped work. GitHub PRs and human review handle code.",
+          "Now: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo: not selected. Latest: Builders approved the hook scaffold with 5 yes and 1 no.",
+        ],
+        managedBy: {
+          summary: "daemon",
+          changelog: "daemon",
+          pullRequests: "daemon",
+          reviewer: "review-agent",
+        },
+        currentVote: expect.objectContaining({
+          status: "recorded",
+          title: "No open vote",
+          proposalId: "cmd-001",
+          yesVotes: 5,
+          noVotes: 1,
+        }),
+        discussionTopics: [
+          expect.objectContaining({
+            id: "proposal-cmd-001",
+            title: "Draft hook scaffold",
+            status: "repo not selected",
+          }),
+          expect.objectContaining({
+            id: "repo-selection",
+            title: "Select the pilot GitHub repo",
+            status: "needed",
+          }),
+        ],
+        pullRequests: [],
+        memberCount: 6,
+        members: expect.arrayContaining([
+          expect.objectContaining({
+            identity: "david",
+            role: "Coordinator",
+            voteSummary: "yes on cmd-001",
+          }),
+          expect.objectContaining({
+            identity: "blocknoob",
+            role: "Voter",
+            voteSummary: "no on cmd-001",
+          }),
+        ]),
       }),
     ]);
   });
@@ -84,6 +127,16 @@ describe("active hook projects", () => {
       codeStatus: "Reviewer process must be selected before review is complete.",
       reviewStatusLabel: "reviewer process needed",
       evidenceLabel: "1 proposal, 1 run, reviewer pending",
+      pullRequests: [
+        {
+          id: "cmd-001",
+          title: "Draft hook scaffold",
+          reason: "Draft the non-upgradeable AMM hook scaffold with fee parameters capped at 100 bps and tests.",
+          url: "https://github.com/6529-Collections/6529-hook/pull/12",
+          daemonSignoff: "signed off",
+          reviewerSignoff: "proof recorded",
+        },
+      ],
     });
   });
 

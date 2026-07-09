@@ -448,6 +448,14 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529 AMM hook");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "currentVote");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "discussionTopics");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "pullRequests");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "managedBy");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "members");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "voteSummary");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "daemon");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "review-agent");
   assert(
     !JSON.stringify(projectsPayload).includes("https://github.com/your-org/your-hook-repo"),
     "Projects response should not expose the placeholder repo URL as a selected repo.",

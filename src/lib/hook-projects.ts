@@ -1,5 +1,7 @@
 import type { CommandWave } from "./command-waves";
 import { reviewAgentIdentity } from "./agent-identities";
+import { createBuilderRoster, type BuilderRosterMember } from "./builder-roster";
+import { createContributionReport } from "./contribution-report";
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
@@ -7,6 +9,12 @@ import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
+import { createPublicProjectSnapshot, type PublicProjectSnapshot } from "./public-project-snapshot";
+
+export type ActiveHookProjectMember = Pick<
+  BuilderRosterMember,
+  "identity" | "role" | "activity" | "scoreLabel" | "detail" | "voteSummary"
+>;
 
 export type ActiveHookProject = {
   id: string;
@@ -35,6 +43,13 @@ export type ActiveHookProject = {
   reviewStatusLabel: string;
   evidenceLabel: string;
   latestActivity: string;
+  summaryParagraphs: string[];
+  managedBy: PublicProjectSnapshot["managedBy"];
+  currentVote: PublicProjectSnapshot["currentVote"];
+  discussionTopics: PublicProjectSnapshot["discussionTopics"];
+  pullRequests: PublicProjectSnapshot["pullRequests"];
+  memberCount: number;
+  members: ActiveHookProjectMember[];
 };
 
 function hookName(wave: CommandWave) {
@@ -270,6 +285,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
 
   return waves.map((wave) => {
     const phaseWork = selectPhaseWork(wave);
+    const publicSnapshot = createPublicProjectSnapshot(wave);
     const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
     const hasProject = Boolean(wave.waveUrl.trim() && hasConfiguredRepo(wave));
@@ -289,6 +305,14 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
           countLabel(wave.executions.length, "run"),
           reviewEvidenceLabel,
         ].join(", ");
+    const members = createBuilderRoster(createContributionReport(wave), { limit: 6 }).map((member) => ({
+      identity: member.identity,
+      role: member.role,
+      activity: member.activity,
+      scoreLabel: member.scoreLabel,
+      detail: member.detail,
+      voteSummary: member.voteSummary,
+    }));
 
     return {
       id: wave.id,
@@ -317,6 +341,13 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       reviewStatusLabel: reviewStatus(wave),
       evidenceLabel,
       latestActivity,
+      summaryParagraphs: publicSnapshot.summaryParagraphs,
+      managedBy: publicSnapshot.managedBy,
+      currentVote: publicSnapshot.currentVote,
+      discussionTopics: publicSnapshot.discussionTopics,
+      pullRequests: publicSnapshot.pullRequests,
+      memberCount: members.length,
+      members,
     };
   });
 }

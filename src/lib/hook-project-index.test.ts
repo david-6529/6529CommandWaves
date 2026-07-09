@@ -23,6 +23,35 @@ describe("hook project index", () => {
           repoUrl: null,
           repoLabel: "GitHub repo placeholder",
           nextActionTitle: "Repo not selected yet",
+          managedBy: {
+            summary: "daemon",
+            changelog: "daemon",
+            pullRequests: "daemon",
+            reviewer: "review-agent",
+          },
+          currentVote: {
+            status: "recorded",
+            title: "No open vote",
+            proposalId: "cmd-001",
+            yesVotes: 5,
+            noVotes: 1,
+          },
+          discussionTopics: expect.arrayContaining([
+            expect.objectContaining({
+              title: "Draft hook scaffold",
+            }),
+            expect.objectContaining({
+              title: "Select the pilot GitHub repo",
+            }),
+          ]),
+          pullRequests: [],
+          memberCount: 6,
+          members: expect.arrayContaining([
+            expect.objectContaining({
+              identity: "david",
+              voteSummary: "yes on cmd-001",
+            }),
+          ]),
         },
       ],
     });
@@ -30,6 +59,12 @@ describe("hook project index", () => {
     expect(projectsHash).toBe(hashValue(hookProjectIndexHashInput(indexWithoutHash)));
     expect(JSON.stringify(index.projects)).toContain("accessDetails");
     expect(JSON.stringify(index.projects)).toContain("accessSnapshotLabel");
+    expect(JSON.stringify(index.projects)).toContain("currentVote");
+    expect(JSON.stringify(index.projects)).toContain("discussionTopics");
+    expect(JSON.stringify(index.projects)).toContain("pullRequests");
+    expect(JSON.stringify(index.projects)).toContain("managedBy");
+    expect(JSON.stringify(index.projects)).toContain("members");
+    expect(JSON.stringify(index.projects)).toContain("voteSummary");
     expect(JSON.stringify(index.projects)).not.toContain("gateDetails");
     expect(JSON.stringify(index.projects)).not.toContain("gateSnapshotLabel");
     expect(JSON.stringify(index)).not.toContain("\u2014");
