@@ -330,15 +330,15 @@ describe("public project snapshot", () => {
           at: "2026-06-20T13:10:00.000Z",
           actor: "daemon",
           type: "chat_observed",
-          message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
+          message: "alice suggested work. Message: Can we discuss fee cap tests before anyone opens a PR?",
         },
       ],
     });
 
-    expect(snapshot.summary).toContain("Latest: alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?");
+    expect(snapshot.summary).toContain("Latest: alice suggested work. Message: Can we discuss fee cap tests before anyone opens a PR?");
     expect(snapshot.latestChanges[0]).toMatchObject({
-      label: "review request",
-      message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
+      label: "work suggested",
+      message: "alice suggested work. Message: Can we discuss fee cap tests before anyone opens a PR?",
     });
     expect(snapshot.discussionTopics).toEqual([
       expect.objectContaining({
@@ -349,7 +349,7 @@ describe("public project snapshot", () => {
         id: "chat-evt-chat",
         title: "Fee cap tests before anyone opens a PR",
         detail: "Can we discuss fee cap tests before anyone opens a PR?",
-        status: "in chat",
+        status: "suggested work",
       },
       expect.objectContaining({
         id: "repo-selection",

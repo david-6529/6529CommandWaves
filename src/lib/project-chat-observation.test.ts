@@ -5,6 +5,7 @@ import {
   messageFromProjectChatObservation,
   projectChatObservationLabel,
   projectChatSignal,
+  projectChatTopicStatus,
   publicChatAuthor,
   signalFromProjectChatObservation,
 } from "./project-chat-observation";
@@ -16,6 +17,7 @@ describe("project chat observation", () => {
     expect(projectChatSignal("Please review the hook tests before we merge.")).toBe("review_request");
     expect(projectChatSignal("Which GitHub repo should we use?")).toBe("repo_setup");
     expect(projectChatSignal("I suggest a small fee cap test PR next.")).toBe("suggested_work");
+    expect(projectChatSignal("Can we discuss fee cap tests before anyone opens a PR?")).toBe("suggested_work");
     expect(projectChatSignal("Why is the hook immutable?")).toBe("question");
     expect(projectChatSignal("I am reading the fee cap notes.")).toBe("chat");
     expect(projectChatSignal("No deploy or ownership change.")).toBe("chat");
@@ -56,11 +58,22 @@ describe("project chat observation", () => {
       "PR link",
     );
     expect(projectChatObservationLabel("alice asked for a decision. Message: Can we vote?")).toBe("decision request");
-    expect(projectChatObservationLabel("alice asked for review. Message: Please test this.")).toBe("review request");
+    expect(projectChatObservationLabel("alice asked for review. Message: Please review this.")).toBe("review request");
     expect(projectChatObservationLabel("alice discussed repo setup. Message: Which GitHub repo should we use?")).toBe("repo setup");
     expect(projectChatObservationLabel("alice suggested work. Message: I suggest a fee cap test PR.")).toBe("work suggested");
     expect(projectChatObservationLabel("alice raised a question. Message: Why immutable?")).toBe("question");
     expect(signalFromProjectChatObservation("Legacy note with https://github.com/builders/hook/pull/45")).toBe("pr_link");
+  });
+
+  it("labels parsed daemon observations for discussion topics", () => {
+    expect(projectChatTopicStatus("alice shared a PR link for discussion. Message: https://github.com/builders/hook/pull/45")).toBe(
+      "PR shared",
+    );
+    expect(projectChatTopicStatus("alice asked for a decision. Message: Can we vote?")).toBe("needs decision");
+    expect(projectChatTopicStatus("alice asked for review. Message: Please review this.")).toBe("needs review");
+    expect(projectChatTopicStatus("alice discussed repo setup. Message: Which GitHub repo should we use?")).toBe("repo setup");
+    expect(projectChatTopicStatus("alice suggested work. Message: I suggest a fee cap test PR.")).toBe("suggested work");
+    expect(projectChatTopicStatus("alice raised a question. Message: Why immutable?")).toBe("question");
   });
 
   it("keeps public author and message compaction deterministic", () => {

@@ -10,7 +10,11 @@ import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
-import { messageFromProjectChatObservation, projectChatObservationLabel } from "./project-chat-observation";
+import {
+  messageFromProjectChatObservation,
+  projectChatObservationLabel,
+  projectChatTopicStatus,
+} from "./project-chat-observation";
 
 export type PublicProjectSnapshot = ReturnType<typeof createPublicProjectSnapshot>;
 
@@ -299,7 +303,7 @@ function discussionTopicsSnapshot(wave: CommandWave) {
         id: `chat-${event.id}`,
         title: compactChatTopicTitle(message),
         detail: message || "Builders are discussing this in chat.",
-        status: "in chat",
+        status: projectChatTopicStatus(event.message),
       };
     });
   const topics = [

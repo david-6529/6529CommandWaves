@@ -1408,7 +1408,13 @@ export function CommandWavesConsole() {
   const projectRepoInputLabel = projectRepoDraftIsPlaceholder ? githubRepoPlaceholder.label : "GitHub repo";
   const discussionTopicItems = publicProjectSnapshot.discussionTopics.map((item) => ({
     ...item,
-    statusClassName: item.status === "needed" || item.status === "repo not selected" ? riskClass("medium") : statusClass(item.status),
+    statusClassName:
+      item.status === "needed" ||
+      item.status === "repo not selected" ||
+      item.status === "needs decision" ||
+      item.status === "needs review"
+        ? riskClass("medium")
+        : statusClass(item.status),
   }));
   const pullRequestRows = publicProjectSnapshot.pullRequests.map((row) => ({
     ...row,

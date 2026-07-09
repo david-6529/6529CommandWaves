@@ -49,7 +49,7 @@ export function projectChatSignal(content: string): ProjectChatSignal {
     return "suggested_work";
   }
 
-  if (/\b(review|check|audit|test|tests|ci|guardian)\b/i.test(message)) {
+  if (/\b(review|check|audit|ci|guardian)\b/i.test(message)) {
     return "review_request";
   }
 
@@ -134,6 +134,20 @@ export function projectChatObservationLabel(value: string) {
     suggested_work: "work suggested",
     question: "question",
     chat: "chat observed",
+  };
+
+  return labels[signalFromProjectChatObservation(value)];
+}
+
+export function projectChatTopicStatus(value: string) {
+  const labels: Record<ProjectChatSignal, string> = {
+    pr_link: "PR shared",
+    decision_request: "needs decision",
+    review_request: "needs review",
+    repo_setup: "repo setup",
+    suggested_work: "suggested work",
+    question: "question",
+    chat: "in chat",
   };
 
   return labels[signalFromProjectChatObservation(value)];

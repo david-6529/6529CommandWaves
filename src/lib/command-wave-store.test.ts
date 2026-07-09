@@ -149,7 +149,7 @@ describe("Command wave store", () => {
     expect(wave.ledger[0]).toMatchObject({
       actor: "daemon",
       type: "chat_observed",
-      message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
+      message: "alice suggested work. Message: Can we discuss fee cap tests before anyone opens a PR?",
     });
   });
 
