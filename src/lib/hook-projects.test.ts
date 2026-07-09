@@ -94,6 +94,7 @@ describe("active hook projects", () => {
           yesVotes: 5,
           noVotes: 1,
         }),
+        currentDecisionRequest: null,
         discussionTopics: [
           expect.objectContaining({
             id: "proposal-cmd-001",

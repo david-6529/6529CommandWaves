@@ -432,6 +432,7 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "Pull request");
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
   assertIncludes("State response", JSON.stringify(statePayload), "currentVote");
+  assertIncludes("State response", JSON.stringify(statePayload), "currentDecisionRequest");
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
   assertIncludes("State response", JSON.stringify(statePayload), "\"chat\"");
   assertIncludes("State response", JSON.stringify(statePayload), "group_chat");

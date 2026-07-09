@@ -1175,14 +1175,24 @@ export function CommandWavesConsole() {
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
+  const currentDecisionRequest = publicProjectSnapshot.currentDecisionRequest;
+  const currentDecisionStatus = currentDecisionRequest?.status ?? publicProjectSnapshot.currentVote.status;
+  const currentDecisionBadgeClass = currentDecisionRequest
+    ? riskClass("medium")
+    : publicProjectSnapshot.currentVote.status === "open" || publicProjectSnapshot.currentVote.status === "decision link needed"
+      ? riskClass("medium")
+      : statusClass(publicProjectSnapshot.currentVote.status === "recorded" ? "complete" : publicProjectSnapshot.currentVote.status);
   const currentVoteStatusLabel =
-    publicProjectSnapshot.currentVote.status === "open"
+    currentDecisionStatus === "open"
       ? "needs votes"
-      : publicProjectSnapshot.currentVote.status === "none"
+      : currentDecisionStatus === "none"
         ? "none"
-        : publicProjectSnapshot.currentVote.status;
-  const currentVoteTitle = publicProjectSnapshot.currentVote.title;
-  const currentVoteDetail = publicProjectSnapshot.currentVote.detail;
+        : currentDecisionStatus;
+  const currentVoteSectionLabel = currentDecisionRequest ? "Decision needed" : "Current vote";
+  const currentVoteTitle = currentDecisionRequest?.title ?? publicProjectSnapshot.currentVote.title;
+  const currentVoteDetail = currentDecisionRequest
+    ? `${currentDecisionRequest.detail} Record a decision when builders are ready.`
+    : publicProjectSnapshot.currentVote.detail;
   const currentNextTitle = currentWorkNeedsRepo ? "Keep discussing" : phaseNextAction.title;
   const currentNextDetail = currentWorkNeedsRepo
     ? "PR work starts after maintainers select the hook repo."
@@ -2331,13 +2341,11 @@ export function CommandWavesConsole() {
               <div className="py-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current vote</p>
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{currentVoteSectionLabel}</p>
                     <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{currentVoteTitle}</p>
                     <p className="mt-1 text-sm leading-6 text-zinc-500">{currentVoteDetail}</p>
                   </div>
-                  <Badge className={activePoll?.status === "open" ? riskClass("medium") : statusClass("complete")}>
-                    {currentVoteStatusLabel}
-                  </Badge>
+                  <Badge className={currentDecisionBadgeClass}>{currentVoteStatusLabel}</Badge>
                 </div>
               </div>
               <div className="py-4">

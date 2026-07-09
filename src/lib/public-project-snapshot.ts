@@ -264,6 +264,27 @@ function currentVoteSnapshot(wave: CommandWave) {
   };
 }
 
+function currentDecisionRequestSnapshot(wave: CommandWave) {
+  const event = ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl).find(
+    (item) => item.type === "chat_observed" && signalFromProjectChatObservation(item.message) === "decision_request",
+  );
+
+  if (!event) {
+    return null;
+  }
+
+  const message = chatMessageFromObservation(event.message);
+
+  return {
+    id: `chat-${event.id}`,
+    title: compactChatTopicTitle(message),
+    detail: message || "Builders asked for a decision in chat.",
+    status: "needs decision",
+    risk: chatTopicRisk(event.message),
+    at: event.at,
+  };
+}
+
 function decisionSnapshot(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal;
@@ -543,6 +564,7 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
     workflow: workflowSnapshot(wave),
     currentWork,
     currentVote: currentVoteSnapshot(wave),
+    currentDecisionRequest: currentDecisionRequestSnapshot(wave),
     discussionTopics: discussionTopicsSnapshot(wave),
     chat: publicProjectChatSettings,
     pullRequests: pullRequestSnapshots(wave),

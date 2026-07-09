@@ -90,6 +90,7 @@ describe("hook project index", () => {
     expect(JSON.stringify(index.projects)).toContain("accessSnapshotLabel");
     expect(JSON.stringify(index.projects)).toContain("latestChanges");
     expect(JSON.stringify(index.projects)).toContain("currentVote");
+    expect(JSON.stringify(index.projects)).toContain("currentDecisionRequest");
     expect(JSON.stringify(index.projects)).toContain("discussionTopics");
     expect(JSON.stringify(index.projects)).toContain("workflow");
     expect(JSON.stringify(index.projects)).toContain("chat");

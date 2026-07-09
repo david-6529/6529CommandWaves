@@ -34,6 +34,7 @@ describe("command wave state snapshot", () => {
           yesVotes: 5,
           noVotes: 1,
         },
+        currentDecisionRequest: null,
         discussionTopics: [
           {
             id: "proposal-cmd-001",

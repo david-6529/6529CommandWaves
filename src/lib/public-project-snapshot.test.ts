@@ -177,6 +177,45 @@ describe("public project snapshot", () => {
     expect(JSON.stringify(snapshot)).not.toContain("\u2014");
   });
 
+  it("surfaces daemon-parsed decision requests without replacing the last recorded vote", () => {
+    const snapshot = createPublicProjectSnapshot({
+      ...demoWave,
+      ledger: [
+        {
+          id: "evt-decision-needed",
+          at: "2026-06-20T12:45:00.000Z",
+          actor: "daemon",
+          type: "chat_observed",
+          message: "ada asked for a decision. Message: Can we vote on the fee cap test plan before opening the PR?",
+        },
+        ...demoWave.ledger,
+      ],
+    });
+
+    expect(snapshot.currentVote).toMatchObject({
+      status: "recorded",
+      title: "No open vote",
+      detail: "Last decision: 5 yes, 1 no.",
+    });
+    expect(snapshot.currentDecisionRequest).toMatchObject({
+      id: "chat-evt-decision-needed",
+      title: "Vote on the fee cap test plan before opening the PR",
+      detail: "Can we vote on the fee cap test plan before opening the PR?",
+      status: "needs decision",
+      risk: "high",
+      at: "2026-06-20T12:45:00.000Z",
+    });
+    expect(snapshot.discussionTopics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "chat-evt-decision-needed",
+          title: "Vote on the fee cap test plan before opening the PR",
+          status: "needs decision",
+        }),
+      ]),
+    );
+  });
+
   it("updates the daemon summary from current project state", () => {
     const emptyWave = {
       ...demoWave,
