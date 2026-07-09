@@ -965,6 +965,14 @@ function browserWalletProvider() {
   return (window as Window & { ethereum?: BrowserWalletProvider }).ethereum ?? null;
 }
 
+const nonBuilderProjectChatAuthors = new Set(["agent", "daemon", "decision", "review-agent", "reviewer", "rule engine", "setup"]);
+
+function isBuilderProjectChatDrop(drop: WaveContextPreview["sampleDrops"][number]) {
+  const author = projectChatAuthorLabel(drop.author).toLowerCase();
+
+  return !nonBuilderProjectChatAuthors.has(author);
+}
+
 export function CommandWavesConsole() {
   const [wave, setWave] = useState<CommandWave>(() => cloneDemoWave());
   const [waveUrl, setWaveUrl] = useState(wave.waveUrl);
@@ -1195,7 +1203,6 @@ export function CommandWavesConsole() {
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
-  const hasRecentDiscussionPosts = Boolean(primaryProjectContextPreview?.sampleDrops.length);
   const chatRosterPosts = useMemo(
     () =>
       (primaryProjectContextPreview?.sampleDrops ?? []).map((drop) => ({
@@ -1230,8 +1237,9 @@ export function CommandWavesConsole() {
   );
   const visibleBuilderProfiles = builderRoster.slice(0, 4);
   const visibleProjectChatSnapshotDrops = primaryProjectContextPreview
-    ? [...primaryProjectContextPreview.sampleDrops].slice(-3).reverse()
+    ? [...primaryProjectContextPreview.sampleDrops].filter(isBuilderProjectChatDrop).slice(-3).reverse()
     : [];
+  const hasRecentDiscussionPosts = visibleProjectChatSnapshotDrops.length >= 2;
   const visibleProjectChatSnapshotFallback = projectChatFeed.slice(0, 4);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(

@@ -246,6 +246,7 @@ describe("CommandWavesConsole", () => {
 
   it("keeps project chat as one open group chat accordion", () => {
     const html = renderedConsoleHtml();
+    const text = renderedConsoleText();
 
     expect(html).toContain('<details id="project-chat"');
     expect(html).toContain('open="">');
@@ -253,6 +254,14 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain('aria-label="Send a chat message"');
     expect(html).toContain("Group thread");
     expect(html).toContain("Send a message");
+    expect(text).toContain("david");
+    expect(text).toContain("gpebbles");
+    expect(text).toContain("simo");
+    expect(text).toContain("I think the next hook change should be Draft the non-upgradeable hook scaffold.");
+    expect(text).toContain("keep this to the non-upgradeable scaffold, fee cap, and tests.");
+    expect(text).toContain("PR work can start once maintainers select the pilot GitHub repo.");
+    expect(text).not.toContain("I am watching for clear agreement before this becomes PR work.");
+    expect(text).not.toContain("I recorded the PR for the approved hook change so builders can inspect it.");
     expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or share context."');
     expect(html).not.toContain('role="tablist"');
     expect(html).not.toContain('role="tab"');

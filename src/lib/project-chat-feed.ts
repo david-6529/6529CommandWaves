@@ -43,8 +43,8 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
       id: "decision",
       label: "message",
       author: "builders",
-      title: "Decision recorded",
-      body: `Approved the current hook change with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+      title: "Decision linked",
+      body: `The hook scaffold vote passed with ${poll.yesVotes} yes and ${poll.noVotes} no. This is the scope PRs should follow.`,
       status: `${poll.yesVotes} yes, ${poll.noVotes} no`,
       href: poll.decision.url,
       hrefLabel: "Open decision",
@@ -65,10 +65,43 @@ function draftDecisionItem(): ProjectChatFeedItem {
   return {
     id: "draft-decision",
     label: "message",
-    author: orchestratorAgentIdentity.handle,
-    title: "Waiting for agreement",
-    body: "I am watching for clear agreement before this becomes PR work.",
+    author: "gpebbles",
+    title: "Scope check",
+    body: "This seems small enough for the next step if it only adds tests and does not change deployment or ownership.",
     status: "needs decision",
+  };
+}
+
+function builderScopeItem(): ProjectChatFeedItem {
+  return {
+    id: "scope-check",
+    label: "message",
+    author: "gpebbles",
+    title: "Scope check",
+    body: "Let's keep this to the non-upgradeable scaffold, fee cap, and tests. No deploy or ownership change.",
+    status: "scope",
+  };
+}
+
+function repoNextItem(): ProjectChatFeedItem {
+  return {
+    id: "repo-next",
+    label: "message",
+    author: "simo",
+    title: "Repo next",
+    body: "PR work can start once maintainers select the pilot GitHub repo.",
+    status: "repo needed",
+  };
+}
+
+function builderRiskItem(): ProjectChatFeedItem {
+  return {
+    id: "risk-note",
+    label: "message",
+    author: "zoku",
+    title: "Risk note",
+    body: "Because this touches hook code, let's keep bounds and tests explicit before PR work starts.",
+    status: "needs care",
   };
 }
 
@@ -107,9 +140,9 @@ function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): Pro
   return {
     id: "pr",
     label: "message",
-    author: orchestratorAgentIdentity.handle,
+    author: "david",
     title: label,
-    body: "I recorded the PR for the approved hook change so builders can inspect it.",
+    body: "I linked the PR for the approved hook change so everyone can inspect the code and tests.",
     status: execution.status,
     href: prUrl(execution),
     hrefLabel: "Open PR",
@@ -126,7 +159,7 @@ function reviewFeedItem(review: GuardianReview | null): ProjectChatFeedItem | nu
     label: "message",
     author: reviewAgentIdentity.handle,
     title: review.status === "pass" ? "Review passed" : `Review is ${review.status.replaceAll("_", " ")}`,
-    body: "Review checked the PR against the approved hook proposal and rules.",
+    body: "Reviewer check matched the PR to the approved hook scope and project rules.",
     status: review.status.replaceAll("_", " "),
   };
 }
@@ -154,7 +187,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
       label: "message",
       author: clean(draft?.proposer ?? "", "A builder"),
       title: "Suggested work",
-      body: `I want to discuss ${draftTitle}. ${clean(draft?.prompt ?? "", "Can this be the next small hook change?")}`,
+      body: `Can we discuss ${draftTitle}? ${clean(draft?.prompt ?? "", "Can this be the next small hook change?")}`,
       status: "draft",
     });
     items.push(draftDecisionItem());
@@ -167,6 +200,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
       body: `I think the next hook change should be ${phaseWork.prProposal.title}. ${phaseWork.prProposal.prompt}`,
       status: phaseWork.prProposal.status.replaceAll("_", " "),
     });
+    items.push(builderScopeItem());
   } else {
     items.push(...phaseWork.supportProposals.slice(0, 2).map(supportProposalFeedItem));
   }
@@ -179,6 +213,14 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
     if (item) {
       items.push(item);
     }
+  }
+
+  if (phaseWork.prProposal && !phaseWork.prExecution && items.length < 4) {
+    items.push(repoNextItem());
+  }
+
+  if (phaseWork.prProposal && !phaseWork.prExecution && items.length < 4) {
+    items.push(builderRiskItem());
   }
 
   for (const event of ledgerEventsByRecency(wave.ledger)) {

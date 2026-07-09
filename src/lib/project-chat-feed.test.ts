@@ -15,25 +15,25 @@ describe("project chat feed", () => {
     expect(feed[0]).toMatchObject({
       author: "david",
       title: "Suggested work",
-      body: "I want to discuss Add fee cap tests. Add tests for the fee cap.",
+      body: "Can we discuss Add fee cap tests? Add tests for the fee cap.",
       status: "draft",
     });
     expect(feed[1]).toMatchObject({
-      author: "daemon",
-      title: "Waiting for agreement",
-      body: "I am watching for clear agreement before this becomes PR work.",
+      author: "gpebbles",
+      title: "Scope check",
+      body: "This seems small enough for the next step if it only adds tests and does not change deployment or ownership.",
       status: "needs decision",
     });
     expect(feed[2]).toMatchObject({
-      author: "daemon",
+      author: "david",
       title: "Last PR",
-      body: "I recorded the PR for the approved hook change so builders can inspect it.",
+      body: "I linked the PR for the approved hook change so everyone can inspect the code and tests.",
       hrefLabel: "Open PR",
       status: "complete",
     });
     expect(feed[3]).toMatchObject({
       author: "review-agent",
-      body: "Review checked the PR against the approved hook proposal and rules.",
+      body: "Reviewer check matched the PR to the approved hook scope and project rules.",
       title: "Review passed",
       status: "pass",
     });
@@ -101,5 +101,59 @@ describe("project chat feed", () => {
       body: "Clarify fee cap options: Compare the simplest fee cap options.",
       status: "approved",
     });
+  });
+
+  it("shows builder conversation when PR work is waiting on a repo", () => {
+    const wave: CommandWave = {
+      id: "cw-repo-needed",
+      name: "6529 AMM hook",
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      repoUrl: "",
+      gates: [],
+      rules: defaultRules,
+      proposals: [
+        {
+          id: "cmd-001",
+          title: "Draft the non-upgradeable hook scaffold",
+          proposer: "david",
+          kind: "open_pr",
+          risk: "high",
+          prompt: "Draft the hook scaffold with capped fee parameters and tests.",
+          spec: "No deploy scripts or ownership changes.",
+          budgetUsd: 0,
+          status: "approved",
+        },
+      ],
+      polls: [],
+      executions: [],
+      reviews: [],
+      ledger: [
+        {
+          id: "evt-001",
+          at: "2026-06-20T12:05:03.000Z",
+          actor: "Rule Engine",
+          type: "rule_check",
+          message: "Marked the hook scaffold high risk.",
+        },
+      ],
+    };
+    const feed = createProjectChatFeed(wave);
+
+    expect(feed).toHaveLength(4);
+    expect(feed[0]).toMatchObject({
+      author: "david",
+      title: "Suggested work",
+    });
+    expect(feed[1]).toMatchObject({
+      author: "gpebbles",
+      title: "Scope check",
+      body: "Let's keep this to the non-upgradeable scaffold, fee cap, and tests. No deploy or ownership change.",
+    });
+    expect(feed[2]).toMatchObject({
+      author: "simo",
+      title: "Repo next",
+      body: "PR work can start once maintainers select the pilot GitHub repo.",
+    });
+    expect(feed.map((item) => item.author)).not.toContain("Rule Engine");
   });
 });
