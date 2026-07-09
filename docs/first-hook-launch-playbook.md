@@ -28,6 +28,7 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 - Draft PRs with Command Waves manifests.
 - Repo contributor rules in [../CONTRIBUTING.md](../CONTRIBUTING.md).
 - Copyable chat launch brief for the first public post.
+- Chat launch proof with a `Group discussion` item after daemon parses a builder message.
 - Reviewer checks for vote status, rules hashes, risky files, hook signals, Solidity patch signals, and explicit parameter caps.
 - Launch check during setup and again before inviting broad participation.
 - Guardian workflow check for the selected hook repo.
@@ -91,25 +92,26 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 3. Select the hook repo before PR work, then confirm it has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, the guardian workflow, and the required guardian check.
 4. Copy the chat launch brief from setup.
 5. Post the brief with the chat, repo status, participation notes, and hook scope.
-6. Copy the participation guide and share it where new contributors will see it.
-7. Invite ideas in the project chat.
-8. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
-9. Vote or approve through the project chat.
-10. Record the decision URL as the manual decision link.
-11. Use the build step to prepare the branch, commit the Codex work packet, and open a draft PR record.
-12. Run any code-writing agent only inside that approved packet and branch.
-13. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
-14. Make `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` required in GitHub branch protection or rulesets.
-15. Continue the draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
-16. Review the PR manifest, tests, parameter-cap evidence, and changed files.
-17. Humans merge only after review passes.
-18. Use the contribution report and fee plan as evidence for any separate payout vote.
-19. Review the chat update draft and share it manually in project chat.
-20. Keep the launch packet with the PR so later contributors can audit the loop.
-21. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
+6. Post or pull at least one real builder message so daemon records group discussion evidence.
+7. Copy the participation guide and share it where new contributors will see it.
+8. Invite ideas in the project chat.
+9. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
+10. Vote or approve through the project chat.
+11. Record the decision URL as the manual decision link.
+12. Use the build step to prepare the branch, commit the Codex work packet, and open a draft PR record.
+13. Run any code-writing agent only inside that approved packet and branch.
+14. Set `COMMAND_WAVE_STATE_URL` to `/api/command-wave/state` for guardian PR checks.
+15. Make `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` required in GitHub branch protection or rulesets.
+16. Continue the draft PR using the repo template, review request, launch evidence, and Command Waves manifest.
+17. Review the PR manifest, tests, parameter-cap evidence, and changed files.
+18. Humans merge only after review passes.
+19. Use the contribution report and fee plan as evidence for any separate payout vote.
+20. Review the chat update draft and share it manually in project chat.
+21. Keep the launch packet with the PR so later contributors can audit the loop.
+22. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
 
 The launch check focuses on the first public loop. The chat-first launch requires the deployed app URL, first hook chat,
-admin key, durable storage, live 6529 mode, and daemon chat posting credentials. The GitHub repo can stay as a placeholder
+admin key, durable storage, live 6529 mode, daemon chat posting credentials, and daemon-observed group discussion evidence. The GitHub repo can stay as a placeholder
 until maintainers choose it. A ready PR loop also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian workflow,
 guardian wave-state URL, and required guardian check. Failed checks block broad participation.
 

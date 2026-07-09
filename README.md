@@ -62,6 +62,7 @@ What exists now:
   contract signal checks.
 - Setup proof omits placeholder GitHub repo values and blocks required-check verification until the real repo is selected.
 - Setup validation checks the selected hook repo for contributor rules, the PR template, the guardian workflow, and the required guardian check.
+- Chat launch proof includes a `Group discussion` item. It is ready only after daemon has parsed at least one builder message.
 - Launch audit, workflow proof, checklists, launch packets, update drafts, and contribution reports reject stale PR or review evidence unless the PR link and review proof are bound to the configured repo.
 - Review cannot record guardian proof unless the current execution includes a PR link for the configured repo.
 - Review records a bounded PR comment and check run before saving reviewer proof.
@@ -86,17 +87,18 @@ What remains manual or MVP-only:
 - Contribution reporting is a daemon-generated visible-activity analysis with partial confidence. It uses visible app
   activity, project chat posts pulled into the app, recorded PR links, and repo-bound review proof. Agent and system log events stay in the audit trail but do not become member score. Builder profiles show activity, voting summaries, and report points as context only. Full scoring
   across unattached GitHub commits, merges, and off-app activity is still future work.
-- The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until maintainers choose the repo.
+- The default demo includes approved work and decision activity. daemon-observed group discussion appears after builders post through the app or after chat is pulled into app state. The default placeholder repo keeps PR work blocked until maintainers choose the repo.
 
 What we are working on next:
 
 1. Pick the first real public project chat.
 2. Keep the GitHub repo as a placeholder until maintainers choose it.
 3. Configure launch env, durable storage, and daemon chat posting.
-4. Add the selected hook repo, reviewer process, guardian workflow, and required guardian check before the first PR.
-5. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
-6. Wire live wallet/session access checks when the manual access process is proven.
-7. Expand contribution analysis after the workflow is useful and understandable.
+4. Record the first daemon-observed group discussion message.
+5. Add the selected hook repo, reviewer process, guardian workflow, and required guardian check before the first PR.
+6. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
+7. Wire live wallet/session access checks when the manual access process is proven.
+8. Expand contribution analysis after the workflow is useful and understandable.
 
 ## Why This Exists
 
@@ -223,19 +225,19 @@ Audit and launch:
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
 - Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
 - Public launch audit separates chat launch readiness from the full reviewed PR loop.
-- `npm run chat:launch` verifies the chat launch track while the GitHub repo is still a placeholder.
+- `npm run chat:launch` verifies the chat launch track while the GitHub repo is still a placeholder. The chat track includes setup, production env, daemon posting, advisory participation notes, and daemon-observed group discussion evidence.
 - Public command-wave state includes the informational contribution report method and notes.
 - Public launch audit includes the hashed wave state, rules, and full audit bundle it checked.
 - Public launch audit keeps project and setup repo URLs empty while the GitHub repo is still a placeholder.
 - Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
-  The proof and checklist keep review and log pending while the reviewer process is still a placeholder.
+  The chat step is ready only after daemon parses a builder message. The proof and checklist keep review and log pending while the reviewer process is still a placeholder.
 - Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.
   Fee planning waits for a selected reviewer process and reviewed PR loop.
 - Public launch audit publishes the same human-readable launch packet builders can share back to chat, with a packet hash.
 - Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
 - The copyable launch packet includes the same workflow proof chain for chat share-back.
 - The local demo separates current work status from launch readiness. Chat launch readiness still needs production env,
-  durable storage, live 6529 mode, and daemon posting. PR-loop readiness also needs the selected hook repo, GitHub PR adapter,
+  durable storage, live 6529 mode, daemon posting, and one daemon-observed group message. PR-loop readiness also needs the selected hook repo, GitHub PR adapter,
   guardian state, guardian workflow, and required checks.
 
 Maintainer setup:
@@ -294,16 +296,15 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 Use [.env.production.example](.env.production.example) as the deployment checklist.
 
 `COMMAND_WAVE_INITIAL_WAVE_URL` seeds the first project chat. `COMMAND_WAVE_INITIAL_REPO_URL` stays as a placeholder
-until maintainers choose the hook repo. Chat launch readiness allows the placeholder repo, while full PR-loop readiness blocks PR work until
-a real repo is selected. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions.
+until maintainers choose the hook repo. Chat launch readiness allows the placeholder repo, but still requires daemon to parse at least one builder message. Full PR-loop readiness blocks PR work until a real repo is selected. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions.
 `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
-The chat-first launch requires daemon chat posting credentials and durable storage. A ready PR loop also requires the
+The chat-first launch requires daemon chat posting credentials, durable storage, and daemon-observed group discussion evidence. A ready PR loop also requires the
 selected reviewer process, GitHub PR adapter, guardian workflow in the selected hook repo, and the required guardian check
 so the public workflow can record draft PRs predictably.
 
 The local demo still reports launch gaps until the first hook chat is reachable, `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`,
-durable storage, live 6529 mode, daemon chat posting credentials, and setup validation are configured. PR-loop readiness
+durable storage, live 6529 mode, daemon chat posting credentials, daemon-observed discussion evidence, and setup validation are configured. PR-loop readiness
 also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian state, guardian workflow, and
 required guardian check.
 
@@ -452,7 +453,7 @@ If `NEXT_PUBLIC_APP_URL` is set, `npm run chat:launch` reads
 Without an explicit path, URL, or app URL, `npm run chat:launch` uses the local dev app at `http://localhost:5001` and
 runs a shape-only chat launch check.
 
-`npm run chat:launch` exits nonzero until the chat launch track is ready and generated with remote setup checks. The full
+`npm run chat:launch` exits nonzero until the chat launch track is ready, includes daemon-observed group discussion evidence, and is generated with remote setup checks. The full
 `npm run launch:audit` command exits nonzero until the reviewed PR loop is also ready. For offline verification, set
 `CHAT_LAUNCH_PATH` or `LAUNCH_AUDIT_PATH`. The chat verifier prints chat blockers, open items, and a chat operator
 checklist. The full launch verifier prints the status draft, state hashes, blockers, open items, and an operator checklist.
@@ -472,7 +473,7 @@ npm run launch:audit
 
 If Next is running on another port, set `LOCAL_APP_URL` to that app URL before `setup:verify`, `chat:launch`, or
 `launch:audit`. The smoke check should pass when the app is loading. The setup and launch commands still exit nonzero
-until production env, live 6529 mode, durable storage, and daemon posting are configured. PR-loop readiness also needs a
+until production env, live 6529 mode, durable storage, daemon posting, and daemon-observed group discussion are configured. PR-loop readiness also needs a
 selected hook repo, GitHub PR adapter, guardian state, guardian workflow, and the required guardian check.
 
 Expose the current project state to the guardian with:
@@ -494,7 +495,7 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `GET /api/command-wave/reports/contribution`: public informational contribution report with a `reportHash`.
 - `GET /api/command-wave/verification/manifest`: public map of verification endpoints, chat posting capability, required hash fields, stable anchors, and its own manifest URL.
 - `GET /api/command-wave/launch/audit`: public first-loop launch audit with authority boundary. Add `?remote=1` to run remote wave and repo setup checks.
-- `GET /api/command-wave/launch/chat`: public chat launch audit with `chatLaunchHash`. Add `?remote=1` before inviting builders into discussion.
+- `GET /api/command-wave/launch/chat`: public chat launch audit with `chatLaunchHash`, including `Group discussion` evidence from daemon-observed messages. Add `?remote=1` before inviting builders into discussion.
 - `GET /api/command-wave`: return the current local command wave.
 - `PUT /api/command-wave`: disabled in phase 1. Use scoped setup, proposal, vote, decision, run, and review routes.
 - `PATCH /api/command-wave`: update the demo wave/repo setup and log it.
@@ -521,7 +522,7 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 ## Next Production Steps
 
 1. Apply the Postgres schema, set `COMMAND_WAVE_STORE=postgres`, and verify durable storage.
-2. Set the initial hook chat, keep the GitHub repo placeholder for chat launch, then run the remote chat launch audit until setup is reachable.
+2. Set the initial hook chat, keep the GitHub repo placeholder for chat launch, record daemon-observed group discussion, then run the remote chat launch audit until setup is reachable.
 3. Add an isolated Codex worker that produces bounded patch files before the existing branch, commit, and draft PR sequence.
 4. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 5. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.
