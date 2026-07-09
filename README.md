@@ -46,6 +46,7 @@ What exists now:
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Direct chat posting is admin-protected, IP-limited, and paced at 3 messages per 5 minutes per supplied builder identity.
 - Successful chat posts record a daemon-observed project event so the summary and changelog show that discussion was read.
+- Public daemon summaries redact obvious credentials before they enter project state.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
 - Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,

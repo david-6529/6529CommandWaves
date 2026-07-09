@@ -154,6 +154,22 @@ describe("Command wave store", () => {
     });
   });
 
+  it("redacts obvious secrets before daemon observations enter public state", async () => {
+    const wave = await recordProjectChatObservation({
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      senderId: "alice",
+      content:
+        "Can someone review https://github.com/builders/hook/pull/45? token=abc1234567890 and private_key=0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    });
+    const message = wave.ledger[0]?.message ?? "";
+
+    expect(message).toContain("https://github.com/builders/hook/pull/45");
+    expect(message).toContain("token=[redacted]");
+    expect(message).toContain("private_key=[redacted]");
+    expect(message).not.toContain("abc1234567890");
+    expect(message).not.toContain("0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
+  });
+
   it("does not replace custom setup with environment setup", async () => {
     await updateCommandWaveSetup({
       waveUrl: "https://6529.io/waves/custom-chat",

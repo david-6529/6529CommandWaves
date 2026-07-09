@@ -9,6 +9,7 @@ import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { defaultParticipationGates, normalizeParticipationGates } from "./participation-gates";
+import { redactPublicText } from "./public-text-redaction";
 import { validateSetupShape } from "./setup-validation";
 import { isPlaceholderValue } from "./env-placeholders";
 import {
@@ -396,7 +397,7 @@ function publicChatAuthor(value: string) {
 }
 
 function compactChatMessage(value: string) {
-  const compact = value.replace(/\s+/g, " ").trim();
+  const compact = redactPublicText(value).replace(/\s+/g, " ").trim();
 
   return compact.length > 140 ? `${compact.slice(0, 137)}...` : compact;
 }
