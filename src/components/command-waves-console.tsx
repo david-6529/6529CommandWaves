@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { attachAdminApiKey } from "@/lib/admin-client";
 import { formatApiError, type ApiErrorPayload } from "@/lib/api-error-copy";
 import { createBuildTimeline, type BuildTimelineStatus } from "@/lib/build-timeline";
@@ -1512,6 +1512,29 @@ export function CommandWavesConsole() {
   }));
   const projectRuleItems = publicProjectSnapshot.rules;
 
+  const applyWave = useCallback((nextWave: CommandWave) => {
+    autoPreviewKeysRef.current.clear();
+    setWave(nextWave);
+    setWaveUrl(nextWave.waveUrl);
+    setRepoUrl(nextWave.repoUrl);
+    setGateNotes(nextWave.gates.join("\n"));
+    setContributionReportNotice("");
+    setDeveloperFeePlanNotice("");
+    setProjectChatNotice("");
+    setChatPostUrl("");
+    setProjectContextPreviews({});
+    setSetupContextPreview(null);
+    setDecisionDraftNotice("");
+    setLaunchBriefNotice("");
+    setParticipationGuideNotice("");
+    setLaunchStatusNotice("");
+    setLaunchEnvNotice("");
+    setLaunchLinkNotice("");
+    setProposalDraftNotice("");
+    setReviewRequestNotice("");
+    setCodexPacketNotice("");
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
     const timer = window.setTimeout(() => {
@@ -1586,7 +1609,21 @@ export function CommandWavesConsole() {
     let isCurrent = true;
 
     requestContextPreview(project.waveUrl)
-      .then((preview) => {
+      .then(async (preview) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        try {
+          const sync = await requestProjectChatObservationSync(project.waveUrl, preview, accessKey);
+
+          if (isCurrent && sync.observedCount > 0) {
+            applyWave(sync.wave);
+          }
+        } catch {
+          // The preview is still useful when protected daemon sync is not available.
+        }
+
         if (!isCurrent) {
           return;
         }
@@ -1605,7 +1642,7 @@ export function CommandWavesConsole() {
     return () => {
       isCurrent = false;
     };
-  }, [activeHookProjects, projectContextPreviews]);
+  }, [accessKey, activeHookProjects, applyWave, projectContextPreviews]);
 
   function updateAccessKey(value: string) {
     setAccessKey(value);
@@ -1615,29 +1652,6 @@ export function CommandWavesConsole() {
     } else {
       window.sessionStorage.removeItem(accessKeyStorageKey);
     }
-  }
-
-  function applyWave(nextWave: CommandWave) {
-    autoPreviewKeysRef.current.clear();
-    setWave(nextWave);
-    setWaveUrl(nextWave.waveUrl);
-    setRepoUrl(nextWave.repoUrl);
-    setGateNotes(nextWave.gates.join("\n"));
-    setContributionReportNotice("");
-    setDeveloperFeePlanNotice("");
-    setProjectChatNotice("");
-    setChatPostUrl("");
-    setProjectContextPreviews({});
-    setSetupContextPreview(null);
-    setDecisionDraftNotice("");
-    setLaunchBriefNotice("");
-    setParticipationGuideNotice("");
-    setLaunchStatusNotice("");
-    setLaunchEnvNotice("");
-    setLaunchLinkNotice("");
-    setProposalDraftNotice("");
-    setReviewRequestNotice("");
-    setCodexPacketNotice("");
   }
 
   async function runWaveAction(busy: BusyState, action: () => Promise<CommandWave>, success: string) {
