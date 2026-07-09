@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffArtifact } from "./agent-handoff";
 import { demoWave } from "./demo-wave";
-import { findExecutionFileManifestArtifact } from "./execution-files";
+import {
+  createExecutionFilePatchEvidence,
+  findExecutionFileManifestArtifact,
+  findExecutionFilePatchEvidenceArtifact,
+  formatExecutionFilePatchEvidenceArtifact,
+} from "./execution-files";
 import { createLocalOrchestratorAdapter, localGuardianAdapter, localOrchestratorAdapter, localRepoAdapter } from "./local-adapters";
 import { COMMAND_PR_MANIFEST_START } from "./github/pr-reviewer-gate";
 import { createCommandRunManifest, findRunManifestArtifact, formatRunManifestArtifact } from "./run-manifest";
@@ -154,6 +159,7 @@ describe("local command adapters", () => {
     expect(execution.artifacts).toContain("changed .command-waves/commands/cmd-001.md, test/FeeCap.t.sol");
 
     const approvedFileManifest = findExecutionFileManifestArtifact(execution.artifacts);
+    const approvedFilePatchEvidence = findExecutionFilePatchEvidenceArtifact(execution.artifacts);
 
     expect(approvedFileManifest).toMatchObject({
       proposalId: "cmd-001",
@@ -167,6 +173,17 @@ describe("local command adapters", () => {
         },
       ],
       manifestHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
+    expect(approvedFilePatchEvidence).toMatchObject({
+      proposalId: "cmd-001",
+      fileCount: 1,
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          patch: "+contract FeeCapTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+      evidenceHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
   });
 
@@ -355,6 +372,95 @@ describe("local command adapters", () => {
 
     expect(review.status).toBe("changes_requested");
     expect(review.checks).toContain("Approved file manifest is missing or does not match approved file paths.");
+  });
+
+  it("asks for changes when approved files have no patch evidence", async () => {
+    const proposal = configuredWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: configuredWave,
+      proposal,
+      poll: configuredWave.polls[0],
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+    const review = await localGuardianAdapter.review({
+      wave: configuredWave,
+      proposal,
+      execution: {
+        ...execution,
+        artifacts: execution.artifacts.filter((artifact) => !artifact.startsWith("approved-file-patches:")),
+      },
+    });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain("Approved file patch evidence is missing or does not match approved file paths.");
+  });
+
+  it("asks for changes when approved file patch evidence does not match the manifest hash", async () => {
+    const proposal = configuredWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: configuredWave,
+      proposal,
+      poll: configuredWave.polls[0],
+      files: [
+        {
+          path: "test/FeeCap.t.sol",
+          content: "contract FeeCapTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+    const tamperedPatchEvidence = createExecutionFilePatchEvidence(proposal.id, [
+      {
+        path: "test/FeeCap.t.sol",
+        content: "contract FeeCapTest { function testWrongThing() public {} }",
+      },
+    ]);
+    const review = await localGuardianAdapter.review({
+      wave: configuredWave,
+      proposal,
+      execution: {
+        ...execution,
+        artifacts: execution.artifacts.map((artifact) =>
+          artifact.startsWith("approved-file-patches:")
+            ? formatExecutionFilePatchEvidenceArtifact(tamperedPatchEvidence)
+            : artifact,
+        ),
+      },
+    });
+
+    expect(review.status).toBe("changes_requested");
+    expect(review.checks).toContain("Approved file patch evidence is missing or does not match approved file paths.");
+  });
+
+  it("includes approved Solidity patch evidence in local reviewer proof", async () => {
+    const proposal = configuredWave.proposals[0];
+    const execution = await localOrchestratorAdapter.execute({
+      wave: configuredWave,
+      proposal,
+      poll: configuredWave.polls[0],
+      files: [
+        {
+          path: "contracts/HookParameters.sol",
+          content:
+            "contract HookParameters { uint256 public feeBps; function setFeeBps(uint256 nextFeeBps) external { require(nextFeeBps <= 100, \"fee cap\"); feeBps = nextFeeBps; } }",
+        },
+        {
+          path: "test/HookParameters.t.sol",
+          content: "contract HookParametersTest { function testFeeCap100Bps() public {} }",
+        },
+      ],
+    });
+    const review = await localGuardianAdapter.review({ wave: configuredWave, proposal, execution });
+
+    expect(review.status).toBe("pass");
+    expect(review.checks).toContain("Approved file patch evidence hashes 2 approved files.");
+    expect(review.checks).toContain("Hook patch signals checked: parameter write.");
+    expect(review.checks).toContain("Hook patch signals fit the approved risk level.");
+    expect(review.proof?.inputs.changedFilesHash).toHaveLength(64);
   });
 
   it("asks for changes when the guardian PR gate fails", async () => {

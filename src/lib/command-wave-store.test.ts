@@ -535,7 +535,9 @@ describe("Command wave store", () => {
 
     expect(reviewed.reviews[0]?.status).toBe("pass");
     expect(reviewed.reviews[0]?.checks).toContain("Approved file manifest hashes 1 approved file.");
+    expect(reviewed.reviews[0]?.checks).toContain("Approved file patch evidence hashes 1 approved file.");
     expect(reviewed.reviews[0]?.proof?.inputs.changedPathsHash).toHaveLength(64);
+    expect(reviewed.reviews[0]?.proof?.inputs.changedFilesHash).toHaveLength(64);
   });
 
   it("rejects approved file paths outside the repo", async () => {

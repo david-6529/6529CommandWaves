@@ -7,7 +7,12 @@ import {
   riskAllowsHookContractSignal,
   type HookContractSignal,
 } from "./safety/hook-contract-policy";
-import { findHookPatchSignals, riskAllowsHookPatchSignal, type HookPatchSignal } from "./safety/hook-diff-policy";
+import {
+  findHookPatchSignals,
+  riskAllowsHookPatchSignal,
+  type HookChangedFile,
+  type HookPatchSignal,
+} from "./safety/hook-diff-policy";
 import { evaluateHookParameterPolicy } from "./safety/hook-parameter-policy";
 
 export const executionRequestBodyMaxBytes = 128 * 1024;
@@ -23,6 +28,14 @@ export type ExecutionFileManifest = {
     contentLength: number;
   }>;
   manifestHash: string;
+};
+
+export type ExecutionFilePatchEvidence = {
+  version: "command-wave-approved-file-patches-v0.1";
+  proposalId: string;
+  fileCount: number;
+  files: HookChangedFile[];
+  evidenceHash: string;
 };
 
 const maxApprovedFiles = 8;
@@ -111,7 +124,7 @@ function assertAllowedRepoPath(path: string) {
   }
 }
 
-function contentAsAddedPatch(content: string) {
+export function contentAsAddedPatch(content: string) {
   return content
     .split(/\r?\n/)
     .map((line) => `+${line}`)
@@ -249,8 +262,38 @@ export function createExecutionFileManifest(proposalId: string, files: RepoCommi
   };
 }
 
+function patchEvidenceWithoutHash(evidence: Omit<ExecutionFilePatchEvidence, "evidenceHash">) {
+  return evidence;
+}
+
+export function createExecutionFilePatchEvidence(
+  proposalId: string,
+  files: RepoCommitFile[],
+): ExecutionFilePatchEvidence {
+  const evidence = patchEvidenceWithoutHash({
+    version: "command-wave-approved-file-patches-v0.1",
+    proposalId,
+    fileCount: files.length,
+    files: [...files]
+      .map((file) => ({
+        path: file.path,
+        patch: contentAsAddedPatch(file.content),
+      }))
+      .sort((left, right) => left.path.localeCompare(right.path)),
+  });
+
+  return {
+    ...evidence,
+    evidenceHash: hashValue(evidence),
+  };
+}
+
 export function formatExecutionFileManifestArtifact(manifest: ExecutionFileManifest) {
   return `approved-files:${JSON.stringify(manifest)}`;
+}
+
+export function formatExecutionFilePatchEvidenceArtifact(evidence: ExecutionFilePatchEvidence) {
+  return `approved-file-patches:${JSON.stringify(evidence)}`;
 }
 
 export function findExecutionFileManifestArtifact(artifacts: string[]) {
@@ -267,6 +310,22 @@ export function findExecutionFileManifestArtifact(artifacts: string[]) {
   }
 }
 
+export function findExecutionFilePatchEvidenceArtifact(artifacts: string[]) {
+  const rawEvidence = artifacts
+    .find((artifact) => artifact.startsWith("approved-file-patches:"))
+    ?.slice("approved-file-patches:".length);
+
+  if (!rawEvidence) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawEvidence) as ExecutionFilePatchEvidence;
+  } catch {
+    return null;
+  }
+}
+
 export function executionFileManifestHashMatches(manifest: ExecutionFileManifest | null) {
   if (!manifest) {
     return false;
@@ -275,4 +334,61 @@ export function executionFileManifestHashMatches(manifest: ExecutionFileManifest
   const { manifestHash, ...manifestWithoutManifestHash } = manifest;
 
   return hashValue(manifestWithoutManifestHash) === manifestHash;
+}
+
+export function executionFilePatchEvidenceHashMatches(evidence: ExecutionFilePatchEvidence | null) {
+  if (!evidence) {
+    return false;
+  }
+
+  const { evidenceHash, ...evidenceWithoutEvidenceHash } = evidence;
+
+  return hashValue(evidenceWithoutEvidenceHash) === evidenceHash;
+}
+
+function contentFromAddedPatch(patch: string | null | undefined) {
+  if (typeof patch !== "string") {
+    return null;
+  }
+
+  const lines = patch.split(/\r?\n/);
+
+  if (lines.some((line) => !line.startsWith("+"))) {
+    return null;
+  }
+
+  return lines.map((line) => line.slice(1)).join("\n");
+}
+
+export function executionFilePatchEvidenceMatchesManifest(
+  evidence: ExecutionFilePatchEvidence | null,
+  manifest: ExecutionFileManifest | null,
+) {
+  if (!evidence || !manifest || !executionFilePatchEvidenceHashMatches(evidence) || !executionFileManifestHashMatches(manifest)) {
+    return false;
+  }
+
+  if (evidence.proposalId !== manifest.proposalId || evidence.fileCount !== manifest.fileCount) {
+    return false;
+  }
+
+  const evidenceFiles = [...evidence.files].sort((left, right) => left.path.localeCompare(right.path));
+  const manifestFiles = [...manifest.files].sort((left, right) => left.path.localeCompare(right.path));
+
+  if (evidenceFiles.length !== manifestFiles.length) {
+    return false;
+  }
+
+  return evidenceFiles.every((file, index) => {
+    const manifestFile = manifestFiles[index];
+    const content = contentFromAddedPatch(file.patch);
+
+    return Boolean(
+      manifestFile &&
+        content !== null &&
+        file.path === manifestFile.path &&
+        content.length === manifestFile.contentLength &&
+        hashValue(content) === manifestFile.contentHash,
+    );
+  });
 }

@@ -12,9 +12,14 @@ import { createAgentHandoffPacket, findAgentHandoffArtifact, formatAgentHandoffA
 import { createCodexWorkPacket } from "./codex-work-packet";
 import {
   createExecutionFileManifest,
+  createExecutionFilePatchEvidence,
   executionFileManifestHashMatches,
+  executionFilePatchEvidenceHashMatches,
+  executionFilePatchEvidenceMatchesManifest,
   findExecutionFileManifestArtifact,
+  findExecutionFilePatchEvidenceArtifact,
   formatExecutionFileManifestArtifact,
+  formatExecutionFilePatchEvidenceArtifact,
 } from "./execution-files";
 import {
   createCommandPrManifest,
@@ -29,6 +34,7 @@ import {
   proposalAllowsUpgradeabilityException,
   riskAllowsHookContractSignal,
 } from "./safety/hook-contract-policy";
+import { findHookPatchSignals, riskAllowsHookPatchSignal } from "./safety/hook-diff-policy";
 import { evaluateHookParameterPolicy } from "./safety/hook-parameter-policy";
 import { findDangerousPromptFlags, toolPolicyForProposal } from "./safety/tool-policy";
 
@@ -192,6 +198,9 @@ export function createLocalOrchestratorAdapter(
       const approvedFileManifest = approvedFiles.length
         ? createExecutionFileManifest(input.proposal.id, approvedFiles)
         : null;
+      const approvedFilePatchEvidence = approvedFiles.length
+        ? createExecutionFilePatchEvidence(input.proposal.id, approvedFiles)
+        : null;
       const wavePost = [
         formatProposalForWave(input.proposal, input.poll),
         ...(prManifest ? ["", formatCommandPrManifestForPullRequest(prManifest)] : []),
@@ -260,6 +269,7 @@ export function createLocalOrchestratorAdapter(
                 `packet path ${packetFilePath}`,
                 ...approvedFiles.map((file) => `approved file ${file.path}`),
                 ...(approvedFileManifest ? [formatExecutionFileManifestArtifact(approvedFileManifest)] : []),
+                ...(approvedFilePatchEvidence ? [formatExecutionFilePatchEvidenceArtifact(approvedFilePatchEvidence)] : []),
                 `packet commit ${commit.commitSha}`,
                 `packet hash ${codexPacket?.packetHash}`,
                 commit.url,
@@ -292,7 +302,10 @@ export const localGuardianAdapter: GuardianAdapter = {
     const changedPaths = changedPathsFromExecutionArtifacts(input.execution.artifacts);
     const approvedFilePaths = approvedFilePathsFromArtifacts(input.execution.artifacts);
     const approvedFileManifest = findExecutionFileManifestArtifact(input.execution.artifacts);
+    const approvedFilePatchEvidence = findExecutionFilePatchEvidenceArtifact(input.execution.artifacts);
     const approvedFileManifestPaths = approvedFileManifest?.files.map((file) => file.path).sort((left, right) => left.localeCompare(right)) ?? [];
+    const approvedFilePatchEvidencePaths =
+      approvedFilePatchEvidence?.files.map((file) => file.path).sort((left, right) => left.localeCompare(right)) ?? [];
     const approvedFileManifestMatches =
       approvedFilePaths.length === 0 ||
       Boolean(
@@ -301,6 +314,16 @@ export const localGuardianAdapter: GuardianAdapter = {
           approvedFileManifest.fileCount === approvedFilePaths.length &&
           JSON.stringify(approvedFileManifestPaths) === JSON.stringify(approvedFilePaths) &&
           executionFileManifestHashMatches(approvedFileManifest),
+      );
+    const approvedFilePatchEvidenceMatches =
+      approvedFilePaths.length === 0 ||
+      Boolean(
+        approvedFilePatchEvidence &&
+          approvedFilePatchEvidence.proposalId === input.proposal.id &&
+          approvedFilePatchEvidence.fileCount === approvedFilePaths.length &&
+          JSON.stringify(approvedFilePatchEvidencePaths) === JSON.stringify(approvedFilePaths) &&
+          executionFilePatchEvidenceHashMatches(approvedFilePatchEvidence) &&
+          executionFilePatchEvidenceMatchesManifest(approvedFilePatchEvidence, approvedFileManifest),
       );
     const expectedHandoff =
       input.proposal.kind === "open_pr"
@@ -326,16 +349,28 @@ export const localGuardianAdapter: GuardianAdapter = {
     const proposalText = `${input.proposal.prompt}\n${input.proposal.spec}`;
     const dangerousFlags = findDangerousPromptFlags(proposalText);
     const touchesDangerousSurface = dangerousFlags.length > 0;
+    const approvedChangedFiles = approvedFilePatchEvidenceMatches ? (approvedFilePatchEvidence?.files ?? []) : [];
+    const hookPatchSignals = findHookPatchSignals(approvedChangedFiles);
     const hookSignals = findHookContractSignals({ changedPaths, proposalText });
     const hookParameterChecks = evaluateHookParameterPolicy({
       proposalText,
       changedPaths,
+      changedFiles: approvedChangedFiles,
       hookSignals,
+      hookPatchSignals,
     });
     const upgradeabilityExceptionApproved = proposalAllowsUpgradeabilityException(proposalText);
     const blockedHookSignals = hookSignals.filter(
       (signal) =>
         !riskAllowsHookContractSignal({
+          risk: input.proposal.risk,
+          signal,
+          upgradeabilityExceptionApproved,
+        }),
+    );
+    const blockedHookPatchSignals = hookPatchSignals.filter(
+      (signal) =>
+        !riskAllowsHookPatchSignal({
           risk: input.proposal.risk,
           signal,
           upgradeabilityExceptionApproved,
@@ -350,6 +385,7 @@ export const localGuardianAdapter: GuardianAdapter = {
             poll,
             manifest: createCommandPrManifest({ wave: input.wave, proposal: input.proposal, poll }),
             changedPaths,
+            ...(approvedChangedFiles.length ? { changedFiles: approvedChangedFiles } : {}),
             ...(repository ? { repository } : {}),
           })
         : null;
@@ -360,8 +396,10 @@ export const localGuardianAdapter: GuardianAdapter = {
       !manifestMatches ||
       !handoffMatches ||
       !approvedFileManifestMatches ||
+      !approvedFilePatchEvidenceMatches ||
       !guardianGatePassed ||
       blockedHookSignals.length > 0 ||
+      blockedHookPatchSignals.length > 0 ||
       blockedParameterChecks.length > 0;
 
     return {
@@ -385,6 +423,11 @@ export const localGuardianAdapter: GuardianAdapter = {
             ? `Approved file manifest hashes ${approvedFileCountLabel(approvedFilePaths.length)}.`
             : "Approved file manifest is missing or does not match approved file paths."
           : "No approved file manifest required.",
+        approvedFilePaths.length
+          ? approvedFilePatchEvidenceMatches
+            ? `Approved file patch evidence hashes ${approvedFileCountLabel(approvedFilePaths.length)}.`
+            : "Approved file patch evidence is missing or does not match approved file paths."
+          : "No approved file patch evidence required.",
         `Allowed permissions: ${policy.permissions.join(", ")}.`,
         touchesDangerousSurface
           ? `Dangerous surface mentioned (${dangerousFlags.join(", ")}); human review required before completion.`
@@ -395,6 +438,12 @@ export const localGuardianAdapter: GuardianAdapter = {
         blockedHookSignals.length
           ? `Blocked hook signals: ${blockedHookSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
           : "Hook contract signals fit the approved risk level.",
+        hookPatchSignals.length
+          ? `Hook patch signals checked: ${hookPatchSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
+          : "No hook patch risk signals found in approved file content.",
+        blockedHookPatchSignals.length
+          ? `Blocked hook patch signals: ${blockedHookPatchSignals.map((signal) => signal.label.replaceAll("_", " ")).join(", ")}.`
+          : "Hook patch signals fit the approved risk level.",
         ...hookParameterChecks.map((item) => item.message),
         ...(attestation
           ? [
