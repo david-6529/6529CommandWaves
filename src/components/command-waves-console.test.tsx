@@ -367,6 +367,7 @@ describe("CommandWavesConsole", () => {
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(membersHtml).toContain("Activity");
+    expect(membersHtml).toContain("Proposed work. Recorded project decision link");
     expect(membersHtml).toContain("Report: 1 report point");
     expect(membersHtml).not.toContain("Proposal work: 3 report points");
     expect(membersHtml).not.toContain("Decision links: 2 report points");

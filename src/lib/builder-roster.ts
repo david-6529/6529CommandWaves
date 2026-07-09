@@ -68,12 +68,17 @@ function activityFor(contributor: ContributionContributor) {
 
 function detailFor(contributor: ContributionContributor) {
   const chatPostRationale = contributor.rationale.find((item) => item.startsWith("Recent chat post: "));
+  const mainRationale = contributor.rationale.filter((item) => !item.startsWith("Recent chat post: "));
 
   if (contributor.chatPosts > 0 && contributor.proposals === 0 && contributor.votes === 0 && contributor.decisions === 0) {
     return chatPostRationale ?? "Posted in chat";
   }
 
-  return contributor.rationale[0] ?? chatPostRationale ?? "Visible project activity";
+  if (mainRationale.length) {
+    return mainRationale.slice(0, 2).join(". ");
+  }
+
+  return chatPostRationale ?? "Visible project activity";
 }
 
 function scoreLabelFor(contributor: ContributionContributor) {

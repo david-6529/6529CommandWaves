@@ -12,6 +12,7 @@ describe("builder roster", () => {
       role: "Coordinator",
       activity: "1 proposal, 1 vote, 1 decision, 1 activity event",
       scoreLabel: "10 report points",
+      detail: "Proposed work. Recorded project decision link",
       voteSummary: "yes on cmd-001",
       basis: expect.arrayContaining(["Proposal work: 6 report points"]),
       stats: expect.arrayContaining([
