@@ -1393,7 +1393,7 @@ export function CommandWavesConsole() {
     () => ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl),
     [wave.ledger, wave.repoUrl],
   );
-  const topChangelogItems = orderedLedgerEvents.slice(0, 3);
+  const topChangelogItems = publicProjectSnapshot.latestChanges;
   const currentLoopItem =
     phaseChecklist.find((item) => item.status === "blocked" || item.status === "active") ??
     phaseChecklist.find((item) => item.status === "waiting") ??
@@ -2317,9 +2317,9 @@ export function CommandWavesConsole() {
               <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
                 {topChangelogItems.length ? (
                   topChangelogItems.map((event) => (
-                    <div key={event.id} className="py-3">
+                    <div key={`${event.at}-${event.label}-${event.message}`} className="py-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{eventTypeLabel(event.type)}</p>
+                        <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">{event.label}</p>
                         <Badge className="border-zinc-700 bg-zinc-900 text-zinc-300">{shortTime(event.at)}</Badge>
                       </div>
                       <p className="mt-1 text-base leading-7 text-zinc-300">{humanizeLegacyCommandCopy(event.message)}</p>

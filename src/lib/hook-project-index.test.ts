@@ -23,6 +23,12 @@ describe("hook project index", () => {
           repoUrl: null,
           repoLabel: "GitHub repo placeholder",
           nextActionTitle: "Repo not selected yet",
+          latestChanges: expect.arrayContaining([
+            expect.objectContaining({
+              label: "builders approved",
+              message: "Builders approved the hook scaffold with 5 yes and 1 no.",
+            }),
+          ]),
           managedBy: {
             summary: "daemon",
             changelog: "daemon",
@@ -79,6 +85,7 @@ describe("hook project index", () => {
     expect(projectsHash).toBe(hashValue(hookProjectIndexHashInput(indexWithoutHash)));
     expect(JSON.stringify(index.projects)).toContain("accessDetails");
     expect(JSON.stringify(index.projects)).toContain("accessSnapshotLabel");
+    expect(JSON.stringify(index.projects)).toContain("latestChanges");
     expect(JSON.stringify(index.projects)).toContain("currentVote");
     expect(JSON.stringify(index.projects)).toContain("discussionTopics");
     expect(JSON.stringify(index.projects)).toContain("chatSections");

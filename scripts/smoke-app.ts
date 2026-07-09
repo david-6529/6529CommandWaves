@@ -460,6 +460,8 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529 AMM hook");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "latestChanges");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "builders approved");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "currentVote");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "discussionTopics");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "chatSections");

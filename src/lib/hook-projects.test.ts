@@ -65,6 +65,18 @@ describe("active hook projects", () => {
         reviewStatusLabel: "not ready",
         evidenceLabel: "1 proposal, GitHub repo not set",
         latestActivity: "Builders approved the hook scaffold with 5 yes and 1 no.",
+        latestChanges: [
+          expect.objectContaining({
+            label: "builders approved",
+            message: "Builders approved the hook scaffold with 5 yes and 1 no.",
+          }),
+          expect.objectContaining({
+            label: "safety check",
+          }),
+          expect.objectContaining({
+            label: "work proposed",
+          }),
+        ],
         summaryParagraphs: [
           "Builders coordinate this hook in chat. Decisions approve scoped work. GitHub PRs and human review handle code.",
           "Now: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo: not selected. Latest: Builders approved the hook scaffold with 5 yes and 1 no.",
