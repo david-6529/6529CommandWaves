@@ -222,6 +222,50 @@ describe("public project snapshot", () => {
     });
   });
 
+  it("surfaces selected-repo PR links from chat as pending discussion rows", () => {
+    const snapshot = createPublicProjectSnapshot({
+      ...configuredDemoWave(),
+      ledger: [
+        {
+          id: "evt-chat-pr",
+          at: "2026-06-20T13:20:00.000Z",
+          actor: "daemon",
+          type: "chat_observed",
+          message:
+            "Read alice's chat message and updated the project summary: I opened https://github.com/builders/hook/pull/45 for fee cap tests.",
+        },
+        {
+          id: "evt-off-repo-pr",
+          at: "2026-06-20T13:19:00.000Z",
+          actor: "daemon",
+          type: "chat_observed",
+          message:
+            "Read bob's chat message and updated the project summary: I opened https://github.com/other/hook/pull/2 by mistake.",
+        },
+        ...demoWave.ledger,
+      ],
+    });
+
+    expect(snapshot.pullRequests).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "cmd-001",
+          daemonSignoff: "signed off",
+          reviewerSignoff: "proof recorded",
+        }),
+        {
+          id: "chat-pr-evt-chat-pr",
+          title: "PR #45 discussed in chat",
+          reason: "I opened https://github.com/builders/hook/pull/45 for fee cap tests.",
+          url: "https://github.com/builders/hook/pull/45",
+          daemonSignoff: "needs decision",
+          reviewerSignoff: "pending",
+        },
+      ]),
+    );
+    expect(JSON.stringify(snapshot.pullRequests)).not.toContain("https://github.com/other/hook/pull/2");
+  });
+
   it("does not treat stale reviewer proof as selected-repo signoff", () => {
     const snapshot = createPublicProjectSnapshot({
       ...demoWave,

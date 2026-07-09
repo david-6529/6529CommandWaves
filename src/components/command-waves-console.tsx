@@ -1419,7 +1419,9 @@ export function CommandWavesConsole() {
         ? statusClass("pass")
         : row.daemonSignoff === "blocked"
           ? statusClass("failed")
-          : statusClass("reviewing"),
+          : row.daemonSignoff === "needs decision"
+            ? riskClass("medium")
+            : statusClass("reviewing"),
     reviewStatus: row.reviewerSignoff,
     reviewStatusClass:
       row.reviewerSignoff === "signed off" || row.reviewerSignoff === "proof recorded"

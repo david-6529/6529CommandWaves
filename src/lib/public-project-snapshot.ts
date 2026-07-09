@@ -175,6 +175,17 @@ function chatMessageFromObservation(message: string) {
   return normalized.slice(index + separator.length).trim();
 }
 
+function githubPullRequestUrlFromText(value: string) {
+  return (
+    value.match(/https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?/i)?.[0] ??
+    null
+  );
+}
+
+function pullRequestNumberFromUrl(value: string) {
+  return value.match(/\/pull\/(\d+)/i)?.[1] ?? null;
+}
+
 function currentVoteSnapshot(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
@@ -332,7 +343,7 @@ function pullRequestSnapshots(wave: CommandWave) {
     return [];
   }
 
-  return wave.executions
+  const executionRows = wave.executions
     .map((execution) => {
       const proposal = wave.proposals.find((item) => item.id === execution.proposalId);
 
@@ -366,6 +377,31 @@ function pullRequestSnapshots(wave: CommandWave) {
       };
     })
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
+  const executionUrls = new Set(executionRows.map((row) => row.url).filter((url): url is string => Boolean(url)));
+  const chatRows = ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl)
+    .filter((event) => event.type === "chat_observed")
+    .map((event) => {
+      const message = chatMessageFromObservation(event.message);
+      const url = githubPullRequestUrlFromText(message);
+
+      if (!url || executionUrls.has(url) || !gitHubPullRequestUrlsForRepo([url], wave.repoUrl).length) {
+        return null;
+      }
+
+      const prNumber = pullRequestNumberFromUrl(url);
+
+      return {
+        id: `chat-pr-${event.id}`,
+        title: prNumber ? `PR #${prNumber} discussed in chat` : "PR discussed in chat",
+        reason: message,
+        url,
+        daemonSignoff: "needs decision",
+        reviewerSignoff: "pending",
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  return [...executionRows, ...chatRows].slice(0, 6);
 }
 
 function projectRulesSnapshot(wave: CommandWave) {

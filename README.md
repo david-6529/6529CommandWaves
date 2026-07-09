@@ -183,6 +183,7 @@ Default workspace:
 - Current vote, topics in discussion, recent daemon-observed chat, and the next action for the active hook change.
 - Collapsed active-project list with chat, repo state, current focus, and next step.
 - Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
+- PR links pasted in chat for the selected repo appear as pending discussion rows until builders approve scope and review runs.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct chat posting when configured, recent posts, and copyable messages.
 - Sending a chat message refreshes project state after daemon records the observed discussion.
