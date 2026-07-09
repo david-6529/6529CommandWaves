@@ -1415,6 +1415,7 @@ export function CommandWavesConsole() {
       item.status === "needs review"
         ? riskClass("medium")
         : statusClass(item.status),
+    riskClassName: item.risk ? riskClass(item.risk) : "",
   }));
   const pullRequestRows = publicProjectSnapshot.pullRequests.map((row) => ({
     ...row,
@@ -2324,6 +2325,7 @@ export function CommandWavesConsole() {
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-base font-semibold text-zinc-50">{item.title}</p>
                         <Badge className={item.statusClassName}>{item.status}</Badge>
+                        {item.risk ? <Badge className={item.riskClassName}>{item.risk} risk</Badge> : null}
                       </div>
                       <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{item.detail}</p>
                     </div>

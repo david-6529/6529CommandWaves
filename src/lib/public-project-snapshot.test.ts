@@ -68,11 +68,13 @@ describe("public project snapshot", () => {
           id: "proposal-cmd-001",
           title: "Draft hook scaffold",
           status: "repo not selected",
+          risk: "high",
         },
         {
           id: "repo-selection",
           title: "Select the pilot GitHub repo",
           status: "needed",
+          risk: null,
         },
       ],
       workflow: {
@@ -350,6 +352,7 @@ describe("public project snapshot", () => {
         title: "Fee cap tests before anyone opens a PR",
         detail: "Can we discuss fee cap tests before anyone opens a PR?",
         status: "suggested work",
+        risk: "high",
       },
       expect.objectContaining({
         id: "repo-selection",

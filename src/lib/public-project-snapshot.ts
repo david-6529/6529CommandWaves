@@ -1,4 +1,4 @@
-import { pollApprovalPassedForWave, type CommandWave } from "./command-waves";
+import { classifyRisk, pollApprovalPassedForWave, type CommandWave, type RiskLevel } from "./command-waves";
 import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { directChatPostPace } from "./chat-posting-policy";
 import { isPlaceholderValue } from "./env-placeholders";
@@ -14,6 +14,7 @@ import {
   messageFromProjectChatObservation,
   projectChatObservationLabel,
   projectChatTopicStatus,
+  signalFromProjectChatObservation,
 } from "./project-chat-observation";
 
 export type PublicProjectSnapshot = ReturnType<typeof createPublicProjectSnapshot>;
@@ -175,6 +176,16 @@ function chatMessageFromObservation(message: string) {
   return messageFromProjectChatObservation(humanizeLegacyCommandCopy(message));
 }
 
+function chatTopicRisk(message: string): RiskLevel | null {
+  const signal = signalFromProjectChatObservation(message);
+
+  if (!["pr_link", "decision_request", "review_request", "suggested_work"].includes(signal)) {
+    return null;
+  }
+
+  return classifyRisk("open_pr", chatMessageFromObservation(message));
+}
+
 function githubPullRequestUrlFromText(value: string) {
   return (
     value.match(/https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?/i)?.[0] ??
@@ -304,6 +315,7 @@ function discussionTopicsSnapshot(wave: CommandWave) {
         title: compactChatTopicTitle(message),
         detail: message || "Builders are discussing this in chat.",
         status: projectChatTopicStatus(event.message),
+        risk: chatTopicRisk(event.message),
       };
     });
   const topics = [
@@ -313,6 +325,7 @@ function discussionTopicsSnapshot(wave: CommandWave) {
           title: compactTopicTitle(proposal.title),
           detail: humanizeLegacyCommandCopy(proposal.prompt),
           status: isPlaceholderValue(wave.repoUrl) && proposal.kind === "open_pr" ? "repo not selected" : proposal.status.replaceAll("_", " "),
+          risk: proposal.risk,
         }
       : null,
     ...chatTopics,
@@ -322,6 +335,7 @@ function discussionTopicsSnapshot(wave: CommandWave) {
           title: "Select the pilot GitHub repo",
           detail: "PR links and code review start after maintainers choose the repo.",
           status: "needed",
+          risk: null,
         }
       : null,
     ...phaseWork.supportProposals
@@ -332,6 +346,7 @@ function discussionTopicsSnapshot(wave: CommandWave) {
         title: humanizeLegacyCommandCopy(item.title),
         detail: humanizeLegacyCommandCopy(item.prompt),
         status: item.status.replaceAll("_", " "),
+        risk: item.risk,
       })),
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
