@@ -38,7 +38,7 @@ What exists now:
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
 - A simplified chat-first UI with a project overview, current hook change, chat composer, latest posts, builder profiles,
-  project rules, and folded proposal flow.
+  current vote, discussion topics, PR status, project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for chat posts, join requests, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
@@ -49,6 +49,7 @@ What exists now:
 - Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,
   and public project state.
 - Public active project index for agents or future UI surfaces that need the hook list and project chat links.
+- Public project snapshot with daemon-managed summary, changelog, current vote, discussion topics, PR status, and agent status.
 - Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, launch track status, and required hash fields.
 - Public project state includes a full snapshot hash, so setup checks can detect stale or edited state payloads.
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
@@ -78,7 +79,8 @@ What remains manual or MVP-only:
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting uses visible app activity, project chat posts pulled into the app, recorded PR links, and
-  repo-bound review proof. Full scoring across unattached GitHub commits, merges, and off-app activity is still future work.
+  repo-bound review proof. Builder profiles show activity, voting summaries, and report points as context only. Full scoring
+  across unattached GitHub commits, merges, and off-app activity is still future work.
 - The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until maintainers choose the repo.
 
 What we are working on next:
@@ -174,13 +176,14 @@ setup and audit tools stay collapsed until a maintainer needs them.
 
 Default workspace:
 
-- Project overview with chat, repo, access, and current status.
+- Project summary accordion, updated by `daemon`, with the current design and repo state in two short paragraphs.
+- Current vote, topics in discussion, and the next action for the active hook change.
 - Collapsed active-project list with chat, repo state, current focus, and next step.
-- Current hook task, saved discussion items, visible decision need, recent PR evidence, latest log, and next action.
+- Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct chat posting when configured, recent posts, and copyable discussion draft.
 - Folded proposal form that asks for title, change, and success criteria before optional work details.
-- Builder profiles with profile links, visible chat and repo activity, and informational contribution signals.
+- Builder profiles with profile links, visible chat and repo activity, voting summaries, and informational contribution signals.
 - Collapsed builder details: who can join, activity-report boundaries, and hook guardrails.
 
 Safety and review:
@@ -206,6 +209,7 @@ Audit and launch:
 - Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
   rights, reputation, or token weight.
 - Public project summary publishes two state-derived paragraphs: the builder loop, then current focus, next step, repo state, and latest change.
+- Public command-wave state exposes `currentVote`, `discussionTopics`, `pullRequests`, `managedBy`, and contribution report voting summaries.
 - Public command-wave state keeps placeholder repo URLs empty while keeping hashes verifiable.
 - Public project index keeps repo URLs empty while projects still use placeholder repos.
 - Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.

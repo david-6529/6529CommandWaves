@@ -859,26 +859,6 @@ function pullRequestUrlFromArtifacts(artifacts: string[]) {
   );
 }
 
-function memberVoteSummary(wave: CommandWave, identity: string) {
-  const normalizedIdentity = identity.trim().replace(/^@/, "").toLowerCase();
-  const votes = wave.polls.flatMap((poll) =>
-    poll.votes
-      .filter((vote) => vote.voterIdentity.trim().replace(/^@/, "").toLowerCase() === normalizedIdentity)
-      .map((vote) => ({
-        ...vote,
-        proposalId: poll.proposalId,
-      })),
-  );
-
-  if (!votes.length) {
-    return "No recorded vote yet.";
-  }
-
-  const latestVote = [...votes].sort((left, right) => new Date(right.at).getTime() - new Date(left.at).getTime())[0];
-
-  return `${latestVote.vote} on ${latestVote.proposalId}`;
-}
-
 function downloadJson(filename: string, payload: unknown) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -1118,6 +1098,7 @@ export function CommandWavesConsole() {
         ? hookProposalPreflight.summary
         : "This support message does not open a PR.";
   const phaseWork = useMemo(() => selectPhaseWork(wave), [wave]);
+  const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
   const activeProposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
   const activePoll = activeProposal
     ? activeProposal.kind === "open_pr"
@@ -1233,27 +1214,14 @@ export function CommandWavesConsole() {
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
-  const currentVoteStatusLabel = activePoll?.status === "open" ? "needs votes" : activePoll ? "no open vote" : "none";
-  const currentVoteTitle =
-    activePoll?.status === "open"
-      ? "Vote open"
-      : activePollDecisionRecorded
-        ? "No open vote"
-        : activePollNeedsWaveDecision
-          ? "Decision link needed"
-          : activePoll
-            ? "Vote closed"
-            : "No vote yet";
-  const currentVoteDetail =
-    activePoll?.status === "open"
-      ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Builders can still vote.`
-      : activePollDecisionRecorded
-        ? `Last decision: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no.`
-        : activePollNeedsWaveDecision
-          ? "Local vote passed. Record the project decision before PR work starts."
-          : activePoll
-            ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no.`
-            : "Save a proposal from chat when the group is ready to decide.";
+  const currentVoteStatusLabel =
+    publicProjectSnapshot.currentVote.status === "open"
+      ? "needs votes"
+      : publicProjectSnapshot.currentVote.status === "none"
+        ? "none"
+        : publicProjectSnapshot.currentVote.status;
+  const currentVoteTitle = publicProjectSnapshot.currentVote.title;
+  const currentVoteDetail = publicProjectSnapshot.currentVote.detail;
   const currentNextTitle = currentWorkNeedsRepo ? "Keep discussing" : phaseNextAction.title;
   const currentNextDetail = currentWorkNeedsRepo
     ? "PR work starts after maintainers select the hook repo."
@@ -1277,7 +1245,6 @@ export function CommandWavesConsole() {
       ["approved", "reviewing", "complete"].includes(activeProposal.status),
   );
   const pollResult = activePoll ? evaluatePoll(activePoll) : null;
-  const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
   const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
@@ -1488,70 +1455,28 @@ export function CommandWavesConsole() {
   const projectRepoDraftIsPlaceholder = !repoUrl.trim() || isPlaceholderValue(repoUrl);
   const projectRepoInputValue = projectRepoDraftIsPlaceholder ? "" : repoUrl;
   const projectRepoInputLabel = projectRepoDraftIsPlaceholder ? githubRepoPlaceholder.label : "GitHub repo";
-  const discussionTopicItems = [
-    activeProposal
-      ? {
-          id: `proposal-${activeProposal.id}`,
-          title: currentFocusDisplayTitle,
-          detail: humanizeLegacyCommandCopy(currentFocusDescription),
-          status: currentBuildStatusLabel,
-          statusClassName: currentBuildStatusClass,
-        }
-      : null,
-    projectRepoIsPlaceholder
-      ? {
-          id: "repo-selection",
-          title: "Select the pilot GitHub repo",
-          detail: "PR links and code review start after maintainers choose the repo.",
-          status: "needed",
-          statusClassName: riskClass("medium"),
-        }
-      : null,
-    ...visibleSupportProposals.map((proposal) => ({
-      id: `support-${proposal.id}`,
-      title: humanizeLegacyCommandCopy(proposal.title),
-      detail: humanizeLegacyCommandCopy(proposal.prompt),
-      status: proposal.status.replaceAll("_", " "),
-      statusClassName: statusClass(proposal.status),
-    })),
-  ]
-    .filter((item): item is NonNullable<typeof item> => Boolean(item))
-    .slice(0, 3);
-  const pullRequestRows = repoCanRunCode
-    ? wave.executions
-        .map((execution) => {
-          const proposal = wave.proposals.find((item) => item.id === execution.proposalId);
-
-          if (!proposal || proposal.kind !== "open_pr") {
-            return null;
-          }
-
-          const review = wave.reviews.find((item) => item.proposalId === execution.proposalId) ?? null;
-          const prUrl = pullRequestUrlFromArtifacts(execution.artifacts);
-          const daemonStatus =
-            execution.status === "complete" ? "signed off" : execution.status === "blocked" ? "blocked" : "checking";
-          const reviewStatus =
-            review?.status === "pass"
-              ? "signed off"
-              : review?.status === "changes_requested"
-                ? "changes requested"
-                : review?.status === "rule_violation"
-                  ? "blocked"
-                  : "pending";
-
-          return {
-            id: execution.proposalId,
-            title: currentWorkDisplayTitle(proposal.title),
-            reason: humanizeLegacyCommandCopy(proposal.prompt),
-            prUrl,
-            daemonStatus,
-            daemonStatusClass: statusClass(execution.status === "complete" ? "pass" : execution.status),
-            reviewStatus,
-            reviewStatusClass: statusClass(review?.status ?? "waiting"),
-          };
-        })
-        .filter((item): item is NonNullable<typeof item> => Boolean(item))
-    : [];
+  const discussionTopicItems = publicProjectSnapshot.discussionTopics.map((item) => ({
+    ...item,
+    statusClassName: item.status === "needed" || item.status === "repo not selected" ? riskClass("medium") : statusClass(item.status),
+  }));
+  const pullRequestRows = publicProjectSnapshot.pullRequests.map((row) => ({
+    ...row,
+    prUrl: row.url,
+    daemonStatus: row.daemonSignoff,
+    daemonStatusClass:
+      row.daemonSignoff === "signed off"
+        ? statusClass("pass")
+        : row.daemonSignoff === "blocked"
+          ? statusClass("failed")
+          : statusClass("reviewing"),
+    reviewStatus: row.reviewerSignoff,
+    reviewStatusClass:
+      row.reviewerSignoff === "signed off" || row.reviewerSignoff === "proof recorded"
+        ? statusClass("pass")
+        : row.reviewerSignoff === "blocked" || row.reviewerSignoff === "changes requested"
+          ? statusClass("failed")
+          : statusClass("waiting"),
+  }));
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
@@ -1888,15 +1813,6 @@ export function CommandWavesConsole() {
     openSetupControls();
   }
 
-  function runWalletAction() {
-    if (walletAddress) {
-      prepareJoinRequest();
-      return;
-    }
-
-    void connectWallet();
-  }
-
   async function copyWaveUpdateDraft() {
     setApiError("");
 
@@ -2146,7 +2062,7 @@ export function CommandWavesConsole() {
     const provider = browserWalletProvider();
 
     if (!provider?.request) {
-      setWalletNotice("No browser wallet found. Use Request access in chat for this phase.");
+      setWalletNotice("No browser wallet found.");
       return;
     }
 
@@ -2162,7 +2078,7 @@ export function CommandWavesConsole() {
       }
 
       setWalletAddress(address);
-      setWalletNotice("Wallet connected. Use Request access to include it in the draft.");
+      setWalletNotice("Wallet connected.");
     } catch {
       setWalletNotice("Wallet connection was cancelled.");
     }
@@ -2378,22 +2294,10 @@ export function CommandWavesConsole() {
                 Join a swarm of builders creating a hook together through chat, decisions, pull requests, and reviews.
               </p>
             </div>
-            <section className="min-w-52 rounded-lg border border-zinc-800 p-3" aria-label="Wallet access">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Wallet</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-400">
-                    {walletAddress ? shortWalletAddress(walletAddress) : "Access is manual for now."}
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={runWalletAction}
-                >
-                  {walletAddress ? "Request access" : "Connect wallet"}
-                </Button>
-              </div>
+            <section className="shrink-0 text-right" aria-label="Wallet connection">
+              <Button type="button" variant="secondary" onClick={() => void connectWallet()}>
+                {walletAddress ? shortWalletAddress(walletAddress) : "Connect wallet"}
+              </Button>
               {walletNotice ? <p className="mt-2 text-sm leading-6 text-zinc-500">{walletNotice}</p> : null}
             </section>
           </div>
@@ -2721,7 +2625,7 @@ export function CommandWavesConsole() {
               <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Pull requests</p>
               <h2 className="mt-1 text-3xl font-semibold text-zinc-50">Code contributions</h2>
               <p className="mt-2 text-base leading-7 text-zinc-400">
-                PRs show why code changed, where to inspect it, and whether daemon and the reviewer signed off.
+                PRs show why code changed, where to inspect it, and daemon and reviewer status.
               </p>
             </div>
             <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">
@@ -2748,7 +2652,7 @@ export function CommandWavesConsole() {
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reviewer signoff</dt>
+                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reviewer status</dt>
                       <dd className="mt-1">
                         <Badge className={row.reviewStatusClass}>{row.reviewStatus}</Badge>
                       </dd>
@@ -2766,7 +2670,7 @@ export function CommandWavesConsole() {
                 </div>
                 <p className="mt-2 text-base leading-7 text-zinc-400">
                   Select the pilot repo before PR work starts. Future PRs will show their reason, GitHub link, daemon signoff,
-                  and reviewer signoff.
+                  and reviewer status.
                 </p>
                 <p className="mt-1 text-sm leading-6 text-zinc-500">
                   {reviewAgentIdentity.role} is still a placeholder. Humans control merge decisions.
@@ -2839,8 +2743,6 @@ export function CommandWavesConsole() {
             <div className="mt-5 grid gap-3 lg:grid-cols-3">
               {visibleBuilderProfiles.length ? (
                 visibleBuilderProfiles.map((member) => {
-                  const votingSummary = memberVoteSummary(wave, member.identity);
-
                   return (
                     <article key={member.identity} className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
                       <div className="flex items-start gap-3">
@@ -2859,7 +2761,7 @@ export function CommandWavesConsole() {
                         <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Activity</p>
                         <p className="mt-1 text-base font-semibold text-zinc-50">{member.activity}</p>
                         <p className="mt-1 text-sm leading-6 text-zinc-400">Report: {member.scoreLabel}</p>
-                        <p className="mt-1 text-sm leading-6 text-zinc-400">Voting: {votingSummary}</p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-400">Voting: {member.voteSummary}</p>
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>

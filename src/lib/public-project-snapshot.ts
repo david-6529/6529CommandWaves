@@ -1,6 +1,8 @@
 import { pollApprovalPassedForWave, type CommandWave } from "./command-waves";
-import { githubRepoPlaceholder } from "./agent-identities";
+import { githubRepoPlaceholder, orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { isPlaceholderValue } from "./env-placeholders";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { createPhaseChecklist } from "./phase-checklist";
@@ -61,6 +63,84 @@ function currentWorkSnapshot(wave: CommandWave) {
   };
 }
 
+function compactTopicTitle(title: string) {
+  const normalized = humanizeLegacyCommandCopy(title).trim();
+
+  if (normalized === "Draft the non-upgradeable hook scaffold") {
+    return "Draft hook scaffold";
+  }
+
+  return normalized;
+}
+
+function currentVoteSnapshot(wave: CommandWave) {
+  const phaseWork = selectPhaseWork(wave);
+  const proposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
+  const poll = proposal
+    ? proposal.kind === "open_pr"
+      ? phaseWork.prPoll
+      : (wave.polls.find((item) => item.proposalId === proposal.id) ?? null)
+    : null;
+
+  if (!poll) {
+    return {
+      status: "none",
+      title: "No vote yet",
+      detail: "Save a proposal from chat when the group is ready to decide.",
+      proposalId: proposal?.id ?? null,
+      yesVotes: 0,
+      noVotes: 0,
+      decisionUrl: null,
+    };
+  }
+
+  if (poll.status === "open") {
+    return {
+      status: "open",
+      title: "Vote open",
+      detail: `${poll.yesVotes} yes, ${poll.noVotes} no. Builders can still vote.`,
+      proposalId: poll.proposalId,
+      yesVotes: poll.yesVotes,
+      noVotes: poll.noVotes,
+      decisionUrl: poll.decision?.url ?? null,
+    };
+  }
+
+  if (poll.decision) {
+    return {
+      status: "recorded",
+      title: "No open vote",
+      detail: `Last decision: ${poll.yesVotes} yes, ${poll.noVotes} no.`,
+      proposalId: poll.proposalId,
+      yesVotes: poll.yesVotes,
+      noVotes: poll.noVotes,
+      decisionUrl: poll.decision.url,
+    };
+  }
+
+  if (poll.status === "passed") {
+    return {
+      status: "decision link needed",
+      title: "Decision link needed",
+      detail: "Local vote passed. Record the project decision before PR work starts.",
+      proposalId: poll.proposalId,
+      yesVotes: poll.yesVotes,
+      noVotes: poll.noVotes,
+      decisionUrl: null,
+    };
+  }
+
+  return {
+    status: poll.status,
+    title: poll.status === "failed" ? "Vote failed" : "Vote closed",
+    detail: `${poll.yesVotes} yes, ${poll.noVotes} no.`,
+    proposalId: poll.proposalId,
+    yesVotes: poll.yesVotes,
+    noVotes: poll.noVotes,
+    decisionUrl: null,
+  };
+}
+
 function decisionSnapshot(wave: CommandWave) {
   const phaseWork = selectPhaseWork(wave);
   const proposal = phaseWork.prProposal;
@@ -95,6 +175,81 @@ function decisionSnapshot(wave: CommandWave) {
     detail: "Discuss scope in chat before PR work starts.",
     url: null,
   };
+}
+
+function discussionTopicsSnapshot(wave: CommandWave) {
+  const phaseWork = selectPhaseWork(wave);
+  const proposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
+  const topics = [
+    proposal
+      ? {
+          id: `proposal-${proposal.id}`,
+          title: compactTopicTitle(proposal.title),
+          detail: humanizeLegacyCommandCopy(proposal.prompt),
+          status: isPlaceholderValue(wave.repoUrl) && proposal.kind === "open_pr" ? "repo not selected" : proposal.status.replaceAll("_", " "),
+        }
+      : null,
+    isPlaceholderValue(wave.repoUrl)
+      ? {
+          id: "repo-selection",
+          title: "Select the pilot GitHub repo",
+          detail: "PR links and code review start after maintainers choose the repo.",
+          status: "needed",
+        }
+      : null,
+    ...phaseWork.supportProposals
+      .filter((item) => item.id !== proposal?.id)
+      .slice(0, 3)
+      .map((item) => ({
+        id: `support-${item.id}`,
+        title: humanizeLegacyCommandCopy(item.title),
+        detail: humanizeLegacyCommandCopy(item.prompt),
+        status: item.status.replaceAll("_", " "),
+      })),
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  return topics.slice(0, 3);
+}
+
+function pullRequestSnapshots(wave: CommandWave) {
+  if (isPlaceholderValue(wave.repoUrl)) {
+    return [];
+  }
+
+  return wave.executions
+    .map((execution) => {
+      const proposal = wave.proposals.find((item) => item.id === execution.proposalId);
+
+      if (!proposal || proposal.kind !== "open_pr") {
+        return null;
+      }
+
+      const review = wave.reviews.find((item) => item.proposalId === execution.proposalId) ?? null;
+      const prUrl = gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl)[0] ?? null;
+      const daemonSignoff =
+        execution.status === "complete" ? "signed off" : execution.status === "blocked" ? "blocked" : "checking";
+      const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
+      const reviewerSignoff =
+        review?.status === "pass" && reviewProofBound
+          ? reviewAgentIdentity.status === "placeholder"
+            ? "proof recorded"
+            : "signed off"
+          : review?.status === "changes_requested"
+            ? "changes requested"
+            : review?.status === "rule_violation"
+              ? "blocked"
+              : "pending";
+
+      return {
+        id: execution.proposalId,
+        title: compactTopicTitle(proposal.title),
+        reason: humanizeLegacyCommandCopy(proposal.prompt),
+        url: prUrl,
+        daemonSignoff,
+        reviewerSignoff,
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
 }
 
 function nextStepSnapshot(wave: CommandWave) {
@@ -171,7 +326,16 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
     summary: summaryParagraphs.join(" "),
     summaryParagraphs,
     updatedAt: latestChanges[0]?.at ?? null,
+    managedBy: {
+      summary: orchestratorAgentIdentity.handle,
+      changelog: orchestratorAgentIdentity.handle,
+      pullRequests: orchestratorAgentIdentity.handle,
+      reviewer: reviewAgentIdentity.handle,
+    },
     currentWork,
+    currentVote: currentVoteSnapshot(wave),
+    discussionTopics: discussionTopicsSnapshot(wave),
+    pullRequests: pullRequestSnapshots(wave),
     decision: decisionSnapshot(wave),
     repo,
     nextStep,

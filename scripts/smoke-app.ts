@@ -96,8 +96,6 @@ async function main() {
     "Decentralized Coding: Beta",
     "Pilot: 6529 AMM hook",
     "Join a swarm of builders creating a hook together through chat, decisions, pull requests, and reviews.",
-    "Wallet",
-    "Access is manual for now.",
     "Connect wallet",
     "Project summary",
     "daemon updates",
@@ -169,9 +167,9 @@ async function main() {
     "Recent chat",
     "Pull requests",
     "Code contributions",
-    "PRs show why code changed, where to inspect it, and whether daemon and the reviewer signed off.",
+    "PRs show why code changed, where to inspect it, and daemon and reviewer status.",
     "No pull requests yet",
-    "Future PRs will show their reason, GitHub link, daemon signoff, and reviewer signoff.",
+    "Future PRs will show their reason, GitHub link, daemon signoff, and reviewer status.",
     "Review agent is still a placeholder. Humans control merge decisions.",
     "Builders",
     "Profiles show what each builder has done.",
@@ -203,6 +201,7 @@ async function main() {
   ]) {
     assertIncludes("Home page", renderedHtml, label);
   }
+  assert(!renderedHtml.includes("Access is manual for now."), "Home page still shows stale wallet access copy.");
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
   const staleDecisionCopy = "decision " + "receipt";
@@ -396,6 +395,13 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "Public proof of the chat, decision, PR, review, and log path");
   assertIncludes("State response", JSON.stringify(statePayload), "Pull request");
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
+  assertIncludes("State response", JSON.stringify(statePayload), "currentVote");
+  assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
+  assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
+  assertIncludes("State response", JSON.stringify(statePayload), "managedBy");
+  assertIncludes("State response", JSON.stringify(statePayload), "voteSummary");
+  assertIncludes("State response", JSON.stringify(statePayload), "latestVote");
+  assertIncludes("State response", JSON.stringify(statePayload), "Select the pilot GitHub repo");
   assertIncludes("State response", JSON.stringify(statePayload), "nextStep");
   assertIncludes("State response", JSON.stringify(statePayload), "latestChanges");
   assertIncludes("State response", JSON.stringify(statePayload), "updatedAt");
@@ -481,6 +487,8 @@ async function main() {
   assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "GitHub repo placeholder");
   assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "informational");
   assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "Visible activity report");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "voteSummary");
+  assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "latestVote");
   assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "Merge rights");
   assertIncludes("Contribution report", JSON.stringify(contributionReportPayload), "Token weight");
   assert(

@@ -12,6 +12,7 @@ describe("builder roster", () => {
       role: "Coordinator",
       activity: "1 proposal, 1 vote, 1 decision, 1 activity event",
       scoreLabel: "10 report points",
+      voteSummary: "yes on cmd-001",
       basis: expect.arrayContaining(["Proposal work: 6 report points"]),
       stats: expect.arrayContaining([
         { label: "Proposals", value: "1" },
@@ -22,6 +23,8 @@ describe("builder roster", () => {
     });
     expect(roster.some((member) => member.identity === "gpebbles" && member.role === "Voter")).toBe(true);
     expect(roster.find((member) => member.identity === "gpebbles")?.scoreLabel).toBe("1 report point");
+    expect(roster.find((member) => member.identity === "gpebbles")?.voteSummary).toBe("yes on cmd-001");
+    expect(roster.find((member) => member.identity === "blocknoob")?.voteSummary).toBe("no on cmd-001");
     expect(roster.some((member) => member.identity === "Decision")).toBe(false);
   });
 

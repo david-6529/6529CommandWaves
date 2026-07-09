@@ -85,6 +85,13 @@ describe("contribution report", () => {
       pullRequests: 1,
       reviewProofs: 1,
       decisions: 1,
+      latestVote: {
+        proposalId: "cmd-001",
+        vote: "yes",
+        source: "local",
+        at: "2026-06-20T12:10:00.000Z",
+      },
+      voteSummary: "yes on cmd-001",
     });
     expect(report.contributors[0].rationale).toContain("Linked approved work to a GitHub PR");
     expect(report.contributors[0].rationale).toContain("Received repo-bound Guardian review proof");
@@ -104,6 +111,10 @@ describe("contribution report", () => {
     expect(report.contributors[0]).toMatchObject({
       pullRequests: 0,
       reviewProofs: 0,
+      voteSummary: "yes on cmd-001",
+    });
+    expect(report.contributors.find((contributor) => contributor.identity === "blocknoob")).toMatchObject({
+      voteSummary: "no on cmd-001",
     });
     expect(report.contributors[0].rationale).not.toContain("Carried work through review");
     expect(report.notes.join(" ")).toContain("not a permission system");
@@ -224,6 +235,7 @@ describe("contribution report", () => {
     expect(draft).toContain("Review proof: 2 report points");
     expect(draft).toContain("1 PR");
     expect(draft).toContain("1 review proof");
+    expect(draft).toContain("voting yes on cmd-001");
     expect(draft).toContain("Decision links: 2 report points");
     expect(draft).toContain("Report scores are an AI-readable activity report, not a permission system.");
     expect(draft).toContain("Reputation, token weight, payouts, and merge rights must use separate human-approved rules.");

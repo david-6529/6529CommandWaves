@@ -20,8 +20,8 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Decentralized Coding: Beta");
     expect(text).toContain("Pilot: 6529 AMM hook");
     expect(text).toContain("Join a swarm of builders creating a hook together through chat, decisions, pull requests, and reviews.");
-    expect(text).toContain("Wallet");
-    expect(text).toContain("Access is manual for now.");
+    expect(text).toContain("Connect wallet");
+    expect(text).not.toContain("Access is manual for now.");
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Project summary");
     expect(text).toContain("daemon updates");
@@ -106,9 +106,10 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Recent chat");
     expect(text).toContain("Pull requests");
     expect(text).toContain("Code contributions");
-    expect(text).toContain("PRs show why code changed, where to inspect it, and whether daemon and the reviewer signed off.");
+    expect(text).toContain("PRs show why code changed, where to inspect it, and daemon and reviewer status.");
     expect(text).toContain("No pull requests yet");
-    expect(text).toContain("Future PRs will show their reason, GitHub link, daemon signoff, and reviewer signoff.");
+    expect(text).toContain("Future PRs will show their reason, GitHub link, daemon signoff, and reviewer status.");
+    expect(text).toContain("reviewer status");
     expect(text).toContain("Review agent is still a placeholder. Humans control merge decisions.");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show what each builder has done.");

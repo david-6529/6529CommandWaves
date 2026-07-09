@@ -11,6 +11,7 @@ export type BuilderRosterMember = {
   activity: string;
   scoreLabel: string;
   detail: string;
+  voteSummary: string;
   basis: string[];
   stats: BuilderRosterStat[];
 };
@@ -121,6 +122,7 @@ export function createBuilderRoster(
       activity: activityFor(contributor),
       scoreLabel: scoreLabelFor(contributor),
       detail: detailFor(contributor),
+      voteSummary: contributor.voteSummary,
       basis: contributor.scoreBasis.slice(0, 3),
       stats: statsFor(contributor),
     }));

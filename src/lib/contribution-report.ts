@@ -15,6 +15,13 @@ export type ContributionContributor = {
   reviewProofs: number;
   chatPosts: number;
   ledgerEvents: number;
+  latestVote: {
+    proposalId: string;
+    vote: "yes" | "no";
+    source: "local" | "6529" | "manual";
+    at: string;
+  } | null;
+  voteSummary: string;
   rationale: string[];
 };
 
@@ -62,6 +69,8 @@ function addContributor(map: Map<string, ContributionContributor>, identity: str
     reviewProofs: 0,
     chatPosts: 0,
     ledgerEvents: 0,
+    latestVote: null,
+    voteSummary: "No recorded vote yet.",
     rationale: [],
   };
 
@@ -260,6 +269,15 @@ export function createContributionReport(
 
       contributor.votes += 1;
       contributor.score += 1;
+      if (!contributor.latestVote || Date.parse(vote.at) > Date.parse(contributor.latestVote.at)) {
+        contributor.latestVote = {
+          proposalId: poll.proposalId,
+          vote: vote.vote,
+          source: vote.source,
+          at: vote.at,
+        };
+        contributor.voteSummary = `${vote.vote} on ${poll.proposalId}`;
+      }
       addScoreBasis(contributor, "Votes", 1);
       addRationale(contributor, "Participated in decisions");
     }
@@ -344,7 +362,7 @@ export function createContributionReportDraft(
           countLabel(contributor.ledgerEvents, "activity log event"),
         ].join(", ");
 
-        return `- ${contributor.identity}: report score ${contributor.score}; ${contributor.scoreBasis.join(", ")}; ${counts}; ${contributor.rationale.join(", ")}`;
+        return `- ${contributor.identity}: report score ${contributor.score}; ${contributor.scoreBasis.join(", ")}; ${counts}; voting ${contributor.voteSummary}; ${contributor.rationale.join(", ")}`;
       })
     : ["- No visible contributors yet."];
 

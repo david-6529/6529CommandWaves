@@ -1,6 +1,36 @@
 import { describe, expect, it } from "vitest";
 import { demoWave } from "./demo-wave";
 import { createPublicProjectSnapshot } from "./public-project-snapshot";
+import { hashValue } from "./run-manifest";
+
+const configuredRepo = {
+  owner: "builders",
+  repo: "hook",
+  htmlUrl: "https://github.com/builders/hook",
+};
+
+function configuredDemoWave() {
+  return {
+    ...demoWave,
+    repoUrl: configuredRepo.htmlUrl,
+    executions: demoWave.executions.map((execution) => ({
+      ...execution,
+      artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+    })),
+    reviews: demoWave.reviews.map((review) => ({
+      ...review,
+      proof: review.proof
+        ? {
+            ...review.proof,
+            inputs: {
+              ...review.proof.inputs,
+              repositoryHash: hashValue(configuredRepo),
+            },
+          }
+        : review.proof,
+    })),
+  };
+}
 
 describe("public project snapshot", () => {
   it("summarizes current hook work without implying the placeholder repo can run code", () => {
@@ -14,10 +44,38 @@ describe("public project snapshot", () => {
         "Now: Draft the non-upgradeable hook scaffold. Next: Keep discussing in chat. Select the hook repo before PR work starts. Repo: not selected. Latest: Builders approved the hook scaffold with 5 yes and 1 no.",
       ],
       updatedAt: "2026-06-20T12:40:00.000Z",
+      managedBy: {
+        summary: "daemon",
+        changelog: "daemon",
+        pullRequests: "daemon",
+        reviewer: "review-agent",
+      },
       currentWork: {
         title: "Draft the non-upgradeable hook scaffold",
         status: "complete",
       },
+      currentVote: {
+        status: "recorded",
+        title: "No open vote",
+        detail: "Last decision: 5 yes, 1 no.",
+        proposalId: "cmd-001",
+        yesVotes: 5,
+        noVotes: 1,
+        decisionUrl: "https://6529.io/waves/6529-hook-builder/drops/drop-cmd-001-approval",
+      },
+      discussionTopics: [
+        {
+          id: "proposal-cmd-001",
+          title: "Draft hook scaffold",
+          status: "repo not selected",
+        },
+        {
+          id: "repo-selection",
+          title: "Select the pilot GitHub repo",
+          status: "needed",
+        },
+      ],
+      pullRequests: [],
       decision: {
         status: "recorded",
         detail: "Builders approved with 5 yes and 1 no.",
@@ -61,6 +119,45 @@ describe("public project snapshot", () => {
     expect(createPublicProjectSnapshot(configuredWave).summary).toContain(
       "Repo: connected. Approved changes can enter PR review.",
     );
+  });
+
+  it("publishes PR reasons, GitHub links, and agent status when the repo is selected", () => {
+    const snapshot = createPublicProjectSnapshot(configuredDemoWave());
+
+    expect(snapshot.repo).toMatchObject({
+      status: "configured",
+      url: configuredRepo.htmlUrl,
+    });
+    expect(snapshot.discussionTopics[0]).toMatchObject({
+      id: "proposal-cmd-001",
+      title: "Draft hook scaffold",
+      status: "complete",
+    });
+    expect(snapshot.pullRequests[0]).toMatchObject({
+      id: "cmd-001",
+      title: "Draft hook scaffold",
+      reason: "Draft the non-upgradeable AMM hook scaffold with fee parameters capped at 100 bps and tests.",
+      url: "https://github.com/builders/hook/pull/12",
+      daemonSignoff: "signed off",
+      reviewerSignoff: "proof recorded",
+    });
+  });
+
+  it("does not treat stale reviewer proof as selected-repo signoff", () => {
+    const snapshot = createPublicProjectSnapshot({
+      ...demoWave,
+      repoUrl: configuredRepo.htmlUrl,
+      executions: demoWave.executions.map((execution) => ({
+        ...execution,
+        artifacts: execution.artifacts.map((artifact) => artifact.replace(demoWave.repoUrl, configuredRepo.htmlUrl)),
+      })),
+    });
+
+    expect(snapshot.pullRequests[0]).toMatchObject({
+      id: "cmd-001",
+      daemonSignoff: "signed off",
+      reviewerSignoff: "pending",
+    });
   });
 
   it("moves new proposal activity into the current summary and changelog", () => {

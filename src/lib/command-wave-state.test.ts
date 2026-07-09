@@ -19,9 +19,32 @@ describe("command wave state snapshot", () => {
       generatedAt: "2026-06-21T12:00:00.000Z",
       wave: createPublicCommandWave(demoWave),
       projectSnapshot: {
+        managedBy: {
+          summary: "daemon",
+          changelog: "daemon",
+          pullRequests: "daemon",
+          reviewer: "review-agent",
+        },
         currentWork: {
           title: "Draft the non-upgradeable hook scaffold",
         },
+        currentVote: {
+          status: "recorded",
+          proposalId: "cmd-001",
+          yesVotes: 5,
+          noVotes: 1,
+        },
+        discussionTopics: [
+          {
+            id: "proposal-cmd-001",
+            title: "Draft hook scaffold",
+          },
+          {
+            id: "repo-selection",
+            title: "Select the pilot GitHub repo",
+          },
+        ],
+        pullRequests: [],
         updatedAt: "2026-06-20T12:40:00.000Z",
         repo: {
           status: "placeholder",
@@ -110,6 +133,8 @@ describe("command wave state snapshot", () => {
     expect(snapshot.projectSnapshot.summary).toContain(
       "Next: Keep discussing in chat. Select the hook repo before PR work starts.",
     );
+    expect(snapshot.projectSnapshot.currentVote.detail).toBe("Last decision: 5 yes, 1 no.");
+    expect(snapshot.projectSnapshot.discussionTopics.map((topic) => topic.title)).toContain("Select the pilot GitHub repo");
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
     expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("delegatecall");
     expect(snapshot.workflowProof.steps.map((step) => [step.id, step.status])).toEqual([
