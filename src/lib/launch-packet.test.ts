@@ -97,8 +97,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("Summary: Public proof of the chat, decision, PR, review, and log path for the first hook build.");
     expect(packet.text).toContain("Source of truth: project chat");
     expect(packet.text).toContain("Code surface: GitHub PR");
-    expect(packet.text).toContain("Status: 2 ready, 0 blocked.");
-    expect(packet.text).toContain("Project chat: ready.");
+    expect(packet.text).toContain("Status: 1 ready, 0 blocked.");
+    expect(packet.text).toContain(
+      "Project chat: needed. Project chat is connected. First daemon-parsed builder message is still needed.",
+    );
     expect(packet.text).toContain("Decision: ready.");
     expect(packet.text).toContain("Pull request: needed. GitHub repo is a placeholder.");
     expect(packet.text).toContain("Review: needed. Review waits for a selected hook repo and PR record.");
@@ -151,7 +153,10 @@ describe("launch packet", () => {
     expect(packet.text).toContain("PR evidence: 2 report points");
     expect(packet.text).toContain("Review proof: 2 report points");
     expect(packet.text).toContain("1 PR, 1 review proof");
-    expect(packet.text).toContain("Status: 3 ready, 0 blocked.");
+    expect(packet.text).toContain("Status: 2 ready, 0 blocked.");
+    expect(packet.text).toContain(
+      "Project chat: needed. Project chat is connected. First daemon-parsed builder message is still needed.",
+    );
     expect(packet.text).toContain("Review: needed. Review proof exists, but the reviewer process is still a placeholder.");
     expect(packet.text).toContain("Log: needed. Log waits for the selected reviewer process.");
     expect(packet.text).toContain("Select the reviewer process before claiming the reviewed PR loop is ready.");

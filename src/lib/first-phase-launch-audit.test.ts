@@ -49,6 +49,22 @@ const configuredDemoWave = {
   })),
 };
 
+function withChatObservation<T extends typeof demoWave>(wave: T): T {
+  return {
+    ...wave,
+    ledger: [
+      {
+        id: "evt-chat-001",
+        at: "2026-06-20T12:41:00.000Z",
+        actor: "daemon",
+        type: "chat_observed",
+        message: "alice suggested work. Message: Can we add fee cap tests next?",
+      },
+      ...wave.ledger,
+    ],
+  } as T;
+}
+
 const productionSetupValidation: SetupValidation = {
   waveId: "6529-hook-builder",
   repo: configuredRepo,
@@ -117,11 +133,12 @@ const productionSetupValidation: SetupValidation = {
 
 describe("first phase launch audit", () => {
   it("keeps the completed demo flow pending while reviewer process is a placeholder", () => {
+    const wave = withChatObservation(configuredDemoWave);
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(configuredDemoWave),
+      phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: productionReadyChecks,
       setupValidation: productionSetupValidation,
-      wave: configuredDemoWave,
+      wave,
     });
 
     expect(audit.status).toBe("needs_setup");
@@ -180,9 +197,18 @@ describe("first phase launch audit", () => {
         title: "Open project chat",
       },
     });
+    expect(audit.chatLaunch.items).toContainEqual(
+      expect.objectContaining({
+        id: "flow_discussion_signal",
+        label: "Group discussion",
+        status: "ready",
+        detail: "daemon parsed group chat: work suggested.",
+      }),
+    );
   });
 
   it("can mark chat launch ready while PR work waits for the repo", () => {
+    const wave = withChatObservation(demoWave);
     const chatReadyChecks = getReadinessChecks({
       NEXT_PUBLIC_APP_URL: "https://command-waves.6529.io",
       DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
@@ -220,10 +246,10 @@ describe("first phase launch audit", () => {
       canRunCode: false,
     };
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(demoWave),
+      phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: chatReadyChecks,
       setupValidation,
-      wave: demoWave,
+      wave,
     });
 
     expect(audit.chatLaunch.status).toBe("ready");

@@ -30,6 +30,22 @@ const configuredDemoWave = {
   })),
 };
 
+function withChatObservation<T extends typeof demoWave>(wave: T): T {
+  return {
+    ...wave,
+    ledger: [
+      {
+        id: "evt-chat-001",
+        at: "2026-06-20T12:41:00.000Z",
+        actor: "daemon",
+        type: "chat_observed",
+        message: "alice suggested work. Message: Can we add fee cap tests next?",
+      },
+      ...wave.ledger,
+    ],
+  } as T;
+}
+
 describe("public workflow proof", () => {
   it("does not imply a placeholder repo can run PR work", () => {
     const proof = createPublicWorkflowProof(demoWave);
@@ -41,12 +57,18 @@ describe("public workflow proof", () => {
       blockedCount: 0,
     });
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
-      ["chat", "ready"],
+      ["chat", "needed"],
       ["decision", "ready"],
       ["pr", "needed"],
       ["review", "needed"],
       ["log", "needed"],
     ]);
+    expect(proof.steps.find((step) => step.id === "chat")).toMatchObject({
+      label: "Project chat",
+      detail: "Project chat is connected. First daemon-parsed builder message is still needed.",
+      evidenceUrl: "https://6529.io/waves/6529-hook-builder",
+      evidenceHash: null,
+    });
     expect(proof.steps.find((step) => step.id === "pr")).toMatchObject({
       label: "Pull request",
       detail: "GitHub repo is a placeholder. Choose it before PR work can run.",
@@ -63,9 +85,9 @@ describe("public workflow proof", () => {
     const proof = createPublicWorkflowProof(configuredDemoWave);
 
     expect(proof.blockedCount).toBe(0);
-    expect(proof.readyCount).toBe(3);
+    expect(proof.readyCount).toBe(2);
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
-      ["chat", "ready"],
+      ["chat", "needed"],
       ["decision", "ready"],
       ["pr", "ready"],
       ["review", "needed"],
@@ -103,7 +125,7 @@ describe("public workflow proof", () => {
 
     expect(proof.blockedCount).toBe(3);
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
-      ["chat", "ready"],
+      ["chat", "needed"],
       ["decision", "ready"],
       ["pr", "blocked"],
       ["review", "blocked"],
@@ -137,7 +159,7 @@ describe("public workflow proof", () => {
 
     expect(proof.blockedCount).toBe(1);
     expect(proof.steps.map((step) => [step.id, step.status])).toEqual([
-      ["chat", "ready"],
+      ["chat", "needed"],
       ["decision", "ready"],
       ["pr", "ready"],
       ["review", "blocked"],
@@ -148,6 +170,18 @@ describe("public workflow proof", () => {
     });
     expect(proof.steps.find((step) => step.id === "log")).toMatchObject({
       detail: "Log waits for review proof bound to the configured repo.",
+    });
+  });
+
+  it("marks project chat ready after daemon parses a builder message", () => {
+    const proof = createPublicWorkflowProof(withChatObservation(demoWave));
+
+    expect(proof.readyCount).toBe(2);
+    expect(proof.steps.find((step) => step.id === "chat")).toMatchObject({
+      status: "ready",
+      detail: "daemon parsed group chat: work suggested.",
+      evidenceUrl: "https://6529.io/waves/6529-hook-builder",
+      evidenceHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
   });
 

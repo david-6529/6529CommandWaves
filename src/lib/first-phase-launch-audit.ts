@@ -2,7 +2,9 @@ import { validateWaveDecisionReference, type CommandWave } from "./command-waves
 import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { configuredGitHubRepo, gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
+import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { participationGateNeedsAdvisoryNote } from "./participation-gates";
+import { projectChatObservationLabel } from "./project-chat-observation";
 import { reviewAgentIdentity } from "./agent-identities";
 import type { PhaseChecklistItem, PhaseChecklistStatus } from "./phase-checklist";
 import type { SetupCheckStatus, SetupValidation } from "./setup-validation";
@@ -136,6 +138,7 @@ const launchActionCopyByItemId: Record<string, string> = {
   flow_build: "Build the approved PR",
   flow_review: "Review the PR result",
   flow_log: "Share the result back to chat",
+  flow_discussion_signal: "Start group discussion",
   flow_project_decision_link: "Record the project decision URL",
   flow_participation_notes: "Make participation notes advisory",
   flow_audit_packet: "Fix launch packet evidence",
@@ -503,6 +506,37 @@ function participationNotesItem(wave: CommandWave | null | undefined): FirstPhas
   ];
 }
 
+function discussionSignalItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
+  if (!wave?.waveUrl.trim()) {
+    return [];
+  }
+
+  const latestChatObservation =
+    ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl).find((event) => event.type === "chat_observed") ?? null;
+
+  if (latestChatObservation) {
+    return [
+      {
+        id: "flow_discussion_signal",
+        label: "Group discussion",
+        status: "ready",
+        detail: `daemon parsed group chat: ${projectChatObservationLabel(latestChatObservation.message)}.`,
+        source: "flow",
+      },
+    ];
+  }
+
+  return [
+    {
+      id: "flow_discussion_signal",
+      label: "Group discussion",
+      status: "needed",
+      detail: "Start the group thread so daemon can parse the first builder message.",
+      source: "flow",
+    },
+  ];
+}
+
 function auditPacketItem(wave: CommandWave | null | undefined): FirstPhaseLaunchAuditItem[] {
   const proposal = wave?.proposals.find((item) => item.kind === "open_pr") ?? null;
 
@@ -671,6 +705,7 @@ export function createFirstPhaseLaunchAudit({
       ];
   const chatLaunchItems = [
     ...chatSetupItems(setupValidation),
+    ...discussionSignalItem(wave),
     ...participationNotesItem(wave),
     ...chatReadinessItems,
   ];

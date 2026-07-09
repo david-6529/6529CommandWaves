@@ -43,6 +43,22 @@ const configuredDemoWave = {
   })),
 };
 
+function withChatObservation<T extends typeof demoWave>(wave: T): T {
+  return {
+    ...wave,
+    ledger: [
+      {
+        id: "evt-chat-001",
+        at: "2026-06-20T12:41:00.000Z",
+        actor: "daemon",
+        type: "chat_observed",
+        message: "alice suggested work. Message: Can we add fee cap tests next?",
+      },
+      ...wave.ledger,
+    ],
+  } as T;
+}
+
 describe("launch status draft", () => {
   it("summarizes open launch items for the project chat", () => {
     const audit = createFirstPhaseLaunchAudit({
@@ -78,8 +94,9 @@ describe("launch status draft", () => {
   });
 
   it("states the reviewer process gap when checked records otherwise pass", () => {
+    const wave = withChatObservation(configuredDemoWave);
     const audit = createFirstPhaseLaunchAudit({
-      phaseChecklist: createPhaseChecklist(configuredDemoWave),
+      phaseChecklist: createPhaseChecklist(wave),
       readinessChecks: getReadinessChecks({
         NEXT_PUBLIC_APP_URL: "https://command-waves.example.com",
         DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
@@ -155,9 +172,9 @@ describe("launch status draft", () => {
         canSave: true,
         canRunCode: true,
       },
-      wave: configuredDemoWave,
+      wave,
     });
-    const draft = createLaunchStatusDraft({ wave: configuredDemoWave, audit, verificationTargets });
+    const draft = createLaunchStatusDraft({ wave, audit, verificationTargets });
 
     expect(audit.status).toBe("needs_setup");
     expect(draft).toContain("Chat launch: ready");

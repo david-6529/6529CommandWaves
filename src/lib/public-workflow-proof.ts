@@ -3,9 +3,11 @@ import { isPlaceholderValue } from "./env-placeholders";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
+import { ledgerEventsForVisibleProjectHistory } from "./ledger";
 import { hashValue } from "./run-manifest";
 import { selectPhaseWork } from "./phase-work";
 import { reviewAgentIdentity } from "./agent-identities";
+import { projectChatObservationLabel } from "./project-chat-observation";
 
 export type PublicWorkflowProofStepId = "chat" | "decision" | "pr" | "review" | "log";
 export type PublicWorkflowProofStepStatus = "ready" | "needed" | "blocked";
@@ -23,6 +25,10 @@ export type PublicWorkflowProof = ReturnType<typeof createPublicWorkflowProof>;
 
 function hasProjectChat(wave: CommandWave) {
   return Boolean(wave.waveUrl.trim());
+}
+
+function latestChatObservation(wave: CommandWave) {
+  return ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl).find((event) => event.type === "chat_observed") ?? null;
 }
 
 function hasConfiguredRepo(wave: CommandWave) {
@@ -108,6 +114,7 @@ export function createPublicWorkflowProof(wave: CommandWave) {
   const prUrl = latestPrUrl(wave);
   const decision = decisionEvidence(wave);
   const chatReady = hasProjectChat(wave);
+  const chatObservation = latestChatObservation(wave);
   const missingConfiguredPrLink = Boolean(repoConfigured && execution?.status === "complete" && !prUrl);
   const reviewProofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
   const reviewerProcessSelected = reviewAgentIdentity.status !== "placeholder";
@@ -149,10 +156,14 @@ export function createPublicWorkflowProof(wave: CommandWave) {
     {
       id: "chat",
       label: "Project chat",
-      status: chatReady ? "ready" : "needed",
-      detail: chatReady ? "Project chat is the social source of truth." : "Connect the project chat before inviting builders.",
+      status: chatObservation ? "ready" : "needed",
+      detail: !chatReady
+        ? "Connect the project chat before inviting builders."
+        : chatObservation
+          ? `daemon parsed group chat: ${projectChatObservationLabel(chatObservation.message)}.`
+          : "Project chat is connected. First daemon-parsed builder message is still needed.",
       evidenceUrl: chatReady ? wave.waveUrl : null,
-      evidenceHash: chatReady ? hashValue(wave.waveUrl) : null,
+      evidenceHash: chatObservation ? hashValue(chatObservation) : null,
     },
     {
       id: "decision",

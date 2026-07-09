@@ -377,6 +377,8 @@ async function main() {
   assert(!JSON.stringify(launchPayload).includes("roomPosts"), "Launch audit response still includes roomPosts.");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Project decision link");
   assertIncludes("Launch audit response", JSON.stringify(launchPayload), "flow_project_decision_link");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "flow_discussion_signal");
+  assertIncludes("Launch audit response", JSON.stringify(launchPayload), "Group discussion");
   assert(
     !JSON.stringify(launchPayload).includes(`Project ${staleDecisionCopy}`),
     "Launch audit response still exposes legacy decision-link labels.",
@@ -409,6 +411,8 @@ async function main() {
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "/api/command-wave/verification/manifest");
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "chatLaunch");
   assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "prLoop");
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "flow_discussion_signal");
+  assertIncludes("Chat launch response", JSON.stringify(chatLaunchPayload), "Group discussion");
   assertNoPublicRepoLeaks("Chat launch response", JSON.stringify(chatLaunchPayload));
   assertNoForbiddenDash("Chat launch response", JSON.stringify(chatLaunchPayload));
 

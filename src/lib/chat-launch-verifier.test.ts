@@ -44,9 +44,26 @@ const chatReadySetupValidation: SetupValidation = {
   canRunCode: false,
 };
 
+function withChatObservation<T extends typeof demoWave>(wave: T): T {
+  return {
+    ...wave,
+    ledger: [
+      {
+        id: "evt-chat-001",
+        at: "2026-06-20T12:41:00.000Z",
+        actor: "daemon",
+        type: "chat_observed",
+        message: "alice suggested work. Message: Can we add fee cap tests next?",
+      },
+      ...wave.ledger,
+    ],
+  } as T;
+}
+
 describe("chat launch verifier", () => {
   it("passes when the project chat is ready and the GitHub repo is still a placeholder", async () => {
-    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const wave = withChatObservation(demoWave);
+    const snapshot = await createFirstPhaseLaunchSnapshot(wave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: chatReadyEnv,
       checkSetupRemote: true,
@@ -69,7 +86,8 @@ describe("chat launch verifier", () => {
   });
 
   it("passes direct chat launch endpoint payloads", async () => {
-    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const wave = withChatObservation(demoWave);
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(wave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: chatReadyEnv,
       checkSetupRemote: true,
@@ -77,10 +95,10 @@ describe("chat launch verifier", () => {
     });
     const chatSnapshot = createChatLaunchSnapshot(launchSnapshot);
     const result = verifyChatLaunchPayload(chatSnapshot, {
-      commandWaveState: createCommandWaveStateSnapshot(demoWave, {
+      commandWaveState: createCommandWaveStateSnapshot(wave, {
         generatedAt: "2026-06-20T13:01:00.000Z",
       }),
-      projectIndex: createHookProjectIndex(demoWave, {
+      projectIndex: createHookProjectIndex(wave, {
         generatedAt: "2026-06-20T13:02:00.000Z",
       }),
     });
@@ -107,7 +125,7 @@ describe("chat launch verifier", () => {
   });
 
   it("fails direct chat launch endpoint payloads when their hash is stale", async () => {
-    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(withChatObservation(demoWave), {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: chatReadyEnv,
       checkSetupRemote: true,
@@ -127,7 +145,7 @@ describe("chat launch verifier", () => {
   });
 
   it("fails direct chat launch payloads when fetched state does not match", async () => {
-    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(withChatObservation(demoWave), {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: chatReadyEnv,
       checkSetupRemote: true,
@@ -151,13 +169,14 @@ describe("chat launch verifier", () => {
   });
 
   it("fails direct chat launch payloads when public state omits group chat settings", async () => {
-    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const wave = withChatObservation(demoWave);
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(wave, {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: chatReadyEnv,
       checkSetupRemote: true,
       setupValidation: chatReadySetupValidation,
     });
-    const publicState = createCommandWaveStateSnapshot(demoWave, {
+    const publicState = createCommandWaveStateSnapshot(wave, {
       generatedAt: "2026-06-20T13:01:00.000Z",
     });
     const brokenState = {
@@ -219,7 +238,7 @@ describe("chat launch verifier", () => {
   });
 
   it("fails until remote setup checks are run", async () => {
-    const snapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+    const snapshot = await createFirstPhaseLaunchSnapshot(withChatObservation(demoWave), {
       generatedAt: "2026-06-20T13:00:00.000Z",
       env: chatReadyEnv,
       setupValidation: chatReadySetupValidation,

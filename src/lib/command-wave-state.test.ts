@@ -174,12 +174,17 @@ describe("command wave state snapshot", () => {
     expect(snapshot.hookSafety.parameterPolicy.join(" ")).toContain("bound-focused tests");
     expect(snapshot.hookSafety.blockedInPhaseOne.join(" ")).toContain("delegatecall");
     expect(snapshot.workflowProof.steps.map((step) => [step.id, step.status])).toEqual([
-      ["chat", "ready"],
+      ["chat", "needed"],
       ["decision", "ready"],
       ["pr", "needed"],
       ["review", "needed"],
       ["log", "needed"],
     ]);
+    expect(snapshot.workflowProof.steps.find((step) => step.id === "chat")).toMatchObject({
+      detail: "Project chat is connected. First daemon-parsed builder message is still needed.",
+      evidenceUrl: "https://6529.io/waves/6529-hook-builder",
+      evidenceHash: null,
+    });
     expect(snapshot.access.notes).toContain("Manual builder review for phase 1");
     expect(snapshot.productContract.firstPhaseLimits.join(" ")).toContain("Contribution reports are evidence");
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
