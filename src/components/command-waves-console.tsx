@@ -909,6 +909,7 @@ function eventTypeLabel(type: string) {
     rule_check: "safety check",
     poll_opened: "vote opened",
     poll_passed: "vote passed",
+    chat_observed: "chat observed",
     execution_started: "run started",
     execution_logged: "run logged",
     guardian_reviewed: "review recorded",
@@ -1851,7 +1852,17 @@ export function CommandWavesConsole() {
 
     try {
       const post = await requestChatPost(chatPostTargetUrl, builderWaveChatDraft, accessKey, walletAddress || proposer);
+      let projectStateRefreshed = false;
       let chatPreviewRefreshed = false;
+
+      try {
+        const nextWave = await requestWave("/api/command-wave");
+
+        applyWave(nextWave);
+        projectStateRefreshed = true;
+      } catch {
+        projectStateRefreshed = false;
+      }
 
       if (primaryHookProject) {
         try {
@@ -1871,8 +1882,8 @@ export function CommandWavesConsole() {
       setChatPostUrl(post.url ?? "");
       setProjectChatNotice(
         `${post.mode === "mock" ? "Saved to local chat." : "Posted to project chat."}${
-          chatPreviewRefreshed ? " Chat preview refreshed." : ""
-        }`,
+          projectStateRefreshed ? " daemon updated the summary." : ""
+        }${chatPreviewRefreshed ? " Chat preview refreshed." : ""}`,
       );
     } catch (error) {
       setProjectChatNotice(error instanceof Error ? error.message : "Post failed.");

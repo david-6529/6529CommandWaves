@@ -48,6 +48,7 @@ function eventTypeLabel(type: string) {
     rule_check: "safety check",
     poll_opened: "decision opened",
     poll_passed: "builders approved",
+    chat_observed: "chat observed",
     execution_started: "run started",
     execution_logged: "PR recorded",
     guardian_reviewed: "review recorded",

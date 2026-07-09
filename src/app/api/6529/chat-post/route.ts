@@ -2,6 +2,7 @@ import { createChatPostingCapabilityPayload, postChatMessage } from "@/lib/6529/
 import { handleRouteError, json, readJsonObject } from "@/lib/api";
 import { requireAdminRequest } from "@/lib/admin-auth";
 import { chatPostPaceIdentity, directChatPostPace } from "@/lib/chat-posting-policy";
+import { recordProjectChatObservation } from "@/lib/command-wave-store";
 import { assertRateLimit, assertRateLimitForKey } from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
@@ -26,9 +27,11 @@ export async function POST(request: Request) {
       windowMs: directChatPostPace.windowMs,
     });
 
-    return json({
-      post: await postChatMessage(body),
-    });
+    const post = await postChatMessage(body);
+
+    await recordProjectChatObservation(body);
+
+    return json({ post });
   } catch (error) {
     return handleRouteError(error);
   }

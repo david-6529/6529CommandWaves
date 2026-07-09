@@ -198,6 +198,37 @@ describe("API route validation", () => {
     });
   });
 
+  it("records daemon chat observations after posting to the project chat", async () => {
+    const response = await postChatMessage(
+      request("https://command-waves.example.com/api/6529/chat-post", {
+        method: "POST",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/6529-hook-builder",
+          content: "Can we discuss fee cap tests before anyone opens a PR?",
+          senderId: "alice",
+        }),
+      }),
+    );
+    const payload = await responsePayload(response);
+    const waveResponse = await getWave(request("https://command-waves.example.com/api/command-wave"));
+    const wavePayload = await responsePayload(waveResponse);
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      post: {
+        waveId: "6529-hook-builder",
+        mode: "mock",
+      },
+    });
+    expect(waveResponse.status).toBe(200);
+    expect((wavePayload.wave as { ledger?: unknown[] }).ledger?.[0]).toMatchObject({
+      actor: "daemon",
+      type: "chat_observed",
+      message:
+        "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+    });
+  });
+
   it("publishes chat posting capability without credentials", async () => {
     process.env["6529_MOCK_MODE"] = "false";
     process.env["6529_BOT_BEARER_TOKEN"] = "secret-token";

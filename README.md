@@ -45,6 +45,7 @@ What exists now:
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Direct chat posting is admin-protected, IP-limited, and paced at 3 messages per 5 minutes per supplied builder identity.
+- Successful chat posts record a daemon-observed project event so the summary and changelog show that discussion was read.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
 - Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,
@@ -184,6 +185,7 @@ Default workspace:
 - Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
 - Builder message composer with direct chat posting when configured, recent posts, and copyable messages.
+- Sending a chat message refreshes project state after daemon records the observed discussion.
 - Folded proposal form that asks for title, change, and success criteria before optional work details.
 - Builder profiles with profile links, visible chat and repo activity, voting summaries, and informational contribution signals.
 - Collapsed builder details: who can join, activity-report boundaries, and hook guardrails.

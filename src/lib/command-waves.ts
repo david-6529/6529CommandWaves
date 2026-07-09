@@ -116,6 +116,7 @@ export type LedgerEvent = {
     | "rule_check"
     | "poll_opened"
     | "poll_passed"
+    | "chat_observed"
     | "execution_started"
     | "execution_logged"
     | "guardian_reviewed";

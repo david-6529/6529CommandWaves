@@ -4,6 +4,7 @@ import {
   executeProposal,
   getCommandWave,
   recordDecisionReceipt,
+  recordProjectChatObservation,
   recordVote,
   replaceCommandWave,
   resetCommandWave,
@@ -135,6 +136,22 @@ describe("Command wave store", () => {
     expect(wave.reviews).toEqual([]);
     expect(wave.ledger.map((event) => event.type)).not.toContain("execution_logged");
     expect(wave.ledger.map((event) => event.type)).not.toContain("guardian_reviewed");
+  });
+
+  it("records daemon observations from project chat without creating work", async () => {
+    const wave = await recordProjectChatObservation({
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      senderId: "alice",
+      content: "Can we discuss fee cap tests before anyone opens a PR?",
+    });
+
+    expect(wave.proposals).toHaveLength(1);
+    expect(wave.ledger[0]).toMatchObject({
+      actor: "daemon",
+      type: "chat_observed",
+      message:
+        "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+    });
   });
 
   it("does not replace custom setup with environment setup", async () => {

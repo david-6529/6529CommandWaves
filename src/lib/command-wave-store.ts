@@ -4,6 +4,7 @@ import { withPlaceholderRepoSetupState } from "./command-wave-sanitize";
 import { applyInitialCommandWaveProject, hasInitialCommandWaveProject } from "./command-wave-seed";
 import { demoWave } from "./demo-wave";
 import { parseExecutionFiles } from "./execution-files";
+import { normalizeWaveId } from "./6529/client";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
@@ -384,6 +385,26 @@ function asText(value: unknown, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
 
+function publicChatAuthor(value: string) {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return "builder";
+  }
+
+  return trimmed.length > 32 ? `${trimmed.slice(0, 6)}...${trimmed.slice(-4)}` : trimmed;
+}
+
+function compactChatMessage(value: string) {
+  const compact = value.replace(/\s+/g, " ").trim();
+
+  return compact.length > 140 ? `${compact.slice(0, 137)}...` : compact;
+}
+
+function sameWaveId(left: string, right: string) {
+  return normalizeWaveId(left) === normalizeWaveId(right);
+}
+
 function asBudget(value: unknown) {
   const number = typeof value === "number" ? value : typeof value === "string" ? Number(value) : 0;
 
@@ -467,6 +488,26 @@ export async function updateCommandWaveSetup(input: unknown) {
       message: `Updated setup to wave ${validation.waveId} and ${repoStatusMessage}.`,
     },
   );
+
+  return replaceCommandWave(nextWave);
+}
+
+export async function recordProjectChatObservation(input: unknown) {
+  const body = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};
+  const wave = await getCommandWave();
+  const target = asText(body.waveUrl, asText(body.waveId));
+  const content = asText(body.content);
+
+  if (!target || !content || !sameWaveId(target, wave.waveUrl)) {
+    return wave;
+  }
+
+  const author = publicChatAuthor(asText(body.senderId, asText(body.walletAddress, asText(body.author, "builder"))));
+  const nextWave = appendLedger(wave, {
+    actor: "daemon",
+    type: "chat_observed",
+    message: `Read ${author}'s chat message and updated the project summary: ${compactChatMessage(content)}`,
+  });
 
   return replaceCommandWave(nextWave);
 }

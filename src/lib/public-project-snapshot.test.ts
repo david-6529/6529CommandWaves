@@ -276,6 +276,32 @@ describe("public project snapshot", () => {
     expect(snapshot.updatedAt).toBe("2026-06-20T13:05:00.000Z");
   });
 
+  it("moves daemon chat observations into the summary and changelog", () => {
+    const snapshot = createPublicProjectSnapshot({
+      ...demoWave,
+      ledger: [
+        ...demoWave.ledger,
+        {
+          id: "evt-chat",
+          at: "2026-06-20T13:10:00.000Z",
+          actor: "daemon",
+          type: "chat_observed",
+          message:
+            "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+        },
+      ],
+    });
+
+    expect(snapshot.summary).toContain(
+      "Latest: Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+    );
+    expect(snapshot.latestChanges[0]).toMatchObject({
+      label: "chat observed",
+      message:
+        "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+    });
+  });
+
   it("labels local approval as waiting for a decision link", () => {
     const snapshot = createPublicProjectSnapshot({
       ...demoWave,
