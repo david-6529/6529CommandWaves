@@ -40,6 +40,7 @@ export type LaunchAuditVerificationOptions = {
 
 export type LaunchAuditVerificationResult = {
   status: "pass" | "fail";
+  chatLaunchStatus: string;
   launchStatus: string;
   generatedAt: string | null;
   projectName: string | null;
@@ -52,6 +53,8 @@ export type LaunchAuditVerificationResult = {
   publicState: LaunchAuditPublicState | null;
   publicProjectIndex: LaunchAuditPublicProjectIndex | null;
   auditHash: string | null;
+  chatLaunchBlockers: string[];
+  chatLaunchOpenItems: string[];
   blockers: string[];
   openItems: string[];
   operatorChecklist: string[];
@@ -435,6 +438,8 @@ function statusDraftReady(value: unknown) {
       draft.includes("Chat next action:") &&
       draft.includes("PR loop:") &&
       draft.includes("PR loop next action:") &&
+      draft.includes("Chat launch gaps:") &&
+      draft.includes("PR loop gaps:") &&
       draft.includes("Operator checklist:") &&
       draft.includes("Verification:") &&
       draft.includes("Guardrails:") &&
@@ -556,10 +561,15 @@ export function verifyLaunchAuditPayload(
   const hasContributionReport = contributionReportReady(reports?.contribution);
   const hasDeveloperFeePlan = developerFeePlanReady(reports?.developerFee);
   const launchStatus = asString(launchAudit?.status) ?? "unknown";
+  const chatLaunchStatus = asString(chatLaunch?.status) ?? "unknown";
   const hasChatLaunch = launchTrackReady(chatLaunch);
+  const chatLaunchBlockers = collectItemSummaries(chatLaunch?.blockers);
+  const chatLaunchOpenItemRecords = collectChecklistItems(chatLaunch?.openItems);
+  const chatLaunchOpenItems = chatLaunchOpenItemRecords.map((item) => (item.detail ? `${item.label}: ${item.detail}` : item.label));
   const blockers = collectItemSummaries(launchAudit?.blockers);
   const openItemRecords = collectChecklistItems(launchAudit?.openItems);
   const openItems = openItemRecords.map((item) => (item.detail ? `${item.label}: ${item.detail}` : item.label));
+  const operatorChecklistItems = [...chatLaunchOpenItemRecords, ...openItemRecords];
   const checks: LaunchAuditVerificationCheck[] = [
     check(
       "payload_shape",
@@ -718,6 +728,7 @@ export function verifyLaunchAuditPayload(
 
   return {
     status: checks.some((item) => item.status === "fail") ? "fail" : "pass",
+    chatLaunchStatus,
     launchStatus,
     generatedAt: asString(snapshot?.generatedAt),
     projectName: asString(project?.name),
@@ -732,9 +743,11 @@ export function verifyLaunchAuditPayload(
     publicState,
     publicProjectIndex,
     auditHash: asString(snapshot?.auditHash),
+    chatLaunchBlockers,
+    chatLaunchOpenItems,
     blockers,
     openItems,
-    operatorChecklist: launchAudit ? launchOperatorChecklistLines(openItemRecords) : [],
+    operatorChecklist: launchAudit ? launchOperatorChecklistLines(operatorChecklistItems) : [],
     checks,
   };
 }

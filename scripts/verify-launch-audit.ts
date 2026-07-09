@@ -29,7 +29,8 @@ async function main() {
   writeJsonResult(process.env.LAUNCH_AUDIT_VERIFICATION_PATH, result);
 
   console.log(`Launch audit verification: ${result.status}`);
-  console.log(`Launch status: ${result.launchStatus}`);
+  console.log(`Chat launch status: ${result.chatLaunchStatus}`);
+  console.log(`PR loop status: ${result.launchStatus}`);
   console.log(`Project: ${result.projectName ?? "unknown"}`);
   console.log(`Generated: ${result.generatedAt ?? "unknown"}`);
   if (stateUrl) {
@@ -69,15 +70,29 @@ async function main() {
     console.log(`${item.status.toUpperCase()} ${item.id}: ${item.message}`);
   }
 
+  if (result.chatLaunchBlockers.length) {
+    console.log("Chat launch blockers:");
+    for (const item of result.chatLaunchBlockers) {
+      console.log(`- ${item}`);
+    }
+  }
+
+  if (result.chatLaunchOpenItems.length) {
+    console.log("Chat launch open items:");
+    for (const item of result.chatLaunchOpenItems) {
+      console.log(`- ${item}`);
+    }
+  }
+
   if (result.blockers.length) {
-    console.log("Blockers:");
+    console.log("PR loop blockers:");
     for (const item of result.blockers) {
       console.log(`- ${item}`);
     }
   }
 
   if (result.openItems.length) {
-    console.log("Open items:");
+    console.log("PR loop open items:");
     for (const item of result.openItems) {
       console.log(`- ${item}`);
     }

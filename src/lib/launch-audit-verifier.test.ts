@@ -126,10 +126,12 @@ describe("launch audit verifier", () => {
 
     expect(result).toMatchObject({
       status: "fail",
+      chatLaunchStatus: "needs_setup",
       launchStatus: "needs_setup",
       generatedAt: "2026-06-20T13:00:00.000Z",
       projectName: configuredDemoWave.name,
       auditHash: snapshot.auditHash,
+      chatLaunchBlockers: [],
       blockers: [],
     });
     expect(result.openItems).toContain(
@@ -198,6 +200,8 @@ describe("launch audit verifier", () => {
     });
     expect(result.nextAction?.title).toBe("Repo not selected yet");
     expect(result.statusDraft).toContain("Staged project status");
+    expect(result.statusDraft).toContain("Chat launch gaps:");
+    expect(result.statusDraft).toContain("PR loop gaps:");
     expect(result.statusDraft).toContain("PR loop: checks needed");
     expect(result.stateEvidence).toEqual({
       waveStateHash: publicCommandWaveHash(configuredDemoWave),
@@ -264,7 +268,11 @@ describe("launch audit verifier", () => {
     const result = verifyLaunchAuditPayload({ audit: snapshot });
 
     expect(result.status).toBe("fail");
+    expect(result.chatLaunchStatus).toBe("blocked");
     expect(result.launchStatus).toBe("blocked");
+    expect(result.chatLaunchBlockers.join("\n")).toContain(
+      "Admin API key: Set ADMIN_API_KEY before public launch so protected actions require a key.",
+    );
     expect(result.blockers.join("\n")).toContain(
       "Admin API key: Set ADMIN_API_KEY before public launch so protected actions require a key.",
     );
