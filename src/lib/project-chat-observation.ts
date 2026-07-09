@@ -95,6 +95,50 @@ export function createProjectChatObservation(input: { author: string; content: s
   };
 }
 
+export function signalFromProjectChatObservation(value: string): ProjectChatSignal {
+  const normalized = value.trim().toLowerCase();
+
+  if (normalized.includes("shared a pr link")) {
+    return "pr_link";
+  }
+
+  if (normalized.includes("asked for a decision")) {
+    return "decision_request";
+  }
+
+  if (normalized.includes("asked for review")) {
+    return "review_request";
+  }
+
+  if (normalized.includes("discussed repo setup")) {
+    return "repo_setup";
+  }
+
+  if (normalized.includes("suggested work")) {
+    return "suggested_work";
+  }
+
+  if (normalized.includes("raised a question")) {
+    return "question";
+  }
+
+  return projectChatSignal(messageFromProjectChatObservation(value));
+}
+
+export function projectChatObservationLabel(value: string) {
+  const labels: Record<ProjectChatSignal, string> = {
+    pr_link: "PR link",
+    decision_request: "decision request",
+    review_request: "review request",
+    repo_setup: "repo setup",
+    suggested_work: "work suggested",
+    question: "question",
+    chat: "chat observed",
+  };
+
+  return labels[signalFromProjectChatObservation(value)];
+}
+
 export function messageFromProjectChatObservation(value: string) {
   const normalized = value.trim();
   const modernSeparator = "Message:";

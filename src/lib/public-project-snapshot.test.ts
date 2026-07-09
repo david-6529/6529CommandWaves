@@ -337,7 +337,7 @@ describe("public project snapshot", () => {
 
     expect(snapshot.summary).toContain("Latest: alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?");
     expect(snapshot.latestChanges[0]).toMatchObject({
-      label: "chat observed",
+      label: "review request",
       message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
     });
     expect(snapshot.discussionTopics).toEqual([

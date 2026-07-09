@@ -3,8 +3,10 @@ import {
   compactPublicChatMessage,
   createProjectChatObservation,
   messageFromProjectChatObservation,
+  projectChatObservationLabel,
   projectChatSignal,
   publicChatAuthor,
+  signalFromProjectChatObservation,
 } from "./project-chat-observation";
 
 describe("project chat observation", () => {
@@ -47,6 +49,18 @@ describe("project chat observation", () => {
         "Read alice's chat message and updated the project summary: Can we discuss fee caps?",
       ),
     ).toBe("Can we discuss fee caps?");
+  });
+
+  it("labels parsed daemon observations for public changelogs", () => {
+    expect(projectChatObservationLabel("alice shared a PR link for discussion. Message: https://github.com/builders/hook/pull/45")).toBe(
+      "PR link",
+    );
+    expect(projectChatObservationLabel("alice asked for a decision. Message: Can we vote?")).toBe("decision request");
+    expect(projectChatObservationLabel("alice asked for review. Message: Please test this.")).toBe("review request");
+    expect(projectChatObservationLabel("alice discussed repo setup. Message: Which GitHub repo should we use?")).toBe("repo setup");
+    expect(projectChatObservationLabel("alice suggested work. Message: I suggest a fee cap test PR.")).toBe("work suggested");
+    expect(projectChatObservationLabel("alice raised a question. Message: Why immutable?")).toBe("question");
+    expect(signalFromProjectChatObservation("Legacy note with https://github.com/builders/hook/pull/45")).toBe("pr_link");
   });
 
   it("keeps public author and message compaction deterministic", () => {

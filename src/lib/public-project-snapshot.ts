@@ -10,7 +10,7 @@ import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
-import { messageFromProjectChatObservation } from "./project-chat-observation";
+import { messageFromProjectChatObservation, projectChatObservationLabel } from "./project-chat-observation";
 
 export type PublicProjectSnapshot = ReturnType<typeof createPublicProjectSnapshot>;
 
@@ -41,7 +41,11 @@ export const publicProjectChatSettings = {
 
 export type PublicProjectChatSettings = typeof publicProjectChatSettings;
 
-function eventTypeLabel(type: string) {
+function eventTypeLabel(type: string, message = "") {
+  if (type === "chat_observed") {
+    return projectChatObservationLabel(message);
+  }
+
   const labels: Record<string, string> = {
     wave_created: "project created",
     rules_defined: "setup updated",
@@ -49,7 +53,6 @@ function eventTypeLabel(type: string) {
     rule_check: "safety check",
     poll_opened: "decision opened",
     poll_passed: "builders approved",
-    chat_observed: "chat observed",
     execution_started: "run started",
     execution_logged: "PR recorded",
     guardian_reviewed: "review recorded",
@@ -499,7 +502,7 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
     .slice(0, 3)
     .map((event) => ({
       at: event.at,
-      label: eventTypeLabel(event.type),
+      label: eventTypeLabel(event.type, event.message),
       message: humanizeLegacyCommandCopy(event.message),
     }));
   const summaryParagraphs = projectSummary({
