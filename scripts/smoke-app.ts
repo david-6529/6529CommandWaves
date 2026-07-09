@@ -502,6 +502,8 @@ async function main() {
   assert(Array.isArray(projects), "Projects response is missing projects.");
   const activeProject = projects[0];
   assertJsonObject("Projects response active project", activeProject);
+  assert(objectValue(activeProject, "status") === "active", "Projects response should mark the selected chat project active.");
+  assert(objectValue(activeProject, "statusLabel") === "active", "Projects response active project label is wrong.");
   const projectCurrentVote = objectValue(activeProject, "currentVote");
   assertJsonObject("Projects response current vote", projectCurrentVote);
   assert(objectValue(projectCurrentVote, "yesVotes") === 5, "Projects response current vote yes count is wrong.");

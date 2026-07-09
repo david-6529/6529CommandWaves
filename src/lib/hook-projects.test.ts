@@ -31,14 +31,15 @@ const configuredDemoWave = {
 };
 
 describe("active hook projects", () => {
-  it("lists the placeholder hook build as setup work", () => {
+  it("lists the placeholder-repo hook build as an active chat-first project", () => {
     const projects = createActiveHookProjects(demoWave);
 
     expect(projects).toEqual([
       expect.objectContaining({
         id: demoWave.id,
         name: "6529 AMM hook",
-        status: "setup",
+        status: "active",
+        statusLabel: "active",
         waveUrl: demoWave.waveUrl,
         repoUrl: null,
         waveLabel: "6529-hook-builder",

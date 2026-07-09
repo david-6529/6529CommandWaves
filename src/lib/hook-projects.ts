@@ -99,8 +99,8 @@ function findPullRequestUrl(wave: CommandWave) {
   )[0] ?? null;
 }
 
-function hasConfiguredRepo(wave: CommandWave) {
-  return Boolean(wave.repoUrl.trim() && !isPlaceholderValue(wave.repoUrl));
+function hasSelectedProjectChat(wave: CommandWave) {
+  return Boolean(wave.waveUrl.trim());
 }
 
 function hasPlaceholderRepo(wave: CommandWave) {
@@ -292,7 +292,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
     const publicSnapshot = createPublicProjectSnapshot(wave);
     const nextAction = createPhaseNextAction(createPhaseChecklist(wave));
     const currentFocus = phaseWork.prProposal?.title ?? "Choose the first PR-sized hook change.";
-    const hasProject = Boolean(wave.waveUrl.trim() && hasConfiguredRepo(wave));
+    const hasProject = hasSelectedProjectChat(wave);
     const repoIsPlaceholder = hasPlaceholderRepo(wave);
     const publicRepoUrl = repoIsPlaceholder ? null : wave.repoUrl;
     const latestActivity = publicSnapshot.latestChanges[0]?.message ?? "No activity logged yet.";
