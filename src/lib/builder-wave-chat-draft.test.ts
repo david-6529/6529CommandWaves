@@ -4,19 +4,16 @@ import { demoWave } from "./demo-wave";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 
-const placeholderRepoText = "GitHub repo placeholder (No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.)";
-
 describe("project chat draft", () => {
-  it("creates a concise message for the project chat", () => {
+  it("keeps chat posts as plain group messages", () => {
     const nextAction = createPhaseNextAction(createPhaseChecklist(demoWave));
     const draft = createBuilderWaveChatDraft(demoWave, nextAction, "I can review the fee cap tests.");
 
-    expect(draft).toContain("Project chat message");
-    expect(draft).toContain("I can review the fee cap tests.");
-    expect(draft).toContain(`Project chat: ${demoWave.waveUrl}`);
-    expect(draft).toContain(`Repo: ${placeholderRepoText}`);
-    expect(draft).toContain(`Current hook change: ${nextAction.title}`);
-    expect(draft).toContain(`Status: ${nextAction.detail}`);
+    expect(draft).toBe("I can review the fee cap tests.");
+    expect(draft).not.toContain("Project chat message");
+    expect(draft).not.toContain(`Project chat: ${demoWave.waveUrl}`);
+    expect(draft).not.toContain(`Current hook change: ${nextAction.title}`);
+    expect(draft).not.toContain(`Status: ${nextAction.detail}`);
     expect(draft).not.toContain("Rules I am following");
     expect(draft).not.toContain("\u2014");
   });

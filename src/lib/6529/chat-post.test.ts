@@ -82,7 +82,7 @@ describe("6529 chat posting", () => {
         content: "Please review this hook idea.",
       }),
     ).rejects.toMatchObject({
-      message: "Chat posting is not configured. Copy the draft instead.",
+      message: "Chat posting is not configured. Copy the message instead.",
       status: 409,
     });
   });
@@ -107,7 +107,7 @@ describe("6529 chat posting", () => {
     expect(getChatPostingCapability({ "6529_MOCK_MODE": "false" })).toEqual({
       canPost: false,
       mode: "manual",
-      message: "Direct chat posting is not configured. Copy the draft instead.",
+      message: "Direct chat posting is not configured. Copy the message instead.",
     });
   });
 

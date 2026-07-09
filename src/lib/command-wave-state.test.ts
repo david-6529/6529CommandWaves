@@ -60,7 +60,7 @@ describe("command wave state snapshot", () => {
           label: "Group chat",
           parser: {
             agent: "daemon",
-            detail: "No need to choose a post type. daemon reads the stream and classifies what matters.",
+            detail: "Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.",
           },
         },
         pullRequests: [],

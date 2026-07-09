@@ -97,15 +97,16 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Discuss repo");
     expect(text).not.toContain("Add PR note");
     expect(text).toContain("Group chat");
-    expect(text).toContain("daemon watches");
+    expect(text).toContain("daemon parses chat");
     expect(text).toContain(
-      "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
+      "Use it like a normal group chat. Ask questions, suggest work, paste PRs, and daemon will parse what matters.",
     );
-    expect(text).toContain("Latest messages");
-    expect(text).toContain("No need to choose a post type. daemon reads the stream and classifies what matters.");
-    expect(text).toContain("Write to the group");
-    expect(text).toContain("Posting pace");
-    expect(text).toContain("daemon can slow posting if chat gets noisy. Keep each message useful.");
+    expect(text).toContain("Group thread");
+    expect(text).toContain("Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.");
+    expect(text).toContain("Send a message");
+    expect(text).toContain("daemon managed pace");
+    expect(text).toContain("Chat settings can limit how often each builder posts when the thread gets noisy.");
+    expect(text).toContain("daemon will pick up questions, PR links, decisions, and work ideas from the thread.");
     expect(text).toContain("Message the group");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Post to chat");
@@ -186,6 +187,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Scope work");
     expect(text).not.toContain("Save as work");
     expect(text).not.toContain("Save scoped work");
+    expect(text).not.toContain("Project chat message");
+    expect(text).not.toContain("No need to choose a post type");
     expect(text).not.toContain("A shared room for people and agents");
     expect(text).not.toContain("Room discussion");
     expect(text).not.toContain("Project discussion");
@@ -243,8 +246,8 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain('open="">');
     expect(html).toContain('aria-label="Group chat stream"');
     expect(html).toContain('aria-label="Send a chat message"');
-    expect(html).toContain("Latest messages");
-    expect(html).toContain("Write to the group");
+    expect(html).toContain("Group thread");
+    expect(html).toContain("Send a message");
     expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or share context."');
     expect(html).not.toContain('role="tablist"');
     expect(html).not.toContain('role="tab"');
@@ -261,7 +264,7 @@ describe("CommandWavesConsole", () => {
     const start = html.indexOf('id="project-chat"');
     const end = html.indexOf('id="active-projects"');
     const chatHtml = html.slice(start, end);
-    const copyIndex = chatHtml.indexOf("Copy draft");
+    const copyIndex = chatHtml.indexOf("Copy message");
     const postIndex = chatHtml.indexOf("Post to chat");
     const clearIndex = chatHtml.indexOf("Clear");
 
@@ -271,6 +274,8 @@ describe("CommandWavesConsole", () => {
     expect(postIndex).toBeGreaterThan(copyIndex);
     expect(clearIndex).toBeGreaterThan(postIndex);
     expect(chatHtml).not.toContain("Save as proposal");
+    expect(chatHtml).not.toContain("Project chat message");
+    expect(chatHtml).not.toContain("Next proposal");
   });
 
   it("does not render light-mode surface classes", () => {

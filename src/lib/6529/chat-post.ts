@@ -60,7 +60,7 @@ export function getChatPostingCapability(env: Record<string, string | undefined>
   return {
     canPost: false,
     mode: "manual",
-    message: "Direct chat posting is not configured. Copy the draft instead.",
+    message: "Direct chat posting is not configured. Copy the message instead.",
   };
 }
 
@@ -98,7 +98,7 @@ export async function postChatMessage(input: ChatPostInput): Promise<ChatPostRes
   }
 
   if (!postingConfigured()) {
-    throw Object.assign(new Error("Chat posting is not configured. Copy the draft instead."), { status: 409 });
+    throw Object.assign(new Error("Chat posting is not configured. Copy the message instead."), { status: 409 });
   }
 
   const waveId = normalizeWaveId(target);

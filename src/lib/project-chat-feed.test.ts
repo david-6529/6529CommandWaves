@@ -11,28 +11,29 @@ describe("project chat feed", () => {
       proposer: "david",
     });
 
-    expect(feed.map((item) => item.label)).toEqual(["Next proposal", "Draft status", "Last PR", "Last review"]);
+    expect(feed.map((item) => item.label)).toEqual(["message", "message", "message", "message"]);
     expect(feed[0]).toMatchObject({
       author: "david",
-      title: "Add fee cap tests",
+      title: "Suggested work",
+      body: "I want to discuss Add fee cap tests. Add tests for the fee cap.",
       status: "draft",
     });
     expect(feed[1]).toMatchObject({
       author: "daemon",
-      title: "Not decided yet",
-      body: "Discuss this draft in chat before PR work starts.",
+      title: "Waiting for agreement",
+      body: "I am watching for clear agreement before this becomes PR work.",
       status: "needs decision",
     });
     expect(feed[2]).toMatchObject({
       author: "daemon",
-      title: "PR recorded",
-      body: "The approved hook change has a PR record ready for builders to inspect.",
+      title: "Last PR",
+      body: "I recorded the PR for the approved hook change so builders can inspect it.",
       hrefLabel: "Open PR",
       status: "complete",
     });
     expect(feed[3]).toMatchObject({
       author: "review-agent",
-      body: "The review checked the PR against the approved hook proposal and rules.",
+      body: "Review checked the PR against the approved hook proposal and rules.",
       title: "Review passed",
       status: "pass",
     });
@@ -56,10 +57,10 @@ describe("project chat feed", () => {
     expect(createProjectChatFeed(emptyWave)).toEqual([
       {
         id: "start",
-        label: "Start",
+        label: "message",
         author: "daemon",
-        title: "No hook activity yet",
-        body: "Pick one small hook change and bring it to chat.",
+        title: "Waiting for builders",
+        body: "Start with one small hook change. I will summarize agreement and keep the next step current.",
         status: "waiting",
       },
     ]);
@@ -94,10 +95,10 @@ describe("project chat feed", () => {
 
     expect(createProjectChatFeed(wave)[0]).toMatchObject({
       id: "support-cmd-002",
-      label: "Question",
+      label: "message",
       author: "david",
-      title: "Clarify fee cap options",
-      body: "Compare the simplest fee cap options.",
+      title: "Question",
+      body: "Clarify fee cap options: Compare the simplest fee cap options.",
       status: "approved",
     });
   });

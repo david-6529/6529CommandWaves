@@ -41,10 +41,10 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
   if (poll.decision) {
     return {
       id: "decision",
-      label: "Decision",
+      label: "message",
       author: "builders",
-      title: "Builders approved",
-      body: `Builders approved with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+      title: "Decision recorded",
+      body: `Approved the current hook change with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
       status: `${poll.yesVotes} yes, ${poll.noVotes} no`,
       href: poll.decision.url,
       hrefLabel: "Open decision",
@@ -53,10 +53,10 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
 
   return {
     id: "decision",
-    label: "Decision",
+    label: "message",
     author: "builders",
     title: poll.status === "open" ? "Decision is open" : `Decision is ${poll.status}`,
-    body: `Current tally is ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+    body: `Current vote is ${poll.yesVotes} yes and ${poll.noVotes} no.`,
     status: poll.status.replaceAll("_", " "),
   };
 }
@@ -64,10 +64,10 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
 function draftDecisionItem(): ProjectChatFeedItem {
   return {
     id: "draft-decision",
-    label: "Draft status",
+    label: "message",
     author: orchestratorAgentIdentity.handle,
-    title: "Not decided yet",
-    body: "Discuss this draft in chat before PR work starts.",
+    title: "Waiting for agreement",
+    body: "I am watching for clear agreement before this becomes PR work.",
     status: "needs decision",
   };
 }
@@ -91,10 +91,10 @@ function supportProposalLabel(proposal: CommandWave["proposals"][number]) {
 function supportProposalFeedItem(proposal: CommandWave["proposals"][number]): ProjectChatFeedItem {
   return {
     id: `support-${proposal.id}`,
-    label: supportProposalLabel(proposal),
+    label: "message",
     author: proposal.proposer,
-    title: proposal.title,
-    body: proposal.prompt,
+    title: supportProposalLabel(proposal),
+    body: `${proposal.title}: ${proposal.prompt}`,
     status: proposal.status.replaceAll("_", " "),
   };
 }
@@ -106,27 +106,27 @@ function executionFeedItem(execution: ExecutionRecord | null, label = "PR"): Pro
 
   return {
     id: "pr",
-    label,
+    label: "message",
     author: orchestratorAgentIdentity.handle,
-    title: "PR recorded",
-    body: "The approved hook change has a PR record ready for builders to inspect.",
+    title: label,
+    body: "I recorded the PR for the approved hook change so builders can inspect it.",
     status: execution.status,
     href: prUrl(execution),
     hrefLabel: "Open PR",
   };
 }
 
-function reviewFeedItem(review: GuardianReview | null, label = "Review"): ProjectChatFeedItem | null {
+function reviewFeedItem(review: GuardianReview | null): ProjectChatFeedItem | null {
   if (!review) {
     return null;
   }
 
   return {
     id: "review",
-    label,
+    label: "message",
     author: reviewAgentIdentity.handle,
     title: review.status === "pass" ? "Review passed" : `Review is ${review.status.replaceAll("_", " ")}`,
-    body: "The review checked the PR against the approved hook proposal and rules.",
+    body: "Review checked the PR against the approved hook proposal and rules.",
     status: review.status.replaceAll("_", " "),
   };
 }
@@ -134,7 +134,7 @@ function reviewFeedItem(review: GuardianReview | null, label = "Review"): Projec
 function activityFeedItem(event: LedgerEvent): ProjectChatFeedItem {
   return {
     id: `activity-${event.id}`,
-    label: "Activity",
+    label: "message",
     author: event.actor,
     title: event.type.replaceAll("_", " "),
     body: event.message,
@@ -151,20 +151,20 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
   if (isNextDraft) {
     items.push({
       id: "next-proposal",
-      label: "Next proposal",
+      label: "message",
       author: clean(draft?.proposer ?? "", "A builder"),
-      title: draftTitle,
-      body: `${clean(draft?.proposer ?? "", "A builder")} is preparing this as the next PR-sized hook change for chat.`,
+      title: "Suggested work",
+      body: `I want to discuss ${draftTitle}. ${clean(draft?.prompt ?? "", "Can this be the next small hook change?")}`,
       status: "draft",
     });
     items.push(draftDecisionItem());
   } else if (phaseWork.prProposal) {
     items.push({
       id: "current-proposal",
-      label: "Current proposal",
+      label: "message",
       author: phaseWork.prProposal.proposer,
-      title: phaseWork.prProposal.title,
-      body: phaseWork.prProposal.prompt,
+      title: "Suggested work",
+      body: `I think the next hook change should be ${phaseWork.prProposal.title}. ${phaseWork.prProposal.prompt}`,
       status: phaseWork.prProposal.status.replaceAll("_", " "),
     });
   } else {
@@ -172,7 +172,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
   }
 
   const evidenceItems = isNextDraft
-    ? [executionFeedItem(phaseWork.prExecution, "Last PR"), reviewFeedItem(phaseWork.prReview, "Last review")]
+    ? [executionFeedItem(phaseWork.prExecution, "Last PR"), reviewFeedItem(phaseWork.prReview)]
     : [decisionFeedItem(phaseWork.prPoll), executionFeedItem(phaseWork.prExecution), reviewFeedItem(phaseWork.prReview)];
 
   for (const item of evidenceItems) {
@@ -194,10 +194,10 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
     : [
         {
           id: "start",
-          label: "Start",
+          label: "message",
           author: orchestratorAgentIdentity.handle,
-          title: "No hook activity yet",
-          body: "Pick one small hook change and bring it to chat.",
+          title: "Waiting for builders",
+          body: "Start with one small hook change. I will summarize agreement and keep the next step current.",
           status: "waiting",
         },
       ];

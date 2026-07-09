@@ -99,16 +99,16 @@ describe("public project snapshot", () => {
         label: "Group chat",
         title: "Group chat",
         detail:
-          "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
+          "Use it like a normal group chat. Ask questions, suggest work, paste PRs, and daemon will parse what matters.",
         composerLabel: "Message the group",
         placeholder: "Ask a question, suggest work, paste a PR, or share context.",
         posting: {
-          label: "Posting pace",
-          detail: "daemon can slow posting if chat gets noisy. Keep each message useful.",
+          label: "daemon managed pace",
+          detail: "Chat settings can limit how often each builder posts when the thread gets noisy.",
         },
         parser: {
           agent: "daemon",
-          detail: "No need to choose a post type. daemon reads the stream and classifies what matters.",
+          detail: "Builders write normally. daemon reads the shared thread and updates summaries, votes, and PR work.",
         },
       },
       pullRequests: [],

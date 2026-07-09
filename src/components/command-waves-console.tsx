@@ -1455,7 +1455,7 @@ export function CommandWavesConsole() {
           setChatPostingCapability({
             canPost: false,
             mode: "manual",
-            message: "Direct chat posting is not configured. Copy the draft instead.",
+            message: "Direct chat posting is not configured. Copy the message instead.",
           });
         }
       });
@@ -1820,7 +1820,7 @@ export function CommandWavesConsole() {
     }
 
     if (!chatPostingCapability?.canPost) {
-      setProjectChatNotice(chatPostingCapability?.message ?? "Direct chat posting is not ready. Copy the draft instead.");
+      setProjectChatNotice(chatPostingCapability?.message ?? "Direct chat posting is not ready. Copy the message instead.");
       return;
     }
 
@@ -2307,13 +2307,14 @@ export function CommandWavesConsole() {
           >
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
               <span>Project chat</span>
-              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} watches</Badge>
+              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} parses chat</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{projectChat.title}</h2>
                 <p className="mt-2 max-w-xl text-base leading-7 text-zinc-400">{projectChat.detail}</p>
+                <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -2325,7 +2326,7 @@ export function CommandWavesConsole() {
             <section className="mt-5 rounded-lg border border-zinc-800 bg-black/20 p-4" aria-label="Group chat stream">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Latest messages</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Group thread</h3>
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
                 <Button
@@ -2377,7 +2378,6 @@ export function CommandWavesConsole() {
                           <div className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3">
                             <div className="flex flex-wrap items-center gap-2">
                               <p className="text-sm font-semibold text-zinc-50">{author}</p>
-                              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{item.label}</Badge>
                               {item.href ? (
                                 <a
                                   className="text-sm font-semibold text-blue-300 hover:text-blue-200"
@@ -2389,9 +2389,6 @@ export function CommandWavesConsole() {
                                 </a>
                               ) : null}
                             </div>
-                            <p className="mt-1 text-sm font-semibold leading-6 text-zinc-50">
-                              {humanizeLegacyCommandCopy(item.title)}
-                            </p>
                             <p className="mt-1 line-clamp-3 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(item.body)}</p>
                           </div>
                         </div>
@@ -2403,8 +2400,8 @@ export function CommandWavesConsole() {
             <section className="mt-5 rounded-lg border border-zinc-800 bg-zinc-950/60 p-4" aria-label="Send a chat message">
               <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-base font-semibold text-zinc-50">Write to the group</p>
-                  <p className="mt-1 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
+                  <p className="text-base font-semibold text-zinc-50">Send a message</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-500">daemon will pick up questions, PR links, decisions, and work ideas from the thread.</p>
                 </div>
                 <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.posting.label}</Badge>
               </div>
@@ -2427,7 +2424,7 @@ export function CommandWavesConsole() {
                   disabled={!hasProjectChatMessage}
                   onClick={() => void copyBuilderWaveChatDraft()}
                 >
-                  Copy draft
+                  Copy message
                 </Button>
                 <Button
                   type="button"
