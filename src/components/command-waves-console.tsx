@@ -250,6 +250,11 @@ type ContextPreviewResponse = ApiErrorPayload & {
   preview?: WaveContextPreview;
 };
 
+type ChatObservationSyncResponse = WaveApiResponse & {
+  observedCount?: number;
+  skippedCount?: number;
+};
+
 type WaveSearchResult = {
   id: string;
   name: string;
@@ -418,6 +423,36 @@ async function requestContextPreview(waveId: string) {
   }
 
   return payload.preview;
+}
+
+async function requestProjectChatObservationSync(waveUrl: string, preview: WaveContextPreview, accessKey?: string) {
+  const headers = new Headers();
+
+  headers.set("content-type", "application/json");
+  attachAdminApiKey(headers, accessKey);
+
+  const response = await fetchWithClientTimeout("/api/command-wave/chat/observe", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      waveUrl,
+      drops: preview.sampleDrops,
+    }),
+  });
+  const payload = await readApiJson<ChatObservationSyncResponse>(response, "Chat sync failed.");
+
+  if (!response.ok || !payload.wave) {
+    throw new Error(formatApiError(payload, "Chat sync failed."));
+  }
+
+  return {
+    wave: createPublicCommandWaveSource({
+      ...payload.wave,
+      repoUrl: payload.wave.repoUrl ?? githubRepoPlaceholder.url,
+    }),
+    observedCount: payload.observedCount ?? 0,
+    skippedCount: payload.skippedCount ?? 0,
+  };
 }
 
 async function requestChatPost(waveUrl: string, content: string, accessKey?: string, senderId?: string) {
@@ -1627,8 +1662,25 @@ export function CommandWavesConsole() {
 
     try {
       const preview = await requestContextPreview(targetWaveUrl);
+      let syncNotice = "";
 
       if (target === "project") {
+        try {
+          const sync = await requestProjectChatObservationSync(targetWaveUrl, preview, accessKey);
+
+          if (sync.observedCount > 0) {
+            applyWave(sync.wave);
+            syncNotice = ` daemon recorded ${postCountLabel(sync.observedCount)}.`;
+          } else {
+            syncNotice = " daemon already had these posts.";
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Chat sync failed.";
+
+          syncNotice = message.includes("Admin API key")
+            ? " daemon sync needs the server key."
+            : ` daemon sync failed: ${message}`;
+        }
         setProjectContextPreviews((previews) => ({
           ...previews,
           [projectId ?? targetWaveUrl]: preview,
@@ -1636,7 +1688,7 @@ export function CommandWavesConsole() {
       } else {
         setSetupContextPreview(preview);
       }
-      setApiNotice(`Project posts loaded: ${postCountLabel(preview.dropCount)}.`);
+      setApiNotice(`Project posts loaded: ${postCountLabel(preview.dropCount)}.${syncNotice}`);
     } catch (error) {
       setApiError(error instanceof Error ? error.message : "Context preview failed.");
     } finally {

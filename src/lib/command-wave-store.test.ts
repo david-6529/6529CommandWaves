@@ -5,6 +5,7 @@ import {
   getCommandWave,
   recordDecisionReceipt,
   recordProjectChatObservation,
+  recordProjectChatPreviewObservations,
   recordVote,
   replaceCommandWave,
   resetCommandWave,
@@ -150,6 +151,49 @@ describe("Command wave store", () => {
       actor: "daemon",
       type: "chat_observed",
       message: "alice suggested work. Message: Can we discuss fee cap tests before anyone opens a PR?",
+    });
+  });
+
+  it("syncs visible project chat drops once and skips agent chatter", async () => {
+    const first = await recordProjectChatPreviewObservations({
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      drops: [
+        {
+          id: "drop-001",
+          author: "alice",
+          preview: "Can we vote on the fee cap tests before opening the PR?",
+        },
+        {
+          id: "drop-002",
+          author: "daemon",
+          preview: "I updated the project summary.",
+        },
+      ],
+    });
+    const second = await recordProjectChatPreviewObservations({
+      waveUrl: "https://6529.io/waves/6529-hook-builder",
+      drops: [
+        {
+          id: "drop-001",
+          author: "alice",
+          preview: "Can we vote on the fee cap tests before opening the PR?",
+        },
+      ],
+    });
+
+    expect(first).toMatchObject({
+      observedCount: 1,
+      skippedCount: 1,
+    });
+    expect(second).toMatchObject({
+      observedCount: 0,
+      skippedCount: 1,
+    });
+    expect(second.wave.ledger.filter((event) => event.type === "chat_observed")).toHaveLength(1);
+    expect(second.wave.ledger[0]).toMatchObject({
+      actor: "daemon",
+      type: "chat_observed",
+      message: "alice asked for a decision. Message: Can we vote on the fee cap tests before opening the PR?",
     });
   });
 

@@ -3,6 +3,7 @@ import { POST as previewContext } from "./6529/context/preview/route";
 import { GET as getChatPostCapability, POST as postChatMessage } from "./6529/chat-post/route";
 import { GET as searchWaves } from "./6529/waves/search/route";
 import { POST as createCodexPacket } from "./command-wave/codex-packet/route";
+import { POST as observeProjectChat } from "./command-wave/chat/observe/route";
 import { POST as recordDecision } from "./command-wave/decision/route";
 import { POST as executeCommand } from "./command-wave/execute/route";
 import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
@@ -228,6 +229,42 @@ describe("API route validation", () => {
     });
   });
 
+  it("records daemon observations from visible project chat drops", async () => {
+    const response = await observeProjectChat(
+      request("https://command-waves.example.com/api/command-wave/chat/observe", {
+        method: "POST",
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/6529-hook-builder",
+          drops: [
+            {
+              id: "drop-001",
+              author: "alice",
+              preview: "Can we vote on the fee cap test plan before opening the PR?",
+            },
+            {
+              id: "drop-002",
+              author: "daemon",
+              preview: "Project summary updated.",
+            },
+          ],
+        }),
+      }),
+    );
+    const payload = await responsePayload(response);
+    const wavePayload = payload.wave as { ledger?: unknown[] };
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      observedCount: 1,
+      skippedCount: 1,
+    });
+    expect(wavePayload.ledger?.[0]).toMatchObject({
+      actor: "daemon",
+      type: "chat_observed",
+      message: "alice asked for a decision. Message: Can we vote on the fee cap test plan before opening the PR?",
+    });
+  });
+
   it("publishes chat posting capability without credentials", async () => {
     process.env["6529_MOCK_MODE"] = "false";
     process.env["6529_BOT_BEARER_TOKEN"] = "secret-token";
@@ -285,6 +322,7 @@ describe("API route validation", () => {
     ["review record", reviewCommand, "/api/command-wave/review", "POST"],
     ["Codex packet", createCodexPacket, "/api/command-wave/codex-packet", "POST"],
     ["chat post", postChatMessage, "/api/6529/chat-post", "POST"],
+    ["chat observation sync", observeProjectChat, "/api/command-wave/chat/observe", "POST"],
   ] satisfies [string, RouteHandler, string, string][])(
     "requires admin auth for %s routes when configured",
     async (_label, handler, path, method) => {
@@ -315,6 +353,7 @@ describe("API route validation", () => {
     ["review record", reviewCommand, "/api/command-wave/review", "POST"],
     ["Codex packet", createCodexPacket, "/api/command-wave/codex-packet", "POST"],
     ["chat post", postChatMessage, "/api/6529/chat-post", "POST"],
+    ["chat observation sync", observeProjectChat, "/api/command-wave/chat/observe", "POST"],
   ] satisfies [string, RouteHandler, string, string][])(
     "fails closed for %s routes in production without ADMIN_API_KEY",
     async (_label, handler, path, method) => {

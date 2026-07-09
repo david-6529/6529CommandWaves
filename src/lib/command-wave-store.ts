@@ -58,6 +58,7 @@ const commandKinds = new Set<CommandKind>([
 ]);
 const firstPhaseCommandKinds = new Set<CommandKind>(["read_context", "draft_response", "post_to_wave", "open_pr"]);
 const parkedCommandKinds: CommandKind[] = ["run_script", "deploy", "spend_money", "change_rules"];
+const nonBuilderChatAuthors = new Set(["agent", "daemon", "decision", "review-agent", "reviewer", "rule engine", "setup"]);
 
 function cloneDemoWave(): CommandWave {
   return JSON.parse(JSON.stringify(demoWave)) as CommandWave;
@@ -498,6 +499,69 @@ export async function recordProjectChatObservation(input: unknown) {
   });
 
   return replaceCommandWave(nextWave);
+}
+
+function previewDropItems(value: unknown) {
+  return Array.isArray(value) ? value.slice(-5) : [];
+}
+
+function isBuilderChatAuthor(value: string) {
+  return !nonBuilderChatAuthors.has(value.trim().toLowerCase());
+}
+
+export async function recordProjectChatPreviewObservations(input: unknown) {
+  const body = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};
+  const wave = await getCommandWave();
+  const target = asText(body.waveUrl, asText(body.waveId));
+  const drops = previewDropItems(body.drops);
+
+  if (!target || !sameWaveId(target, wave.waveUrl)) {
+    return { wave, observedCount: 0, skippedCount: drops.length };
+  }
+
+  let nextWave = wave;
+  let observedCount = 0;
+  let skippedCount = 0;
+  const existingSummaries = new Set(wave.ledger.filter((event) => event.type === "chat_observed").map((event) => event.message));
+
+  for (const item of drops) {
+    const drop = typeof item === "object" && item !== null ? (item as Record<string, unknown>) : {};
+    const author = asText(drop.author, "builder");
+    const content = asText(drop.preview, asText(drop.content));
+
+    if (!content || !isBuilderChatAuthor(author)) {
+      skippedCount += 1;
+      continue;
+    }
+
+    const observation = createProjectChatObservation({
+      author,
+      content,
+    });
+
+    if (existingSummaries.has(observation.summary)) {
+      skippedCount += 1;
+      continue;
+    }
+
+    existingSummaries.add(observation.summary);
+    nextWave = appendLedger(nextWave, {
+      actor: "daemon",
+      type: "chat_observed",
+      message: observation.summary,
+    });
+    observedCount += 1;
+  }
+
+  if (!observedCount) {
+    return { wave, observedCount, skippedCount };
+  }
+
+  return {
+    wave: await replaceCommandWave(nextWave),
+    observedCount,
+    skippedCount,
+  };
 }
 
 export async function submitCommandProposal(input: unknown) {
