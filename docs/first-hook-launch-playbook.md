@@ -49,12 +49,11 @@ Use the 6529-backed project chat for live discussion and decisions. Use this app
 
 ## Community Flow
 
-Use two social spaces if the community wants them:
+Use one project chat as the social source of truth.
 
-1. General chat: collect ideas, questions, and onboarding help.
-2. Builder chat: approve scoped commands that can become PRs.
+Builders can ask questions, suggest work, paste PR links, and share context in the same stream. daemon watches that discussion, updates the project summary, labels risk, and turns clear agreement into decision-ready work. Builders do not need to classify their message before posting.
 
-The app should treat builder chat as the source of truth for work approval. General chat can feed ideas, but it should not authorize code changes.
+If the community uses separate side threads for onboarding or brainstorming, keep them advisory. Code work should still trace back to the project chat and a visible project decision.
 
 ## Optional QnA Check
 
@@ -87,15 +86,15 @@ COMMAND_WAVE_REPO_ADAPTER=github
 COMMAND_WAVE_GITHUB_TOKEN=<github token>
 ```
 
-1. Pick the builder chat. Keep the GitHub repo placeholder for chat launch.
+1. Pick the project chat. Keep the GitHub repo placeholder for chat launch.
 2. Open Maintainer tools, run Launch readiness, and use the launch check to expose setup blockers.
 3. Select the hook repo before PR work, then confirm it has `CONTRIBUTING.md`, a PR template with Command Waves manifest markers, the guardian workflow, and the required guardian check.
 4. Copy the chat launch brief from setup.
 5. Post the brief with the chat, repo status, participation notes, and hook scope.
 6. Copy the participation guide and share it where new contributors will see it.
-7. Invite ideas in the general chat or thread.
+7. Invite ideas in the project chat.
 8. Let orchestration rules turn one strong idea into a risk-classified PR-sized command.
-9. Vote or approve through builder chat.
+9. Vote or approve through the project chat.
 10. Record the decision URL as the manual decision link.
 11. Use the build step to prepare the branch, commit the Codex work packet, and open a draft PR record.
 12. Run any code-writing agent only inside that approved packet and branch.
@@ -105,7 +104,7 @@ COMMAND_WAVE_GITHUB_TOKEN=<github token>
 16. Review the PR manifest, tests, parameter-cap evidence, and changed files.
 17. Humans merge only after review passes.
 18. Use the contribution report and fee plan as evidence for any separate payout vote.
-19. Review the chat update draft and share it manually in builder chat.
+19. Review the chat update draft and share it manually in project chat.
 20. Keep the launch packet with the PR so later contributors can audit the loop.
 21. Run the launch audit with `?remote=1`, or rerun Launch readiness in the app, and fix blockers before broad participation.
 
