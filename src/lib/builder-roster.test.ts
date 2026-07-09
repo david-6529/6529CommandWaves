@@ -60,4 +60,28 @@ describe("builder roster", () => {
     });
     expect(roster.some((member) => member.identity === "wave-poll")).toBe(false);
   });
+
+  it("does not turn daemon observations into member profiles", () => {
+    const report = createContributionReport({
+      ...demoWave,
+      ledger: [
+        {
+          id: "evt-chat",
+          at: "2026-06-20T13:10:00.000Z",
+          actor: "daemon",
+          type: "chat_observed",
+          message:
+            "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+        },
+        ...demoWave.ledger,
+      ],
+    });
+    const roster = createBuilderRoster(report);
+
+    expect(roster.some((member) => member.identity === "daemon")).toBe(false);
+    expect(roster[0]).toMatchObject({
+      identity: "david",
+      scoreLabel: "10 report points",
+    });
+  });
 });

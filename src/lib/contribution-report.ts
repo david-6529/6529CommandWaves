@@ -1,5 +1,5 @@
 import type { CommandWave } from "./command-waves";
-import { orchestratorAgentIdentity } from "./agent-identities";
+import { orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { ledgerEventsForVisibleProjectHistory, latestLedgerTimestamp } from "./ledger";
@@ -60,6 +60,11 @@ export type ContributionReport = {
 
 function addContributor(map: Map<string, ContributionContributor>, identity: string) {
   const normalized = identity.trim() || "unknown";
+
+  if (isSystemContributorIdentity(normalized)) {
+    return null;
+  }
+
   const existing = map.get(normalized);
 
   if (existing) {
@@ -129,16 +134,25 @@ function chatPostPreview(value: string) {
   return value.trim().replace(/\s+/g, " ").slice(0, 110);
 }
 
-function isSystemChatAuthor(identity: string) {
+function isSystemContributorIdentity(identity: string) {
   const normalized = identity.trim().toLowerCase();
+  const systemIdentities = new Set([
+    "",
+    "unknown",
+    "setup",
+    "rule engine",
+    "ai worker",
+    "agent",
+    "reviewer",
+    "wave poll",
+    "wave-poll",
+    "decision",
+    orchestratorAgentIdentity.handle,
+    reviewAgentIdentity.handle,
+  ]);
 
   return (
-    !normalized ||
-    normalized === "unknown" ||
-    normalized === orchestratorAgentIdentity.handle ||
-    normalized === "wave-poll" ||
-    normalized === "agent" ||
-    normalized === "reviewer" ||
+    systemIdentities.has(normalized) ||
     normalized.endsWith("-agent")
   );
 }
@@ -245,6 +259,10 @@ export function createContributionReport(
   for (const proposal of wave.proposals) {
     const contributor = addContributor(contributors, proposal.proposer);
 
+    if (!contributor) {
+      continue;
+    }
+
     contributor.proposals += 1;
     const points = proposal.status === "complete" ? 6 : proposal.status === "reviewing" ? 4 : 3;
 
@@ -279,14 +297,20 @@ export function createContributionReport(
     if (poll.decision?.recordedBy) {
       const contributor = addContributor(contributors, poll.decision.recordedBy);
 
-      contributor.decisions += 1;
-      contributor.score += 2;
-      addScoreBasis(contributor, "Decision links", 2);
-      addRationale(contributor, "Recorded project decision link");
+      if (contributor) {
+        contributor.decisions += 1;
+        contributor.score += 2;
+        addScoreBasis(contributor, "Decision links", 2);
+        addRationale(contributor, "Recorded project decision link");
+      }
     }
 
     for (const vote of poll.votes ?? []) {
       const contributor = addContributor(contributors, vote.voterIdentity);
+
+      if (!contributor) {
+        continue;
+      }
 
       contributor.votes += 1;
       contributor.score += 1;
@@ -305,11 +329,15 @@ export function createContributionReport(
   }
 
   for (const event of visibleLedgerEvents(wave)) {
-    if (["Setup", "Rule Engine", "AI Worker", "Agent", "Reviewer", "Wave Poll", "Decision"].includes(event.actor)) {
+    if (isSystemContributorIdentity(event.actor)) {
       continue;
     }
 
     const contributor = addContributor(contributors, event.actor);
+
+    if (!contributor) {
+      continue;
+    }
 
     contributor.ledgerEvents += 1;
     contributor.score += 1;
@@ -318,11 +346,15 @@ export function createContributionReport(
   }
 
   for (const post of chatPosts) {
-    if (isSystemChatAuthor(post.author)) {
+    if (isSystemContributorIdentity(post.author)) {
       continue;
     }
 
     const contributor = addContributor(contributors, post.author);
+
+    if (!contributor) {
+      continue;
+    }
 
     contributor.chatPosts += 1;
     contributor.score += 1;
@@ -358,7 +390,7 @@ export function createContributionReport(
       "Report scores are an AI-readable activity report, not a permission system.",
       "Reputation, token weight, payouts, and merge rights must use separate human-approved rules.",
       "The report only uses proposal, vote, decision, chat post, PR, review, and ledger records currently stored or previewed by this app.",
-      "Unattributed agent and reviewer events stay in the audit log but do not become human score.",
+      "Agent and system events stay in the audit log but do not become human score.",
     ],
   };
 }

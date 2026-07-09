@@ -82,7 +82,7 @@ What remains manual or MVP-only:
   create bounded check runs when configured. It does not merge, deploy, change repo settings, or spend funds.
 - The current guardian runs as a repo-local GitHub Action. The stronger production version should be an external GitHub App.
 - Contribution reporting is a daemon-generated visible-activity analysis with partial confidence. It uses visible app
-  activity, project chat posts pulled into the app, recorded PR links, and repo-bound review proof. Builder profiles show activity, voting summaries, and report points as context only. Full scoring
+  activity, project chat posts pulled into the app, recorded PR links, and repo-bound review proof. Agent and system log events stay in the audit trail but do not become member score. Builder profiles show activity, voting summaries, and report points as context only. Full scoring
   across unattached GitHub commits, merges, and off-app activity is still future work.
 - The seeded demo includes discussion and decision activity, but the default placeholder repo keeps PR work blocked until maintainers choose the repo.
 

@@ -224,6 +224,73 @@ describe("contribution report", () => {
     });
   });
 
+  it("keeps daemon ledger observations out of contributor scoring", () => {
+    const report = createContributionReport({
+      ...demoWave,
+      ledger: [
+        {
+          id: "evt-chat",
+          at: "2026-06-20T13:10:00.000Z",
+          actor: "daemon",
+          type: "chat_observed",
+          message:
+            "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+        },
+        ...demoWave.ledger,
+      ],
+    });
+
+    expect(report.generatedAt).toBe("2026-06-20T13:10:00.000Z");
+    expect(report.evidence).toContain("5 ledger events");
+    expect(report.contributors.some((contributor) => contributor.identity === "daemon")).toBe(false);
+    expect(report.contributors[0]).toMatchObject({
+      identity: "david",
+      score: 10,
+      ledgerEvents: 1,
+    });
+  });
+
+  it("does not score daemon when agent records appear in proposal, vote, or decision fields", () => {
+    const report = createContributionReport({
+      ...demoWave,
+      proposals: [
+        {
+          ...demoWave.proposals[0],
+          proposer: "daemon",
+        },
+      ],
+      polls: [
+        {
+          ...demoWave.polls[0],
+          decision: demoWave.polls[0].decision
+            ? {
+                ...demoWave.polls[0].decision,
+                recordedBy: "daemon",
+              }
+            : null,
+          votes: [
+            {
+              voterIdentity: "daemon",
+              vote: "yes",
+              weight: 1,
+              source: "local",
+              at: "2026-06-20T12:16:00.000Z",
+            },
+            ...demoWave.polls[0].votes,
+          ],
+        },
+      ],
+    });
+
+    expect(report.evidence).toEqual(expect.arrayContaining(["1 proposal", "7 votes", "1 project decision link"]));
+    expect(report.contributors.some((contributor) => contributor.identity === "daemon")).toBe(false);
+    expect(report.contributors[0]).toMatchObject({
+      identity: "david",
+      score: 2,
+    });
+    expect(report.contributors.some((contributor) => contributor.proposals > 0)).toBe(false);
+  });
+
   it("creates a copyable report draft without granting authority", () => {
     const draft = createContributionReportDraft(configuredDemoWave, {
       generatedAt: "2026-06-21T12:00:00.000Z",
