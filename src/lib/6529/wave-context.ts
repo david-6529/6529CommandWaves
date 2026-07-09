@@ -1,6 +1,7 @@
 import { getWaveDrops, normalizeWaveId } from "./client";
 import { dropCreatedAtMs } from "./normalize";
 import type { JsonRecord, WaveDrop } from "./types";
+import { redactPublicText } from "../public-text-redaction";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WAVE_DROPS_PAGE_SIZE = 200;
@@ -374,7 +375,7 @@ export async function previewWaveContext(params: WaveContextParams) {
         sourceWaveId,
         sourceWaveName: drop.source_wave_name ?? null,
         sourceWaveRole: drop.source_wave_role ?? null,
-        preview: (drop.content ?? "").replace(/\s+/g, " ").trim().slice(0, 220),
+        preview: redactPublicText(drop.content ?? "").replace(/\s+/g, " ").trim().slice(0, 220),
       };
     }),
   };

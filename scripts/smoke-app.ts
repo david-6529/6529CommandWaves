@@ -161,16 +161,15 @@ async function main() {
     "Refresh chat to read the latest posts here.",
     "First public project chat.",
     "Group chat",
-    "daemon reads thread",
-    "A shared thread for questions, ideas, decisions, and PR links. Write normally. daemon parses what matters.",
-    "Shared thread",
-    "No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.",
-    "Write to the group",
-    "No categories or post types. daemon parses the thread in the background.",
+    "Builder thread",
+    "daemon observes",
+    "Builders talk in one shared thread. Ask questions, debate scope, paste PRs, and vote when needed. daemon observes the thread and keeps the project state current.",
+    "Latest messages",
+    "Write normally. daemon watches for agreement, vote needs, and PR links.",
+    "Reply",
     "3 messages / 5 min",
-    "daemon currently limits each builder identity to 3 messages per 5 minutes.",
-    "Message",
-    "Ask a question, suggest work, paste a PR, or share context",
+    "Current daemon setting: 3 messages per 5 minutes for each builder identity.",
+    "Message the group",
     "GitHub repo placeholder",
     "Send",
     "Record proposal",
@@ -214,6 +213,8 @@ async function main() {
   assert(!renderedHtml.includes("Access is manual for now."), "Home page still shows stale wallet access copy.");
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
+  assert(!renderedHtml.includes("Write to the group"), "Home page should use reply copy for group chat.");
+  assert(!renderedHtml.includes("No categories or post types"), "Home page should not explain post types in chat.");
   const staleDecisionCopy = "decision " + "receipt";
   const staleDecisionLabel = "Decision " + "receipt";
   const staleDecisionLabels = "Decision " + "receipts";
@@ -430,7 +431,7 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
   assertIncludes("State response", JSON.stringify(statePayload), "\"chat\"");
   assertIncludes("State response", JSON.stringify(statePayload), "group_chat");
-  assertIncludes("State response", JSON.stringify(statePayload), "No post types are needed.");
+  assertIncludes("State response", JSON.stringify(statePayload), "Write normally. daemon watches for agreement, vote needs, and PR links.");
   assertIncludes("State response", JSON.stringify(statePayload), "3 messages / 5 min");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
   assertIncludes("State response", JSON.stringify(statePayload), "rules");
@@ -487,8 +488,15 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "6529-hook-builder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "latestChanges");
-  assertIncludes("Projects response", JSON.stringify(projectsPayload), "builders approved");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "currentVote");
+  const projects = objectValue(projectsPayload, "projects");
+  assert(Array.isArray(projects), "Projects response is missing projects.");
+  const activeProject = projects[0];
+  assertJsonObject("Projects response active project", activeProject);
+  const projectCurrentVote = objectValue(activeProject, "currentVote");
+  assertJsonObject("Projects response current vote", projectCurrentVote);
+  assert(objectValue(projectCurrentVote, "yesVotes") === 5, "Projects response current vote yes count is wrong.");
+  assert(objectValue(projectCurrentVote, "noVotes") === 1, "Projects response current vote no count is wrong.");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "discussionTopics");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "\"chat\"");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "group_chat");

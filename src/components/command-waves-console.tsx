@@ -2346,15 +2346,14 @@ export function CommandWavesConsole() {
             open
           >
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
-              <span>Project chat</span>
-              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} reads thread</Badge>
+              <span>Group chat</span>
+              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} observes</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0 flex-1">
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{projectChat.title}</h2>
-                <p className="mt-2 max-w-2xl text-base leading-7 text-zinc-400">{projectChat.detail}</p>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
+                <p className="mt-2 text-base leading-7 text-zinc-400">{projectChat.detail}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -2366,19 +2365,22 @@ export function CommandWavesConsole() {
             <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Group chat stream">
               <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-800 p-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Shared thread</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Latest messages</h3>
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  disabled={isBusy || !primaryHookProject?.waveUrl}
-                  onClick={() => void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)}
-                >
-                  {apiBusy === "context" ? "Loading" : "Refresh"}
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{chatPostingPaceLabel}</Badge>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={isBusy || !primaryHookProject?.waveUrl}
+                    onClick={() => void previewContext(primaryHookProject?.waveUrl ?? wave.waveUrl, "project", primaryHookProject?.id)}
+                  >
+                    {apiBusy === "context" ? "Loading" : "Refresh"}
+                  </Button>
+                </div>
               </div>
-              <div className="grid gap-4 p-4">
+              <div className="grid max-h-[30rem] gap-4 overflow-y-auto p-4">
                 {hasRecentDiscussionPosts
                   ? visibleProjectChatSnapshotDrops.slice(0, 4).map((drop) => {
                       const author = projectChatAuthorLabel(drop.author);
@@ -2438,16 +2440,15 @@ export function CommandWavesConsole() {
                           </div>
                         </div>
                       );
-                    })}
+                  })}
               </div>
 
-              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Send a chat message">
+              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Reply to group chat">
                 <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-zinc-50">Write to the group</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-500">No categories or post types. daemon parses the thread in the background.</p>
+                    <p className="text-base font-semibold text-zinc-50">Reply</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
                   </div>
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{chatPostingPaceLabel}</Badge>
                 </div>
                 <Field label={projectChat.composerLabel}>
                   <Textarea

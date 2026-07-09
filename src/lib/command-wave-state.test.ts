@@ -67,7 +67,7 @@ describe("command wave state snapshot", () => {
           },
           parser: {
             agent: "daemon",
-            detail: "No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.",
+            detail: "Write normally. daemon watches for agreement, vote needs, and PR links.",
           },
         },
         pullRequests: [],

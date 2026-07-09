@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { postChatMessage } from "./chat-post";
 import { resetMockDropsForTests } from "./mock";
 import { fetchWaveContext, previewWaveContext } from "./wave-context";
 
@@ -61,6 +62,25 @@ describe("6529 wave context", () => {
       author: "wave-poll",
       preview: "Builders approved the hook scaffold proposal.",
     });
+  });
+
+  it("redacts obvious credentials in sample drop previews", async () => {
+    await postChatMessage({
+      waveId: "mock-command-wave",
+      content:
+        "Please review the hook PR with token=abc1234567890 and private_key=0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    });
+
+    const preview = await previewWaveContext({
+      waveId: "mock-command-wave",
+      includeAllHistory: true,
+    });
+    const latestPreview = preview.sampleDrops.at(-1)?.preview ?? "";
+
+    expect(latestPreview).toContain("token=[redacted]");
+    expect(latestPreview).toContain("private_key=[redacted]");
+    expect(latestPreview).not.toContain("abc1234567890");
+    expect(latestPreview).not.toContain("0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef");
   });
 
   it("caps all-history previews to the requested latest drops", async () => {

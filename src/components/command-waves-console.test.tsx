@@ -98,18 +98,19 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Discuss repo");
     expect(text).not.toContain("Add PR note");
     expect(text).toContain("Group chat");
-    expect(text).toContain("daemon reads thread");
+    expect(text).toContain("Builder thread");
+    expect(text).toContain("daemon observes");
     expect(text).toContain(
-      "A shared thread for questions, ideas, decisions, and PR links. Write normally. daemon parses what matters.",
+      "Builders talk in one shared thread. Ask questions, debate scope, paste PRs, and vote when needed. daemon observes the thread and keeps the project state current.",
     );
-    expect(text).toContain("Shared thread");
-    expect(text).toContain("No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.");
-    expect(text).toContain("Write to the group");
+    expect(text).toContain("Latest messages");
+    expect(text).toContain("Write normally. daemon watches for agreement, vote needs, and PR links.");
+    expect(text).toContain("Reply");
     expect(text).toContain("3 messages / 5 min");
-    expect(text).toContain("daemon currently limits each builder identity to 3 messages per 5 minutes.");
-    expect(text).toContain("No categories or post types. daemon parses the thread in the background.");
+    expect(text).toContain("Current daemon setting: 3 messages per 5 minutes for each builder identity.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Send");
+    expect(text).not.toContain("No categories or post types.");
     expect(text).not.toContain("Save as proposal");
     expect(text).not.toContain("Save proposal");
     expect(text).toContain("Record proposal");
@@ -202,6 +203,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Discuss repo setup");
     expect(text).not.toContain("Save work item");
     expect(text).not.toContain("Post message");
+    expect(text).not.toContain("Write to the group");
+    expect(text).not.toContain("No categories or post types");
     expect(text).not.toContain("\u2014");
     expect(text).not.toContain("Gate");
     expect(text).not.toContain("gate unset");
@@ -252,9 +255,9 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain('<details id="project-chat"');
     expect(html).toContain('open="">');
     expect(html).toContain('aria-label="Group chat stream"');
-    expect(html).toContain('aria-label="Send a chat message"');
-    expect(html).toContain("Shared thread");
-    expect(html).toContain("Write to the group");
+    expect(html).toContain('aria-label="Reply to group chat"');
+    expect(html).toContain("Latest messages");
+    expect(html).toContain("Reply");
     expect(text).toContain("david");
     expect(text).toContain("gpebbles");
     expect(text).toContain("simo");
@@ -263,7 +266,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("PR work can start once maintainers select the pilot GitHub repo.");
     expect(text).not.toContain("I am watching for clear agreement before this becomes PR work.");
     expect(text).not.toContain("I recorded the PR for the approved hook change so builders can inspect it.");
-    expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or share context"');
+    expect(html).toContain('placeholder="Message the group"');
     expect(html).not.toContain('role="tablist"');
     expect(html).not.toContain('role="tab"');
     expect(html).not.toContain('role="tabpanel"');

@@ -55,15 +55,15 @@ describe("project chat feed", () => {
     };
 
     expect(createProjectChatFeed(emptyWave)).toEqual([
-      {
-        id: "start",
-        label: "message",
-        author: "daemon",
-        title: "Waiting for builders",
-        body: "Start with one small hook change. I will summarize agreement and keep the next step current.",
-        status: "waiting",
-      },
-    ]);
+        {
+          id: "start",
+          label: "message",
+          author: "builders",
+          title: "Start the thread",
+          body: "Drop the first small hook change here. daemon will summarize agreement and keep the next step current.",
+          status: "waiting",
+        },
+      ]);
   });
 
   it("shows support proposals when no PR proposal is active", () => {

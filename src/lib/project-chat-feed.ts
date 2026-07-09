@@ -1,5 +1,5 @@
 import type { CommandWave, ExecutionRecord, GuardianReview, LedgerEvent, PollState } from "./command-waves";
-import { orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identities";
+import { reviewAgentIdentity } from "./agent-identities";
 import { commandKindLabel } from "./command-kind-copy";
 import { ledgerEventsByRecency } from "./ledger";
 import { selectPhaseWork } from "./phase-work";
@@ -237,9 +237,9 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
         {
           id: "start",
           label: "message",
-          author: orchestratorAgentIdentity.handle,
-          title: "Waiting for builders",
-          body: "Start with one small hook change. I will summarize agreement and keep the next step current.",
+          author: "builders",
+          title: "Start the thread",
+          body: "Drop the first small hook change here. daemon will summarize agreement and keep the next step current.",
           status: "waiting",
         },
       ];
