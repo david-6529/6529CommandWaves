@@ -55,8 +55,8 @@ describe("contribution report", () => {
         reviewedBy: "humans",
         summary: "daemon analyzes visible project records and produces a report for human review.",
         limitations: [
-          "Only visible app, chat preview, PR link, review proof, vote, decision, and ledger records are scored.",
-          "The report cannot see private coordination or live activity that has not been pulled into app state.",
+          "Only visible app, daemon-observed chat, PR link, review proof, vote, decision, and ledger records are scored.",
+          "The report cannot see private coordination or live activity that daemon has not observed in app state.",
           "Humans must approve access, payouts, merges, reputation, token weight, and governance changes separately.",
         ],
       },
@@ -64,11 +64,11 @@ describe("contribution report", () => {
     });
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
     expect(report.notes.join(" ")).toContain("Reputation, token weight, payouts, and merge rights");
-    expect(report.notes.join(" ")).toContain("chat post, PR, review, and ledger records");
+    expect(report.notes.join(" ")).toContain("daemon-observed chat, PR, review, and ledger records");
     expect(report.coverage.included).toContain("Work proposals stored by this app.");
-    expect(report.coverage.included).toContain("Chat posts pulled into this app.");
+    expect(report.coverage.included).toContain("Chat posts observed by daemon or pulled into this app.");
     expect(report.coverage.included).toContain("Recorded GitHub PR links and repo-bound Guardian review proof.");
-    expect(report.coverage.notIncluded).toContain("Live chat posts that have not been pulled into app state.");
+    expect(report.coverage.notIncluded).toContain("Live chat posts that daemon has not observed in app state.");
     expect(report.coverage.notIncluded).toContain("Manual payments, reputation, token weight, off-app agreements, or private coordination.");
     expect(report.scoringRubric).toEqual([
       "Complete proposal: 6 report points.",
@@ -78,7 +78,7 @@ describe("contribution report", () => {
       "Repo-bound Guardian review proof linked to a proposal: 2 report points.",
       "Project decision link: 2 report points.",
       "Vote or attributed activity log event: 1 report point.",
-      "Chat post pulled into app: 1 report point.",
+      "Chat post observed in app state: 1 report point.",
     ]);
     expect(report.evidence).toContain("1 GitHub PR link");
     expect(report.evidence).toContain("1 Guardian review proof");
@@ -224,7 +224,7 @@ describe("contribution report", () => {
     });
   });
 
-  it("keeps daemon ledger observations out of contributor scoring", () => {
+  it("counts daemon-observed chat for the human author only", () => {
     const report = createContributionReport({
       ...demoWave,
       ledger: [
@@ -240,12 +240,19 @@ describe("contribution report", () => {
     });
 
     expect(report.generatedAt).toBe("2026-06-20T13:10:00.000Z");
+    expect(report.evidence).toContain("1 chat post");
     expect(report.evidence).toContain("5 ledger events");
     expect(report.contributors.some((contributor) => contributor.identity === "daemon")).toBe(false);
     expect(report.contributors[0]).toMatchObject({
       identity: "david",
       score: 10,
       ledgerEvents: 1,
+    });
+    expect(report.contributors.find((contributor) => contributor.identity === "alice")).toMatchObject({
+      score: 1,
+      scoreBasis: ["Chat posts: 1 report point"],
+      chatPosts: 1,
+      ledgerEvents: 0,
     });
   });
 
@@ -309,9 +316,9 @@ describe("contribution report", () => {
     expect(draft).toContain("- daemon analyzes visible project records and produces a report for human review.");
     expect(draft).toContain("Coverage included:");
     expect(draft).toContain("- Work proposals stored by this app.");
-    expect(draft).toContain("- Chat posts pulled into this app.");
+    expect(draft).toContain("- Chat posts observed by daemon or pulled into this app.");
     expect(draft).toContain("Not included:");
-    expect(draft).toContain("- Live chat posts that have not been pulled into app state.");
+    expect(draft).toContain("- Live chat posts that daemon has not observed in app state.");
     expect(draft).toContain("Contributors:");
     expect(draft).toContain("- david: report score");
     expect(draft).toContain("Proposal work: 6 report points");

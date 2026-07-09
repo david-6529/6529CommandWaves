@@ -171,3 +171,22 @@ export function messageFromProjectChatObservation(value: string) {
 
   return normalized;
 }
+
+export function authorFromProjectChatObservation(value: string) {
+  const normalized = value.trim();
+  const modernMatch = normalized.match(
+    /^(.+?) (?:shared a PR link for discussion|asked for a decision|asked for review|discussed repo setup|suggested work|raised a question|posted in chat)\. Message:/i,
+  );
+
+  if (modernMatch?.[1]) {
+    return publicChatAuthor(modernMatch[1]);
+  }
+
+  const legacyMatch = normalized.match(/^Read (.+?)'s chat message and updated the project summary:/i);
+
+  if (legacyMatch?.[1]) {
+    return publicChatAuthor(legacyMatch[1]);
+  }
+
+  return "builder";
+}

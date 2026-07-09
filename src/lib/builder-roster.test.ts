@@ -61,7 +61,7 @@ describe("builder roster", () => {
     expect(roster.some((member) => member.identity === "wave-poll")).toBe(false);
   });
 
-  it("does not turn daemon observations into member profiles", () => {
+  it("turns daemon-observed chat into a simple member profile", () => {
     const report = createContributionReport({
       ...demoWave,
       ledger: [
@@ -81,6 +81,14 @@ describe("builder roster", () => {
     expect(roster[0]).toMatchObject({
       identity: "david",
       scoreLabel: "10 report points",
+    });
+    expect(roster.find((member) => member.identity === "alice")).toMatchObject({
+      role: "Chat participant",
+      activity: "1 chat post",
+      scoreLabel: "chat activity",
+      detail: "Recent chat post: Can we discuss fee cap tests before anyone opens a PR?",
+      basis: ["Chat posts: 1 report point"],
+      stats: [{ label: "Chat posts", value: "1" }],
     });
   });
 });

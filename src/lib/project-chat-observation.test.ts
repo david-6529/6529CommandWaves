@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  authorFromProjectChatObservation,
   compactPublicChatMessage,
   createProjectChatObservation,
   messageFromProjectChatObservation,
@@ -51,6 +52,21 @@ describe("project chat observation", () => {
         "Read alice's chat message and updated the project summary: Can we discuss fee caps?",
       ),
     ).toBe("Can we discuss fee caps?");
+  });
+
+  it("reads public authors from daemon observations", () => {
+    expect(authorFromProjectChatObservation("alice suggested work. Message: Can we discuss fee caps?")).toBe("alice");
+    expect(
+      authorFromProjectChatObservation(
+        "0x1234567890abcdef1234567890abcdef12345678 shared a PR link for discussion. Message: https://github.com/builders/hook/pull/45",
+      ),
+    ).toBe("0x1234...5678");
+    expect(
+      authorFromProjectChatObservation(
+        "Read alice's chat message and updated the project summary: Can we discuss fee caps?",
+      ),
+    ).toBe("alice");
+    expect(authorFromProjectChatObservation("Unstructured observation")).toBe("builder");
   });
 
   it("labels parsed daemon observations for public changelogs", () => {

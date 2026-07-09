@@ -3,6 +3,7 @@ import { orchestratorAgentIdentity, reviewAgentIdentity } from "./agent-identiti
 import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { ledgerEventsForVisibleProjectHistory, latestLedgerTimestamp } from "./ledger";
+import { authorFromProjectChatObservation, messageFromProjectChatObservation } from "./project-chat-observation";
 
 export type ContributionContributor = {
   identity: string;
@@ -134,6 +135,10 @@ function chatPostPreview(value: string) {
   return value.trim().replace(/\s+/g, " ").slice(0, 110);
 }
 
+function chatPostDedupKey(post: ContributionChatPost) {
+  return [post.author.trim().toLowerCase(), chatPostPreview(post.preview).toLowerCase(), post.createdAt ?? ""].join("|");
+}
+
 function isSystemContributorIdentity(identity: string) {
   const normalized = identity.trim().toLowerCase();
   const systemIdentities = new Set([
@@ -159,6 +164,17 @@ function isSystemContributorIdentity(identity: string) {
 
 function visibleLedgerEvents(wave: CommandWave) {
   return ledgerEventsForVisibleProjectHistory(wave.ledger, wave.repoUrl);
+}
+
+function daemonObservedChatPosts(wave: CommandWave): ContributionChatPost[] {
+  return visibleLedgerEvents(wave)
+    .filter((event) => event.type === "chat_observed")
+    .map((event) => ({
+      author: authorFromProjectChatObservation(event.message),
+      preview: messageFromProjectChatObservation(event.message),
+      createdAt: event.at,
+    }))
+    .filter((post) => post.preview.trim());
 }
 
 function latestReportTimestamp(wave: CommandWave, chatPosts: ContributionChatPost[]) {
@@ -206,19 +222,19 @@ const scoringRubric = [
   "Repo-bound Guardian review proof linked to a proposal: 2 report points.",
   "Project decision link: 2 report points.",
   "Vote or attributed activity log event: 1 report point.",
-  "Chat post pulled into app: 1 report point.",
+  "Chat post observed in app state: 1 report point.",
 ];
 
 const coverage = {
   included: [
     "Work proposals stored by this app.",
     "Votes and recorded project decision links stored by this app.",
-    "Chat posts pulled into this app.",
+    "Chat posts observed by daemon or pulled into this app.",
     "Recorded GitHub PR links and repo-bound Guardian review proof.",
     "Attributed activity log events stored by this app.",
   ],
   notIncluded: [
-    "Live chat posts that have not been pulled into app state.",
+    "Live chat posts that daemon has not observed in app state.",
     "GitHub commits, comments, reviews, and merges that are not attached to a recorded PR.",
     "Manual payments, reputation, token weight, off-app agreements, or private coordination.",
   ],
@@ -237,8 +253,8 @@ const reportAnalysis: ContributionReport["analysis"] = {
   reviewedBy: "humans",
   summary: "daemon analyzes visible project records and produces a report for human review.",
   limitations: [
-    "Only visible app, chat preview, PR link, review proof, vote, decision, and ledger records are scored.",
-    "The report cannot see private coordination or live activity that has not been pulled into app state.",
+    "Only visible app, daemon-observed chat, PR link, review proof, vote, decision, and ledger records are scored.",
+    "The report cannot see private coordination or live activity that daemon has not observed in app state.",
     "Humans must approve access, payouts, merges, reputation, token weight, and governance changes separately.",
   ],
 };
@@ -253,6 +269,12 @@ export function createContributionReport(
 ): ContributionReport {
   const contributors = new Map<string, ContributionContributor>();
   const chatPosts = options.chatPosts ?? [];
+  const observedChatPosts = daemonObservedChatPosts(wave);
+  const dedupedChatPosts = [...chatPosts, ...observedChatPosts].filter((post, index, posts) => {
+    const key = chatPostDedupKey(post);
+
+    return posts.findIndex((candidate) => chatPostDedupKey(candidate) === key) === index;
+  });
   const includedChatPosts: ContributionChatPost[] = [];
   let includedChatPostCount = 0;
 
@@ -345,7 +367,7 @@ export function createContributionReport(
     addRationale(contributor, "Appears in the activity log");
   }
 
-  for (const post of chatPosts) {
+  for (const post of dedupedChatPosts) {
     if (isSystemContributorIdentity(post.author)) {
       continue;
     }
@@ -389,7 +411,7 @@ export function createContributionReport(
     notes: [
       "Report scores are an AI-readable activity report, not a permission system.",
       "Reputation, token weight, payouts, and merge rights must use separate human-approved rules.",
-      "The report only uses proposal, vote, decision, chat post, PR, review, and ledger records currently stored or previewed by this app.",
+      "The report only uses proposal, vote, decision, daemon-observed chat, PR, review, and ledger records currently stored or previewed by this app.",
       "Agent and system events stay in the audit log but do not become human score.",
     ],
   };
