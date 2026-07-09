@@ -8,7 +8,7 @@ export function createBuilderWaveJoinDraft(handle: string, gates?: unknown, opti
   const cleanHandle = handle.trim().replace(/\s+/g, " ");
   const cleanWalletAddress = options.walletAddress?.trim().replace(/\s+/g, "") ?? "";
   const handleLine = cleanHandle ? `Handle: ${cleanHandle}.` : "Handle: not set yet.";
-  const walletLine = cleanWalletAddress ? [`Wallet: ${cleanWalletAddress}.`] : [];
+  const walletLine = cleanWalletAddress ? [`Wallet shared for identity: ${cleanWalletAddress}.`] : [];
   const joinNotes = normalizeParticipationGates(gates).slice(0, 2).join("; ");
 
   return [
@@ -16,6 +16,7 @@ export function createBuilderWaveJoinDraft(handle: string, gates?: unknown, opti
     handleLine,
     ...walletLine,
     `Join notes: ${joinNotes}.`,
+    "I understand wallet and access notes are manual for now.",
     "I understand a maintainer reviews who can contribute for now.",
     "I can help with discussion, tests, review, or a small PR.",
     "I will wait for a visible project decision before PR work starts.",

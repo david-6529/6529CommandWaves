@@ -1993,7 +1993,7 @@ export function CommandWavesConsole() {
       }
 
       setWalletAddress(address);
-      setWalletNotice("Wallet connected.");
+      setWalletNotice("Wallet connected for identity only.");
     } catch {
       setWalletNotice("Wallet connection was cancelled.");
     }
