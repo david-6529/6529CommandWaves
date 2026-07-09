@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { githubRepoPlaceholder } from "./agent-identities";
 import { createCommandWaveStateSnapshot } from "./command-wave-state";
+import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { demoWave } from "./demo-wave";
 import { createChatLaunchSnapshot } from "./chat-launch-snapshot";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
@@ -146,6 +147,41 @@ describe("chat launch verifier", () => {
     expect(result.status).toBe("fail");
     expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
       status: "fail",
+    });
+  });
+
+  it("fails direct chat launch payloads when public state omits group chat settings", async () => {
+    const launchSnapshot = await createFirstPhaseLaunchSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:00:00.000Z",
+      env: chatReadyEnv,
+      checkSetupRemote: true,
+      setupValidation: chatReadySetupValidation,
+    });
+    const publicState = createCommandWaveStateSnapshot(demoWave, {
+      generatedAt: "2026-06-20T13:01:00.000Z",
+    });
+    const brokenState = {
+      ...publicState,
+      projectSnapshot: {
+        ...publicState.projectSnapshot,
+        chat: {
+          ...publicState.projectSnapshot.chat,
+          mode: "status_feed",
+        },
+      },
+    };
+    const result = verifyChatLaunchPayload(createChatLaunchSnapshot(launchSnapshot), {
+      commandWaveState: {
+        ...brokenState,
+        stateHash: createCommandWaveStateHash(brokenState),
+      },
+      requirePublicState: true,
+    });
+
+    expect(result.status).toBe("fail");
+    expect(result.checks.find((item) => item.id === "public_state_endpoint")).toMatchObject({
+      status: "fail",
+      message: "Public command-wave state must match the chat launch audit evidence.",
     });
   });
 

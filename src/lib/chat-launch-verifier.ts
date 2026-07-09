@@ -2,6 +2,7 @@ import { createCommandWaveStateHash } from "./command-wave-state-hash";
 import { hookProjectIndexHashInput } from "./hook-project-index";
 import { verifyLaunchAuditPayload, type LaunchAuditVerificationCheck } from "./launch-audit-verifier";
 import { launchOperatorChecklistLines, type LaunchStatusOpenItem } from "./launch-status-draft";
+import { publicProjectChatSettings } from "./public-project-snapshot";
 import { hashValue } from "./run-manifest";
 
 export type ChatLaunchVerificationResult = {
@@ -158,6 +159,30 @@ function collectStateEvidence(value: unknown): ChatLaunchStateEvidence | null {
   };
 }
 
+function publicStateChatSettingsReady(value: unknown) {
+  const record = isRecord(value) ? value : null;
+  const projectSnapshot = isRecord(record?.projectSnapshot) ? record.projectSnapshot : null;
+  const chat = isRecord(projectSnapshot?.chat) ? projectSnapshot.chat : null;
+  const posting = isRecord(chat?.posting) ? chat.posting : null;
+  const pace = isRecord(posting?.pace) ? posting.pace : null;
+  const parser = isRecord(chat?.parser) ? chat.parser : null;
+
+  return Boolean(
+    chat &&
+      asString(chat.id) === publicProjectChatSettings.id &&
+      asString(chat.mode) === publicProjectChatSettings.mode &&
+      asString(chat.label) === publicProjectChatSettings.label &&
+      asString(chat.title) === publicProjectChatSettings.title &&
+      asString(chat.composerLabel) === publicProjectChatSettings.composerLabel &&
+      asString(posting?.label) === publicProjectChatSettings.posting.label &&
+      asNumber(pace?.maxPosts) === publicProjectChatSettings.posting.pace.maxPosts &&
+      asNumber(pace?.windowSeconds) === publicProjectChatSettings.posting.pace.windowSeconds &&
+      asString(pace?.identity) === publicProjectChatSettings.posting.pace.identity &&
+      asString(pace?.enforcedBy) === publicProjectChatSettings.posting.pace.enforcedBy &&
+      asString(parser?.agent) === publicProjectChatSettings.parser.agent,
+  );
+}
+
 function publicStateMatches(value: unknown, expected: ChatLaunchStateEvidence | null) {
   const record = isRecord(value) ? value : null;
   const wave = isRecord(record?.wave) ? record.wave : null;
@@ -185,7 +210,8 @@ function publicStateMatches(value: unknown, expected: ChatLaunchStateEvidence | 
       hashValue(rules) === expected.rulesHash &&
       proposals.length === expected.proposalCount &&
       reviews.length === expected.reviewCount &&
-      ledger.length === expected.ledgerEventCount,
+      ledger.length === expected.ledgerEventCount &&
+      publicStateChatSettingsReady(record),
   );
 }
 
