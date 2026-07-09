@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { publicGithubRepoPlaceholder } from "./agent-identities";
+import { createChatPostingCapabilityPayload } from "./6529/chat-post";
 import { publicCommandWaveHash } from "./command-wave-state";
 import { demoWave } from "./demo-wave";
 import { createPublicContributionReport } from "./public-contribution-report";
@@ -111,6 +112,12 @@ describe("public verification manifest", () => {
         requiredHashFields: ["chatLaunchHash", "sourceAuditHash"],
         verifierCommand: "npm run chat:launch",
       }),
+      expect.objectContaining({
+        id: "chat_posting_capability",
+        url: "https://command-waves.example.com/api/6529/chat-post",
+        requiredHashFields: ["capabilityHash"],
+        verifierCommand: null,
+      }),
     ]);
     expect(manifest.endpoints.find((endpoint) => endpoint.id === "chat_launch")?.hashes).toMatchObject({
       generated: expect.stringMatching(/^[a-f0-9]{64}$/),
@@ -122,7 +129,12 @@ describe("public verification manifest", () => {
     expect(manifest.endpoints.find((endpoint) => endpoint.id === "contribution_report")?.hashes.generated).toBe(
       createPublicContributionReport(demoWave).reportHash,
     );
+    expect(manifest.endpoints.find((endpoint) => endpoint.id === "chat_posting_capability")?.hashes.stable).toBe(
+      createChatPostingCapabilityPayload(manifestEnv).capabilityHash,
+    );
     expect(JSON.stringify(manifest)).not.toContain("\u2014");
+    expect(JSON.stringify(manifest)).not.toContain("6529_BOT");
+    expect(JSON.stringify(manifest)).not.toContain("windowMs");
   });
 
   it("keeps stable anchors stable across generated times", async () => {

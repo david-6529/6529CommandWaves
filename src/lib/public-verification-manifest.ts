@@ -1,9 +1,11 @@
 import { publicGithubRepoPlaceholder } from "./agent-identities";
+import { createChatPostingCapabilityPayload } from "./6529/chat-post";
 import { createChatLaunchSnapshot } from "./chat-launch-snapshot";
 import { createCommandWaveStateSnapshot } from "./command-wave-state";
 import type { CommandWave } from "./command-waves";
 import { createFirstPhaseLaunchSnapshot } from "./first-phase-launch-snapshot";
 import { createHookProjectIndex } from "./hook-project-index";
+import { hasProductionValue } from "./env-placeholders";
 import { createPublicCommandWaveSource } from "./public-command-wave";
 import { createPublicContributionReport } from "./public-contribution-report";
 import { hashValue } from "./run-manifest";
@@ -17,7 +19,8 @@ type VerificationEndpoint = {
     | "project_index"
     | "contribution_report"
     | "launch_audit"
-    | "chat_launch";
+    | "chat_launch"
+    | "chat_posting_capability";
   label: string;
   url: string;
   payloadVersion: string;
@@ -97,6 +100,14 @@ export function publicVerificationManifestHashInput(manifest: PublicVerification
   return Object.fromEntries(Object.entries(manifest).filter(([key]) => key !== "manifestHash"));
 }
 
+function appRouteUrl(path: string, env: Record<string, string | undefined>) {
+  const appUrl = hasProductionValue(env.NEXT_PUBLIC_APP_URL, env)
+    ? env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/+$/, "")
+    : "";
+
+  return appUrl ? `${appUrl}${path}` : path;
+}
+
 export async function createPublicVerificationManifest(
   wave: CommandWave,
   options: PublicVerificationManifestOptions = {},
@@ -109,6 +120,7 @@ export async function createPublicVerificationManifest(
     env,
   });
   const chatLaunchSnapshot = createChatLaunchSnapshot(launchSnapshot);
+  const chatPostingCapability = createChatPostingCapabilityPayload(env);
   const stateSnapshot = createCommandWaveStateSnapshot(publicSourceWave, { generatedAt });
   const projectIndex = createHookProjectIndex(publicSourceWave, { generatedAt });
   const contributionReport = createPublicContributionReport(publicSourceWave);
@@ -221,6 +233,18 @@ export async function createPublicVerificationManifest(
         },
         verifierCommand: "npm run chat:launch",
         note: "chatLaunchHash verifies the generated chat-launch payload.",
+      },
+      {
+        id: "chat_posting_capability",
+        label: "Chat posting capability",
+        url: appRouteUrl("/api/6529/chat-post", env),
+        payloadVersion: chatPostingCapability.version,
+        requiredHashFields: ["capabilityHash"],
+        hashes: {
+          stable: chatPostingCapability.capabilityHash,
+        },
+        verifierCommand: null,
+        note: "capabilityHash verifies safe public chat posting mode and pace metadata without exposing bot credentials.",
       },
     ],
     launchTracks: {

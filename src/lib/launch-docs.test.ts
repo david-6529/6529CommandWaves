@@ -87,6 +87,7 @@ describe("launch docs", () => {
 
     expect(readme).toContain("/api/command-wave/verification/manifest");
     expect(readme).toContain("required hash fields");
+    expect(readme).toContain("chat posting capability");
     expect(readme).toContain("its own manifest URL");
   });
 

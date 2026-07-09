@@ -1,5 +1,6 @@
 import { normalizeWaveId, postDrop } from "./client";
 import { directChatPostPace } from "../chat-posting-policy";
+import { hashValue } from "../run-manifest";
 export { chatPostPaceIdentity, directChatPostPace } from "../chat-posting-policy";
 
 type ChatPostInput = {
@@ -34,6 +35,12 @@ export type ChatPostingCapability = {
     identity: string;
     enforcedBy: string;
   };
+};
+
+export type ChatPostingCapabilityPayload = {
+  version: "command-wave-chat-posting-capability-v0.1";
+  capability: ChatPostingCapability;
+  capabilityHash: string;
 };
 
 function text(value: unknown) {
@@ -84,6 +91,24 @@ export function getChatPostingCapability(env: Record<string, string | undefined>
     mode: "manual",
     message: "Direct chat posting is not configured. Copy the message instead.",
     pace: publicPostingPace(),
+  };
+}
+
+export function chatPostingCapabilityHashInput(payload: ChatPostingCapabilityPayload) {
+  return Object.fromEntries(Object.entries(payload).filter(([key]) => key !== "capabilityHash"));
+}
+
+export function createChatPostingCapabilityPayload(
+  env: Record<string, string | undefined> = process.env,
+): ChatPostingCapabilityPayload {
+  const payloadWithoutHash = {
+    version: "command-wave-chat-posting-capability-v0.1",
+    capability: getChatPostingCapability(env),
+  } satisfies Omit<ChatPostingCapabilityPayload, "capabilityHash">;
+
+  return {
+    ...payloadWithoutHash,
+    capabilityHash: hashValue(payloadWithoutHash),
   };
 }
 

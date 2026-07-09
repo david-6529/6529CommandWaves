@@ -52,7 +52,7 @@ What exists now:
 - Public active project index for agents or future UI surfaces that need the hook list, project chat links, latest changes,
   group chat settings, current vote, discussion topics, PR rows, member summaries, and agent ownership.
 - Public project snapshot with daemon-managed summary, changelog, current vote, discussion topics, PR status, project rules, and agent status.
-- Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, launch track status, and required hash fields.
+- Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, chat posting capability, launch track status, and required hash fields.
 - Public project state includes a full snapshot hash, so setup checks can detect stale or edited state payloads.
 - Shared JSON body validation for API routes so malformed, non-object, or oversized request bodies fail clearly.
 - A deterministic reviewer foundation with PR manifests, guardian attestations, proof replay, risky path checks, and hook
@@ -207,7 +207,7 @@ Audit and launch:
 - Remote launch checks can be run from maintainer controls to refresh setup, required guardian check, and readiness blockers.
 - Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
 - Public setup proof, command-wave state, and launch audit endpoints.
-- Public verification manifest with stable anchors, required hash fields, and a self endpoint for third-party checks.
+- Public verification manifest with stable anchors, chat posting capability, required hash fields, and a self endpoint for third-party checks.
 - Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
   rights, reputation, or token weight.
 - Public project summary publishes two state-derived paragraphs: the builder loop, then current focus, next step, repo state, and latest change.
@@ -480,14 +480,14 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 
 - `GET /api/6529/waves/search?q=term`: search 6529 waves by name.
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
-- `GET /api/6529/chat-post`: public capability check for direct chat posting. It does not expose bot credentials.
+- `GET /api/6529/chat-post`: public hashable capability check for direct chat posting. It does not expose bot credentials.
 - `POST /api/6529/chat-post`: protected human-triggered chat posting when the bot wallet is configured. Posts are paced per supplied builder identity.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
 - `GET /api/command-wave/state`: public current wave state snapshot for guardian PR checks.
 - `GET /api/command-wave/projects`: public active hook project index with a stable project-list hash.
 - `GET /api/command-wave/reports/contribution`: public informational contribution report with a `reportHash`.
-- `GET /api/command-wave/verification/manifest`: public map of verification endpoints, required hash fields, stable anchors, and its own manifest URL.
+- `GET /api/command-wave/verification/manifest`: public map of verification endpoints, chat posting capability, required hash fields, stable anchors, and its own manifest URL.
 - `GET /api/command-wave/launch/audit`: public first-loop launch audit with authority boundary. Add `?remote=1` to run remote wave and repo setup checks.
 - `GET /api/command-wave/launch/chat`: public chat launch audit with `chatLaunchHash`. Add `?remote=1` before inviting builders into discussion.
 - `GET /api/command-wave`: return the current local command wave.

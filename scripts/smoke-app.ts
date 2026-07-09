@@ -250,6 +250,16 @@ async function main() {
   const chatPostingCapabilityPayload = await fetchJson("/api/6529/chat-post");
   const chatPostingCapability = objectValue(chatPostingCapabilityPayload, "capability");
 
+  assert(
+    objectValue(chatPostingCapabilityPayload, "version") === "command-wave-chat-posting-capability-v0.1",
+    "Chat posting capability returned the wrong version.",
+  );
+  assertSha256("Chat posting capability hash", objectValue(chatPostingCapabilityPayload, "capabilityHash"));
+  assert(
+    objectValue(chatPostingCapabilityPayload, "capabilityHash") ===
+      hashValue(Object.fromEntries(Object.entries(chatPostingCapabilityPayload).filter(([key]) => key !== "capabilityHash"))),
+    "Chat posting capability hash did not match payload.",
+  );
   assertJsonObject("Chat posting capability", chatPostingCapability);
   assert(
     typeof objectValue(chatPostingCapability, "canPost") === "boolean",
@@ -570,9 +580,11 @@ async function main() {
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/reports/contribution");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/audit");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/command-wave/launch/chat");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "/api/6529/chat-post");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "reportHash");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "chatLaunchHash");
   assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "sourceAuditHash");
+  assertIncludes("Verification manifest", JSON.stringify(verificationManifestPayload), "capabilityHash");
   const manifestEndpoints = objectValue(verificationManifest, "endpoints");
 
   assert(Array.isArray(manifestEndpoints), "Verification manifest endpoints are missing.");
@@ -591,7 +603,24 @@ async function main() {
     objectValue(contributionEndpointHashes, "generated") === objectValue(contributionReportPayload, "reportHash"),
     "Verification manifest contribution report hash does not match report endpoint.",
   );
+  const chatPostingEndpoint = manifestEndpoints.find(
+    (endpoint): endpoint is JsonObject =>
+      typeof endpoint === "object" &&
+      endpoint !== null &&
+      objectValue(endpoint as JsonObject, "id") === "chat_posting_capability",
+  );
+
+  assertJsonObject("Verification manifest chat posting endpoint", chatPostingEndpoint);
+  const chatPostingEndpointHashes = objectValue(chatPostingEndpoint, "hashes");
+
+  assertJsonObject("Verification manifest chat posting hashes", chatPostingEndpointHashes);
+  assert(
+    objectValue(chatPostingEndpointHashes, "stable") === objectValue(chatPostingCapabilityPayload, "capabilityHash"),
+    "Verification manifest chat posting hash does not match capability endpoint.",
+  );
   assertNoPublicRepoLeaks("Verification manifest", JSON.stringify(verificationManifestPayload));
+  assert(!JSON.stringify(verificationManifestPayload).includes("6529_BOT"), "Verification manifest exposes chat posting env names.");
+  assert(!JSON.stringify(verificationManifestPayload).includes("windowMs"), "Verification manifest exposes internal chat posting windowMs.");
   assertNoForbiddenDash("Verification manifest", JSON.stringify(verificationManifestPayload));
 
   const setupProofPayload = await fetchJson("/api/command-wave/setup/proof");

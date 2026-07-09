@@ -1,6 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { chatPostPaceIdentity, directChatPostPace, getChatPostingCapability, postChatMessage } from "./chat-post";
+import {
+  chatPostPaceIdentity,
+  chatPostingCapabilityHashInput,
+  createChatPostingCapabilityPayload,
+  directChatPostPace,
+  getChatPostingCapability,
+  postChatMessage,
+} from "./chat-post";
 import { resetMockDropsForTests } from "./mock";
+import { hashValue } from "../run-manifest";
 import { previewWaveContext } from "./wave-context";
 
 describe("6529 chat posting", () => {
@@ -127,6 +135,32 @@ describe("6529 chat posting", () => {
     expect(chatPostPaceIdentity({ walletAddress: " 0x123 " })).toBe("0x123");
     expect(chatPostPaceIdentity({ author: "builder" })).toBe("builder");
     expect(chatPostPaceIdentity({ content: "hello" })).toBe("anonymous-builder");
+  });
+
+  it("creates a hashable public capability payload", () => {
+    const payload = createChatPostingCapabilityPayload({
+      "6529_MOCK_MODE": "false",
+      "6529_BOT_BEARER_TOKEN": "secret-token",
+      "6529_BOT_WALLET_ADDRESS": "0x1234567890abcdef1234567890abcdef12345678",
+    });
+
+    expect(payload).toMatchObject({
+      version: "command-wave-chat-posting-capability-v0.1",
+      capability: {
+        canPost: true,
+        mode: "live",
+        pace: {
+          maxPosts: 3,
+          windowSeconds: 300,
+          identity: "builder identity",
+          enforcedBy: "daemon",
+        },
+      },
+      capabilityHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+    });
+    expect(payload.capabilityHash).toBe(hashValue(chatPostingCapabilityHashInput(payload)));
+    expect(JSON.stringify(payload)).not.toContain("secret-token");
+    expect(JSON.stringify(payload)).not.toContain("windowMs");
   });
 
   it("requires a project chat and message", async () => {

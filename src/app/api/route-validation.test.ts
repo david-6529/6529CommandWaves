@@ -208,6 +208,7 @@ describe("API route validation", () => {
 
     expect(response.status).toBe(200);
     expect(payload).toMatchObject({
+      version: "command-wave-chat-posting-capability-v0.1",
       capability: {
         canPost: true,
         mode: "live",
@@ -219,9 +220,11 @@ describe("API route validation", () => {
           enforcedBy: "daemon",
         },
       },
+      capabilityHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
     expect(JSON.stringify(payload)).not.toContain("secret-token");
     expect(JSON.stringify(payload)).not.toContain("0x1234567890abcdef1234567890abcdef12345678");
+    expect(JSON.stringify(payload)).not.toContain("windowMs");
   });
 
   it("rejects non-JSON mutation bodies at the route", async () => {
@@ -533,6 +536,10 @@ describe("API route validation", () => {
           expect.objectContaining({
             id: "contribution_report",
             requiredHashFields: ["reportHash"],
+          }),
+          expect.objectContaining({
+            id: "chat_posting_capability",
+            requiredHashFields: ["capabilityHash"],
           }),
         ]),
         manifestHash: expect.stringMatching(/^[a-f0-9]{64}$/),

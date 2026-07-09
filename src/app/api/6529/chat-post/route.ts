@@ -1,4 +1,4 @@
-import { getChatPostingCapability, postChatMessage } from "@/lib/6529/chat-post";
+import { createChatPostingCapabilityPayload, postChatMessage } from "@/lib/6529/chat-post";
 import { handleRouteError, json, readJsonObject } from "@/lib/api";
 import { requireAdminRequest } from "@/lib/admin-auth";
 import { chatPostPaceIdentity, directChatPostPace } from "@/lib/chat-posting-policy";
@@ -8,9 +8,7 @@ export async function GET(request: Request) {
   try {
     assertRateLimit(request, { namespace: "6529_chat_post_capability", max: 30, windowMs: 60_000 });
 
-    return json({
-      capability: getChatPostingCapability(),
-    });
+    return json(createChatPostingCapabilityPayload());
   } catch (error) {
     return handleRouteError(error);
   }
