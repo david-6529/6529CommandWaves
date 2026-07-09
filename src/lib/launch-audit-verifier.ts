@@ -472,12 +472,18 @@ function launchPacketReady(value: unknown) {
 function contributionReportReady(value: unknown) {
   const record = isRecord(value) ? value : null;
   const method = isRecord(record?.method) ? record.method : null;
+  const analysis = isRecord(record?.analysis) ? record.analysis : null;
 
   return Boolean(
     record &&
       asString(record.mode) === "informational" &&
       asString(method?.id) === "visible_activity_v0" &&
       asString(method?.authority) === "Informational only" &&
+      asString(analysis?.agent) === "daemon" &&
+      asString(analysis?.mode) === "deterministic_visible_activity" &&
+      asString(analysis?.confidence) === "partial" &&
+      asString(analysis?.reviewedBy) === "humans" &&
+      stringArrayContains(analysis?.limitations, "Humans must approve") &&
       Array.isArray(record.contributors) &&
       stringArrayContains(record.scoringRubric, "report points") &&
       stringArrayContains(record.notes, "not a permission system"),

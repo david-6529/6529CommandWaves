@@ -112,6 +112,12 @@ describe("first phase launch snapshot", () => {
         id: "visible_activity_v0",
         authority: "Informational only",
       },
+      analysis: {
+        agent: "daemon",
+        mode: "deterministic_visible_activity",
+        confidence: "partial",
+        reviewedBy: "humans",
+      },
     });
     expect(snapshot.reports.contribution.notes.join(" ")).toContain("not a permission system");
     expect(snapshot.reports.contribution.contributors[0]).toHaveProperty("chatPosts");
