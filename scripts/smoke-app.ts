@@ -132,7 +132,7 @@ async function main() {
     "Reviewer status is shown on each PR.",
     "The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.",
     "A reviewer check must pass before humans merge.",
-    "Connect wallet if you want, then request access in chat.",
+    "Connect wallet if you want, then ask to join in chat.",
     "Work being discussed",
     "Draft hook scaffold",
     "repo not selected",
@@ -161,17 +161,18 @@ async function main() {
     "Refresh chat to read the latest posts here.",
     "First public project chat.",
     "Group chat",
-    "daemon watches",
-    "Everyone writes in one shared chat. daemon watches the discussion and turns clear agreement into summaries, decisions, and PR-ready work.",
-    "Latest messages",
-    "No need to choose a post type. daemon reads the stream and classifies what matters.",
+    "daemon reads thread",
+    "A shared thread for questions, ideas, decisions, and PR links. Write normally. daemon parses what matters.",
+    "Shared thread",
+    "No post types are needed. daemon reads the thread and updates summaries, votes, and PR work.",
     "Write to the group",
-    "Posting pace",
-    "daemon can slow posting if chat gets noisy. Keep each message useful.",
-    "Message the group",
-    "Ask a question, suggest work, paste a PR, or share context.",
+    "No categories or post types. daemon parses the thread in the background.",
+    "3 messages / 5 min",
+    "daemon currently limits each builder identity to 3 messages per 5 minutes.",
+    "Message",
+    "Ask a question, suggest work, paste a PR, or share context",
     "GitHub repo placeholder",
-    "Post to chat",
+    "Send",
     "Record proposal",
     "Pull requests",
     "Code contributions",
@@ -187,7 +188,7 @@ async function main() {
     "Voting: no on cmd-001",
     "Decision links: 2 report points",
     "Builder details",
-    "Access notes, reports, and code checks for builders who want the details.",
+    "Join notes, reports, and code checks for builders who want the details.",
     "Builders record a project decision before PR work starts.",
     "Reviewer status is shown on each PR.",
     "Report points summarize visible work only.",
@@ -411,7 +412,8 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
   assertIncludes("State response", JSON.stringify(statePayload), "\"chat\"");
   assertIncludes("State response", JSON.stringify(statePayload), "group_chat");
-  assertIncludes("State response", JSON.stringify(statePayload), "No need to choose a post type.");
+  assertIncludes("State response", JSON.stringify(statePayload), "No post types are needed.");
+  assertIncludes("State response", JSON.stringify(statePayload), "3 messages / 5 min");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
   assertIncludes("State response", JSON.stringify(statePayload), "rules");
   assertIncludes("State response", JSON.stringify(statePayload), "How are PRs approved?");
