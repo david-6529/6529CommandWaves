@@ -1,5 +1,4 @@
 import { fetchJsonWithTimeout, fetchTextWithTimeout } from "../src/lib/http-fetch";
-import { commandWaveProductCopy } from "../src/lib/product-copy";
 import { hashValue } from "../src/lib/run-manifest";
 
 type JsonObject = Record<string, unknown>;
@@ -89,159 +88,74 @@ async function main() {
   const html = await fetchText("/");
   const renderedHtml = normalizeHydrationMarkers(html);
 
-  assertIncludes("Home page", renderedHtml, commandWaveProductCopy.headline);
   for (const label of [
     "dark-app",
-    "bg-zinc-950",
-    "Decentralized Coding: Beta",
-    "Pilot: 6529 AMM hook",
-    "Join a swarm of builders creating a hook together through chat, decisions, pull requests, and reviews.",
+    "Decentralized Coding / Beta",
+    "Design preview",
+    "6529 AMM Hook",
+    "50 builders. One immutable hook. Fees shared by accepted contribution.",
     "Connect wallet",
-    "Project summary",
-    "daemon updates",
-    "Builders coordinate this hook in chat.",
-    "Decisions approve scoped work. GitHub PRs and human review handle code.",
-    "Draft the non-upgradeable hook scaffold",
-    "Next: Keep discussing in chat. Select the hook repo before PR work starts.",
-    "Repo: not selected.",
-    "Latest: Builders approved the hook scaffold with 5 yes and 1 no.",
-    "No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.",
-    "GitHub repo placeholder",
-    "Changelog",
-    "How this works",
-    "Current loop",
-    "Build PR: Select the hook repo before PR work starts.",
-    "Active projects",
-    "Start with the pilot hook. More hook projects can appear here after this loop works.",
-    "6529 AMM hook",
-    "6529-hook-builder",
-    "Message builders",
-    "Who can join?",
-    "How do I join?",
-    "How does work start?",
-    "Who coordinates?",
-    "How are PRs approved?",
-    "What about GitHub?",
-    "Who reviews PRs?",
-    "Who merges?",
-    "Everything starts in chat.",
-    "Talk in chat. daemon turns clear group agreement into small proposals.",
-    "daemon labels risk and keeps scope small.",
-    "daemon updates the summary, labels risk, and routes work.",
-    "Builders record a project decision before PR work starts.",
-    "Reviewer status is shown on each PR.",
-    "The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.",
-    "A reviewer check must pass before humans merge.",
-    "Connect wallet if you want, then ask to join in chat.",
-    "Work being discussed",
-    "Draft hook scaffold",
-    "repo not selected",
-    "Keep discussing",
-    "PR work starts after maintainers select the hook repo.",
-    "GitHub repo placeholder",
-    "Message builders",
-    "Current vote",
-    "No open vote",
-    "Last decision: 5 yes, 1 no.",
-    "Topics in discussion",
-    "Select the pilot GitHub repo",
-    "PR links and code review start after maintainers choose the repo.",
-    "Builders approved with 5 yes and 1 no.",
-    "GitHub repo",
-    "id=\"project-repo-url\"",
-    "placeholder=\"Select later, owner/repo or GitHub URL\"",
-    "id=\"project-access-key\"",
-    "No GitHub repo is selected yet. PR work stays blocked until maintainers choose the repo.",
-    "No GitHub repo is selected yet. Select the pilot repo before creating PR work.",
-    "Select the hook repo before PR work starts.",
-    "Project chat",
-    "Open chat",
-    "Find chat",
-    "Type a chat name",
-    "Refresh chat to read the latest posts here.",
-    "First public project chat.",
-    "Group chat",
-    "Builder group chat",
-    "daemon listening",
-    "Everyone talks in one thread. daemon listens for important project updates and keeps the summary, decisions, topics, and PR notes current.",
-    "Group thread",
-    "Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.",
-    "chat setting: 3 messages every 5 min",
-    "daemon setting: 3 messages every 5 minutes for each builder.",
-    "Message the group",
-    "GitHub repo placeholder",
-    "Send",
-    "Record proposal",
-    "Pull requests",
-    "Code contributions",
-    "PRs show why code changed, where to inspect it, and daemon and reviewer status.",
-    "No pull requests yet",
-    "Future PRs will show their reason, GitHub link, daemon signoff, and reviewer status.",
-    "Review agent is still a placeholder. Humans control merge decisions.",
     "Builders",
-    "Profiles show what each builder has done.",
-    "Activity",
-    "Report: 1 report point",
-    "Voting: yes on cmd-001",
-    "Voting: no on cmd-001",
-    "Decision links: 2 report points",
-    "Builder details",
-    "Join notes, reports, and code checks for builders who want the details.",
-    "Builders record a project decision before PR work starts.",
-    "Reviewer status is shown on each PR.",
-    "Report points summarize visible work only.",
-    "They do not grant access, payouts, or merge rights.",
-    "Start in chat so builders can shape the idea.",
-    "Record the proposal once builders can see it.",
-    "Use GitHub PRs once the repo is connected.",
-    "Proposal tools",
-    "after chat",
-    "Discuss in chat first. Record only when builders can see the proposal.",
-    "Boundaries and success criteria",
-    "Details",
-    "Project log",
-    "/api/command-wave/verification/manifest",
-    "Visible activity report",
-    "Maintainer tools",
-    "Server key needed before launch",
-    "Set ADMIN_API_KEY on the server.",
-    "Copy env checklist",
+    "50 max",
+    "Enrollment not open",
+    "Contributor share",
+    "Needs approval",
+    "Repository",
+    "Not connected",
+    "Reviewer",
+    "Not selected",
+    "Approve the pilot rules",
+    "Review proposed rules",
+    "Freeze the project rules",
+    "Open work",
+    "Define immutable fee behavior",
+    "Connect the hook repository",
+    "Draft the hook scaffold",
+    "Set before claim",
+    "Live discussion",
+    "Build together",
+    "Discussion filters",
+    "daemon summary",
+    "No live builder messages yet",
+    "Message the builders",
+    "Send",
+    "Source not connected",
+    "Pull requests",
+    "No real pull requests yet",
+    "Contributors",
+    "Raw chat activity does not determine rewards.",
+    "Builder enrollment has not opened",
+    "Project brief and rules",
+    "Public proof",
+    "Agents cannot vote, merge, deploy, finalize rewards, or move funds.",
   ]) {
     assertIncludes("Home page", renderedHtml, label);
   }
-  assert(!renderedHtml.includes("Access is manual for now."), "Home page still shows stale wallet access copy.");
-  assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
-  assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
-  assert(!renderedHtml.includes("Write to the group"), "Home page should use message copy for group chat.");
-  assert(!renderedHtml.includes("Reply to the builders"), "Home page should not feel like a one-person reply composer.");
-  assert(!renderedHtml.includes("daemon pace"), "Home page should describe pacing as a chat setting.");
-  assert(!renderedHtml.includes("No categories or post types"), "Home page should not explain post types in chat.");
-  assert(!renderedHtml.includes("Ask a question, suggest work, paste a PR, or call for a vote."), "Home page should not ask users to classify chat.");
-  const staleDecisionCopy = "decision " + "receipt";
-  const staleDecisionLabel = "Decision " + "receipt";
-  const staleDecisionLabels = "Decision " + "receipts";
-  const staleProofRecorded = "Rece" + "ipt recorded";
-  const staleBuilderDecision = "Builder decision required";
-
-  assert(!renderedHtml.includes(`6529 ${staleDecisionCopy}`), "Home page should not expose internal decision-link legacy language.");
-  assert(!renderedHtml.includes(staleDecisionLabel), "Home page should not expose legacy decision-link labels.");
-  assert(!renderedHtml.includes(staleDecisionLabels), "Home page should not expose legacy decision-link labels.");
-  assert(!renderedHtml.includes("receipt https://"), "Home page should not expose stale decision proof copy.");
-  assert(!renderedHtml.includes("cmd-001 passed"), "Home page should summarize decisions in human-readable language.");
-  assert(!renderedHtml.includes(staleBuilderDecision), "Home page should not expose stale decision requirement copy.");
-  assert(!renderedHtml.includes("https://github.com/6529-Collections/6529-hook"), "Home page still includes the old concrete hook repo.");
-  assert(
-    !renderedHtml.includes("https://github.com/your-org/your-hook-repo"),
-    "Home page must not render the placeholder GitHub URL.",
-  );
-  for (const oldLabel of ["Open source", "Project source", "Find a source", "Type a source name"]) {
-    assert(!renderedHtml.includes(oldLabel), `Home page should not render old source wording: ${oldLabel}.`);
-  }
-  for (const oldChatControl of ["project-chat-tab", "project-chat-panel", "role=\"tablist\"", "Save as proposal", "Save proposal from chat"]) {
-    assert(!renderedHtml.includes(oldChatControl), `Home page should not render old chat control: ${oldChatControl}.`);
+  for (const removedPublicControl of [
+    "Current loop",
+    "Launch checklist",
+    "Maintainer setup",
+    "Proposal tools",
+    "project-access-key",
+    "Copy env checklist",
+    "Report: 1 report point",
+    "Voting: yes on cmd-001",
+    "gpebbles",
+    "blocknoob",
+    "runtime-check",
+    "preview-redaction",
+  ]) {
+    assert(
+      !renderedHtml.includes(removedPublicControl),
+      `Home page should not render removed public content: ${removedPublicControl}.`,
+    );
   }
   assertNoPublicRepoLeaks("Home page", renderedHtml);
   assertNoForbiddenDash("Home page", renderedHtml);
+
+  const staleDecisionCopy = "decision " + "receipt";
+  const staleProofRecorded = "Rece" + "ipt recorded";
+  const staleBuilderDecision = "Builder decision required";
 
   const readiness = await fetchJson("/api/readiness");
   const readinessChecks = objectValue(readiness, "checks");

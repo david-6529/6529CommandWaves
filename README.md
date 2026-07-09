@@ -37,8 +37,8 @@ What exists now:
 - A top-right identity-only wallet connection control that can add a connected address to the join message.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
-- A simplified chat-first UI with a project overview, current hook change, group chat view, latest posts, builder profiles,
-  current vote, discussion topics, PR status, project rules, and folded proposal flow.
+- A work-first public workspace with the pilot rules decision, open work, group discussion, pull requests, contributors,
+  proposed rewards, and public proof status on one screen.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for chat posts, join messages, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
@@ -179,75 +179,34 @@ Short version:
 
 ## Current App
 
-The current app is a local prototype of the first hook-building loop. The default screen is the product surface. Secondary
-setup and audit tools stay collapsed until a maintainer needs them.
+The root screen is the first implemented slice of the product reset described in
+[docs/product-reset-plan.md](docs/product-reset-plan.md). It is an active build workspace rather than a launch or
+governance dashboard.
 
-Default workspace:
+The public workspace now leads with:
 
-- Project summary accordion, updated by `daemon`, with the current design and repo state in two short paragraphs.
-- Current vote, topics in discussion, recent daemon-observed chat, and the next action for the active hook change.
-- Collapsed active-project list with chat, repo state, current focus, and next step.
-- Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
-- PR links pasted in chat for the selected repo appear as pending discussion rows until builders approve scope and review runs.
-- Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
-- Group chat view with plain builder replies, direct chat posting when configured, recent posts, and copyable messages.
-- Sending a chat message refreshes project state after daemon records the observed discussion.
-- Folded proposal form that asks for title, change, and success criteria before optional work details.
-- Builder profiles with profile links, visible chat and repo activity, voting summaries, and informational contribution signals.
-- Collapsed builder details: who can join, activity-report boundaries, and hook guardrails.
+- The 6529 AMM Hook goal and current pilot status.
+- The 50-builder cap, proposed contributor share, repo state, and reviewer state.
+- The first rules decision and the current milestone.
+- Open contract, setup, and test work without fake claims or payout credits.
+- One natural group discussion with automatic design and review filters.
+- Pull requests, contributor profiles, project rules, and public proof states.
 
-Safety and review:
+Local preview mode deliberately hides seeded votes, demo profiles, and test chat messages. Wallet connection selects an
+address only. Signed membership, fair admission, payout credits, and direct live member posting are not implemented yet.
+The interface labels those boundaries instead of presenting them as working authority.
 
-- How this works section with plain-English join notes.
-- Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
-- Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
-- Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.
-- Approved PR execution files are path, size, secret, deployment, governance, upgradeability, delegatecall, destructive
-  opcode, and hook-parameter checked before commit. The execution log records a hash manifest and patch evidence for approved file content.
-- Reviewer output is written back to the PR as a bounded comment and check run.
-- PR patch checks for upgradeability, delegatecall, destructive opcodes, deployment, governance, parameter writes, and bound-test evidence when patch evidence is bound to the approved file manifest.
+Existing backend foundations remain available for continued development:
 
-Audit and launch:
+- 6529 context, normalization, redaction, sync, and posting adapters.
+- GitHub repo, branch, PR, comment, check-run, and evidence adapters.
+- Hook proposal, diff, fee-bound, upgradeability, deployment, and governance checks.
+- Public state, launch audit, setup proof, verification manifest, and contribution report endpoints.
+- Copied launch status separates chat launch gaps from PR-loop gaps so maintainers do not overstate readiness.
+- Local file storage and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
-- Recent activity log with export.
-- Activity report section for app records and manual planning context.
-- Launch checklist with setup, readiness, flow checklist, and launch next-action records.
-- Remote launch checks can be run from maintainer controls to refresh setup, required guardian check, and readiness blockers.
-- Copyable launch status includes an operator checklist with the exact env and repo actions needed before broad participation.
-- Public setup proof, command-wave state, and launch audit endpoints.
-- Public verification manifest with stable anchors, chat posting capability, required hash fields, and a self endpoint for third-party checks.
-- Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
-  rights, reputation, or token weight.
-- Public project summary publishes two state-derived paragraphs: the builder loop, then current focus, next step, repo state, and latest change.
-- Public command-wave state exposes `currentVote`, `discussionTopics`, group chat settings, `pullRequests`, `rules`, `managedBy`, and contribution report voting summaries.
-- Public active project index exposes the same compact project state for each active hook, including latest changes and member summaries.
-- Public command-wave state keeps placeholder repo URLs empty while keeping hashes verifiable.
-- Public project index keeps repo URLs empty while projects still use placeholder repos.
-- Public command-wave state and launch audit publish the phase 1 authority boundary for agents, reviewers, and third-party auditors.
-- Public launch audit includes a human-readable status draft with next action, operator checklist, verification links, and guardrails.
-- Public launch audit separates chat launch readiness from the full reviewed PR loop.
-- Copied launch status separates chat launch gaps from PR-loop gaps so maintainers can invite discussion without claiming repo or reviewer readiness.
-- `npm run chat:launch` verifies the chat launch track while the GitHub repo is still a placeholder. The chat track includes setup, production env, daemon posting, advisory participation notes, and daemon-observed group discussion evidence.
-- Public command-wave state includes the informational contribution report method and notes.
-- Public launch audit includes the hashed wave state, rules, and full audit bundle it checked.
-- Public launch audit keeps project and setup repo URLs empty while the GitHub repo is still a placeholder.
-- Public command-wave state and launch audit include a workflow proof for chat, decision, PR, review, and log steps.
-  The chat step is ready only after daemon parses a builder message. The proof and checklist keep review and log pending while the reviewer process is still a placeholder.
-- Public launch audit includes informational contribution and developer fee records, with payments kept outside the app.
-  Fee planning waits for a selected reviewer process and reviewed PR loop.
-- Public launch audit publishes the same human-readable launch packet builders can share back to chat, with a packet hash.
-- Copyable discussion update, launch packet, Codex work packet, decision request, and review request drafts.
-- The copyable launch packet includes the same workflow proof chain for chat share-back.
-- The local demo separates current work status from launch readiness. Chat launch readiness still needs production env,
-  durable storage, live 6529 mode, daemon posting, and one daemon-observed group message. PR-loop readiness also needs the selected hook repo, GitHub PR adapter,
-  guardian state, guardian workflow, and required checks.
-
-Maintainer setup:
-
-- Collapsed project setup and guardrail controls at the bottom of the page.
-- 6529 wave search by name or pasted wave URL/ID.
-- GitHub repo link and setup validation for contributor rules and PR template markers.
-- Local file persistence and Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
+The next product slices add signed wallet sessions, GitHub identity, deterministic admission, durable discussion sync,
+work roles, signed decisions, the independent reviewer, task credits, challenges, and reproducible reward proofs.
 
 ## Run Locally
 
