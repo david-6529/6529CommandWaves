@@ -1024,6 +1024,7 @@ export function CommandWavesConsole() {
   const setupControlsRef = useRef<HTMLDetailsElement>(null);
   const suggestRef = useRef<HTMLDetailsElement>(null);
   const activityRef = useRef<HTMLDetailsElement>(null);
+  const projectChatTextareaRef = useRef<HTMLTextAreaElement>(null);
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
@@ -1877,12 +1878,21 @@ export function CommandWavesConsole() {
     setChatPostUrl("");
   }
 
+  function focusProjectChatComposer() {
+    document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.requestAnimationFrame(() => {
+      projectChatTextareaRef.current?.focus();
+      projectChatTextareaRef.current?.setSelectionRange(
+        projectChatTextareaRef.current.value.length,
+        projectChatTextareaRef.current.value.length,
+      );
+    });
+  }
+
   function messageMember(identity: string) {
     setProjectChatMessage(`@${identity} `);
     setProjectChatNotice("Message draft ready.");
-    window.requestAnimationFrame(() => {
-      document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    focusProjectChatComposer();
   }
 
   function proposalTemplateValues() {
@@ -1903,9 +1913,7 @@ export function CommandWavesConsole() {
   function prepareJoinRequest() {
     setProjectChatMessage(createBuilderWaveJoinDraft(proposer, wave.gates, { walletAddress }));
     setProjectChatNotice("Join message ready.");
-    window.requestAnimationFrame(() => {
-      document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    focusProjectChatComposer();
   }
 
   async function connectWallet() {
@@ -2417,6 +2425,7 @@ export function CommandWavesConsole() {
               </div>
               <Field label={projectChat.composerLabel}>
                 <Textarea
+                  inputRef={projectChatTextareaRef}
                   rows={4}
                   value={projectChatMessage}
                   placeholder={projectChat.placeholder}
