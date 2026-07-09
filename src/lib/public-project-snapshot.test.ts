@@ -125,7 +125,7 @@ describe("public project snapshot", () => {
         },
         {
           question: "How do I join?",
-          answer: "Connect wallet if you want, then request access in chat. A maintainer reviews it for this pilot.",
+          answer: "Connect wallet if you want, then ask to join in chat. A maintainer reviews it for this pilot.",
         },
         {
           question: "How does work start?",

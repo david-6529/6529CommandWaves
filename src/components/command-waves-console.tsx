@@ -1902,7 +1902,7 @@ export function CommandWavesConsole() {
 
   function prepareJoinRequest() {
     setProjectChatMessage(createBuilderWaveJoinDraft(proposer, wave.gates, { walletAddress }));
-    setProjectChatNotice("Access request ready.");
+    setProjectChatNotice("Join message ready.");
     window.requestAnimationFrame(() => {
       document.getElementById("project-chat")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -2328,7 +2328,7 @@ export function CommandWavesConsole() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
-                  Request access
+                  Ask to join
                 </Button>
               </div>
             </div>
@@ -2634,7 +2634,7 @@ export function CommandWavesConsole() {
               <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">optional</Badge>
             </summary>
             <p className="mt-3 text-base leading-7 text-zinc-400">
-              Access notes, reports, and code checks for builders who want the details.
+              Join notes, reports, and code checks for builders who want the details.
             </p>
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <section className="border-t border-zinc-800 pt-4 lg:border-t-0 lg:pt-0">
@@ -2645,7 +2645,7 @@ export function CommandWavesConsole() {
                   ))}
                 </ul>
                 <Button type="button" variant="secondary" className="mt-3" onClick={prepareJoinRequest}>
-                  Draft access request
+                  Draft join message
                 </Button>
               </section>
               <section className="border-t border-zinc-800 pt-4 lg:border-t-0 lg:pt-0">

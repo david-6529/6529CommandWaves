@@ -15,12 +15,12 @@ The proposal path should ask for the change, limits, and success criteria first.
 The simplest product view is:
 
 ```text
-Access -> Chat -> Decision -> PR -> Review
+Join -> Chat -> Decision -> PR -> Review
 ```
 
 ## Roles
 
-- **Builders:** request access, propose ideas or code, vote when rules require it, and inspect results.
+- **Builders:** ask to join in chat, propose ideas or code, vote when rules require it, and inspect results.
 - **Orchestration agent:** the 6529 account `daemon`, acts as the hook expert, summarizes chat input, classifies risk, applies rules, and prepares scoped PR work.
 - **Agent worker:** helps with approved PR work through a constrained Codex packet and GitHub draft PR flow.
 - **Reviewer agent:** placeholder for now. The production reviewer should check the PR against the approved work, decision, rules, architecture, security, and expected artifacts before humans merge.

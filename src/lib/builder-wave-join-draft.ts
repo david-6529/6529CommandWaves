@@ -9,15 +9,15 @@ export function createBuilderWaveJoinDraft(handle: string, gates?: unknown, opti
   const cleanWalletAddress = options.walletAddress?.trim().replace(/\s+/g, "") ?? "";
   const handleLine = cleanHandle ? `Handle: ${cleanHandle}.` : "Handle: not set yet.";
   const walletLine = cleanWalletAddress ? [`Wallet: ${cleanWalletAddress}.`] : [];
-  const accessNotes = normalizeParticipationGates(gates).slice(0, 2).join("; ");
+  const joinNotes = normalizeParticipationGates(gates).slice(0, 2).join("; ");
 
   return [
-    "I would like to help with this hook.",
+    "I would like to help build this hook.",
     handleLine,
     ...walletLine,
-    `Access notes: ${accessNotes}.`,
-    "I understand access is reviewed manually for this first phase.",
-    "I can help with discussion, review, tests, or a small PR.",
+    `Join notes: ${joinNotes}.`,
+    "I understand a maintainer reviews who can contribute for now.",
+    "I can help with discussion, tests, review, or a small PR.",
     "I will wait for a visible project decision before PR work starts.",
     "What should I take next?",
   ].join("\n");

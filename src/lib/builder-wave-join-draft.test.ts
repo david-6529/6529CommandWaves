@@ -5,12 +5,12 @@ describe("project access draft", () => {
   it("creates a short join request with the builder handle", () => {
     const draft = createBuilderWaveJoinDraft(" david ");
 
-    expect(draft).toContain("I would like to help with this hook.");
+    expect(draft).toContain("I would like to help build this hook.");
     expect(draft).toContain("Handle: david.");
     expect(draft).not.toContain("Wallet:");
-    expect(draft).toContain("Access notes: Manual builder review for phase 1; REP or TDH access checks are planned, not enforced here.");
-    expect(draft).toContain("access is reviewed manually");
-    expect(draft).toContain("discussion, review, tests, or a small PR");
+    expect(draft).toContain("Join notes: Manual builder review for phase 1; REP or TDH access checks are planned, not enforced here.");
+    expect(draft).toContain("a maintainer reviews who can contribute");
+    expect(draft).toContain("discussion, tests, review, or a small PR");
     expect(draft).toContain("visible project decision before PR work starts");
     expect(draft).toContain("What should I take next?");
     expect(draft).not.toContain("\u2014");
@@ -29,7 +29,7 @@ describe("project access draft", () => {
     });
 
     expect(draft).toContain("Wallet: 0x1234567890abcdef1234567890abcdef12345678.");
-    expect(draft).toContain("access is reviewed manually");
+    expect(draft).toContain("a maintainer reviews who can contribute");
     expect(draft).not.toContain("\u2014");
   });
 
