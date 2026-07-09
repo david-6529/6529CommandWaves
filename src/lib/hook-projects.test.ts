@@ -119,7 +119,7 @@ describe("active hook projects", () => {
         chat: expect.objectContaining({
           id: "project-chat",
           mode: "group_chat",
-          title: "Live builder thread",
+          title: "Project group chat",
           parser: expect.objectContaining({
             agent: "daemon",
           }),

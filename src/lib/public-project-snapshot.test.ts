@@ -99,13 +99,14 @@ describe("public project snapshot", () => {
         id: "project-chat",
         mode: "group_chat",
         label: "Group chat",
-        title: "Live builder thread",
-        detail: "One shared thread. Ask questions, suggest work, vote, and paste PR links. daemon keeps the project state current.",
-        composerLabel: "Message",
-        placeholder: "Ask a question, suggest work, paste a PR, or call for a vote.",
+        title: "Project group chat",
+        detail:
+          "Builders talk here like a normal group chat. daemon reads the conversation and keeps the project summary, decisions, topics, and PR notes current.",
+        composerLabel: "Reply",
+        placeholder: "Write a message to the builders.",
         posting: {
           label: "3 messages every 5 min",
-          detail: "Current chat limit: 3 messages every 5 minutes for each builder. daemon enforces it.",
+          detail: "daemon currently allows 3 messages every 5 minutes for each builder.",
           pace: {
             maxPosts: 3,
             windowSeconds: 300,
@@ -115,7 +116,7 @@ describe("public project snapshot", () => {
         },
         parser: {
           agent: "daemon",
-          detail: "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
+          detail: "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
         },
       },
       pullRequests: [],

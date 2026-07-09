@@ -161,14 +161,14 @@ async function main() {
     "Refresh chat to read the latest posts here.",
     "First public project chat.",
     "Group chat",
-    "Live builder thread",
-    "daemon observes",
-    "One shared thread. Ask questions, suggest work, vote, and paste PR links. daemon keeps the project state current.",
-    "Thread",
-    "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
-    "limit: 3 messages every 5 min",
-    "Current chat limit: 3 messages every 5 minutes for each builder. daemon enforces it.",
-    "Message the group",
+    "Project group chat",
+    "daemon reads",
+    "Builders talk here like a normal group chat. daemon reads the conversation and keeps the project summary, decisions, topics, and PR notes current.",
+    "Messages",
+    "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
+    "daemon pace: 3 messages every 5 min",
+    "daemon currently allows 3 messages every 5 minutes for each builder.",
+    "Reply to the builders",
     "GitHub repo placeholder",
     "Send",
     "Record proposal",
@@ -214,6 +214,7 @@ async function main() {
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
   assert(!renderedHtml.includes("Write to the group"), "Home page should use reply copy for group chat.");
   assert(!renderedHtml.includes("No categories or post types"), "Home page should not explain post types in chat.");
+  assert(!renderedHtml.includes("Ask a question, suggest work, paste a PR, or call for a vote."), "Home page should not ask users to classify chat.");
   const staleDecisionCopy = "decision " + "receipt";
   const staleDecisionLabel = "Decision " + "receipt";
   const staleDecisionLabels = "Decision " + "receipts";
@@ -437,7 +438,7 @@ async function main() {
   assertIncludes(
     "State response",
     JSON.stringify(statePayload),
-    "Write normal group messages. daemon reads the thread for work, votes, reviews, and PR links.",
+    "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
   );
   assertIncludes("State response", JSON.stringify(statePayload), "3 messages every 5 min");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");

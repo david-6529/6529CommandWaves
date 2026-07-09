@@ -2383,14 +2383,14 @@ export function CommandWavesConsole() {
           >
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
               <span>Group chat</span>
-              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} observes</Badge>
+              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} reads</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{projectChat.title}</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">{projectChat.detail}</p>
-                <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="Thread participants">
+                <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="People in chat">
                   {groupChatParticipants.map((participant) => (
                     <span
                       key={participant}
@@ -2411,14 +2411,14 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
-            <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Group chat stream">
+            <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Project group chat feed">
               <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-800 p-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Thread</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Messages</h3>
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">limit: {chatPostingPaceLabel}</Badge>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">daemon pace: {chatPostingPaceLabel}</Badge>
                   <Button
                     type="button"
                     variant="secondary"
@@ -2523,10 +2523,10 @@ export function CommandWavesConsole() {
                   : null}
               </div>
 
-              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Message group chat">
+              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Group chat composer">
                 <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-zinc-50">Message the group</p>
+                    <p className="text-base font-semibold text-zinc-50">Reply to the builders</p>
                     <p className="mt-1 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
                   </div>
                 </div>

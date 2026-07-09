@@ -37,7 +37,7 @@ What exists now:
 - A top-right identity-only wallet connection control that can add a connected address to the join message.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
-- A simplified chat-first UI with a project overview, current hook change, group chat composer, latest posts, builder profiles,
+- A simplified chat-first UI with a project overview, current hook change, group chat view, latest posts, builder profiles,
   current vote, discussion topics, PR status, project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
 - Copyable drafts for chat posts, join messages, decisions, review requests, project updates, launch packets, Codex work
@@ -45,7 +45,7 @@ What exists now:
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Direct chat posting is admin-protected, IP-limited, and paced by the current daemon setting for each builder.
-- Successful chat posts record a daemon-observed project event with parsed signals for PR links, decisions, reviews, repo setup, suggested work, or questions.
+- Successful chat posts record a daemon-observed project event from the shared conversation, including PR links, decisions, reviews, repo setup, suggested work, or questions when daemon detects them.
 - Public daemon summaries redact obvious credentials before they enter project state.
 - Pulled chat previews use the same redaction before display or contribution reporting.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
@@ -189,7 +189,7 @@ Default workspace:
 - Pull request section with the reason for each PR, GitHub links when available, daemon signoff, and reviewer status.
 - PR links pasted in chat for the selected repo appear as pending discussion rows until builders approve scope and review runs.
 - Links to project chat, GitHub repo, current PR, and reviewed work where those records exist.
-- Group chat composer with plain replies, direct chat posting when configured, recent posts, and copyable messages.
+- Group chat view with plain builder replies, direct chat posting when configured, recent posts, and copyable messages.
 - Sending a chat message refreshes project state after daemon records the observed discussion.
 - Folded proposal form that asks for title, change, and success criteria before optional work details.
 - Builder profiles with profile links, visible chat and repo activity, voting summaries, and informational contribution signals.

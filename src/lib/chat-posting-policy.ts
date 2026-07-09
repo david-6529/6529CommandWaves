@@ -35,7 +35,7 @@ export function chatPostPaceShortLabel(pace: ChatPostPace) {
 }
 
 export function chatPostPaceDetail(pace: ChatPostPace) {
-  return `Current chat limit: ${pace.maxPosts} messages every ${minutesLabel(pace.windowSeconds)} minutes for ${pace.identity}. ${pace.enforcedBy} enforces it.`;
+  return `${pace.enforcedBy} currently allows ${pace.maxPosts} messages every ${minutesLabel(pace.windowSeconds)} minutes for ${pace.identity}.`;
 }
 
 export function chatPostPaceIdentity(input: ChatPostPaceInput) {

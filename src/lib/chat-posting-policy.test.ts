@@ -12,7 +12,7 @@ describe("chat posting policy", () => {
     });
     expect(chatPostPaceShortLabel(directChatPostPace)).toBe("3 messages every 5 min");
     expect(chatPostPaceDetail(directChatPostPace)).toBe(
-      "Current chat limit: 3 messages every 5 minutes for each builder. daemon enforces it.",
+      "daemon currently allows 3 messages every 5 minutes for each builder.",
     );
   });
 
