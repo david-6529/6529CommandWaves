@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { GET as getChatPostCapability, POST as postChatMessage } from "./6529/chat-post/route";
+import { POST as observeProjectChat } from "./command-wave/chat/observe/route";
 import { GET as getLaunchAudit } from "./command-wave/launch/audit/route";
 import { GET as getChatLaunch } from "./command-wave/launch/chat/route";
 import { GET as getHookProjects } from "./command-wave/projects/route";
@@ -165,6 +166,59 @@ describe("API route rate limits", () => {
           waveUrl: "https://6529.io/waves/mock-command-wave",
           content: "Builder pace post over limit",
           senderId: " david ",
+        }),
+      }),
+    );
+
+    expect(limited.status).toBe(429);
+    await expect(limited.json()).resolves.toMatchObject({
+      error: "Too many requests. Try again shortly.",
+    });
+  });
+
+  it("rate limits project chat observation sync after admin auth", async () => {
+    const adminKey = "strong-admin-key-for-route-tests";
+
+    process.env.ADMIN_API_KEY = adminKey;
+
+    for (let index = 0; index < 10; index += 1) {
+      const response = await observeProjectChat(
+        request("https://command-waves.example.com/api/command-wave/chat/observe", {
+          method: "POST",
+          headers: {
+            "x-admin-api-key": adminKey,
+          },
+          body: JSON.stringify({
+            waveUrl: "https://6529.io/waves/6529-hook-builder",
+            drops: [
+              {
+                id: `drop-${index}`,
+                author: `builder-${index}`,
+                preview: `Can we vote on fee cap test ${index}?`,
+              },
+            ],
+          }),
+        }),
+      );
+
+      expect(response.status).toBe(200);
+    }
+
+    const limited = await observeProjectChat(
+      request("https://command-waves.example.com/api/command-wave/chat/observe", {
+        method: "POST",
+        headers: {
+          "x-admin-api-key": adminKey,
+        },
+        body: JSON.stringify({
+          waveUrl: "https://6529.io/waves/6529-hook-builder",
+          drops: [
+            {
+              id: "drop-over-limit",
+              author: "builder-over-limit",
+              preview: "Can we vote on one more fee cap test?",
+            },
+          ],
         }),
       }),
     );

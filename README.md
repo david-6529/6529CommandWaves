@@ -43,7 +43,7 @@ What exists now:
 - Copyable drafts for chat posts, join messages, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
-- Per-instance rate limits for public routes that read 6529 or GitHub setup context.
+- Per-instance rate limits for public read routes, direct chat posting, and protected chat sync.
 - Direct chat posting is admin-protected, IP-limited, and paced by the current daemon setting for each builder.
 - Successful chat posts record a daemon-observed project event from the shared conversation, including PR links, decisions, reviews, repo setup, suggested work, or questions when daemon detects them.
 - Protected chat sync can import the latest visible builder posts into daemon-observed project state without duplicating prior observations.
