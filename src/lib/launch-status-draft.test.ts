@@ -75,10 +75,14 @@ describe("launch status draft", () => {
     expect(draft).toContain("Chat next action: Run project chat check");
     expect(draft).toContain("PR loop: checks needed");
     expect(draft).toContain("PR loop next action: Run launch setup check");
+    expect(draft).toContain("Chat launch gaps:");
+    expect(draft).toContain("- Project chat check: Run setup check to verify the project chat before inviting builders.");
+    expect(draft).toContain("PR loop gaps:");
     expect(draft).toContain(
       "- Setup check: Verify the project chat, repo, contributor rules, PR template, guardian workflow, and required guardian check before inviting contributors.",
     );
     expect(draft).toContain("Operator checklist:");
+    expect(draft).toContain("- Run the remote project chat setup check before inviting builders.");
     expect(draft).toContain("- Run the setup check against the selected project chat and current repo setting.");
     expect(draft).toContain("- If the repo is still a placeholder, PR checks stay blocked until the hook repo is selected.");
     expect(draft).toContain("- Run launch readiness from the app or /api/command-wave/launch/audit?remote=1.");
@@ -179,6 +183,8 @@ describe("launch status draft", () => {
     expect(audit.status).toBe("needs_setup");
     expect(draft).toContain("Chat launch: ready");
     expect(draft).toContain("Chat next action: Open project chat");
+    expect(draft).toContain("Chat launch gaps:");
+    expect(draft).toContain("- No chat launch gaps found in the checked records.");
     expect(draft).toContain("PR loop: checks needed");
     expect(draft).toContain("PR loop next action: Select reviewer process");
     expect(draft).toContain(

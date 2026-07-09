@@ -14,12 +14,12 @@ export type LaunchStatusVerificationTargets = {
 
 export type LaunchStatusOpenItem = Pick<FirstPhaseLaunchAudit["openItems"][number], "id" | "label" | "detail">;
 
-function openItemLines(audit: FirstPhaseLaunchAudit) {
-  if (!audit.openItems.length) {
-    return ["- No launch gaps found in the checked records."];
+function openItemLines(items: LaunchStatusOpenItem[], empty: string) {
+  if (!items.length) {
+    return [`- ${empty}`];
   }
 
-  return audit.openItems.slice(0, 5).map((item) => `- ${item.label}: ${item.detail}`);
+  return items.slice(0, 5).map((item) => `- ${item.label}: ${item.detail}`);
 }
 
 const checklistByItemId: Record<string, string[]> = {
@@ -108,6 +108,8 @@ export function createLaunchStatusDraft({
   audit: FirstPhaseLaunchAudit;
   verificationTargets: LaunchStatusVerificationTargets;
 }) {
+  const operatorItems = [...audit.chatLaunch.openItems, ...audit.openItems];
+
   return [
     "Staged project status",
     "",
@@ -124,11 +126,14 @@ export function createLaunchStatusDraft({
     `PR loop next action: ${audit.nextAction.title}`,
     audit.nextAction.detail,
     "",
-    "Open items:",
-    ...openItemLines(audit),
+    "Chat launch gaps:",
+    ...openItemLines(audit.chatLaunch.openItems, "No chat launch gaps found in the checked records."),
+    "",
+    "PR loop gaps:",
+    ...openItemLines(audit.openItems, "No PR loop gaps found in the checked records."),
     "",
     "Operator checklist:",
-    ...launchOperatorChecklistLines(audit.openItems),
+    ...launchOperatorChecklistLines(operatorItems),
     "",
     "Verification:",
     ...(verificationTargets.verificationManifestUrl

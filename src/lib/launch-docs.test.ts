@@ -80,6 +80,7 @@ describe("launch docs", () => {
     expect(docs).toContain("npm run chat:launch");
     expect(docs).toContain("npm run launch:audit");
     expect(docs).toContain("reviewed PR loop");
+    expect(docs).toContain("separates chat launch gaps from PR-loop gaps");
     expect(docs).toContain("Group discussion");
     expect(docs).toContain("daemon-observed group discussion");
     expect(docs).toContain("daemon parses a builder message");
