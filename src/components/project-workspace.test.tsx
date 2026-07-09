@@ -21,13 +21,14 @@ describe("ProjectWorkspace", () => {
     const html = renderWorkspace();
     const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-    expect(text).toContain("Decentralized Coding / Beta");
-    expect(text).toContain("6529 AMM Hook");
+    expect(text).toContain("Decentralized Coding: Beta");
+    expect(text).toContain("Pilot: 6529 AMM Hook");
     expect(text).toContain("50 builders. One immutable hook. Fees shared by accepted contribution.");
     expect(text).toContain("Connect wallet");
     expect(text).toContain("Contributor share Needs approval");
     expect(text).toContain("Approve the pilot rules");
     expect(text).toContain("Open work");
+    expect(text).toContain("View work");
     expect(text).toContain("Live discussion");
     expect(text).toContain("Source not connected");
     expect(text).toContain("Pull requests");
@@ -55,5 +56,14 @@ describe("ProjectWorkspace", () => {
     expect(html).toContain('aria-label="Builder discussion"');
     expect(html).toContain('id="project-message"');
     expect(html).toContain('type="submit"');
+    expect(html).toContain('id="discussion"');
+  });
+
+  it("links every visible work item to its detail page", () => {
+    const html = renderWorkspace();
+
+    expect(html).toContain('href="/work/work-01"');
+    expect(html).toContain('href="/work/work-02"');
+    expect(html).toContain('href="/work/work-03"');
   });
 });

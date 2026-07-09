@@ -3,6 +3,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import type { ChatPostingCapability } from "@/lib/6529/chat-post";
 import type { WorkspaceDiscussionMessage } from "@/lib/project-workspace-view";
+import { siteCopy } from "@/lib/site-copy";
 import { useWalletIdentity } from "./wallet-identity";
 
 type DiscussionTab = "all" | "design" | "reviews";
@@ -82,7 +83,7 @@ export function ProjectDiscussion({
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const message = content.trim();
+    const message = siteCopy(content.trim());
 
     if (!message || !wallet.address || !localPosting) {
       return;
@@ -126,7 +127,7 @@ export function ProjectDiscussion({
       setNotice("Message added to the local project preview.");
       setActiveTab("all");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Message could not be sent.");
+      setNotice(siteCopy(error instanceof Error ? error.message : "Message could not be sent."));
     } finally {
       setBusy(false);
     }
@@ -139,7 +140,7 @@ export function ProjectDiscussion({
       : "Signed member posting is not live yet. Read the discussion here or open the original source.";
 
   return (
-    <section className="overflow-hidden rounded-md border border-zinc-800 bg-[#0c0c0d]" aria-labelledby="discussion-title">
+    <section id="discussion" className="scroll-mt-6 overflow-hidden rounded-md border border-zinc-800 bg-[#0c0c0d]" aria-labelledby="discussion-title">
       <header className="border-b border-zinc-800 px-5 py-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

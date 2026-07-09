@@ -1,4 +1,4 @@
-import { fetchJsonWithTimeout, fetchTextWithTimeout } from "../src/lib/http-fetch";
+import { fetchJsonWithTimeout, fetchTextResponseWithTimeout, fetchTextWithTimeout } from "../src/lib/http-fetch";
 import { hashValue } from "../src/lib/run-manifest";
 
 type JsonObject = Record<string, unknown>;
@@ -90,9 +90,9 @@ async function main() {
 
   for (const label of [
     "dark-app",
-    "Decentralized Coding / Beta",
+    "Decentralized Coding: Beta",
     "Design preview",
-    "6529 AMM Hook",
+    "Pilot: 6529 AMM Hook",
     "50 builders. One immutable hook. Fees shared by accepted contribution.",
     "Connect wallet",
     "Builders",
@@ -111,7 +111,8 @@ async function main() {
     "Define immutable fee behavior",
     "Connect the hook repository",
     "Draft the hook scaffold",
-    "Set before claim",
+    "Not claimable",
+    "View work",
     "Live discussion",
     "Build together",
     "Discussion filters",
@@ -150,8 +151,51 @@ async function main() {
       `Home page should not render removed public content: ${removedPublicControl}.`,
     );
   }
+  assertIncludes("Home page", renderedHtml, 'href="/work/work-01"');
   assertNoPublicRepoLeaks("Home page", renderedHtml);
   assertNoForbiddenDash("Home page", renderedHtml);
+
+  const workHtml = normalizeHydrationMarkers(await fetchText("/work/work-01"));
+
+  for (const label of [
+    "dark-app",
+    "Back to project",
+    "Decentralized Coding: Beta",
+    "Pilot: 6529 AMM Hook",
+    "WORK 01",
+    "Define immutable fee behavior",
+    "Join discussion",
+    "What this should deliver",
+    "Constraints",
+    "No proxy or delegatecall upgrade path.",
+    "Roles",
+    "Not open",
+    "Reward state",
+    "Not claimable",
+    "Group decision",
+    "Needs group decision",
+    "Code and review",
+    "Evidence",
+    "No group decision, pull request, or repo-bound review proof is recorded for this work.",
+  ]) {
+    assertIncludes("Work page", workHtml, label);
+  }
+  assertIncludes("Work page", workHtml, "Work | Decentralized Coding: Beta");
+  assertIncludes("Work page", workHtml, 'href="/#discussion"');
+  for (const unavailableControl of ["Claim work", "Open pull request", "Open repository"]) {
+    assert(!workHtml.includes(unavailableControl), `Work page should not render unavailable control: ${unavailableControl}.`);
+  }
+  assertNoPublicRepoLeaks("Work page", workHtml);
+  assertNoForbiddenDash("Work page", workHtml);
+
+  const missingWork = await fetchTextResponseWithTimeout(appUrl("/work/missing"), {
+    allowedStatuses: [404],
+    headers: { accept: "text/html" },
+  });
+
+  assert(missingWork.status === 404, "Missing work route should return 404.");
+  assertIncludes("Missing work page", missingWork.text, "Work not found");
+  assertNoForbiddenDash("Missing work page", missingWork.text);
 
   const staleDecisionCopy = "decision " + "receipt";
   const staleProofRecorded = "Rece" + "ipt recorded";

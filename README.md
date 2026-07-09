@@ -189,6 +189,7 @@ The public workspace now leads with:
 - The 50-builder cap, proposed contributor share, repo state, and reviewer state.
 - The first rules decision and the current milestone.
 - Open contract, setup, and test work without fake claims or payout credits.
+- Inspectable work pages with scope, constraints, roles, decision state, code status, and repo-bound evidence.
 - One natural group discussion with automatic design and review filters.
 - Pull requests, contributor profiles, project rules, and public proof states.
 

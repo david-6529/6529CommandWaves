@@ -1,10 +1,13 @@
 import { githubRepoPlaceholder, reviewAgentIdentity } from "./agent-identities";
 import { createBuilderRoster } from "./builder-roster";
-import type { CommandProposal, CommandWave, RiskLevel } from "./command-waves";
+import { pollApprovalPassedForWave, type CommandProposal, type CommandWave, type RiskLevel } from "./command-waves";
 import { createContributionReport } from "./contribution-report";
 import { isPlaceholderValue } from "./env-placeholders";
+import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proof";
+import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { parseGitHubRepoUrl } from "./github/repo";
 import { ledgerEventsForVisibleProjectHistory } from "./ledger";
+import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import {
   authorFromProjectChatObservation,
   messageFromProjectChatObservation,
@@ -12,18 +15,44 @@ import {
   type ProjectChatSignal,
 } from "./project-chat-observation";
 import { createPublicProjectSnapshot } from "./public-project-snapshot";
+import { siteCopy } from "./site-copy";
 
 export type WorkspaceTone = "neutral" | "cyan" | "lime" | "amber" | "red";
 
 export type WorkspaceWorkItem = {
   id: string;
+  displayId: string;
+  href: string;
   title: string;
   summary: string;
   stage: string;
   status: string;
   risk: RiskLevel | null;
-  credits: string;
   roles: string[];
+  deliverables: string[];
+  constraints: string[];
+  reward: {
+    status: string;
+    detail: string;
+  };
+  decision: {
+    status: string;
+    detail: string;
+    href: string | null;
+  };
+  code: {
+    status: string;
+    detail: string;
+    repoUrl: string | null;
+    pullRequestUrl: string | null;
+    daemonStatus: string;
+    reviewerStatus: string;
+  };
+  evidence: Array<{
+    label: string;
+    value: string;
+    href: string | null;
+  }>;
 };
 
 export type WorkspaceDiscussionMessage = {
@@ -101,7 +130,13 @@ const previewRules = [
 ] as const;
 
 function projectName(value: string) {
-  return value.trim().toLowerCase() === "6529 amm hook" ? "6529 AMM Hook" : value.trim() || "6529 AMM Hook";
+  const name = value.trim().toLowerCase() === "6529 amm hook" ? "6529 AMM Hook" : value.trim() || "6529 AMM Hook";
+
+  return siteCopy(name);
+}
+
+function workspaceCopy(value: string) {
+  return siteCopy(humanizeLegacyCommandCopy(value));
 }
 
 function workspaceChannel(signal: ProjectChatSignal): WorkspaceDiscussionMessage["channel"] {
@@ -124,8 +159,8 @@ function liveDiscussionMessages(wave: CommandWave): WorkspaceDiscussionMessage[]
 
       return {
         id: event.id,
-        author: authorFromProjectChatObservation(event.message),
-        body: messageFromProjectChatObservation(event.message),
+        author: siteCopy(authorFromProjectChatObservation(event.message)),
+        body: siteCopy(messageFromProjectChatObservation(event.message)),
         at: event.at,
         channel: workspaceChannel(signal),
       };
@@ -147,17 +182,194 @@ function proposalRoles(proposal: CommandProposal) {
   return ["Discussion", "Review"];
 }
 
+function unavailableReward() {
+  return {
+    status: "Not claimable",
+    detail: "Signed membership and approved task credits are not live. No fee share can be earned or finalized for this work yet.",
+  };
+}
+
+function proposalDecision(wave: CommandWave, proposal: CommandProposal): WorkspaceWorkItem["decision"] {
+  const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+
+  if (!poll) {
+    const rule = wave.rules.rulesByKind[proposal.kind];
+
+    if (rule.mode === "auto") {
+      return {
+        status: "No vote required",
+        detail: rule.reason,
+        href: null,
+      };
+    }
+
+    return {
+      status: "Not started",
+      detail: "No group vote has been recorded for this work.",
+      href: null,
+    };
+  }
+
+  if (poll.status === "open") {
+    return {
+      status: "Vote open",
+      detail: `${poll.yesVotes} yes and ${poll.noVotes} no. Approval needs ${poll.quorumRequired} voters and ${poll.yesPercentRequired}% yes.`,
+      href: poll.decision?.url ?? null,
+    };
+  }
+
+  if (pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true })) {
+    return {
+      status: "Recorded",
+      detail: `Builders approved this work with ${poll.yesVotes} yes and ${poll.noVotes} no.`,
+      href: poll.decision?.url ?? null,
+    };
+  }
+
+  if (poll.status === "passed") {
+    return {
+      status: "Decision link needed",
+      detail: `The local vote passed with ${poll.yesVotes} yes and ${poll.noVotes} no, but no valid project decision link is recorded.`,
+      href: null,
+    };
+  }
+
+  if (poll.status === "not_required") {
+    return {
+      status: "No vote required",
+      detail: wave.rules.rulesByKind[proposal.kind].reason,
+      href: poll.decision?.url ?? null,
+    };
+  }
+
+  return {
+    status: poll.status === "failed" ? "Vote failed" : "Vote closed",
+    detail: `${poll.yesVotes} yes and ${poll.noVotes} no.`,
+    href: poll.decision?.url ?? null,
+  };
+}
+
+function proposalCode(wave: CommandWave, proposal: CommandProposal): WorkspaceWorkItem["code"] {
+  const repo = isPlaceholderValue(wave.repoUrl) ? null : parseGitHubRepoUrl(wave.repoUrl);
+  const execution = wave.executions.find((item) => item.proposalId === proposal.id) ?? null;
+  const review = wave.reviews.find((item) => item.proposalId === proposal.id) ?? null;
+  const pullRequestUrl = execution
+    ? (gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl)[0] ?? null)
+    : null;
+  const proofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
+  const reviewerStatus =
+    review?.status === "pass" && proofBound
+      ? "Proof recorded"
+      : review?.status === "changes_requested"
+        ? "Changes requested"
+        : review?.status === "rule_violation"
+          ? "Blocked"
+          : "Pending";
+  const daemonStatus =
+    execution?.status === "complete"
+      ? "Signed off"
+      : execution?.status === "blocked"
+        ? "Blocked"
+        : execution
+          ? "Checking"
+          : "Waiting";
+
+  if (!repo) {
+    return {
+      status: "Blocked",
+      detail: "Select the project repository before PR work starts.",
+      repoUrl: null,
+      pullRequestUrl: null,
+      daemonStatus: "Waiting",
+      reviewerStatus: "Pending",
+    };
+  }
+
+  if (!execution) {
+    return {
+      status: "Not started",
+      detail: "No execution or pull request has been recorded for this work.",
+      repoUrl: repo.htmlUrl,
+      pullRequestUrl: null,
+      daemonStatus,
+      reviewerStatus,
+    };
+  }
+
+  return {
+    status: pullRequestUrl ? "PR recorded" : execution.status.replaceAll("_", " "),
+    detail: workspaceCopy(execution.summary),
+    repoUrl: repo.htmlUrl,
+    pullRequestUrl,
+    daemonStatus,
+    reviewerStatus,
+  };
+}
+
+function proposalEvidence(wave: CommandWave, proposal: CommandProposal): WorkspaceWorkItem["evidence"] {
+  const poll = wave.polls.find((item) => item.proposalId === proposal.id) ?? null;
+  const execution = wave.executions.find((item) => item.proposalId === proposal.id) ?? null;
+  const review = wave.reviews.find((item) => item.proposalId === proposal.id) ?? null;
+  const pullRequestUrl = execution
+    ? (gitHubPullRequestUrlsForRepo(execution.artifacts, wave.repoUrl)[0] ?? null)
+    : null;
+  const proofBound = guardianReviewProofBoundToConfiguredRepo(review, wave.repoUrl);
+  const pullRequestNumber = pullRequestUrl?.match(/\/pull\/(\d+)/)?.[1] ?? null;
+  const decisionRecorded = pollApprovalPassedForWave(poll, wave.waveUrl, { requireUrl: true });
+
+  return [
+    decisionRecorded && poll?.decision?.url
+      ? {
+          label: "Group decision",
+          value: `${poll.yesVotes} yes, ${poll.noVotes} no`,
+          href: poll.decision.url,
+        }
+      : null,
+    pullRequestUrl
+      ? {
+          label: "Pull request",
+          value: pullRequestNumber ? `PR #${pullRequestNumber}` : "GitHub PR",
+          href: pullRequestUrl,
+        }
+      : null,
+    review?.proof && proofBound
+      ? {
+          label: "Reviewer attestation",
+          value: review.proof.attestationHash,
+          href: null,
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item));
+}
+
 function liveWorkItems(wave: CommandWave): WorkspaceWorkItem[] {
-  const items = wave.proposals.slice(0, 4).map((proposal) => ({
-    id: proposal.id.toUpperCase(),
-    title: proposal.title,
-    summary: proposal.prompt,
-    stage: proposal.kind === "open_pr" ? "Hook build" : "Project design",
-    status: proposal.status.replaceAll("_", " "),
-    risk: proposal.risk,
-    credits: "Credits not live",
-    roles: proposalRoles(proposal),
-  }));
+  const items = wave.proposals.slice(0, 4).map((proposal) => {
+    const id = proposal.id.toLowerCase();
+
+    return {
+      id,
+      displayId: proposal.id.toUpperCase(),
+      href: `/work/${encodeURIComponent(id)}`,
+      title: workspaceCopy(proposal.title),
+      summary: workspaceCopy(proposal.prompt),
+      stage: proposal.kind === "open_pr" ? "Hook build" : "Project design",
+      status:
+        proposal.kind === "open_pr" && isPlaceholderValue(wave.repoUrl)
+          ? "Waiting on repo"
+          : proposal.status.replaceAll("_", " "),
+      risk: proposal.risk,
+      roles: proposalRoles(proposal),
+      deliverables: [workspaceCopy(proposal.prompt)],
+      constraints: [
+        workspaceCopy(proposal.spec) ||
+          "Work must stay inside the approved proposal and current project rules.",
+      ],
+      reward: unavailableReward(),
+      decision: proposalDecision(wave, proposal),
+      code: proposalCode(wave, proposal),
+      evidence: proposalEvidence(wave, proposal),
+    };
+  });
 
   if (items.length) {
     return items;
@@ -169,36 +381,118 @@ function liveWorkItems(wave: CommandWave): WorkspaceWorkItem[] {
 function previewWorkItems(): WorkspaceWorkItem[] {
   return [
     {
-      id: "WORK 01",
+      id: "work-01",
+      displayId: "WORK 01",
+      href: "/work/work-01",
       title: "Define immutable fee behavior",
       summary: "Agree on the fee logic, maximum bound, and the small set of parameters that may change.",
       stage: "Contract design",
       status: "Needs decision",
       risk: "high",
-      credits: "Set before claim",
       roles: ["AMM design", "Security"],
+      deliverables: [
+        "An approved fee rule with a hard maximum bound.",
+        "The exact parameters that may change after deployment.",
+        "A short security rationale for each adjustable parameter.",
+      ],
+      constraints: [
+        "No proxy or delegatecall upgrade path.",
+        "No autonomous parameter changes.",
+        "No fee value is treated as final before the group approves it.",
+      ],
+      reward: unavailableReward(),
+      decision: {
+        status: "Needs group decision",
+        detail: "Builders must approve the fee logic, hard cap, and every parameter that may change.",
+        href: null,
+      },
+      code: {
+        status: "Not started",
+        detail: "Design comes first. No contract change or pull request is recorded.",
+        repoUrl: null,
+        pullRequestUrl: null,
+        daemonStatus: "Waiting",
+        reviewerStatus: "Pending",
+      },
+      evidence: [],
     },
     {
-      id: "WORK 02",
+      id: "work-02",
+      displayId: "WORK 02",
+      href: "/work/work-02",
       title: "Connect the hook repository",
       summary: "Select the GitHub repo and install the required review check before code work begins.",
       stage: "Project setup",
       status: "Needs maintainer",
       risk: null,
-      credits: "Setup work",
       roles: ["Maintainer"],
+      deliverables: [
+        "A selected public GitHub repository.",
+        "Contribution guidance and a pull request template.",
+        "A required review check in the merge path.",
+      ],
+      constraints: [
+        "A placeholder URL cannot be presented as the project repo.",
+        "Code work remains blocked until the selected repo is connected.",
+      ],
+      reward: unavailableReward(),
+      decision: {
+        status: "Needs maintainer",
+        detail: "Maintainers must select the repository and approve the required review path.",
+        href: null,
+      },
+      code: {
+        status: "Not connected",
+        detail: "No project repository has been selected.",
+        repoUrl: null,
+        pullRequestUrl: null,
+        daemonStatus: "Waiting",
+        reviewerStatus: "Pending",
+      },
+      evidence: [],
     },
     {
-      id: "WORK 03",
+      id: "work-03",
+      displayId: "WORK 03",
+      href: "/work/work-03",
       title: "Draft the hook scaffold",
       summary: "Create the non-upgradeable contract skeleton with explicit permission flags and bound-focused tests.",
       stage: "Hook build",
       status: "Waiting on repo",
       risk: "high",
-      credits: "Set before claim",
       roles: ["Solidity", "Tests", "Review"],
+      deliverables: [
+        "A minimal non-upgradeable hook contract.",
+        "Explicit Uniswap v4 hook permission flags.",
+        "Tests for every approved fee and parameter bound.",
+      ],
+      constraints: [
+        "Wait for approved fee behavior and a connected repository.",
+        "No deploy script, payment logic, or governance change.",
+      ],
+      reward: unavailableReward(),
+      decision: {
+        status: "Blocked",
+        detail: "This waits for approved fee behavior and a connected repository.",
+        href: null,
+      },
+      code: {
+        status: "Blocked",
+        detail: "No repository or approved contract design is ready for implementation.",
+        repoUrl: null,
+        pullRequestUrl: null,
+        daemonStatus: "Waiting",
+        reviewerStatus: "Pending",
+      },
+      evidence: [],
     },
   ];
+}
+
+export function findWorkspaceWorkItem(view: ProjectWorkspaceView, id: string) {
+  const normalizedId = id.trim().toLowerCase();
+
+  return view.workItems.find((item) => item.id.toLowerCase() === normalizedId) ?? null;
 }
 
 function previewBrief() {
@@ -254,9 +548,9 @@ function liveDecision(wave: CommandWave) {
   if (snapshot.currentDecisionRequest) {
     return {
       label: "Decision requested",
-      title: snapshot.currentDecisionRequest.title,
-      detail: snapshot.currentDecisionRequest.detail,
-      status: snapshot.currentDecisionRequest.status,
+      title: siteCopy(snapshot.currentDecisionRequest.title),
+      detail: siteCopy(snapshot.currentDecisionRequest.detail),
+      status: siteCopy(snapshot.currentDecisionRequest.status),
       href: null,
     };
   }
@@ -264,8 +558,8 @@ function liveDecision(wave: CommandWave) {
   if (snapshot.currentVote.status === "open") {
     return {
       label: "Vote open",
-      title: snapshot.currentVote.title,
-      detail: snapshot.currentVote.detail,
+      title: siteCopy(snapshot.currentVote.title),
+      detail: siteCopy(snapshot.currentVote.detail),
       status: "Open",
       href: snapshot.currentVote.decisionUrl,
     };
@@ -290,27 +584,27 @@ export function createProjectWorkspaceView(
   const contributors = previewMode
     ? []
     : createBuilderRoster(report, { limit: 6 }).map((member) => ({
-        identity: member.identity,
-        role: member.role,
-        contribution: member.detail,
-        vote: member.voteSummary,
+        identity: siteCopy(member.identity),
+        role: siteCopy(member.role),
+        contribution: siteCopy(member.detail),
+        vote: siteCopy(member.voteSummary),
       }));
-  const briefParagraphs = previewMode ? previewBrief() : snapshot.summaryParagraphs;
+  const briefParagraphs = previewMode ? previewBrief() : snapshot.summaryParagraphs.map(siteCopy);
   const pullRequests = previewMode
     ? []
     : snapshot.pullRequests.map((pullRequest) => ({
         id: pullRequest.id,
-        title: pullRequest.title,
-        reason: pullRequest.reason,
+        title: siteCopy(pullRequest.title),
+        reason: siteCopy(pullRequest.reason),
         url: pullRequest.url,
-        daemonStatus: pullRequest.daemonSignoff,
-        reviewerStatus: pullRequest.reviewerSignoff,
+        daemonStatus: siteCopy(pullRequest.daemonSignoff),
+        reviewerStatus: siteCopy(pullRequest.reviewerSignoff),
       }));
 
   return {
     mode: previewMode ? "preview" : "live",
-    eyebrow: "Decentralized Coding / Beta",
-    projectName: projectName(wave.name),
+    eyebrow: "Decentralized Coding: Beta",
+    projectName: `Pilot: ${projectName(wave.name)}`,
     tagline: "50 builders. One immutable hook. Fees shared by accepted contribution.",
     statusLabel: previewMode ? "Design preview" : "Active project",
     waveUrl: wave.waveUrl,

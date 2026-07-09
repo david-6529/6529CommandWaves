@@ -37,7 +37,7 @@ The first screen must answer five questions within a few seconds:
 
 ```text
 +--------------------------------------------------------------------------------------+
-| DECENTRALIZED CODING / BETA       6529 AMM HOOK       GitHub      Connect wallet     |
+| DECENTRALIZED CODING: BETA       6529 AMM HOOK       GitHub      Connect wallet     |
 +--------------------------------------------------------------------------------------+
 | 50 builders. One immutable hook. Fees shared by accepted contribution.               |
 | Phase: Core design       22 / 50 seats       3 open PRs       Contributor share: TBD |
@@ -548,6 +548,9 @@ Decide and publish:
 Exit condition: one signed pilot rules document with no placeholder authority claims.
 
 ### Phase 1: Replace the public experience
+
+Current progress: the server-rendered workspace and initial `/work/[id]` detail route are implemented. Work claims,
+assigned contributors, live credits, and contributor profile routes remain unavailable until identity and admission are real.
 
 - Build the new workspace from a small typed `ProjectWorkspaceView`
 - Move admin and launch controls to `/admin`

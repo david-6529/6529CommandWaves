@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ChatPostingCapability } from "@/lib/6529/chat-post";
 import type { ProjectWorkspaceView, WorkspaceTone } from "@/lib/project-workspace-view";
 import { ProjectDiscussion } from "./project-discussion";
@@ -158,38 +159,47 @@ export function ProjectWorkspace({
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-5 py-3 sm:px-6">
                 <p className="text-sm font-semibold text-zinc-200">Open work</p>
-                <p className="text-xs text-zinc-600">Credits become binding only after rules approval</p>
+                <p className="text-xs text-zinc-600">Rewards wait for approved rules and signed membership</p>
               </div>
               <ol className="divide-y divide-zinc-800">
                 {view.workItems.map((item) => (
-                  <li key={item.id} className="px-5 py-5 transition hover:bg-zinc-900/40 sm:px-6">
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <span className="font-mono text-xs text-zinc-600">{item.id}</span>
-                          <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
-                            {item.status}
-                          </span>
-                          {item.risk ? (
-                            <span className={`text-xs font-semibold ${riskClass(item.risk)}`}>{item.risk} risk</span>
-                          ) : null}
-                        </div>
-                        <h3 className="mt-3 text-xl font-semibold text-zinc-100">{item.title}</h3>
-                        <p className="mt-2 text-sm leading-6 text-zinc-500">{item.summary}</p>
-                        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-500">
-                          <span>{item.stage}</span>
-                          {item.roles.map((role) => (
-                            <span key={role} className="text-zinc-400">
-                              {role}
+                  <li key={item.id}>
+                    <Link
+                      href={item.href}
+                      aria-label={`View ${item.title}, ${item.status}, reward ${item.reward.status}`}
+                      className="group block px-5 py-5 transition hover:bg-zinc-900/40 focus-visible:bg-zinc-900/40 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-cyan-300 sm:px-6"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="font-mono text-xs text-zinc-600">{item.displayId}</span>
+                            <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
+                              {item.status}
                             </span>
-                          ))}
+                            {item.risk ? (
+                              <span className={`text-xs font-semibold ${riskClass(item.risk)}`}>{item.risk} risk</span>
+                            ) : null}
+                          </div>
+                          <h3 className="mt-3 text-xl font-semibold text-zinc-100 transition group-hover:text-cyan-100">
+                            {item.title}
+                          </h3>
+                          <p className="mt-2 text-sm leading-6 text-zinc-500">{item.summary}</p>
+                          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-500">
+                            <span>{item.stage}</span>
+                            {item.roles.map((role) => (
+                              <span key={role} className="text-zinc-400">
+                                {role}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="text-xs uppercase text-zinc-600">Reward</p>
+                          <p className="mt-2 text-sm font-semibold text-amber-200">{item.reward.status}</p>
+                          <p className="mt-3 text-xs font-semibold text-zinc-500 transition group-hover:text-zinc-300">View work</p>
                         </div>
                       </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-xs uppercase text-zinc-600">Reward</p>
-                        <p className="mt-2 text-sm font-semibold text-lime-200">{item.credits}</p>
-                      </div>
-                    </div>
+                    </Link>
                   </li>
                 ))}
               </ol>
