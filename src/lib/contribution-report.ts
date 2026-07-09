@@ -38,6 +38,14 @@ export type ContributionReport = {
     label: string;
     authority: string;
   };
+  analysis: {
+    agent: typeof orchestratorAgentIdentity.handle;
+    mode: "deterministic_visible_activity";
+    confidence: "partial";
+    reviewedBy: "humans";
+    summary: string;
+    limitations: string[];
+  };
   generatedAt: string;
   summary: string;
   coverage: {
@@ -208,6 +216,19 @@ const reportMethod: ContributionReport["method"] = {
   authority: "Informational only",
 };
 
+const reportAnalysis: ContributionReport["analysis"] = {
+  agent: orchestratorAgentIdentity.handle,
+  mode: "deterministic_visible_activity",
+  confidence: "partial",
+  reviewedBy: "humans",
+  summary: "daemon analyzes visible project records and produces a report for human review.",
+  limitations: [
+    "Only visible app, chat preview, PR link, review proof, vote, decision, and ledger records are scored.",
+    "The report cannot see private coordination or live activity that has not been pulled into app state.",
+    "Humans must approve access, payouts, merges, reputation, token weight, and governance changes separately.",
+  ],
+};
+
 export function createContributionReport(
   wave: CommandWave,
   options: {
@@ -324,6 +345,7 @@ export function createContributionReport(
   return {
     mode: "informational",
     method: reportMethod,
+    analysis: reportAnalysis,
     generatedAt: options.generatedAt ?? latestReportTimestamp(wave, includedChatPosts),
     summary: sorted.length
       ? `${sorted.length} contributors have visible project activity.`
@@ -375,6 +397,14 @@ export function createContributionReportDraft(
     "",
     "Records:",
     ...report.evidence.map((item) => `- ${item}`),
+    "",
+    "Analysis:",
+    `- Agent: ${report.analysis.agent}`,
+    `- Mode: ${report.analysis.mode}`,
+    `- Confidence: ${report.analysis.confidence}`,
+    `- Human review: ${report.analysis.reviewedBy}`,
+    `- ${report.analysis.summary}`,
+    ...report.analysis.limitations.map((item) => `- ${item}`),
     "",
     "Coverage included:",
     ...report.coverage.included.map((item) => `- ${item}`),

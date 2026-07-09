@@ -4043,6 +4043,13 @@ export function CommandWavesConsole() {
                   {contributionReport.method.id}. {contributionReport.method.authority}.
                 </p>
               </div>
+              <div className="mt-3 rounded-md border border-zinc-800 bg-black p-3">
+                <p className="text-xs font-semibold uppercase tracking-normal text-zinc-500">Analysis</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-zinc-100">{contributionReport.analysis.agent}</p>
+                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                  {contributionReport.analysis.confidence} confidence. Human review required.
+                </p>
+              </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="secondary" onClick={() => void copyContributionReportDraft()}>
                   Copy report

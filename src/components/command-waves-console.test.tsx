@@ -126,6 +126,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Report: 1 report point");
     expect(text).toContain("Voting: yes on cmd-001");
     expect(text).toContain("Voting: no on cmd-001");
+    expect(text).toContain("Activity report");
+    expect(text).toContain("Report method");
+    expect(text).toContain("Visible activity report");
+    expect(text).toContain("Analysis");
+    expect(text).toContain("partial confidence. Human review required.");
     expect(text).toContain("1 report point");
     expect(text).not.toContain("1 report points");
     expect(text).toContain("Decision links: 2 report points");

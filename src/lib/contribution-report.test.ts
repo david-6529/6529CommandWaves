@@ -48,6 +48,18 @@ describe("contribution report", () => {
         label: "Visible activity report",
         authority: "Informational only",
       },
+      analysis: {
+        agent: "daemon",
+        mode: "deterministic_visible_activity",
+        confidence: "partial",
+        reviewedBy: "humans",
+        summary: "daemon analyzes visible project records and produces a report for human review.",
+        limitations: [
+          "Only visible app, chat preview, PR link, review proof, vote, decision, and ledger records are scored.",
+          "The report cannot see private coordination or live activity that has not been pulled into app state.",
+          "Humans must approve access, payouts, merges, reputation, token weight, and governance changes separately.",
+        ],
+      },
       generatedAt: "2026-06-21T12:00:00.000Z",
     });
     expect(report.notes.join(" ")).toContain("Report scores are an AI-readable activity report");
@@ -223,6 +235,12 @@ describe("contribution report", () => {
     expect(draft).toContain("Method: Visible activity report (visible_activity_v0), Informational only.");
     expect(draft).toContain("Records:");
     expect(draft).toContain("- 1 GitHub PR link");
+    expect(draft).toContain("Analysis:");
+    expect(draft).toContain("- Agent: daemon");
+    expect(draft).toContain("- Mode: deterministic_visible_activity");
+    expect(draft).toContain("- Confidence: partial");
+    expect(draft).toContain("- Human review: humans");
+    expect(draft).toContain("- daemon analyzes visible project records and produces a report for human review.");
     expect(draft).toContain("Coverage included:");
     expect(draft).toContain("- Work proposals stored by this app.");
     expect(draft).toContain("- Chat posts pulled into this app.");

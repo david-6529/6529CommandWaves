@@ -44,6 +44,12 @@ describe("public contribution report", () => {
           id: "visible_activity_v0",
           authority: "Informational only",
         },
+        analysis: {
+          agent: "daemon",
+          mode: "deterministic_visible_activity",
+          confidence: "partial",
+          reviewedBy: "humans",
+        },
       },
     });
     expect(report.reportHash).toMatch(/^[a-f0-9]{64}$/);
