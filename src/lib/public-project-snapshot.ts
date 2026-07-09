@@ -23,10 +23,10 @@ export const publicProjectChatSettings = {
   id: "project-chat",
   mode: "group_chat",
   label: "Group chat",
-  title: "Project group chat",
-  detail: "Builders talk here like a normal group chat. daemon reads the conversation and keeps the project summary, decisions, topics, and PR notes current.",
-  composerLabel: "Reply",
-  placeholder: "Write a message to the builders.",
+  title: "Builder group chat",
+  detail: "Everyone talks in one thread. daemon listens for important project updates and keeps the summary, decisions, topics, and PR notes current.",
+  composerLabel: "Message",
+  placeholder: "Message the group.",
   posting: {
     label: chatPostPaceShortLabel(directChatPostPace),
     detail: chatPostPaceDetail(directChatPostPace),
@@ -39,7 +39,7 @@ export const publicProjectChatSettings = {
   },
   parser: {
     agent: orchestratorAgentIdentity.handle,
-    detail: "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
+    detail: "Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.",
   },
 } as const;
 
@@ -454,7 +454,7 @@ function projectRulesSnapshot(wave: CommandWave) {
     },
     {
       question: "How does work start?",
-      answer: "Post in chat. daemon parses the discussion and turns clear agreement into small proposals.",
+      answer: "Talk in chat. daemon turns clear group agreement into small proposals.",
     },
     {
       question: "Who coordinates?",

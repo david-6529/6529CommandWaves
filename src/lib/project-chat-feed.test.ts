@@ -58,7 +58,7 @@ describe("project chat feed", () => {
         label: "message",
         author: "builders",
         title: "Start the thread",
-        body: "Say what you want to build or ask what the group should decide next. daemon will keep the project summary current.",
+        body: "Start with a normal message. daemon reads for important project updates and keeps the summary current.",
         status: "waiting",
       },
     ]);

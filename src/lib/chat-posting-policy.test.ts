@@ -11,9 +11,7 @@ describe("chat posting policy", () => {
       enforcedBy: "daemon",
     });
     expect(chatPostPaceShortLabel(directChatPostPace)).toBe("3 messages every 5 min");
-    expect(chatPostPaceDetail(directChatPostPace)).toBe(
-      "daemon currently allows 3 messages every 5 minutes for each builder.",
-    );
+    expect(chatPostPaceDetail(directChatPostPace)).toBe("daemon setting: 3 messages every 5 minutes for each builder.");
   });
 
   it("chooses a stable pacing identity without granting authority", () => {

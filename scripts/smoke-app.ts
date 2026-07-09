@@ -125,7 +125,7 @@ async function main() {
     "Who reviews PRs?",
     "Who merges?",
     "Everything starts in chat.",
-    "Post in chat. daemon parses the discussion and turns clear agreement into small proposals.",
+    "Talk in chat. daemon turns clear group agreement into small proposals.",
     "daemon labels risk and keeps scope small.",
     "daemon updates the summary, labels risk, and routes work.",
     "Builders record a project decision before PR work starts.",
@@ -161,14 +161,14 @@ async function main() {
     "Refresh chat to read the latest posts here.",
     "First public project chat.",
     "Group chat",
-    "Project group chat",
-    "daemon reads",
-    "Builders talk here like a normal group chat. daemon reads the conversation and keeps the project summary, decisions, topics, and PR notes current.",
-    "Messages",
-    "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
-    "daemon pace: 3 messages every 5 min",
-    "daemon currently allows 3 messages every 5 minutes for each builder.",
-    "Reply to the builders",
+    "Builder group chat",
+    "daemon listening",
+    "Everyone talks in one thread. daemon listens for important project updates and keeps the summary, decisions, topics, and PR notes current.",
+    "Group thread",
+    "Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.",
+    "chat setting: 3 messages every 5 min",
+    "daemon setting: 3 messages every 5 minutes for each builder.",
+    "Message the group",
     "GitHub repo placeholder",
     "Send",
     "Record proposal",
@@ -212,7 +212,9 @@ async function main() {
   assert(!renderedHtml.includes("Access is manual for now."), "Home page still shows stale wallet access copy.");
   assert(!renderedHtml.includes("1 report points"), "Home page contains an incorrect singular report point label.");
   assert(!renderedHtml.includes("Use Codex to draft"), "Home page should describe pilot work for builders, not as a Codex task.");
-  assert(!renderedHtml.includes("Write to the group"), "Home page should use reply copy for group chat.");
+  assert(!renderedHtml.includes("Write to the group"), "Home page should use message copy for group chat.");
+  assert(!renderedHtml.includes("Reply to the builders"), "Home page should not feel like a one-person reply composer.");
+  assert(!renderedHtml.includes("daemon pace"), "Home page should describe pacing as a chat setting.");
   assert(!renderedHtml.includes("No categories or post types"), "Home page should not explain post types in chat.");
   assert(!renderedHtml.includes("Ask a question, suggest work, paste a PR, or call for a vote."), "Home page should not ask users to classify chat.");
   const staleDecisionCopy = "decision " + "receipt";
@@ -439,7 +441,7 @@ async function main() {
   assertIncludes(
     "State response",
     JSON.stringify(statePayload),
-    "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
+    "Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.",
   );
   assertIncludes("State response", JSON.stringify(statePayload), "3 messages every 5 min");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");

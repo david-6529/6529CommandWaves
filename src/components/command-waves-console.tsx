@@ -2457,7 +2457,7 @@ export function CommandWavesConsole() {
           >
             <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
               <span>Group chat</span>
-              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} reads</Badge>
+              <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{projectChat.parser.agent} listening</Badge>
             </summary>
 
             <div className="mt-5 flex flex-wrap items-start justify-between gap-3">
@@ -2485,14 +2485,14 @@ export function CommandWavesConsole() {
               </div>
             </div>
 
-            <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Project group chat feed">
+            <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Builder group chat feed">
               <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-800 p-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Messages</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Group thread</h3>
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">daemon pace: {chatPostingPaceLabel}</Badge>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">chat setting: {chatPostingPaceLabel}</Badge>
                   <Button
                     type="button"
                     variant="secondary"
@@ -2600,8 +2600,10 @@ export function CommandWavesConsole() {
               <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Group chat composer">
                 <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-zinc-50">Reply to the builders</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
+                    <p className="text-base font-semibold text-zinc-50">Message the group</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">
+                      Talk naturally. daemon parses the thread and updates the project state.
+                    </p>
                   </div>
                 </div>
                 <Field label={projectChat.composerLabel}>
@@ -2633,6 +2635,7 @@ export function CommandWavesConsole() {
                     Clear
                   </Button>
                 </div>
+                <p className="mt-2 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
                 {hasProjectChatMessage && chatPostingUnavailableMessage ? (
                   <p className="mt-2 text-sm leading-6 text-zinc-500">{chatPostingUnavailableMessage}</p>
                 ) : null}

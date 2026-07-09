@@ -99,14 +99,14 @@ describe("public project snapshot", () => {
         id: "project-chat",
         mode: "group_chat",
         label: "Group chat",
-        title: "Project group chat",
+        title: "Builder group chat",
         detail:
-          "Builders talk here like a normal group chat. daemon reads the conversation and keeps the project summary, decisions, topics, and PR notes current.",
-        composerLabel: "Reply",
-        placeholder: "Write a message to the builders.",
+          "Everyone talks in one thread. daemon listens for important project updates and keeps the summary, decisions, topics, and PR notes current.",
+        composerLabel: "Message",
+        placeholder: "Message the group.",
         posting: {
           label: "3 messages every 5 min",
-          detail: "daemon currently allows 3 messages every 5 minutes for each builder.",
+          detail: "daemon setting: 3 messages every 5 minutes for each builder.",
           pace: {
             maxPosts: 3,
             windowSeconds: 300,
@@ -116,7 +116,7 @@ describe("public project snapshot", () => {
         },
         parser: {
           agent: "daemon",
-          detail: "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
+          detail: "Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.",
         },
       },
       pullRequests: [],
@@ -131,7 +131,7 @@ describe("public project snapshot", () => {
         },
         {
           question: "How does work start?",
-          answer: "Post in chat. daemon parses the discussion and turns clear agreement into small proposals.",
+          answer: "Talk in chat. daemon turns clear group agreement into small proposals.",
         },
         {
           question: "Who coordinates?",

@@ -68,7 +68,7 @@ describe("command wave state snapshot", () => {
           },
           parser: {
             agent: "daemon",
-            detail: "daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.",
+            detail: "Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.",
           },
         },
         pullRequests: [],

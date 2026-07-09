@@ -56,7 +56,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who reviews PRs?");
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
-    expect(text).toContain("Post in chat. daemon parses the discussion and turns clear agreement into small proposals.");
+    expect(text).toContain("Talk in chat. daemon turns clear group agreement into small proposals.");
     expect(text).toContain("Maintainers review who can change the project.");
     expect(text).toContain("daemon labels risk and keeps scope small.");
     expect(text).toContain("daemon updates the summary, labels risk, and routes work.");
@@ -98,21 +98,24 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Discuss repo");
     expect(text).not.toContain("Add PR note");
     expect(text).toContain("Group chat");
-    expect(text).toContain("Project group chat");
-    expect(text).toContain("daemon reads");
+    expect(text).toContain("Builder group chat");
+    expect(text).toContain("daemon listening");
     expect(text).toContain(
-      "Builders talk here like a normal group chat. daemon reads the conversation and keeps the project summary, decisions, topics, and PR notes current.",
+      "Everyone talks in one thread. daemon listens for important project updates and keeps the summary, decisions, topics, and PR notes current.",
     );
-    expect(text).toContain("Messages");
-    expect(text).toContain("daemon parses the shared conversation automatically. Builders do not need to tag or classify messages.");
-    expect(text).toContain("Reply to the builders");
-    expect(text).toContain("daemon pace: 3 messages every 5 min");
-    expect(text).toContain("daemon currently allows 3 messages every 5 minutes for each builder.");
+    expect(text).toContain("Group thread");
+    expect(text).toContain("Send normal messages. daemon parses the group chat for work, decisions, PR links, and review notes.");
+    expect(text).toContain("Message the group");
+    expect(text).toContain("chat setting: 3 messages every 5 min");
+    expect(text).toContain("Talk naturally. daemon parses the thread and updates the project state.");
+    expect(text).toContain("daemon setting: 3 messages every 5 minutes for each builder.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Send");
     expect(text).not.toContain("No categories or post types.");
     expect(text).not.toContain("Ask a question, suggest work, paste a PR, or call for a vote.");
     expect(text).not.toContain("No need to choose a post type.");
+    expect(text).not.toContain("Reply to the builders");
+    expect(text).not.toContain("daemon pace");
     expect(text).not.toContain("Thread participants");
     expect(text).not.toContain("Save as proposal");
     expect(text).not.toContain("Save proposal");
@@ -257,11 +260,11 @@ describe("CommandWavesConsole", () => {
 
     expect(html).toContain('<details id="project-chat"');
     expect(html).toContain('open="">');
-    expect(html).toContain('aria-label="Project group chat feed"');
+    expect(html).toContain('aria-label="Builder group chat feed"');
     expect(html).toContain('aria-label="Group chat composer"');
-    expect(html).toContain("Messages");
+    expect(html).toContain("Group thread");
     expect(html).toContain("People in chat");
-    expect(html).toContain("Reply to the builders");
+    expect(html).toContain("Message the group");
     expect(text).toContain("david");
     expect(text).toContain("gpebbles");
     expect(text).toContain("simo");
@@ -272,7 +275,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Can we discuss Add fee cap tests?");
     expect(text).not.toContain("I am watching for clear agreement before this becomes PR work.");
     expect(text).not.toContain("I recorded the PR for the approved hook change so builders can inspect it.");
-    expect(html).toContain('placeholder="Write a message to the builders."');
+    expect(html).toContain('placeholder="Message the group."');
     expect(html).not.toContain("Ask a question, suggest work, paste a PR, or call for a vote.");
     expect(html).not.toContain("No need to choose a post type.");
     expect(html).not.toContain('role="tablist"');
