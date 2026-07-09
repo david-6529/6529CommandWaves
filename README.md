@@ -34,13 +34,13 @@ What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
 - One active hook project with project chat and an intentional placeholder GitHub repo until maintainers choose it.
-- A top-right wallet connection control that can add a connected address to the access request draft.
+- A top-right wallet connection control that can add a connected address to the join message.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
 - A simplified chat-first UI with a project overview, current hook change, chat composer, latest posts, builder profiles,
   current vote, discussion topics, PR status, project rules, and folded proposal flow.
 - Simple work types: Code PR, Question, Update, and Context.
-- Copyable drafts for chat posts, join requests, decisions, review requests, project updates, launch packets, Codex work
+- Copyable drafts for chat posts, join messages, decisions, review requests, project updates, launch packets, Codex work
   packets, and contribution reports.
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
@@ -116,7 +116,7 @@ The first public phase:
 
 1. Choose one public project chat.
 2. Keep the GitHub repo placeholder through chat launch, then connect one repo when maintainers choose it.
-3. Record who-can-join requirements such as reputation, token, allowlists, or QnA as advisory until live enforcement exists.
+3. Record join requirements such as reputation, token, allowlists, or QnA as advisory until live enforcement exists.
 4. Propose hook work in plain English with clear limits.
 5. Let orchestration rules classify risk and require votes for important changes.
 6. Let an agent help produce a PR when allowed.
@@ -190,7 +190,7 @@ Default workspace:
 
 Safety and review:
 
-- How this works section with plain-English access notes.
+- How this works section with plain-English join notes.
 - Hook proposal preflight for caps, tests, upgradeability, deployment, governance, and live holder-authority claims.
 - Risk classification for hook, fee, Solidity, proxy, deployment, and governance work.
 - Reviewer check foundation for manifests, vote status, rules hashes, risky paths, and hook contract signals.

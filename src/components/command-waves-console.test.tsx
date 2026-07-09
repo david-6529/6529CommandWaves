@@ -57,6 +57,7 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
     expect(text).toContain("Post in chat. daemon parses the discussion and turns clear agreement into small proposals.");
+    expect(text).toContain("Maintainers review who can change the project.");
     expect(text).toContain("daemon labels risk and keeps scope small.");
     expect(text).toContain("daemon updates the summary, labels risk, and routes work.");
     expect(text).toContain("The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.");
@@ -207,6 +208,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("gate unset");
     expect(text).not.toContain("Who can play");
     expect(text).not.toContain("Participation gate is not set yet.");
+    expect(text).not.toContain("Access is reviewed before someone can change the project.");
     expect(text).not.toContain("Build details");
     expect(text).not.toContain("Build reference");
     expect(text).not.toContain("Use Codex to draft");

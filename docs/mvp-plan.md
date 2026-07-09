@@ -4,9 +4,9 @@
 
 A Command Wave is a project workspace where public chat governs scoped work in a GitHub repo.
 
-For the first public phase, the product helps the community build a 6529 hook together. Access notes explain who can join. People and agents propose work in plain English. The daemon account summarizes chat, classifies risk, keeps scope small, and routes important work to a visible decision. Approved work can move into a controlled PR flow. Reviewer checks are placeholders for this phase, and humans stay in charge of merge, deploy, payment, and governance decisions.
+For the first public phase, the product helps the community build a 6529 hook together. Join notes explain who can participate. People and agents propose work in plain English. The daemon account summarizes chat, classifies risk, keeps scope small, and routes important work to a visible decision. Approved work can move into a controlled PR flow. Reviewer checks are placeholders for this phase, and humans stay in charge of merge, deploy, payment, and governance decisions.
 
-The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused project workspace so anyone can see the access notes, chat activity, repo setup status, current code review state, and next action.
+The underlying workflow should be reusable for future public open source projects. The first shipped UI should feel like a focused project workspace so anyone can see the join notes, chat activity, repo setup status, current code review state, and next action.
 
 6529 remains the live conversation and decision layer for this pilot. The app should act as a snapshot and project dashboard: recent chat context, approved work, risk classifications, PR evidence, review evidence, launch evidence, and contribution reporting are easier to inspect here.
 Maintainer setup, guardrails, and readiness checks should stay available without leading the public project experience.
@@ -25,12 +25,12 @@ Join -> Chat -> Decision -> PR -> Review
 - **Agent worker:** helps with approved PR work through a constrained Codex packet and GitHub draft PR flow.
 - **Reviewer agent:** placeholder for now. The production reviewer should check the PR against the approved work, decision, rules, architecture, security, and expected artifacts before humans merge.
 
-Implementation names can evolve later. The user-facing MVP should lead with access, chat, proposal, decision, PR, and review.
+Implementation names can evolve later. The user-facing MVP should lead with join, chat, proposal, decision, PR, and review.
 
 ## Core Objects
 
 - **CommandWave:** project workspace tied to a 6529 wave and optionally a GitHub repo.
-- **Access notes:** participation notes for REP, TDH, allowlists, QnA, or manual admission. They are advisory until live enforcement is wired.
+- **Join notes:** participation notes for REP, TDH, allowlists, QnA, or manual admission. They are advisory until live enforcement is wired.
 - **Rules:** versioned policy for command types, risk, quorum, thresholds, expiry, allowed tools, and blocked actions.
 - **Proposal:** a requested command with prompt, spec, risk, proposer, budget, and status.
 - **Poll:** yes/no vote with quorum and yes threshold.

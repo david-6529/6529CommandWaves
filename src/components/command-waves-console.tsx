@@ -150,7 +150,7 @@ const hookGuardrails = [
   "Contribution report scores are not permissions.",
 ];
 const projectWorkRules = [
-  "Access is reviewed before someone can change the project.",
+  "Maintainers review who can change the project.",
   "Ideas and proposals start in chat.",
   "daemon labels risk and keeps scope small.",
   "Important changes need a visible project decision before PR work.",
@@ -2905,7 +2905,7 @@ export function CommandWavesConsole() {
             </Badge>
           </summary>
           <p className="mt-3 max-w-3xl text-base leading-7 text-zinc-500">
-            Hook project chat, GitHub repo, access notes, and the next code step.
+            Hook project chat, GitHub repo, join notes, and the next code step.
           </p>
           <div className="mt-4 grid gap-3">
             {activeHookProjects.map((project) => {
@@ -2929,7 +2929,7 @@ export function CommandWavesConsole() {
 
                   <dl className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     {[
-                      ["Access", project.accessSnapshotLabel],
+                      ["Join", project.accessSnapshotLabel],
                       ["Decision", project.orchestrationSnapshotLabel],
                       ["PR", project.codeSnapshotLabel],
                       ["Review", project.reviewStatusLabel],
