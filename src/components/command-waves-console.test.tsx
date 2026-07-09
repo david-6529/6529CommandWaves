@@ -70,6 +70,12 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("PR work starts after maintainers select the hook repo.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Message builders");
+    expect(text).toContain("Current vote");
+    expect(text).toContain("No open vote");
+    expect(text).toContain("Last decision: 5 yes, 1 no.");
+    expect(text).toContain("Topics in discussion");
+    expect(text).toContain("Select the pilot GitHub repo");
+    expect(text).toContain("PR links and code review start after maintainers choose the repo.");
     expect(text).toContain("Decision");
     expect(text).toContain("Builders approved with 5 yes and 1 no.");
     expect(text).toContain("GitHub repo");
@@ -98,10 +104,18 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Save as proposal");
     expect(text).toContain("Save proposal");
     expect(text).toContain("Recent chat");
+    expect(text).toContain("Pull requests");
+    expect(text).toContain("Code contributions");
+    expect(text).toContain("PRs show why code changed, where to inspect it, and whether daemon and the reviewer signed off.");
+    expect(text).toContain("No pull requests yet");
+    expect(text).toContain("Future PRs will show their reason, GitHub link, daemon signoff, and reviewer signoff.");
+    expect(text).toContain("Review agent is still a placeholder. Humans control merge decisions.");
     expect(text).toContain("Builders");
     expect(text).toContain("Profiles show what each builder has done.");
     expect(text).toContain("Activity");
     expect(text).toContain("Report: 1 report point");
+    expect(text).toContain("Voting: yes on cmd-001");
+    expect(text).toContain("Voting: no on cmd-001");
     expect(text).toContain("1 report point");
     expect(text).not.toContain("1 report points");
     expect(text).toContain("Decision links: 2 report points");
@@ -199,6 +213,7 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Add demo yes");
     expect(text).not.toContain("Add demo no");
     expect(text).not.toContain("Posted to mock chat");
+    expect(text).not.toContain("Saved discussion");
   });
 
   it("keeps optional advanced sections on the dark app surface", () => {

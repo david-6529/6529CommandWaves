@@ -852,6 +852,33 @@ function memberProfileUrl(identity: string) {
   return `https://6529.io/${encodeURIComponent(handle || "6529")}`;
 }
 
+function pullRequestUrlFromArtifacts(artifacts: string[]) {
+  return (
+    artifacts.find((artifact) => /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact)) ??
+    null
+  );
+}
+
+function memberVoteSummary(wave: CommandWave, identity: string) {
+  const normalizedIdentity = identity.trim().replace(/^@/, "").toLowerCase();
+  const votes = wave.polls.flatMap((poll) =>
+    poll.votes
+      .filter((vote) => vote.voterIdentity.trim().replace(/^@/, "").toLowerCase() === normalizedIdentity)
+      .map((vote) => ({
+        ...vote,
+        proposalId: poll.proposalId,
+      })),
+  );
+
+  if (!votes.length) {
+    return "No recorded vote yet.";
+  }
+
+  const latestVote = [...votes].sort((left, right) => new Date(right.at).getTime() - new Date(left.at).getTime())[0];
+
+  return `${latestVote.vote} on ${latestVote.proposalId}`;
+}
+
 function downloadJson(filename: string, payload: unknown) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -1111,10 +1138,7 @@ export function CommandWavesConsole() {
       ? phaseWork.prExecution
       : (wave.executions.find((execution) => execution.proposalId === activeProposal.id) ?? null)
     : null;
-  const activeExecutionPrUrl =
-    activeExecution?.artifacts.find((artifact) =>
-      /^https:\/\/github\.com\/[^/\s]+\/[^/\s]+\/pull\/\d+(?:[?#][^\s]*)?$/.test(artifact),
-    ) ?? null;
+  const activeExecutionPrUrl = activeExecution ? pullRequestUrlFromArtifacts(activeExecution.artifacts) : null;
   const activeReview = activeProposal
     ? activeProposal.kind === "open_pr"
       ? phaseWork.prReview
@@ -1126,7 +1150,6 @@ export function CommandWavesConsole() {
   const readyForNextHookChange = activeReview?.status === "pass";
   const supportProposals = phaseWork.supportProposals.filter((proposal) => proposal.id !== activeProposal?.id);
   const visibleSupportProposals = supportProposals.slice(0, 3);
-  const discussionQueueItems = phaseWork.supportProposals.slice(0, 2);
   const activeProposalIsPr = activeProposal?.kind === "open_pr";
   const activeSupportProposal = activeProposal && !activeProposalIsPr ? activeProposal : null;
   const activeSupportProposalLabel = activeSupportProposal
@@ -1210,15 +1233,27 @@ export function CommandWavesConsole() {
       : activeProposal
         ? humanizeLegacyCommandCopy(activeProposal.prompt)
         : "Start with one small change builders can discuss and review.";
-  const currentDecisionDetail = activePollNeedsWaveDecision
-    ? "Record the project decision before PR work starts."
-    : activePollDecisionRecorded
-      ? activePollApprovalText
-      : activePoll?.status === "open"
-        ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Decision still open.`
-        : activeProposal
-          ? "No decision required by current rules."
-          : "Discuss scope in chat before saving a proposal.";
+  const currentVoteStatusLabel = activePoll?.status === "open" ? "needs votes" : activePoll ? "no open vote" : "none";
+  const currentVoteTitle =
+    activePoll?.status === "open"
+      ? "Vote open"
+      : activePollDecisionRecorded
+        ? "No open vote"
+        : activePollNeedsWaveDecision
+          ? "Decision link needed"
+          : activePoll
+            ? "Vote closed"
+            : "No vote yet";
+  const currentVoteDetail =
+    activePoll?.status === "open"
+      ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no. Builders can still vote.`
+      : activePollDecisionRecorded
+        ? `Last decision: ${activePoll?.yesVotes ?? 0} yes, ${activePoll?.noVotes ?? 0} no.`
+        : activePollNeedsWaveDecision
+          ? "Local vote passed. Record the project decision before PR work starts."
+          : activePoll
+            ? `${activePoll.yesVotes} yes, ${activePoll.noVotes} no.`
+            : "Save a proposal from chat when the group is ready to decide.";
   const currentNextTitle = currentWorkNeedsRepo ? "Keep discussing" : phaseNextAction.title;
   const currentNextDetail = currentWorkNeedsRepo
     ? "PR work starts after maintainers select the hook repo."
@@ -1453,6 +1488,70 @@ export function CommandWavesConsole() {
   const projectRepoDraftIsPlaceholder = !repoUrl.trim() || isPlaceholderValue(repoUrl);
   const projectRepoInputValue = projectRepoDraftIsPlaceholder ? "" : repoUrl;
   const projectRepoInputLabel = projectRepoDraftIsPlaceholder ? githubRepoPlaceholder.label : "GitHub repo";
+  const discussionTopicItems = [
+    activeProposal
+      ? {
+          id: `proposal-${activeProposal.id}`,
+          title: currentFocusDisplayTitle,
+          detail: humanizeLegacyCommandCopy(currentFocusDescription),
+          status: currentBuildStatusLabel,
+          statusClassName: currentBuildStatusClass,
+        }
+      : null,
+    projectRepoIsPlaceholder
+      ? {
+          id: "repo-selection",
+          title: "Select the pilot GitHub repo",
+          detail: "PR links and code review start after maintainers choose the repo.",
+          status: "needed",
+          statusClassName: riskClass("medium"),
+        }
+      : null,
+    ...visibleSupportProposals.map((proposal) => ({
+      id: `support-${proposal.id}`,
+      title: humanizeLegacyCommandCopy(proposal.title),
+      detail: humanizeLegacyCommandCopy(proposal.prompt),
+      status: proposal.status.replaceAll("_", " "),
+      statusClassName: statusClass(proposal.status),
+    })),
+  ]
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .slice(0, 3);
+  const pullRequestRows = repoCanRunCode
+    ? wave.executions
+        .map((execution) => {
+          const proposal = wave.proposals.find((item) => item.id === execution.proposalId);
+
+          if (!proposal || proposal.kind !== "open_pr") {
+            return null;
+          }
+
+          const review = wave.reviews.find((item) => item.proposalId === execution.proposalId) ?? null;
+          const prUrl = pullRequestUrlFromArtifacts(execution.artifacts);
+          const daemonStatus =
+            execution.status === "complete" ? "signed off" : execution.status === "blocked" ? "blocked" : "checking";
+          const reviewStatus =
+            review?.status === "pass"
+              ? "signed off"
+              : review?.status === "changes_requested"
+                ? "changes requested"
+                : review?.status === "rule_violation"
+                  ? "blocked"
+                  : "pending";
+
+          return {
+            id: execution.proposalId,
+            title: currentWorkDisplayTitle(proposal.title),
+            reason: humanizeLegacyCommandCopy(proposal.prompt),
+            prUrl,
+            daemonStatus,
+            daemonStatusClass: statusClass(execution.status === "complete" ? "pass" : execution.status),
+            reviewStatus,
+            reviewStatusClass: statusClass(review?.status ?? "waiting"),
+          };
+        })
+        .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    : [];
   const projectRuleItems = [
     ["Who can join?", participationAccess.summary],
     ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
@@ -2411,8 +2510,35 @@ export function CommandWavesConsole() {
                 ) : null}
               </div>
               <div className="py-4">
-                <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Decision</p>
-                <p className="mt-1 text-base leading-7 text-zinc-400">{currentDecisionDetail}</p>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Current vote</p>
+                    <p className="mt-1 text-base font-semibold leading-7 text-zinc-100">{currentVoteTitle}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">{currentVoteDetail}</p>
+                  </div>
+                  <Badge className={activePoll?.status === "open" ? riskClass("medium") : statusClass("complete")}>
+                    {currentVoteStatusLabel}
+                  </Badge>
+                </div>
+              </div>
+              <div className="py-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Topics in discussion</p>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">
+                    {countLabel(discussionTopicItems.length, "topic")}
+                  </Badge>
+                </div>
+                <div className="mt-3 divide-y divide-zinc-800">
+                  {discussionTopicItems.map((item) => (
+                    <div key={item.id} className="py-3 first:pt-0 last:pb-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-base font-semibold text-zinc-50">{item.title}</p>
+                        <Badge className={item.statusClassName}>{item.status}</Badge>
+                      </div>
+                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-zinc-400">{item.detail}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
               {projectRepoHref && !projectRepoIsPlaceholder ? (
                 <div className="flex flex-wrap items-center justify-between gap-3 py-4">
@@ -2428,27 +2554,6 @@ export function CommandWavesConsole() {
                 </div>
               ) : null}
             </div>
-            {discussionQueueItems.length ? (
-              <div className="mt-5 border-t border-zinc-800 pt-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Saved discussion</p>
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">
-                    {countLabel(phaseWork.supportProposals.length, "item")}
-                  </Badge>
-                </div>
-                <div className="mt-3 grid gap-3">
-                  {discussionQueueItems.map((proposal) => (
-                    <div key={proposal.id} className="grid gap-1 border-t border-zinc-800 pt-3 first:border-t-0 first:pt-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-base font-semibold text-zinc-50">{humanizeLegacyCommandCopy(proposal.title)}</p>
-                        <Badge className={statusClass(proposal.status)}>{proposal.status.replaceAll("_", " ")}</Badge>
-                      </div>
-                      <p className="line-clamp-2 text-sm leading-6 text-zinc-400">{humanizeLegacyCommandCopy(proposal.prompt)}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
           </section>
 
           <details id="project-chat" className="scroll-mt-4 rounded-lg border border-zinc-800 p-5" open>
@@ -2610,6 +2715,67 @@ export function CommandWavesConsole() {
           </details>
         </section>
 
+        <section id="pull-requests" className="border-t border-zinc-800 pt-5" aria-label="Pull requests">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Pull requests</p>
+              <h2 className="mt-1 text-3xl font-semibold text-zinc-50">Code contributions</h2>
+              <p className="mt-2 text-base leading-7 text-zinc-400">
+                PRs show why code changed, where to inspect it, and whether daemon and the reviewer signed off.
+              </p>
+            </div>
+            <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">
+              {pullRequestRows.length ? countLabel(pullRequestRows.length, "PR") : "repo pending"}
+            </Badge>
+          </div>
+          <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
+            {pullRequestRows.length ? (
+              pullRequestRows.map((row) => (
+                <article key={row.id} className="grid gap-4 py-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)]">
+                  <div>
+                    <p className="text-lg font-semibold text-zinc-50">{row.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-400">{row.reason}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {row.prUrl ? <LinkButton href={row.prUrl}>Open PR</LinkButton> : null}
+                      {!row.prUrl ? <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">GitHub link pending</Badge> : null}
+                    </div>
+                  </div>
+                  <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                    <div>
+                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">daemon signoff</dt>
+                      <dd className="mt-1">
+                        <Badge className={row.daemonStatusClass}>{row.daemonStatus}</Badge>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Reviewer signoff</dt>
+                      <dd className="mt-1">
+                        <Badge className={row.reviewStatusClass}>{row.reviewStatus}</Badge>
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              ))
+            ) : (
+              <div className="py-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-lg font-semibold text-zinc-50">No pull requests yet</p>
+                  {projectRepoIsPlaceholder ? (
+                    <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">GitHub repo placeholder</Badge>
+                  ) : null}
+                </div>
+                <p className="mt-2 text-base leading-7 text-zinc-400">
+                  Select the pilot repo before PR work starts. Future PRs will show their reason, GitHub link, daemon signoff,
+                  and reviewer signoff.
+                </p>
+                <p className="mt-1 text-sm leading-6 text-zinc-500">
+                  {reviewAgentIdentity.role} is still a placeholder. Humans control merge decisions.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
         <details id="active-projects" className="border-t border-zinc-800 pt-4">
           <summary className="flex cursor-pointer items-center justify-between gap-3 text-base font-semibold text-zinc-50">
             <span>Active projects</span>
@@ -2672,33 +2838,38 @@ export function CommandWavesConsole() {
             </div>
             <div className="mt-5 grid gap-3 lg:grid-cols-3">
               {visibleBuilderProfiles.length ? (
-                visibleBuilderProfiles.map((member) => (
-                  <article key={member.identity} className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-zinc-800 bg-zinc-800 text-base font-semibold text-zinc-100">
-                        {member.identity.slice(0, 2).toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="break-words text-xl font-semibold text-zinc-50">{member.identity}</h3>
-                          <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{member.role}</Badge>
+                visibleBuilderProfiles.map((member) => {
+                  const votingSummary = memberVoteSummary(wave, member.identity);
+
+                  return (
+                    <article key={member.identity} className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-zinc-800 bg-zinc-800 text-base font-semibold text-zinc-100">
+                          {member.identity.slice(0, 2).toUpperCase()}
                         </div>
-                        <p className="mt-2 text-sm leading-6 text-zinc-400">{member.detail}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="break-words text-xl font-semibold text-zinc-50">{member.identity}</h3>
+                            <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{member.role}</Badge>
+                          </div>
+                          <p className="mt-2 text-sm leading-6 text-zinc-400">{member.detail}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="mt-4 border-y border-zinc-800 py-3">
-                      <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Activity</p>
-                      <p className="mt-1 text-base font-semibold text-zinc-50">{member.activity}</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-400">Report: {member.scoreLabel}</p>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
-                        Message
-                      </Button>
-                      <LinkButton href={memberProfileUrl(member.identity)}>Profile</LinkButton>
-                    </div>
-                  </article>
-                ))
+                      <div className="mt-4 border-y border-zinc-800 py-3">
+                        <p className="text-sm font-semibold uppercase tracking-normal text-zinc-500">Activity</p>
+                        <p className="mt-1 text-base font-semibold text-zinc-50">{member.activity}</p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-400">Report: {member.scoreLabel}</p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-400">Voting: {votingSummary}</p>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button type="button" variant="secondary" onClick={() => messageMember(member.identity)}>
+                          Message
+                        </Button>
+                        <LinkButton href={memberProfileUrl(member.identity)}>Profile</LinkButton>
+                      </div>
+                    </article>
+                  );
+                })
               ) : (
                 <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-4 md:col-span-2">
                   <p className="text-base font-semibold text-zinc-50">No visible members yet</p>
