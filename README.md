@@ -48,8 +48,8 @@ What exists now:
 - Client request timeouts so UI actions fail clearly instead of hanging.
 - Scoped API routes for setup, proposals, local votes, decision links, PR records, reviews, launch audit, setup proof,
   and public project state.
-- Public active project index for agents or future UI surfaces that need the hook list, project chat links, current vote,
-  discussion topics, PR rows, member summaries, and agent ownership.
+- Public active project index for agents or future UI surfaces that need the hook list, project chat links, chat sections,
+  current vote, discussion topics, PR rows, member summaries, and agent ownership.
 - Public project snapshot with daemon-managed summary, changelog, current vote, discussion topics, PR status, project rules, and agent status.
 - Public verification manifest lists itself, setup proof, state, project index, launch audit, chat launch, launch track status, and required hash fields.
 - Public project state includes a full snapshot hash, so setup checks can detect stale or edited state payloads.
@@ -210,7 +210,7 @@ Audit and launch:
 - Public contribution report endpoint with a hashable informational report. It does not grant access, payouts, merge
   rights, reputation, or token weight.
 - Public project summary publishes two state-derived paragraphs: the builder loop, then current focus, next step, repo state, and latest change.
-- Public command-wave state exposes `currentVote`, `discussionTopics`, `pullRequests`, `rules`, `managedBy`, and contribution report voting summaries.
+- Public command-wave state exposes `currentVote`, `discussionTopics`, `chatSections`, `pullRequests`, `rules`, `managedBy`, and contribution report voting summaries.
 - Public active project index exposes the same compact project state for each active hook, including member summaries.
 - Public command-wave state keeps placeholder repo URLs empty while keeping hashes verifiable.
 - Public project index keeps repo URLs empty while projects still use placeholder repos.

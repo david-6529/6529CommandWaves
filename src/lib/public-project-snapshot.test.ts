@@ -75,6 +75,29 @@ describe("public project snapshot", () => {
           status: "needed",
         },
       ],
+      chatSections: [
+        {
+          id: "general",
+          label: "General",
+          title: "Chat",
+          detail: "Questions, ideas, risks, and work all start here.",
+          placeholder: "Ask a question, suggest work, or share context.",
+        },
+        {
+          id: "build",
+          label: "Build",
+          title: "Work",
+          detail: "Shape one change small enough for a decision and a PR.",
+          placeholder: "Describe the change builders should discuss or decide on.",
+        },
+        {
+          id: "review",
+          label: "Review",
+          title: "Review",
+          detail: "Share PR links, test results, and concerns before merge.",
+          placeholder: "Paste a PR link, test result, or review note.",
+        },
+      ],
       pullRequests: [],
       rules: [
         {

@@ -94,6 +94,23 @@ describe("active hook projects", () => {
             status: "needed",
           }),
         ],
+        chatSections: [
+          expect.objectContaining({
+            id: "general",
+            label: "General",
+            title: "Chat",
+          }),
+          expect.objectContaining({
+            id: "build",
+            label: "Build",
+            title: "Work",
+          }),
+          expect.objectContaining({
+            id: "review",
+            label: "Review",
+            title: "Review",
+          }),
+        ],
         pullRequests: [],
         rules: expect.arrayContaining([
           expect.objectContaining({

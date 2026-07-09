@@ -46,7 +46,7 @@ import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-n
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
 import { selectPhaseWork } from "@/lib/phase-work";
 import { createPublicCommandWaveSource } from "@/lib/public-command-wave";
-import { createPublicProjectSnapshot } from "@/lib/public-project-snapshot";
+import { createPublicProjectSnapshot, type PublicProjectChatSection } from "@/lib/public-project-snapshot";
 import { projectChatAuthorLabel } from "@/lib/project-chat-display";
 import { createProjectChatFeed } from "@/lib/project-chat-feed";
 import { hookParameterPolicySummary } from "@/lib/safety/hook-parameter-policy";
@@ -140,30 +140,7 @@ const proposalFlowSteps = [
   ["Build", "Use GitHub PRs once the repo is connected."],
   ["Review", "Check the PR against the approved scope and rules."],
 ];
-const discussionTabs = [
-  {
-    id: "general",
-    label: "General",
-    title: "Chat",
-    detail: "Questions, ideas, risks, and work all start here.",
-    placeholder: "Ask a question, suggest work, or share context.",
-  },
-  {
-    id: "build",
-    label: "Build",
-    title: "Work",
-    detail: "Shape one change small enough for a decision and a PR.",
-    placeholder: "Describe the change builders should discuss or decide on.",
-  },
-  {
-    id: "review",
-    label: "Review",
-    title: "Review",
-    detail: "Share PR links, test results, and concerns before merge.",
-    placeholder: "Paste a PR link, test result, or review note.",
-  },
-] as const;
-type DiscussionTabId = (typeof discussionTabs)[number]["id"];
+type DiscussionTabId = PublicProjectChatSection["id"];
 
 function projectChatTabId(id: DiscussionTabId) {
   return `project-chat-tab-${id}`;
@@ -1074,7 +1051,10 @@ export function CommandWavesConsole() {
   const waveUpdateDraftRef = useRef<HTMLTextAreaElement>(null);
   const autoPreviewKeysRef = useRef<Set<string>>(new Set());
   const selectedRule = wave.rules.rulesByKind[kind];
-  const selectedDiscussionTab = discussionTabs.find((item) => item.id === discussionTabId) ?? discussionTabs[0];
+  const phaseWork = useMemo(() => selectPhaseWork(wave), [wave]);
+  const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
+  const projectChatSections = publicProjectSnapshot.chatSections;
+  const selectedDiscussionTab = projectChatSections.find((item) => item.id === discussionTabId) ?? projectChatSections[0];
   const selectedProposalType = proposalTypeOptions.find((item) => item.kind === kind) ?? proposalTypeOptions[0];
   const classifiedRisk = useMemo(() => classifyRisk(kind, prompt), [kind, prompt]);
   const hookProposalPreflight = useMemo(
@@ -1097,8 +1077,6 @@ export function CommandWavesConsole() {
       : hookProposalPreflightRequired
         ? hookProposalPreflight.summary
         : "This support message does not open a PR.";
-  const phaseWork = useMemo(() => selectPhaseWork(wave), [wave]);
-  const publicProjectSnapshot = useMemo(() => createPublicProjectSnapshot(wave), [wave]);
   const activeProposal = phaseWork.prProposal ?? phaseWork.supportProposals[0] ?? null;
   const activePoll = activeProposal
     ? activeProposal.kind === "open_pr"
@@ -2018,7 +1996,7 @@ export function CommandWavesConsole() {
   }
 
   function handleDiscussionTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
-    const lastIndex = discussionTabs.length - 1;
+    const lastIndex = projectChatSections.length - 1;
     let nextIndex: number | null = null;
 
     if (event.key === "ArrowRight" || event.key === "ArrowDown") {
@@ -2036,7 +2014,11 @@ export function CommandWavesConsole() {
     }
 
     event.preventDefault();
-    focusDiscussionTab(discussionTabs[nextIndex].id);
+    const nextTab = projectChatSections[nextIndex];
+
+    if (nextTab) {
+      focusDiscussionTab(nextTab.id);
+    }
   }
 
   async function connectWallet() {
@@ -2460,7 +2442,7 @@ export function CommandWavesConsole() {
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Project chat sections">
-              {discussionTabs.map((tab, index) => {
+              {projectChatSections.map((tab, index) => {
                 const selected = tab.id === selectedDiscussionTab.id;
 
                 return (

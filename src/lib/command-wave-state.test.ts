@@ -44,6 +44,20 @@ describe("command wave state snapshot", () => {
             title: "Select the pilot GitHub repo",
           },
         ],
+        chatSections: [
+          {
+            id: "general",
+            label: "General",
+          },
+          {
+            id: "build",
+            label: "Build",
+          },
+          {
+            id: "review",
+            label: "Review",
+          },
+        ],
         pullRequests: [],
         rules: expect.arrayContaining([
           {

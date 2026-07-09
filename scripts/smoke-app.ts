@@ -404,6 +404,8 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "currentWork");
   assertIncludes("State response", JSON.stringify(statePayload), "currentVote");
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
+  assertIncludes("State response", JSON.stringify(statePayload), "chatSections");
+  assertIncludes("State response", JSON.stringify(statePayload), "Shape one change small enough for a decision and a PR.");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
   assertIncludes("State response", JSON.stringify(statePayload), "rules");
   assertIncludes("State response", JSON.stringify(statePayload), "How are PRs approved?");
@@ -460,6 +462,7 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "GitHub repo placeholder");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "currentVote");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "discussionTopics");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "chatSections");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "pullRequests");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "rules");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "How are PRs approved?");
