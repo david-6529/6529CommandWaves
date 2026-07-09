@@ -161,14 +161,13 @@ async function main() {
     "Refresh chat to read the latest posts here.",
     "First public project chat.",
     "Group chat",
-    "Builder thread",
+    "Live builder thread",
     "daemon observes",
-    "Builders talk in one shared thread. Ask questions, debate scope, paste PRs, and vote when needed. daemon observes the thread and keeps the project state current.",
-    "Latest messages",
-    "Write normally. daemon watches for agreement, vote needs, and PR links.",
-    "Reply",
+    "One shared thread for questions, ideas, votes, and PR links. daemon parses messages in the background and keeps the project state current.",
+    "Thread",
+    "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
     "3 messages / 5 min",
-    "Current daemon setting: 3 messages per 5 minutes for each builder identity.",
+    "Current daemon pace: 3 messages every 5 minutes per builder identity.",
     "Message the group",
     "GitHub repo placeholder",
     "Send",
@@ -431,7 +430,11 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
   assertIncludes("State response", JSON.stringify(statePayload), "\"chat\"");
   assertIncludes("State response", JSON.stringify(statePayload), "group_chat");
-  assertIncludes("State response", JSON.stringify(statePayload), "Write normally. daemon watches for agreement, vote needs, and PR links.");
+  assertIncludes(
+    "State response",
+    JSON.stringify(statePayload),
+    "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
+  );
   assertIncludes("State response", JSON.stringify(statePayload), "3 messages / 5 min");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
   assertIncludes("State response", JSON.stringify(statePayload), "rules");

@@ -4,39 +4,37 @@ import { demoWave } from "./demo-wave";
 import { createProjectChatFeed } from "./project-chat-feed";
 
 describe("project chat feed", () => {
-  it("shows the next draft and local hook evidence when live posts are absent", () => {
-    const feed = createProjectChatFeed(demoWave, {
-      title: "Add fee cap tests",
-      prompt: "Add tests for the fee cap.",
-      proposer: "david",
-    });
+  it("shows project thread evidence without echoing the composer draft", () => {
+    const feed = createProjectChatFeed(demoWave);
 
     expect(feed.map((item) => item.label)).toEqual(["message", "message", "message", "message"]);
     expect(feed[0]).toMatchObject({
       author: "david",
       title: "Suggested work",
-      body: "Can we discuss Add fee cap tests? Add tests for the fee cap.",
-      status: "draft",
+      body:
+        "I think the next hook change should be Draft the non-upgradeable hook scaffold. Draft the non-upgradeable AMM hook scaffold with fee parameters capped at 100 bps and tests.",
+      status: "complete",
     });
     expect(feed[1]).toMatchObject({
       author: "gpebbles",
       title: "Scope check",
-      body: "This seems small enough for the next step if it only adds tests and does not change deployment or ownership.",
-      status: "needs decision",
+      body: "Let's keep this to the non-upgradeable scaffold, fee cap, and tests. No deploy or ownership change.",
+      status: "scope",
     });
     expect(feed[2]).toMatchObject({
+      author: "builders",
+      title: "Decision linked",
+      body: "The hook scaffold vote passed with 5 yes and 1 no. This is the scope PRs should follow.",
+      status: "5 yes, 1 no",
+    });
+    expect(feed[3]).toMatchObject({
       author: "david",
-      title: "Last PR",
+      title: "PR",
       body: "I linked the PR for the approved hook change so everyone can inspect the code and tests.",
       hrefLabel: "Open PR",
       status: "complete",
     });
-    expect(feed[3]).toMatchObject({
-      author: "review-agent",
-      body: "Reviewer check matched the PR to the approved hook scope and project rules.",
-      title: "Review passed",
-      status: "pass",
-    });
+    expect(feed.map((item) => item.body).join(" ")).not.toContain("Can we discuss Add fee cap tests?");
   });
 
   it("falls back to a clear start item when no project activity exists", () => {
@@ -55,15 +53,15 @@ describe("project chat feed", () => {
     };
 
     expect(createProjectChatFeed(emptyWave)).toEqual([
-        {
-          id: "start",
-          label: "message",
-          author: "builders",
-          title: "Start the thread",
-          body: "Drop the first small hook change here. daemon will summarize agreement and keep the next step current.",
-          status: "waiting",
-        },
-      ]);
+      {
+        id: "start",
+        label: "message",
+        author: "builders",
+        title: "Start the thread",
+        body: "Say what you want to build or ask what the group should decide next. daemon will keep the project summary current.",
+        status: "waiting",
+      },
+    ]);
   });
 
   it("shows support proposals when no PR proposal is active", () => {

@@ -1235,20 +1235,47 @@ export function CommandWavesConsole() {
   );
   const builderRoster = useMemo(() => createBuilderRoster(contributionReport), [contributionReport]);
   const projectChatFeed = useMemo(
-    () =>
-      createProjectChatFeed(wave, {
-        title,
-        prompt,
-        proposer,
-      }),
-    [prompt, proposer, title, wave],
+    () => createProjectChatFeed(wave),
+    [wave],
   );
   const visibleBuilderProfiles = builderRoster.slice(0, 4);
-  const visibleProjectChatSnapshotDrops = primaryProjectContextPreview
-    ? [...primaryProjectContextPreview.sampleDrops].filter(isBuilderProjectChatDrop).slice(-3).reverse()
-    : [];
-  const hasRecentDiscussionPosts = visibleProjectChatSnapshotDrops.length >= 2;
+  const visibleProjectChatSnapshotDrops = useMemo(() => {
+    if (!primaryProjectContextPreview) {
+      return [];
+    }
+
+    return [...primaryProjectContextPreview.sampleDrops].filter(isBuilderProjectChatDrop).slice(-3).reverse();
+  }, [primaryProjectContextPreview]);
+  const hasRecentDiscussionPosts = visibleProjectChatSnapshotDrops.length > 0;
   const visibleProjectChatSnapshotFallback = projectChatFeed.slice(0, 4);
+  const visibleFallbackAfterLivePosts = visibleProjectChatSnapshotFallback.slice(
+    0,
+    Math.max(0, 4 - visibleProjectChatSnapshotDrops.length),
+  );
+  const groupChatParticipants = useMemo(() => {
+    const names = [
+      ...visibleProjectChatSnapshotDrops.map((drop) => projectChatAuthorLabel(drop.author)),
+      ...projectChatFeed.map((item) => item.author ?? ""),
+      ...builderRoster.slice(0, 4).map((member) => member.identity),
+      orchestratorAgentIdentity.handle,
+    ];
+    const seen = new Set<string>();
+
+    return names
+      .map((name) => name.trim())
+      .filter((name) => name && name !== "unknown")
+      .filter((name) => {
+        const key = name.toLowerCase();
+
+        if (seen.has(key)) {
+          return false;
+        }
+
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 6);
+  }, [builderRoster, projectChatFeed, visibleProjectChatSnapshotDrops]);
   const completedPhaseCount = phaseChecklist.filter((item) => item.status === "done").length;
   const launchAudit = useMemo(
     () =>
@@ -2362,6 +2389,19 @@ export function CommandWavesConsole() {
               <div className="min-w-0 flex-1">
                 <h2 className="mt-1 text-3xl font-semibold text-zinc-50">{projectChat.title}</h2>
                 <p className="mt-2 text-base leading-7 text-zinc-400">{projectChat.detail}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="Thread participants">
+                  {groupChatParticipants.map((participant) => (
+                    <span
+                      key={participant}
+                      className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm font-semibold text-zinc-300"
+                    >
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-xs text-zinc-100">
+                        {participant.slice(0, 2).toUpperCase()}
+                      </span>
+                      {participant}
+                    </span>
+                  ))}
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="button" variant="secondary" onClick={prepareJoinRequest}>
@@ -2373,11 +2413,11 @@ export function CommandWavesConsole() {
             <section className="mt-5 overflow-hidden rounded-lg border border-zinc-800 bg-black/25" aria-label="Group chat stream">
               <div className="flex flex-wrap items-start justify-between gap-3 border-b border-zinc-800 p-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-zinc-50">Latest messages</h3>
+                  <h3 className="text-lg font-semibold text-zinc-50">Thread</h3>
                   <p className="mt-1 max-w-xl text-sm leading-6 text-zinc-500">{projectChat.parser.detail}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">{chatPostingPaceLabel}</Badge>
+                  <Badge className="border-zinc-800 bg-zinc-900 text-zinc-400">daemon pace: {chatPostingPaceLabel}</Badge>
                   <Button
                     type="button"
                     variant="secondary"
@@ -2449,12 +2489,43 @@ export function CommandWavesConsole() {
                         </div>
                       );
                   })}
+                {hasRecentDiscussionPosts
+                  ? visibleFallbackAfterLivePosts.map((item) => {
+                      const author = item.author ?? (item.label === "Activity" ? item.status : orchestratorAgentIdentity.handle);
+
+                      return (
+                        <div key={`context-${item.id}`} className="flex gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-zinc-100">
+                            {author.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-semibold text-zinc-50">{author}</p>
+                              {item.href ? (
+                                <a
+                                  className="text-sm font-semibold text-blue-300 hover:text-blue-200"
+                                  href={item.href}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {item.hrefLabel ?? "Open"}
+                                </a>
+                              ) : null}
+                            </div>
+                            <p className="mt-1 line-clamp-3 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3 text-sm leading-6 text-zinc-300">
+                              {humanizeLegacyCommandCopy(item.body)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  : null}
               </div>
 
-              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Reply to group chat">
+              <section className="border-t border-zinc-800 bg-zinc-950/70 p-4" aria-label="Message group chat">
                 <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-zinc-50">Reply</p>
+                    <p className="text-base font-semibold text-zinc-50">Message the group</p>
                     <p className="mt-1 text-sm leading-6 text-zinc-500">{projectChat.posting.detail}</p>
                   </div>
                 </div>

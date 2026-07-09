@@ -23,14 +23,14 @@ export const publicProjectChatSettings = {
   id: "project-chat",
   mode: "group_chat",
   label: "Group chat",
-  title: "Builder thread",
+  title: "Live builder thread",
   detail:
-    "Builders talk in one shared thread. Ask questions, debate scope, paste PRs, and vote when needed. daemon observes the thread and keeps the project state current.",
-  composerLabel: "Reply",
-  placeholder: "Message the group",
+    "One shared thread for questions, ideas, votes, and PR links. daemon parses messages in the background and keeps the project state current.",
+  composerLabel: "Message",
+  placeholder: "Ask a question, suggest work, paste a PR, or call for a vote.",
   posting: {
     label: `${directChatPostPace.maxPosts} messages / ${directChatPostPace.windowSeconds / 60} min`,
-    detail: `Current daemon setting: ${directChatPostPace.maxPosts} messages per ${directChatPostPace.windowSeconds / 60} minutes for each builder identity.`,
+    detail: `Current daemon pace: ${directChatPostPace.maxPosts} messages every ${directChatPostPace.windowSeconds / 60} minutes per builder identity.`,
     pace: {
       maxPosts: directChatPostPace.maxPosts,
       windowSeconds: directChatPostPace.windowSeconds,
@@ -40,7 +40,7 @@ export const publicProjectChatSettings = {
   },
   parser: {
     agent: orchestratorAgentIdentity.handle,
-    detail: "Write normally. daemon watches for agreement, vote needs, and PR links.",
+    detail: "Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.",
   },
 } as const;
 

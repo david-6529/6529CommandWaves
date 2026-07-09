@@ -98,16 +98,16 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Discuss repo");
     expect(text).not.toContain("Add PR note");
     expect(text).toContain("Group chat");
-    expect(text).toContain("Builder thread");
+    expect(text).toContain("Live builder thread");
     expect(text).toContain("daemon observes");
     expect(text).toContain(
-      "Builders talk in one shared thread. Ask questions, debate scope, paste PRs, and vote when needed. daemon observes the thread and keeps the project state current.",
+      "One shared thread for questions, ideas, votes, and PR links. daemon parses messages in the background and keeps the project state current.",
     );
-    expect(text).toContain("Latest messages");
-    expect(text).toContain("Write normally. daemon watches for agreement, vote needs, and PR links.");
-    expect(text).toContain("Reply");
+    expect(text).toContain("Thread");
+    expect(text).toContain("Write like a normal group chat. daemon reads the thread for work, votes, reviews, and PR links.");
+    expect(text).toContain("Message the group");
     expect(text).toContain("3 messages / 5 min");
-    expect(text).toContain("Current daemon setting: 3 messages per 5 minutes for each builder identity.");
+    expect(text).toContain("Current daemon pace: 3 messages every 5 minutes per builder identity.");
     expect(text).toContain("GitHub repo placeholder");
     expect(text).toContain("Send");
     expect(text).not.toContain("No categories or post types.");
@@ -255,18 +255,21 @@ describe("CommandWavesConsole", () => {
     expect(html).toContain('<details id="project-chat"');
     expect(html).toContain('open="">');
     expect(html).toContain('aria-label="Group chat stream"');
-    expect(html).toContain('aria-label="Reply to group chat"');
-    expect(html).toContain("Latest messages");
-    expect(html).toContain("Reply");
+    expect(html).toContain('aria-label="Message group chat"');
+    expect(html).toContain("Thread");
+    expect(html).toContain("Thread participants");
+    expect(html).toContain("Message the group");
     expect(text).toContain("david");
     expect(text).toContain("gpebbles");
     expect(text).toContain("simo");
     expect(text).toContain("I think the next hook change should be Draft the non-upgradeable hook scaffold.");
     expect(text).toContain("keep this to the non-upgradeable scaffold, fee cap, and tests.");
+    expect(text).toContain("The hook scaffold vote passed with 5 yes and 1 no.");
     expect(text).toContain("PR work can start once maintainers select the pilot GitHub repo.");
+    expect(text).not.toContain("Can we discuss Add fee cap tests?");
     expect(text).not.toContain("I am watching for clear agreement before this becomes PR work.");
     expect(text).not.toContain("I recorded the PR for the approved hook change so builders can inspect it.");
-    expect(html).toContain('placeholder="Message the group"');
+    expect(html).toContain('placeholder="Ask a question, suggest work, paste a PR, or call for a vote."');
     expect(html).not.toContain('role="tablist"');
     expect(html).not.toContain('role="tab"');
     expect(html).not.toContain('role="tabpanel"');

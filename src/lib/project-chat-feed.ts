@@ -4,12 +4,6 @@ import { commandKindLabel } from "./command-kind-copy";
 import { ledgerEventsByRecency } from "./ledger";
 import { selectPhaseWork } from "./phase-work";
 
-export type ProjectChatFeedDraft = {
-  title: string;
-  prompt: string;
-  proposer: string;
-};
-
 export type ProjectChatFeedItem = {
   id: string;
   label: string;
@@ -20,10 +14,6 @@ export type ProjectChatFeedItem = {
   href?: string | null;
   hrefLabel?: string;
 };
-
-function clean(value: string, fallback: string) {
-  return value.trim() || fallback;
-}
 
 function prUrl(execution: ExecutionRecord | null) {
   return (
@@ -58,17 +48,6 @@ function decisionFeedItem(poll: PollState | null): ProjectChatFeedItem | null {
     title: poll.status === "open" ? "Decision is open" : `Decision is ${poll.status}`,
     body: `Current vote is ${poll.yesVotes} yes and ${poll.noVotes} no.`,
     status: poll.status.replaceAll("_", " "),
-  };
-}
-
-function draftDecisionItem(): ProjectChatFeedItem {
-  return {
-    id: "draft-decision",
-    label: "message",
-    author: "gpebbles",
-    title: "Scope check",
-    body: "This seems small enough for the next step if it only adds tests and does not change deployment or ownership.",
-    status: "needs decision",
   };
 }
 
@@ -175,23 +154,11 @@ function activityFeedItem(event: LedgerEvent): ProjectChatFeedItem {
   };
 }
 
-export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeedDraft): ProjectChatFeedItem[] {
+export function createProjectChatFeed(wave: CommandWave): ProjectChatFeedItem[] {
   const phaseWork = selectPhaseWork(wave);
   const items: ProjectChatFeedItem[] = [];
-  const draftTitle = clean(draft?.title ?? "", "");
-  const isNextDraft = phaseWork.prReview?.status === "pass" && Boolean(draftTitle);
 
-  if (isNextDraft) {
-    items.push({
-      id: "next-proposal",
-      label: "message",
-      author: clean(draft?.proposer ?? "", "A builder"),
-      title: "Suggested work",
-      body: `Can we discuss ${draftTitle}? ${clean(draft?.prompt ?? "", "Can this be the next small hook change?")}`,
-      status: "draft",
-    });
-    items.push(draftDecisionItem());
-  } else if (phaseWork.prProposal) {
+  if (phaseWork.prProposal) {
     items.push({
       id: "current-proposal",
       label: "message",
@@ -205,9 +172,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
     items.push(...phaseWork.supportProposals.slice(0, 2).map(supportProposalFeedItem));
   }
 
-  const evidenceItems = isNextDraft
-    ? [executionFeedItem(phaseWork.prExecution, "Last PR"), reviewFeedItem(phaseWork.prReview)]
-    : [decisionFeedItem(phaseWork.prPoll), executionFeedItem(phaseWork.prExecution), reviewFeedItem(phaseWork.prReview)];
+  const evidenceItems = [decisionFeedItem(phaseWork.prPoll), executionFeedItem(phaseWork.prExecution), reviewFeedItem(phaseWork.prReview)];
 
   for (const item of evidenceItems) {
     if (item) {
@@ -239,7 +204,7 @@ export function createProjectChatFeed(wave: CommandWave, draft?: ProjectChatFeed
           label: "message",
           author: "builders",
           title: "Start the thread",
-          body: "Drop the first small hook change here. daemon will summarize agreement and keep the next step current.",
+          body: "Say what you want to build or ask what the group should decide next. daemon will keep the project summary current.",
           status: "waiting",
         },
       ];
