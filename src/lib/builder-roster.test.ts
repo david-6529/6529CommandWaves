@@ -70,8 +70,7 @@ describe("builder roster", () => {
           at: "2026-06-20T13:10:00.000Z",
           actor: "daemon",
           type: "chat_observed",
-          message:
-            "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+          message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
         },
         ...demoWave.ledger,
       ],

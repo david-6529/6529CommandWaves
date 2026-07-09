@@ -10,6 +10,7 @@ import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
 import { createPhaseNextAction } from "./phase-next-action";
 import { selectPhaseWork } from "./phase-work";
+import { messageFromProjectChatObservation } from "./project-chat-observation";
 
 export type PublicProjectSnapshot = ReturnType<typeof createPublicProjectSnapshot>;
 
@@ -164,15 +165,7 @@ function compactChatTopicTitle(message: string) {
 }
 
 function chatMessageFromObservation(message: string) {
-  const normalized = humanizeLegacyCommandCopy(message).trim();
-  const separator = "updated the project summary:";
-  const index = normalized.toLowerCase().indexOf(separator);
-
-  if (index === -1) {
-    return normalized;
-  }
-
-  return normalized.slice(index + separator.length).trim();
+  return messageFromProjectChatObservation(humanizeLegacyCommandCopy(message));
 }
 
 function githubPullRequestUrlFromText(value: string) {

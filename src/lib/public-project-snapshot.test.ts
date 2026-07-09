@@ -232,7 +232,7 @@ describe("public project snapshot", () => {
           actor: "daemon",
           type: "chat_observed",
           message:
-            "Read alice's chat message and updated the project summary: I opened https://github.com/builders/hook/pull/45 for fee cap tests.",
+            "alice shared a PR link for discussion. Message: I opened https://github.com/builders/hook/pull/45 for fee cap tests.",
         },
         {
           id: "evt-off-repo-pr",
@@ -240,7 +240,7 @@ describe("public project snapshot", () => {
           actor: "daemon",
           type: "chat_observed",
           message:
-            "Read bob's chat message and updated the project summary: I opened https://github.com/other/hook/pull/2 by mistake.",
+            "bob shared a PR link for discussion. Message: I opened https://github.com/other/hook/pull/2 by mistake.",
         },
         ...demoWave.ledger,
       ],
@@ -330,19 +330,15 @@ describe("public project snapshot", () => {
           at: "2026-06-20T13:10:00.000Z",
           actor: "daemon",
           type: "chat_observed",
-          message:
-            "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+          message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
         },
       ],
     });
 
-    expect(snapshot.summary).toContain(
-      "Latest: Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
-    );
+    expect(snapshot.summary).toContain("Latest: alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?");
     expect(snapshot.latestChanges[0]).toMatchObject({
       label: "chat observed",
-      message:
-        "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+      message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
     });
     expect(snapshot.discussionTopics).toEqual([
       expect.objectContaining({

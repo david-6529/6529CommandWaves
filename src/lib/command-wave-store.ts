@@ -9,7 +9,7 @@ import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { createHookProposalPreflight } from "./hook-proposal-preflight";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { defaultParticipationGates, normalizeParticipationGates } from "./participation-gates";
-import { redactPublicText } from "./public-text-redaction";
+import { createProjectChatObservation } from "./project-chat-observation";
 import { validateSetupShape } from "./setup-validation";
 import { isPlaceholderValue } from "./env-placeholders";
 import {
@@ -386,22 +386,6 @@ function asText(value: unknown, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
 
-function publicChatAuthor(value: string) {
-  const trimmed = value.trim();
-
-  if (!trimmed) {
-    return "builder";
-  }
-
-  return trimmed.length > 32 ? `${trimmed.slice(0, 6)}...${trimmed.slice(-4)}` : trimmed;
-}
-
-function compactChatMessage(value: string) {
-  const compact = redactPublicText(value).replace(/\s+/g, " ").trim();
-
-  return compact.length > 140 ? `${compact.slice(0, 137)}...` : compact;
-}
-
 function sameWaveId(left: string, right: string) {
   return normalizeWaveId(left) === normalizeWaveId(right);
 }
@@ -503,11 +487,14 @@ export async function recordProjectChatObservation(input: unknown) {
     return wave;
   }
 
-  const author = publicChatAuthor(asText(body.senderId, asText(body.walletAddress, asText(body.author, "builder"))));
+  const observation = createProjectChatObservation({
+    author: asText(body.senderId, asText(body.walletAddress, asText(body.author, "builder"))),
+    content,
+  });
   const nextWave = appendLedger(wave, {
     actor: "daemon",
     type: "chat_observed",
-    message: `Read ${author}'s chat message and updated the project summary: ${compactChatMessage(content)}`,
+    message: observation.summary,
   });
 
   return replaceCommandWave(nextWave);

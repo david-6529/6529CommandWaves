@@ -224,8 +224,7 @@ describe("API route validation", () => {
     expect((wavePayload.wave as { ledger?: unknown[] }).ledger?.[0]).toMatchObject({
       actor: "daemon",
       type: "chat_observed",
-      message:
-        "Read alice's chat message and updated the project summary: Can we discuss fee cap tests before anyone opens a PR?",
+      message: "alice asked for review. Message: Can we discuss fee cap tests before anyone opens a PR?",
     });
   });
 

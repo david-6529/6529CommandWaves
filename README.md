@@ -45,7 +45,7 @@ What exists now:
 - Hook proposal checks for caps, tests, upgradeability, deployment, governance, payments, and live-holder authority claims.
 - Per-instance rate limits for public routes that read 6529 or GitHub setup context.
 - Direct chat posting is admin-protected, IP-limited, and paced by the current daemon setting per supplied builder identity.
-- Successful chat posts record a daemon-observed project event so the summary and changelog show that discussion was read.
+- Successful chat posts record a daemon-observed project event with parsed signals for PR links, decisions, reviews, repo setup, suggested work, or questions.
 - Public daemon summaries redact obvious credentials before they enter project state.
 - Pulled chat previews use the same redaction before display or contribution reporting.
 - Timeout and response-size bounds around external 6529, GitHub, setup, launch, and smoke-check fetches.
