@@ -45,6 +45,16 @@ describe("command wave state snapshot", () => {
           },
         ],
         pullRequests: [],
+        rules: expect.arrayContaining([
+          {
+            question: "Who can join?",
+            answer: "Ask in chat to join. Access is reviewed manually for now.",
+          },
+          {
+            question: "How are PRs approved?",
+            answer: "Builders record a project decision before PR work starts. Reviewer status is shown on each PR.",
+          },
+        ]),
         updatedAt: "2026-06-20T12:40:00.000Z",
         repo: {
           status: "placeholder",

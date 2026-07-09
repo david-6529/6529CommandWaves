@@ -119,12 +119,19 @@ async function main() {
     "Who can join?",
     "How do I join?",
     "How does work start?",
+    "Who coordinates?",
     "How are PRs approved?",
+    "What about GitHub?",
+    "Who reviews PRs?",
     "Who merges?",
     "Everything starts in chat.",
     "daemon labels risk and keeps scope small.",
+    "daemon updates the summary, labels risk, and routes work.",
+    "Builders record a project decision before PR work starts.",
+    "Reviewer status is shown on each PR.",
+    "The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.",
     "A reviewer check must pass before humans merge.",
-    "Connect wallet if you want, then use Request access in chat.",
+    "Connect wallet if you want, then request access in chat.",
     "Work being discussed",
     "Draft hook scaffold",
     "repo not selected",
@@ -180,8 +187,8 @@ async function main() {
     "Decision links: 2 report points",
     "Builder details",
     "Access notes, reports, and code checks for builders who want the details.",
-    "The group records a project decision before PR work starts.",
-    "Review approval is manual in this phase.",
+    "Builders record a project decision before PR work starts.",
+    "Reviewer status is shown on each PR.",
     "Report points summarize visible work only.",
     "They do not grant access, payouts, or merge rights.",
     "Start in chat so builders can shape the idea.",
@@ -398,6 +405,9 @@ async function main() {
   assertIncludes("State response", JSON.stringify(statePayload), "currentVote");
   assertIncludes("State response", JSON.stringify(statePayload), "discussionTopics");
   assertIncludes("State response", JSON.stringify(statePayload), "pullRequests");
+  assertIncludes("State response", JSON.stringify(statePayload), "rules");
+  assertIncludes("State response", JSON.stringify(statePayload), "How are PRs approved?");
+  assertIncludes("State response", JSON.stringify(statePayload), "Reviewer status is shown on each PR.");
   assertIncludes("State response", JSON.stringify(statePayload), "managedBy");
   assertIncludes("State response", JSON.stringify(statePayload), "voteSummary");
   assertIncludes("State response", JSON.stringify(statePayload), "latestVote");
@@ -451,6 +461,8 @@ async function main() {
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "currentVote");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "discussionTopics");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "pullRequests");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "rules");
+  assertIncludes("Projects response", JSON.stringify(projectsPayload), "How are PRs approved?");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "managedBy");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "members");
   assertIncludes("Projects response", JSON.stringify(projectsPayload), "voteSummary");

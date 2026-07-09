@@ -95,6 +95,16 @@ describe("active hook projects", () => {
           }),
         ],
         pullRequests: [],
+        rules: expect.arrayContaining([
+          expect.objectContaining({
+            question: "Who can join?",
+            answer: "Ask in chat to join. Access is reviewed manually for now.",
+          }),
+          expect.objectContaining({
+            question: "How are PRs approved?",
+            answer: "Builders record a project decision before PR work starts. Reviewer status is shown on each PR.",
+          }),
+        ]),
         memberCount: 6,
         members: expect.arrayContaining([
           expect.objectContaining({

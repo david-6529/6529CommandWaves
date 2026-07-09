@@ -5,6 +5,7 @@ import { guardianReviewProofBoundToConfiguredRepo } from "./guardian-review-proo
 import { gitHubPullRequestUrlsForRepo } from "./github/pr-evidence";
 import { humanizeLegacyCommandCopy } from "./legacy-copy";
 import { ledgerEventsForVisibleProjectHistory } from "./ledger";
+import { createParticipationAccessSnapshot } from "./participation-gates";
 import { createPhaseChecklist } from "./phase-checklist";
 import { selectPhaseWork } from "./phase-work";
 
@@ -252,6 +253,48 @@ function pullRequestSnapshots(wave: CommandWave) {
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
 }
 
+function projectRulesSnapshot(wave: CommandWave) {
+  const access = createParticipationAccessSnapshot(wave.gates);
+  const repoIsPlaceholder = isPlaceholderValue(wave.repoUrl);
+
+  return [
+    {
+      question: "Who can join?",
+      answer: access.summary,
+    },
+    {
+      question: "How do I join?",
+      answer: "Connect wallet if you want, then request access in chat. A maintainer reviews it for this pilot.",
+    },
+    {
+      question: "How does work start?",
+      answer: "Post in chat. Good ideas become small proposals the group can discuss.",
+    },
+    {
+      question: "Who coordinates?",
+      answer: `${orchestratorAgentIdentity.handle} updates the summary, labels risk, and routes work.`,
+    },
+    {
+      question: "How are PRs approved?",
+      answer: "Builders record a project decision before PR work starts. Reviewer status is shown on each PR.",
+    },
+    {
+      question: "What about GitHub?",
+      answer: repoIsPlaceholder
+        ? "The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo."
+        : "PR work uses the selected GitHub repo. Each PR must link back to the approved work.",
+    },
+    {
+      question: "Who reviews PRs?",
+      answer: `${reviewAgentIdentity.role} is a placeholder for this phase. Humans still merge.`,
+    },
+    {
+      question: "Who merges?",
+      answer: "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work.",
+    },
+  ];
+}
+
 function nextStepSnapshot(wave: CommandWave) {
   const checklist = createPhaseChecklist(wave);
   const item =
@@ -336,6 +379,7 @@ export function createPublicProjectSnapshot(wave: CommandWave) {
     currentVote: currentVoteSnapshot(wave),
     discussionTopics: discussionTopicsSnapshot(wave),
     pullRequests: pullRequestSnapshots(wave),
+    rules: projectRulesSnapshot(wave),
     decision: decisionSnapshot(wave),
     repo,
     nextStep,

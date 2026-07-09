@@ -45,6 +45,12 @@ describe("hook project index", () => {
             }),
           ]),
           pullRequests: [],
+          rules: expect.arrayContaining([
+            expect.objectContaining({
+              question: "How are PRs approved?",
+              answer: "Builders record a project decision before PR work starts. Reviewer status is shown on each PR.",
+            }),
+          ]),
           memberCount: 6,
           members: expect.arrayContaining([
             expect.objectContaining({
@@ -63,6 +69,8 @@ describe("hook project index", () => {
     expect(JSON.stringify(index.projects)).toContain("discussionTopics");
     expect(JSON.stringify(index.projects)).toContain("pullRequests");
     expect(JSON.stringify(index.projects)).toContain("managedBy");
+    expect(JSON.stringify(index.projects)).toContain("rules");
+    expect(JSON.stringify(index.projects)).toContain("How are PRs approved?");
     expect(JSON.stringify(index.projects)).toContain("members");
     expect(JSON.stringify(index.projects)).toContain("voteSummary");
     expect(JSON.stringify(index.projects)).not.toContain("gateDetails");

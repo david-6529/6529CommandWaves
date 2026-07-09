@@ -48,6 +48,7 @@ export type ActiveHookProject = {
   currentVote: PublicProjectSnapshot["currentVote"];
   discussionTopics: PublicProjectSnapshot["discussionTopics"];
   pullRequests: PublicProjectSnapshot["pullRequests"];
+  rules: PublicProjectSnapshot["rules"];
   memberCount: number;
   members: ActiveHookProjectMember[];
 };
@@ -346,6 +347,7 @@ export function createActiveHookProjects(input: CommandWave | CommandWave[]): Ac
       currentVote: publicSnapshot.currentVote,
       discussionTopics: publicSnapshot.discussionTopics,
       pullRequests: publicSnapshot.pullRequests,
+      rules: publicSnapshot.rules,
       memberCount: members.length,
       members,
     };

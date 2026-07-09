@@ -76,6 +76,40 @@ describe("public project snapshot", () => {
         },
       ],
       pullRequests: [],
+      rules: [
+        {
+          question: "Who can join?",
+          answer: "Ask in chat to join. Access is reviewed manually for now.",
+        },
+        {
+          question: "How do I join?",
+          answer: "Connect wallet if you want, then request access in chat. A maintainer reviews it for this pilot.",
+        },
+        {
+          question: "How does work start?",
+          answer: "Post in chat. Good ideas become small proposals the group can discuss.",
+        },
+        {
+          question: "Who coordinates?",
+          answer: "daemon updates the summary, labels risk, and routes work.",
+        },
+        {
+          question: "How are PRs approved?",
+          answer: "Builders record a project decision before PR work starts. Reviewer status is shown on each PR.",
+        },
+        {
+          question: "What about GitHub?",
+          answer: "The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.",
+        },
+        {
+          question: "Who reviews PRs?",
+          answer: "Review agent is a placeholder for this phase. Humans still merge.",
+        },
+        {
+          question: "Who merges?",
+          answer: "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work.",
+        },
+      ],
       decision: {
         status: "recorded",
         detail: "Builders approved with 5 yes and 1 no.",
@@ -140,6 +174,9 @@ describe("public project snapshot", () => {
       url: "https://github.com/builders/hook/pull/12",
       daemonSignoff: "signed off",
       reviewerSignoff: "proof recorded",
+    });
+    expect(snapshot.rules.find((item) => item.question === "What about GitHub?")).toMatchObject({
+      answer: "PR work uses the selected GitHub repo. Each PR must link back to the approved work.",
     });
   });
 

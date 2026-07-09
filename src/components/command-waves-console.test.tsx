@@ -57,11 +57,11 @@ describe("CommandWavesConsole", () => {
     expect(text).toContain("Who merges?");
     expect(text).toContain("Everything starts in chat.");
     expect(text).toContain("daemon labels risk and keeps scope small.");
-    expect(text).toContain("daemon is the 6529 account that updates the summary, labels risk, and routes work.");
-    expect(text).toContain("The GitHub repo is a placeholder for now. Chat can continue. PR work waits until maintainers choose the repo.");
+    expect(text).toContain("daemon updates the summary, labels risk, and routes work.");
+    expect(text).toContain("The GitHub repo is a placeholder. Chat can continue. PR work waits until maintainers choose the repo.");
     expect(text).toContain("Review agent is a placeholder for this phase. Humans still merge.");
     expect(text).toContain("A reviewer check must pass before humans merge.");
-    expect(text).toContain("Connect wallet if you want, then use Request access in chat.");
+    expect(text).toContain("Connect wallet if you want, then request access in chat.");
     expect(text).toContain("Work being discussed");
     expect(text).toContain("repo not selected");
     expect(text).toContain("Draft hook scaffold");
@@ -126,8 +126,8 @@ describe("CommandWavesConsole", () => {
     expect(text).not.toContain("Decision " + "receipt");
     expect(text).toContain("Builder details");
     expect(text).toContain("Access notes, reports, and code checks for builders who want the details.");
-    expect(text).toContain("The group records a project decision before PR work starts.");
-    expect(text).toContain("Review approval is manual in this phase.");
+    expect(text).toContain("Builders record a project decision before PR work starts.");
+    expect(text).toContain("Reviewer status is shown on each PR.");
     expect(text).toContain("Report points summarize visible work only.");
     expect(text).toContain("They do not grant access, payouts, or merge rights.");
     expect(text).toContain("Start in chat so builders can shape the idea.");

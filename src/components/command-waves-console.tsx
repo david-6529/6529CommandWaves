@@ -40,7 +40,7 @@ import { ledgerEventsForVisibleProjectHistory } from "@/lib/ledger";
 import { createLaunchPacket } from "@/lib/launch-packet";
 import { createLaunchStatusDraft } from "@/lib/launch-status-draft";
 import { createParticipationGuideDraft } from "@/lib/participation-guide-draft";
-import { createParticipationAccessSnapshot, normalizeParticipationGates } from "@/lib/participation-gates";
+import { normalizeParticipationGates } from "@/lib/participation-gates";
 import { createPhaseChecklist, type PhaseChecklistItem, type PhaseChecklistStatus } from "@/lib/phase-checklist";
 import { createPhaseNextAction, type PhaseNextActionStatus } from "@/lib/phase-next-action";
 import { firstPhaseScopeInventory } from "@/lib/phase-scope";
@@ -1248,7 +1248,6 @@ export function CommandWavesConsole() {
   const activeHookProjects = useMemo(() => createActiveHookProjects(wave), [wave]);
   const primaryHookProject = activeHookProjects[0] ?? null;
   const participationGateNotes = useMemo(() => normalizeParticipationGates(wave.gates), [wave.gates]);
-  const participationAccess = useMemo(() => createParticipationAccessSnapshot(wave.gates), [wave.gates]);
   const primaryProjectContextPreview = primaryHookProject
     ? (projectContextPreviews[primaryHookProject.id] ?? null)
     : null;
@@ -1477,25 +1476,7 @@ export function CommandWavesConsole() {
           ? statusClass("failed")
           : statusClass("waiting"),
   }));
-  const projectRuleItems = [
-    ["Who can join?", participationAccess.summary],
-    ["How do I join?", "Connect wallet if you want, then use Request access in chat. A maintainer reviews it for this pilot."],
-    ["How does work start?", "Post in chat. Good ideas become small proposals the group can discuss."],
-    [
-      "Who coordinates?",
-      `${orchestratorAgentIdentity.handle} is the 6529 account that updates the summary, labels risk, and routes work.`,
-    ],
-    [
-      "How are PRs approved?",
-      "The group records a project decision before PR work starts. Review approval is manual in this phase.",
-    ],
-    [
-      "What about GitHub?",
-      "The GitHub repo is a placeholder for now. Chat can continue. PR work waits until maintainers choose the repo.",
-    ],
-    ["Who reviews PRs?", `${reviewAgentIdentity.role} is a placeholder for this phase. Humans still merge.`],
-    ["Who merges?", "Humans merge, deploy, pay, and change rules. Agents summarize, draft, and check work."],
-  ];
+  const projectRuleItems = publicProjectSnapshot.rules;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -2334,10 +2315,10 @@ export function CommandWavesConsole() {
                 Everything starts in chat. The group decides what should become PR work.
               </p>
               <div className="mt-4 divide-y divide-zinc-800 border-y border-zinc-800">
-                {projectRuleItems.map(([question, answer]) => (
-                  <div key={question} className="py-3">
-                    <p className="text-sm font-semibold text-zinc-500">{question}</p>
-                    <p className="mt-1 text-base leading-7 text-zinc-300">{humanizeLegacyCommandCopy(answer)}</p>
+                {projectRuleItems.map((item) => (
+                  <div key={item.question} className="py-3">
+                    <p className="text-sm font-semibold text-zinc-500">{item.question}</p>
+                    <p className="mt-1 text-base leading-7 text-zinc-300">{humanizeLegacyCommandCopy(item.answer)}</p>
                   </div>
                 ))}
               </div>
