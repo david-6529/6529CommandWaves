@@ -1,6 +1,7 @@
 import { commandWaveStateUrlFromEnv } from "../command-wave-state";
 import { hasEnvValue, hasProductionValue, isPlaceholderValue, isProductionEnv } from "../env-placeholders";
 import { validateSetupShape } from "../setup-validation";
+import { walletAuthConfiguration } from "../wallet-auth";
 
 export type ReadinessCheck = {
   id: string;
@@ -127,6 +128,35 @@ function adminApiKeyCheck(env: Record<string, string | undefined>): ReadinessChe
     label: "Admin API key",
     status: "pass",
     message: "Configured.",
+  };
+}
+
+function walletSessionCheck(env: Record<string, string | undefined>): ReadinessCheck {
+  const configuration = walletAuthConfiguration(env);
+
+  if (!configuration.available) {
+    return {
+      id: "wallet_session",
+      label: "Wallet sessions",
+      status: "fail",
+      message: configuration.error ?? "Wallet sign-in is not configured.",
+    };
+  }
+
+  if (!configuration.durable) {
+    return {
+      id: "wallet_session",
+      label: "Wallet sessions",
+      status: "warn",
+      message: "Development uses an ephemeral wallet session key. Set WALLET_SESSION_SECRET before deployment.",
+    };
+  }
+
+  return {
+    id: "wallet_session",
+    label: "Wallet sessions",
+    status: "pass",
+    message: "Signed wallet sessions are configured.",
   };
 }
 
@@ -325,6 +355,7 @@ export function getReadinessChecks(env: Record<string, string | undefined> = pro
           : "In-memory only. State resets when the server restarts.",
     },
     adminApiKeyCheck(env),
+    walletSessionCheck(env),
     {
       id: "6529_mode",
       label: "6529 mode",

@@ -563,6 +563,10 @@ Exit condition: a new developer can explain the project, find available work, un
 
 ### Phase 2: Identity and fair admission
 
+Current progress: EIP-712 wallet ownership verification and signed HttpOnly sessions are implemented. Sessions are
+stateless and intentionally grant no project permissions. GitHub linking, eligibility receipts, membership epochs, and
+seat selection remain unimplemented.
+
 - Signed wallet sessions
 - GitHub OAuth linking
 - REP and challenge eligibility adapters
@@ -649,7 +653,8 @@ The contributor pool percentage, hook fee amount, eligibility REP category and t
 
 - The selected hook behavior and smart contract repo are still placeholders.
 - The live REP category, snapshot API, and eligibility receipt format are not verified.
-- The current wallet control does not authenticate ownership or create a server session.
+- Wallet ownership can be verified, but the stateless session has no database-backed revocation, GitHub link, eligibility receipt, or membership authority.
+- Smart contract wallet sign-in still needs a configured chain RPC and EIP-1271 signature verification.
 - The current contribution score is informational and must never be presented as payout authority.
 - The current reviewer identity is a placeholder and the required GitHub App boundary is not implemented.
 - The current Postgres model persists a mutable aggregate and is not yet a tamper-evident event store.

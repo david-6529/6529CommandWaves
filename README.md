@@ -34,7 +34,8 @@ What exists now:
 
 - A Next app product surface called Decentralized Coding: Beta, focused on helping builders work together in public.
 - One active hook project with project chat and an intentional placeholder GitHub repo until maintainers choose it.
-- A top-right identity-only wallet connection control that can add a connected address to the join message.
+- EIP-712 wallet ownership verification with a five-minute challenge, 24-hour HttpOnly session, logout, origin checks,
+  and explicit pre-admission permissions.
 - Orchestrator identity set to the 6529 account `daemon`.
 - Review agent and GitHub repo are explicit placeholders for this phase until the reviewer process and first repo are selected.
 - A work-first public workspace with the pilot rules decision, open work, group discussion, pull requests, contributors,
@@ -76,8 +77,10 @@ What remains manual or MVP-only:
 
 - Chat posting works when a 6529 bot wallet is configured. Without bot credentials, the app drafts text for a human to
   post manually.
-- Wallet connection is identity context for access drafts. Reputation, token, holder, allowlist, and QnA requirements are
-  manual notes until live wallet, session, and score checks exist.
+- Wallet ownership can be verified, but GitHub linking, REP or challenge eligibility, membership, and seat selection are
+  not implemented. A wallet session grants no chat, claim, vote, merge, or reward authority.
+- The current signature verifier supports EVM externally owned accounts. Smart contract wallets require a configured
+  chain RPC and EIP-1271 verification before they can sign in.
 - Local votes are app records. PR work requires a manually recorded project decision URL before code work starts.
 - Codex execution prepares a branch, commits a bounded work packet plus optional approved text files, and opens a draft PR
   record. It does not yet run an isolated code-writing worker.
@@ -98,7 +101,7 @@ What we are working on next:
 4. Record the first daemon-observed group discussion message.
 5. Add the selected hook repo, reviewer process, guardian workflow, and required guardian check before the first PR.
 6. Finish the first public loop: discussion, scoped proposal, project decision, PR record, reviewer proof, and share-back.
-7. Wire live wallet/session access checks when the manual access process is proven.
+7. Add GitHub identity linking, eligibility receipts, and deterministic builder admission on top of signed wallet sessions.
 8. Expand contribution analysis after the workflow is useful and understandable.
 
 ## Why This Exists
@@ -193,9 +196,10 @@ The public workspace now leads with:
 - One natural group discussion with automatic design and review filters.
 - Pull requests, contributor profiles, project rules, and public proof states.
 
-Local preview mode deliberately hides seeded votes, demo profiles, and test chat messages. Wallet connection selects an
-address only. Signed membership, fair admission, payout credits, and direct live member posting are not implemented yet.
-The interface labels those boundaries instead of presenting them as working authority.
+Local preview mode deliberately hides seeded votes, demo profiles, and test chat messages. Wallet connection now requires
+an EIP-712 signature and creates a server-verified HttpOnly session. The session proves wallet ownership only. Signed
+membership, GitHub identity, fair admission, payout credits, and direct live member posting are not implemented yet. The
+interface labels those boundaries instead of presenting them as working authority.
 
 Existing backend foundations remain available for continued development:
 
@@ -206,8 +210,8 @@ Existing backend foundations remain available for continued development:
 - Copied launch status separates chat launch gaps from PR-loop gaps so maintainers do not overstate readiness.
 - Local file storage and optional Postgres storage via [db/001_command_waves.sql](db/001_command_waves.sql).
 
-The next product slices add signed wallet sessions, GitHub identity, deterministic admission, durable discussion sync,
-work roles, signed decisions, the independent reviewer, task credits, challenges, and reproducible reward proofs.
+The next product slices add GitHub identity, deterministic admission, durable discussion sync, work roles, signed
+decisions, the independent reviewer, task credits, challenges, and reproducible reward proofs.
 
 ## Run Locally
 
@@ -242,6 +246,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.example
 COMMAND_WAVE_STORE=postgres
 DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
+WALLET_SESSION_SECRET=<strong random secret with at least 32 characters>
 COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
 # Intentional placeholder. Keep this until maintainers choose the hook repo.
@@ -259,13 +264,14 @@ Use [.env.production.example](.env.production.example) as the deployment checkli
 
 `COMMAND_WAVE_INITIAL_WAVE_URL` seeds the first project chat. `COMMAND_WAVE_INITIAL_REPO_URL` stays as a placeholder
 until maintainers choose the hook repo. Chat launch readiness allows the placeholder repo, but still requires daemon to parse at least one builder message. Full PR-loop readiness blocks PR work until a real repo is selected. `ADMIN_API_KEY` protects setup, proposal, vote, run, review, and reset actions.
+`WALLET_SESSION_SECRET` signs wallet challenges and sessions. Development can use an ephemeral process key, but production fails closed without a strong configured value.
 `COMMAND_WAVE_STATE_URL` gives guardian PR checks the public wave state.
 `COMMAND_WAVE_GUARDIAN_REQUIRED_CHECK` names the check that must be required in GitHub branch protection or rulesets.
 The chat-first launch requires daemon chat posting credentials, durable storage, and daemon-observed group discussion evidence. A ready PR loop also requires the
 selected reviewer process, GitHub PR adapter, guardian workflow in the selected hook repo, and the required guardian check
 so the public workflow can record draft PRs predictably.
 
-The local demo still reports launch gaps until the first hook chat is reachable, `ADMIN_API_KEY`, `NEXT_PUBLIC_APP_URL`,
+The local demo still reports launch gaps until the first hook chat is reachable, `ADMIN_API_KEY`, `WALLET_SESSION_SECRET`, `NEXT_PUBLIC_APP_URL`,
 durable storage, live 6529 mode, daemon chat posting credentials, daemon-observed discussion evidence, and setup validation are configured. PR-loop readiness
 also requires the selected hook repo, selected reviewer process, GitHub PR adapter, guardian state, guardian workflow, and
 required guardian check.
@@ -428,6 +434,7 @@ Against a running local dev server on the default port:
 
 ```bash
 SMOKE_BASE_URL=http://localhost:5001 npm run smoke:app
+WALLET_SMOKE_BASE_URL=http://localhost:5001 npm run smoke:wallet
 npm run setup:verify
 npm run chat:launch
 npm run launch:audit
@@ -450,6 +457,10 @@ COMMAND_WAVE_STATE_URL=https://your-app.example/api/command-wave/state
 - `POST /api/6529/context/preview`: preview fetched wave context with cap/source metadata.
 - `GET /api/6529/chat-post`: public hashable capability check for direct chat posting. It does not expose bot credentials.
 - `POST /api/6529/chat-post`: protected human-triggered chat posting when the bot wallet is configured. Posts are paced for each builder.
+- `POST /api/auth/wallet/challenge`: create a short-lived EIP-712 wallet ownership challenge in an HttpOnly cookie.
+- `POST /api/auth/wallet/verify`: verify the typed wallet signature and issue a 24-hour HttpOnly identity session.
+- `GET /api/auth/session`: return the current wallet identity and its non-member permission state.
+- `DELETE /api/auth/session`: clear the wallet identity session and pending challenge.
 - `POST /api/command-wave/chat/observe`: protected daemon sync for visible project chat drops. It deduplicates posts and updates the public project state.
 - `GET /api/readiness`: show local/production readiness checks.
 - `GET /api/command-wave/setup/proof`: public setup proof with hashes and third-party verification targets.
@@ -475,9 +486,8 @@ Command-wave mutation routes and chat posting are open only for local demo mode 
 `ADMIN_API_KEY` is set, send it as either `x-admin-api-key: <key>` or `Authorization: Bearer <key>`. In production,
 missing `ADMIN_API_KEY` is a server misconfiguration and protected actions fail closed.
 
-The web console has a collapsed **Access key** field in setup. It stores the key in browser session storage and sends it
-only for protected actions. This is an MVP bridge for testing protected routes; production should replace it with proper
-wallet/session auth before opening the console broadly.
+Wallet sessions authenticate public identity only. They do not authorize maintainer APIs. Protected setup, proposal,
+vote, run, and review routes still require the separate admin key until role-based maintainer authorization is built.
 
 API errors include an `errorId` so a user-visible error can be matched to server logs.
 Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and null bodies return 400-level errors.
@@ -489,4 +499,4 @@ Routes that accept JSON require a JSON object body. Malformed JSON, arrays, and 
 3. Add an isolated Codex worker that produces bounded patch files before the existing branch, commit, and draft PR sequence.
 4. Add contract-aware review adapters for diffs, tests, deployment files, governance, parameters, and upgradeability patterns.
 5. Add human-reviewed contribution reports across wave posts, PRs, reviews, commits, and ledger events.
-6. Add production auth, secrets, distributed rate limits, job queue controls, and required GitHub branch protection.
+6. Add GitHub identity, deterministic admission, database-backed session revocation, distributed rate limits, job queue controls, and required GitHub branch protection.

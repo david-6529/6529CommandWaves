@@ -9,6 +9,7 @@ import { GET as getSetupProof } from "./command-wave/setup/proof/route";
 import { GET as getCommandWaveState } from "./command-wave/state/route";
 import { GET as getVerificationManifest } from "./command-wave/verification/manifest/route";
 import { GET as getReadiness } from "./readiness/route";
+import { GET as getWalletSession } from "./auth/session/route";
 import { resetMockDropsForTests } from "@/lib/6529/mock";
 import { clearCommandWaveStoreForTests } from "@/lib/command-wave-store";
 import { resetRateLimitsForTest } from "@/lib/rate-limit";
@@ -72,6 +73,7 @@ describe("API route rate limits", () => {
     ["verification manifest", getVerificationManifest, "/api/command-wave/verification/manifest", 30],
     ["readiness", getReadiness, "/api/readiness", 30],
     ["chat posting capability", getChatPostCapability, "/api/6529/chat-post", 30],
+    ["wallet session", getWalletSession, "/api/auth/session", 60],
   ] satisfies [string, (request: Request) => Response | Promise<Response>, string, number][])(
     "rate limits %s reads",
     async (_label, handler, path, max) => {

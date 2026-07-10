@@ -197,6 +197,22 @@ async function main() {
   assertIncludes("Missing work page", missingWork.text, "Work not found");
   assertNoForbiddenDash("Missing work page", missingWork.text);
 
+  const walletSessionPayload = await fetchJson("/api/auth/session");
+  const walletSession = objectValue(walletSessionPayload, "session");
+
+  assertJsonObject("Wallet session", walletSession);
+  assert(objectValue(walletSession, "version") === "wallet-auth-v0.1", "Wallet session returned the wrong version.");
+  assert(objectValue(walletSession, "available") === true, "Wallet session should be available in local development.");
+  assert(objectValue(walletSession, "authenticated") === false, "Smoke request should not have a wallet session.");
+  const walletPermissions = objectValue(walletSession, "permissions");
+
+  assertJsonObject("Wallet session permissions", walletPermissions);
+  assert(objectValue(walletPermissions, "chat") === false, "Signed-out wallet should not have chat permission.");
+  assert(objectValue(walletPermissions, "claim") === false, "Signed-out wallet should not have claim permission.");
+  assert(objectValue(walletPermissions, "vote") === false, "Signed-out wallet should not have vote permission.");
+  assert(!JSON.stringify(walletSessionPayload).includes("WALLET_SESSION_SECRET"), "Wallet session exposes configuration names.");
+  assertNoForbiddenDash("Wallet session", JSON.stringify(walletSessionPayload));
+
   const staleDecisionCopy = "decision " + "receipt";
   const staleProofRecorded = "Rece" + "ipt recorded";
   const staleBuilderDecision = "Builder decision required";
@@ -206,6 +222,7 @@ async function main() {
 
   assert(Array.isArray(readinessChecks), "Readiness response is missing checks.");
   assert(readinessChecks.length > 0, "Readiness response has no checks.");
+  assertIncludes("Readiness response", JSON.stringify(readiness), "wallet_session");
   assertNoForbiddenDash("Readiness response", JSON.stringify(readiness));
 
   const chatPostingCapabilityPayload = await fetchJson("/api/6529/chat-post");

@@ -17,13 +17,16 @@
     "chat:launch": "tsx scripts/verify-chat-launch.ts",
     "launch:audit": "tsx scripts/verify-launch-audit.ts",
     "smoke:app": "tsx scripts/smoke-app.ts",
+    "smoke:wallet": "tsx scripts/smoke-wallet-auth.ts",
     "setup:verify": "tsx scripts/verify-setup-proof.ts"
   },
   "dependencies": {
+    "jose": "^6.2.3",
     "next": "16.2.9",
     "pg": "^8.22.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "viem": "^2.55.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

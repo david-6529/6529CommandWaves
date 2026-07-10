@@ -74,6 +74,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.example
 COMMAND_WAVE_STORE=postgres
 DATABASE_URL=postgresql://user:password@host:5432/command_waves
 ADMIN_API_KEY=<strong random key>
+WALLET_SESSION_SECRET=<strong random secret with at least 32 characters>
 COMMAND_WAVE_INITIAL_NAME="6529 AMM hook"
 COMMAND_WAVE_INITIAL_WAVE_URL=https://6529.io/waves/your-hook-project
 # Intentional placeholder. Keep this until maintainers choose the hook repo.

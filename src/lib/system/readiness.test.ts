@@ -28,7 +28,7 @@ describe("readiness checks", () => {
     const checks = getReadinessChecks({});
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 1, warn: 8, fail: 1 });
+    expect(summary).toEqual({ pass: 1, warn: 9, fail: 1 });
     expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
       status: "warn",
       message: "Local chat posting is active. Set 6529_MOCK_MODE=false and configure the 6529 bot wallet before public launch.",
@@ -44,6 +44,10 @@ describe("readiness checks", () => {
     });
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
       status: "fail",
+    });
+    expect(checks.find((check) => check.id === "wallet_session")).toMatchObject({
+      status: "warn",
+      message: "Development uses an ephemeral wallet session key. Set WALLET_SESSION_SECRET before deployment.",
     });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({
       status: "warn",
@@ -62,6 +66,7 @@ describe("readiness checks", () => {
       NEXT_PUBLIC_APP_URL: "https://command-waves.6529.io",
       DATABASE_URL: "postgresql://command_waves:strong-password@db.internal:5432/command_waves",
       ADMIN_API_KEY: "strong-admin-key-for-launch",
+      WALLET_SESSION_SECRET: "strong-wallet-session-secret-for-launch",
       COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/6529-hook-builder",
       COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/6529-Collections/6529-hook",
       "6529_MOCK_MODE": "false",
@@ -69,7 +74,7 @@ describe("readiness checks", () => {
     });
     const summary = getReadinessSummary(checks);
 
-    expect(summary).toEqual({ pass: 7, warn: 1, fail: 2 });
+    expect(summary).toEqual({ pass: 8, warn: 1, fail: 2 });
     expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
       status: "fail",
       message:
@@ -156,6 +161,7 @@ describe("readiness checks", () => {
       NEXT_PUBLIC_APP_URL: "https://your-app.example",
       DATABASE_URL: "postgresql://user:password@host:5432/command_waves",
       ADMIN_API_KEY: "replace-with-a-strong-random-key",
+      WALLET_SESSION_SECRET: "replace-with-a-strong-wallet-session-secret",
       COMMAND_WAVE_INITIAL_WAVE_URL: "https://6529.io/waves/your-hook-project",
       COMMAND_WAVE_INITIAL_REPO_URL: "https://github.com/your-org/your-hook-repo",
       COMMAND_WAVE_REPO_ADAPTER: "github",
@@ -178,6 +184,10 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({
       status: "fail",
       message: "Replace placeholder ADMIN_API_KEY with a strong random key before public launch.",
+    });
+    expect(checks.find((check) => check.id === "wallet_session")).toMatchObject({
+      status: "fail",
+      message: "Replace placeholder WALLET_SESSION_SECRET before wallet sign-in is enabled.",
     });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({
       status: "fail",
@@ -203,6 +213,7 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "app_url")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "database")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "admin_api_key")).toMatchObject({ status: "fail" });
+    expect(checks.find((check) => check.id === "wallet_session")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "initial_hook_project")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "github_pr_adapter")).toMatchObject({ status: "fail" });
     expect(checks.find((check) => check.id === "guardian_wave_state")).toMatchObject({ status: "fail" });
@@ -219,6 +230,17 @@ describe("readiness checks", () => {
     expect(checks.find((check) => check.id === "6529_chat_posting")).toMatchObject({
       status: "pass",
       message: "6529 bot posting is configured.",
+    });
+  });
+
+  it("passes wallet session readiness with a strong configured secret", () => {
+    const checks = getReadinessChecks({
+      WALLET_SESSION_SECRET: "strong-wallet-session-secret-for-readiness",
+    });
+
+    expect(checks.find((check) => check.id === "wallet_session")).toMatchObject({
+      status: "pass",
+      message: "Signed wallet sessions are configured.",
     });
   });
 
